@@ -1,0 +1,19 @@
+# macOS 系統檔
+.DS_Store
+
+# 套件與建置產物
+node_modules/
+dist/
+
+# 環境變數（可能含密鑰）
+.env
+.env.*
+!.env.example
+
+# 記錄檔
+*.log
+
+# 編輯器
+.vscode/*
+!.vscode/extensions.json
+.idea/
