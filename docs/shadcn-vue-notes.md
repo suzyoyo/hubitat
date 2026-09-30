@@ -9,11 +9,11 @@
 - 五大原則：Open Code、Composition、Distribution、Beautiful Defaults、AI-Ready
 
 ## 安裝流程（Vite + Vue）
-1. `pnpm create vite@latest <name> --template vue`（JS 版用 `vue`，不是 `vue-ts`）
-2. `pnpm add tailwindcss @tailwindcss/vite`，`src/style.css` 改為 `@import "tailwindcss";`
+1. `npm create vite@latest <name> -- --template vue`（JS 版用 `vue`，不是 `vue-ts`）
+2. `npm install tailwindcss @tailwindcss/vite`，`src/style.css` 改為 `@import "tailwindcss";`
 3. 路徑別名：`jsconfig.json` 設 `@/*` → `./src/*`；`vite.config.js` 加 `resolve.alias` 與 tailwind plugin
-4. `pnpm dlx shadcn-vue@latest init`（會問 base color，產生 `components.json`）
-5. `pnpm dlx shadcn-vue@latest add button`（要什麼元件加什麼）
+4. `npx shadcn-vue@latest init`（會問 base color，產生 `components.json`）
+5. `npx shadcn-vue@latest add button`（要什麼元件加什麼）
 
 使用範例：
 

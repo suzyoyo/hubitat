@@ -22,16 +22,16 @@
 - [ ] 在 GitHub 建一個**空的 repo**（不勾 README、不勾 .gitignore、不選 license），例如 `hubitat-app`
 - [ ] 把 `owner/repo` 告訴我，我把它接進工作環境
 - [ ] 確認 Node.js 版本可用於 Vite 與 Tailwind v4（以官方文件要求為準，我在 Step 1 會檢查）
-- [ ] 確認你偏好的套件管理器（預設 pnpm，官方範例也用 pnpm）
+- [x] 確認你偏好的套件管理器（已決定使用 npm）
 
 ## Step 1｜Git 與環境檢查
-- 檢查 node / pnpm / git 版本
+- 檢查 node / npm / git 版本
 - 接上遠端 repo，設定預設分支 `main`
 - **Commit**：`chore: init repository`
 
 ## Step 2｜建立 Vue（JavaScript）專案
-- `pnpm create vite@latest` 使用 `vue` 樣板（不是 `vue-ts`）
-- 確認 `pnpm dev` 能跑起來
+- `npm create vite@latest` 使用 `vue` 樣板（不是 `vue-ts`）
+- 確認 `npm run dev` 能跑起來
 - **Commit**：`chore: scaffold vite vue project`
 
 ## Step 3｜導入 Tailwind CSS
@@ -46,7 +46,7 @@
 - **Commit**：`chore: configure path alias`
 
 ## Step 5｜初始化 shadcn-vue
-- `pnpm dlx shadcn-vue@latest init`，base color 先選 Neutral（品牌色之後在 token 階段再改）
+- `npx shadcn-vue@latest init`，base color 先選 Neutral（品牌色之後在 token 階段再改）
 - 確認 `components.json` 中 `"typescript": false`，讓 CLI 產生 **JavaScript 版元件**（`.vue` 檔內為 `<script setup>`，工具函式為 `utils.js`）
 - 若 CLI 沒有自動偵測，手動改 `components.json` 後再加元件
 - **Commit**：`chore: init shadcn-vue`
@@ -114,6 +114,6 @@
 
 ## 待你決定 / 確認
 - [ ] repo 名稱與 `owner/repo`
-- [ ] 套件管理器（pnpm 或 npm）
+- [x] 套件管理器：npm
 - [ ] 專案名稱（資料夾與 package name）
 - [ ] wireframe 完成的大致時間，決定 Step 7–9 何時開始

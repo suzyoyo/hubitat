@@ -11,6 +11,7 @@
 - Vite
 - Tailwind CSS（v4，使用 `@tailwindcss/vite`）
 - shadcn-vue（元件庫，CLI 把原始碼複製進專案）
+- 套件管理器：**npm**（不使用 pnpm；安裝用 `npm install`、一次性指令用 `npx`）
 - 形態：**手機優先、可假裝成 APP 的網頁**（類似 PWA / WebView）
 - 團隊正在學習 JavaScript，請保持程式碼簡單、易讀，必要處加簡短中文註解
 
