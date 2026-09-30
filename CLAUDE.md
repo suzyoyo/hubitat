@@ -23,8 +23,16 @@
 5. 回覆使用繁體中文
 
 ## 目前進度
-- wireframe 繪製中（由我負責，我會告訴你何時定案）
-- 專案尚未初始化（Step 0：需先有 GitHub 空 repo）
+- repo：`suzyoyo/hubitat`，分支 `main`
+- ✅ Step 0–6 完成：Vite + Vue（JS）、Tailwind v4、`@` 路徑別名、shadcn-vue 初始化、首批 20 個元件
+- 元件盤點頁：`src/views/PlaygroundView.vue`（各分類在 `src/views/playground/`），暫時由 `App.vue` 直接顯示
+- wireframe 繪製中（由我負責，我會告訴你何時定案）→ 之後才做 Step 7–9
+- Step 10（PWA）不依賴 wireframe，可隨時進行
+
+## 待辦提醒
+- 【Step 8】觸控區太小：shadcn 預設 Button 高 32px、Input 32px，未達長輩友善的 44px，需調整 `src/components/ui/button/index.js` 等元件的 size
+- 【Step 8】字型：目前 `style.css` 從 Google Fonts 載入 Geist（僅英數），中文字型尚未指定
+- 【觀察中】`npm audit` 有 7 個 moderate 弱點，來自 shadcn-vue CLI 的相依套件（不會打包進網頁）；勿用 `npm audit fix --force`（會把 shadcn-vue 降回 0.10.5）
 
 ## 注意事項
 - shadcn-vue 的 JavaScript 版：在 `components.json` 設 `"typescript": false`。官方 JS 文件範例的 alias 路徑寫 `./*`，但 Vite 專案原始碼在 `src/`，請以 `./src/*` 為準並驗證
