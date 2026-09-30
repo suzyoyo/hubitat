@@ -4,16 +4,21 @@
 # 套件與建置產物
 node_modules/
 dist/
+dist-ssr/
 
 # 環境變數（可能含密鑰）
 .env
 .env.*
 !.env.example
+*.local
 
 # 記錄檔
+logs/
 *.log
 
 # 編輯器
 .vscode/*
 !.vscode/extensions.json
 .idea/
+*.suo
+*.sw?
