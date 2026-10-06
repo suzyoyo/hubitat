@@ -25,8 +25,10 @@
 ## 目前進度
 - repo：`suzyoyo/hubitat`，分支 `main`
 - ✅ Step 0–6 完成：Vite + Vue（JS）、Tailwind v4、`@` 路徑別名、shadcn-vue 初始化、首批 20 個元件
-- 元件盤點頁：`src/views/PlaygroundView.vue`（各分類在 `src/views/playground/`），暫時由 `App.vue` 直接顯示
-- wireframe 大致完成（2026-10-06），接下來做 Step 7–9
+- 元件盤點頁：`/playground`（`src/views/PlaygroundView.vue`，各分類在 `src/views/playground/`），第一區是設計 Token 一覽
+- ✅ Step 7 完成：Vue Router、三端外框（`src/layouts/AppShell.vue`）、角色設定（`src/config/roles.js`）；各分頁目前是佔位頁
+- ✅ Step 8 完成：設計 Token（`src/style.css`）、Noto Sans TC、外框彩色版、按鈕與輸入框放大到 44px
+- wireframe 大致完成（2026-10-06），接下來做 Step 9（假資料），之後逐頁製作畫面
 - Step 10（PWA）可隨時進行
 
 ## 使用者角色與 wireframe
@@ -39,12 +41,20 @@
 - 共用外框：頂部「好彼社區」+ 通知鈴鐺；底部浮動膠囊導覽列 + 右側圓形「＋」按鈕
   - 住戶分頁：首頁、社區檔案、我的；＋ = 通報
   - 管委會、管理人員分頁：首頁、案件、廠商、社區檔案、我的；＋ = 全域新增選單
-- Figma 已定義 Token：色階 blue / red / orange / gray、語意色（`brand/primary` = blue 500 `#6fb7e2`）、字型 Noto Sans TC
+- 彩色版參考畫面：住戶端首頁（node `758:11251`），三端都套用這個風格
+
+## 設計 Token（`src/style.css`）
+- 三層：基礎色階（`@theme`，覆蓋 Tailwind 的 blue / red / gray；orange 用 Tailwind 內建的，不覆蓋）→ 語意色（`:root`）→ 接到 Tailwind（`@theme inline`）。換色改 `:root`
+- 文字樣式用 `type-` 開頭的 class：`type-title`、`type-card-title`、`type-body`、`type-label` 等（不要用 `text-` 開頭，會和顏色 class 撞名）
+- 內文是 16px（設計稿 14px，團隊決定放大）
+- 卡片：`rounded-card`（20px）+ `shadow-card`
+- 外框顏色變數：`--nav`、`--nav-active`、`--fab` 等
 
 ## 待辦提醒
 - 【之後】產品完成後要做一個網頁版使用手冊（給不會用的人看的說明），現在先不處理
-- 【Step 8】觸控區太小：shadcn 預設 Button 高 32px、Input 32px，未達長輩友善的 44px，需調整 `src/components/ui/button/index.js` 等元件的 size
-- 【Step 8】字型：目前 `style.css` 從 Google Fonts 載入 Geist（僅英數），中文字型尚未指定
+- 【設計待決定】對比度偏低，目前完全照設計稿：白字在品牌藍（`--primary` / `--nav-active`）約 2 : 1、白字在 `--fab` 紅約 3 : 1。之後要調整時改 `style.css` 的 `:root` 變數即可
+- 【之後】首頁的問候語與吉祥物放在 `AppHeader` 的 slot；吉祥物圖片尚未加入專案
+- 【之後】管委會、管理人員的「＋」按鈕目前連到佔位頁，設計是彈出「全域新增選單」
 - 【觀察中】`npm audit` 有 7 個 moderate 弱點，來自 shadcn-vue CLI 的相依套件（不會打包進網頁）；勿用 `npm audit fix --force`（會把 shadcn-vue 降回 0.10.5）
 
 ## 注意事項

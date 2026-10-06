@@ -1,5 +1,6 @@
 <script setup>
-// 底部導覽：左邊是黑色膠囊分頁列，右邊是圓形「＋」按鈕
+// 底部導覽：左邊是半透明白色膠囊分頁列，右邊是圓形「＋」按鈕
+// 顏色都來自 src/style.css 的變數（--nav、--nav-active、--fab …）
 import { PlusIcon } from '@lucide/vue'
 import { computed } from 'vue'
 
@@ -24,34 +25,34 @@ const compact = computed(() => props.tabs.length > 3)
     :class="compact ? 'gap-3 pr-5' : 'gap-6 pr-[27px]'"
   >
     <nav
-      class="flex min-w-0 flex-1 items-stretch rounded-full bg-foreground p-1"
-      :class="compact ? '' : 'h-[70px] drop-shadow-[0_4px_7px_rgba(0,0,0,0.18)]'"
+      class="flex min-w-0 flex-1 items-stretch rounded-full border border-nav-border bg-nav p-1 text-nav-foreground shadow-nav"
+      :class="compact ? '' : 'h-[70px]'"
     >
-      <!-- active-class：目前所在的分頁會自動加上這些 class -->
+      <!-- 一般分頁的文字顏色設在外層 nav 上；active-class 是「目前分頁」才會加上的 class -->
       <RouterLink
         v-for="tab in tabs"
         :key="tab.path"
         :to="`${basePath}/${tab.path}`"
-        class="flex min-w-0 flex-1 flex-col items-center justify-center rounded-full font-medium whitespace-nowrap text-background"
-        :class="compact ? 'gap-0.5 py-2 text-xs' : 'gap-1 text-sm'"
-        active-class="bg-white/18 font-bold"
+        class="flex min-w-0 flex-1 flex-col items-center justify-center rounded-full whitespace-nowrap"
+        :class="compact ? 'py-2 type-label' : 'type-nav'"
+        active-class="bg-nav-active text-nav-active-foreground shadow-nav-active"
       >
         <!-- component :is：依資料決定要顯示哪一個圖示元件 -->
         <!-- shrink-0：空間不夠時也不要把圖示壓小 -->
         <component :is="tab.icon" class="size-6 shrink-0" />
-        <span :class="compact ? 'leading-normal' : 'leading-[21px]'">{{ tab.label }}</span>
+        <span>{{ tab.label }}</span>
       </RouterLink>
     </nav>
 
     <RouterLink
       :to="`${basePath}/${fab.path}`"
       :aria-label="fab.title"
-      class="flex shrink-0 flex-col items-center justify-center rounded-full bg-foreground text-background"
-      :class="compact ? 'size-14' : 'size-[68px] gap-0.5 drop-shadow-[0_4px_7px_rgba(0,0,0,0.18)]'"
+      class="flex shrink-0 flex-col items-center justify-center rounded-full border border-nav-border bg-fab type-nav text-fab-foreground shadow-fab"
+      :class="compact ? 'size-14' : 'size-[68px]'"
     >
       <PlusIcon :class="compact ? 'size-6' : 'size-[26px]'" />
       <!-- 只有住戶端的按鈕上有文字「通報」 -->
-      <span v-if="fab.text" class="text-[13px] leading-[18px] font-bold">{{ fab.text }}</span>
+      <span v-if="fab.text">{{ fab.text }}</span>
     </RouterLink>
   </div>
 </template>

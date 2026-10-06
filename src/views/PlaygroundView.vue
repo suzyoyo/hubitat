@@ -6,9 +6,11 @@ import MobileSection from './playground/MobileSection.vue'
 import FormSection from './playground/FormSection.vue'
 import ProgressSection from './playground/ProgressSection.vue'
 import ListSection from './playground/ListSection.vue'
+import TokenSection from './playground/TokenSection.vue'
 
 // 頂部快速跳轉用的清單；id 要和各 section 的 id 一致
 const categories = [
+  { id: 'token', label: '設計 Token' },
   { id: 'basic', label: '基礎' },
   { id: 'mobile', label: '手機互動' },
   { id: 'form', label: '表單' },
@@ -30,7 +32,7 @@ const categories = [
           v-for="category in categories"
           :key="category.id"
           :href="`#${category.id}`"
-          class="shrink-0 rounded-full border px-4 py-2 text-sm hover:bg-muted"
+          class="shrink-0 rounded-full border bg-card px-4 py-2.5 text-sm hover:bg-muted"
         >
           {{ category.label }}
         </a>
@@ -38,6 +40,7 @@ const categories = [
     </header>
 
     <main class="space-y-10 px-4 py-6">
+      <TokenSection />
       <BasicSection />
       <MobileSection />
       <FormSection />

@@ -1,5 +1,5 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+/* 字型：Noto Sans TC（中文、英數都有），只載入用到的三種粗細 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -7,122 +7,284 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-    /* 字型名稱要和上方 Google Fonts 載入的 family=Geist 一致；中文字型於 Step 8 再指定 */
-    --font-sans: 'Geist', sans-serif;
-    --font-heading: var(--font-sans);
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
-    --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --color-foreground: var(--foreground);
-    --color-background: var(--background);
-    --radius-sm: calc(var(--radius) - 4px);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) + 4px);
+/* ───────────────────────────────────────────────────────────
+   第 1 層：基礎色階（Primitives）
+   來源：Figma 變數集合「Primitives」
+   寫在 @theme 裡，會覆蓋 Tailwind 內建的 blue / red / gray，
+   所以 bg-blue-500、text-gray-700 這些 class 用的都是好彼社區的顏色。
+   （orange 沒有覆蓋，用的是 Tailwind 內建的橘色）
+   ─────────────────────────────────────────────────────────── */
+@theme {
+  --color-blue-50: #e4eff4;
+  --color-blue-100: #cde4f0;
+  --color-blue-200: #b5d9ed;
+  --color-blue-300: #9ecde9;
+  --color-blue-400: #86c2e6;
+  --color-blue-500: #6fb7e2;
+  --color-blue-600: #5a9abe;
+  --color-blue-700: #457d9b;
+  --color-blue-800: #306077;
+  --color-blue-900: #1b4354;
+  --color-blue-950: #062630;
+
+  --color-red-50: #f2e2e4;
+  --color-red-100: #f5c6c8;
+  --color-red-200: #f7aaac;
+  --color-red-300: #fa8e8f;
+  --color-red-400: #fc7273;
+  --color-red-500: #ff5657;
+  --color-red-600: #d64748;
+  --color-red-700: #ad3739;
+  --color-red-800: #85282a;
+  --color-red-900: #5c181b;
+  --color-red-950: #33090c;
+
+  /* orange：不覆蓋，直接用 Tailwind / shadcn 內建的橘色（orange-500 = #ff6900） */
+
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #e1e2e4;
+  --color-gray-200: #c9cbcd;
+  --color-gray-300: #b2b3b5;
+  --color-gray-400: #9a9c9d;
+  --color-gray-500: #838486;
+  --color-gray-600: #6c6d6e;
+  --color-gray-700: #545656;
+  --color-gray-800: #3d3e3e;
+  --color-gray-900: #252727;
+  --color-gray-950: #0e0f0f;
+
+  /* 陰影：帶一點藍色調，來自彩色版首頁 */
+  --shadow-card: 0 1px 2px 0 rgb(27 67 84 / 0.4);
+  --shadow-nav: 0 1px 5px 0 rgb(0 0 0 / 0.35);
+  --shadow-nav-active: 0 1px 1.9px 0 rgb(48 96 119 / 0.62);
+  --shadow-fab: 0 1px 2.5px 0 rgb(0 0 0 / 0.35);
+
+  /* 卡片圓角 */
+  --radius-card: 20px;
 }
 
+/* ───────────────────────────────────────────────────────────
+   第 2 層：語意色（Semantic）
+   用「用途」命名，值指向上面的色階。
+   👉 要換色時改這裡：改一行，整個 App 用到的地方一起變。
+   ─────────────────────────────────────────────────────────── */
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+  /* shadcn-vue 元件會用到的變數 */
+  --background: #f6f6f6; /* 頁面背景（彩色版首頁的底色） */
+  --foreground: var(--color-gray-950); /* 主要文字 text/main */
+  --card: #ffffff; /* 卡片底色 surface/card */
+  --card-foreground: var(--color-gray-950);
+  --popover: #ffffff;
+  --popover-foreground: var(--color-gray-950);
+  --primary: var(--color-blue-500); /* 品牌主色 brand/primary */
+  --primary-foreground: #ffffff; /* 主色上的文字 text/on-color */
+  --secondary: var(--color-blue-50); /* brand/primary-subtle */
+  --secondary-foreground: var(--color-blue-900);
+  --muted: var(--color-gray-100);
+  --muted-foreground: var(--color-gray-600); /* 次要說明文字 text/muted */
+  --accent: var(--color-blue-50);
+  --accent-foreground: var(--color-blue-900);
+  --destructive: var(--color-red-500); /* 警告 status/warning */
+  --border: var(--color-gray-100); /* border/default */
+  --input: var(--color-gray-200);
+  --ring: var(--color-blue-500);
+  --radius: 0.625rem;
+
+  /* 好彼社區自訂的語意色 */
+  --brand-strong: var(--color-blue-700); /* brand/primary-strong */
+  --brand-subtle: var(--color-blue-50); /* brand/primary-subtle */
+  --heading: var(--color-blue-950); /* 區塊大標的顏色 */
+  --text-secondary: var(--color-gray-700); /* 卡片內文 text/secondary */
+  --remind: var(--color-orange-500); /* 提醒 status/remind */
+  --remind-strong: var(--color-orange-600);
+  --remind-subtle: var(--color-orange-100);
+  --warning: var(--color-red-500); /* 警告 status/warning */
+  --warning-strong: var(--color-red-600);
+  --warning-subtle: var(--color-red-100);
+  --progress: var(--color-blue-600); /* 進行中 status/progress */
+  --success: var(--color-blue-800); /* 完成 status/success */
+
+  /* 外框（底部導覽、＋ 按鈕）；數字是不透明度 */
+  --nav: rgb(255 255 255 / 0.72); /* 導覽列底色 */
+  --nav-foreground: var(--color-gray-900); /* 一般分頁的字和圖示 */
+  --nav-border: #e9e9e9;
+  --nav-active: rgb(111 183 226 / 0.74); /* 目前分頁的底色（藍 500） */
+  --nav-active-foreground: #ffffff; /* 目前分頁的字和圖示 */
+  --fab: rgb(255 86 87 / 0.79); /* ＋ 按鈕底色（紅 500） */
+  --fab-foreground: #ffffff;
+
+  /* 以下是 shadcn 預設值，目前沒用到（圖表、桌機側邊欄） */
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
-.dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+/* ───────────────────────────────────────────────────────────
+   第 3 層：把語意色接到 Tailwind
+   --color-xxx: var(--xxx) → 就能寫 bg-xxx、text-xxx、border-xxx
+   ─────────────────────────────────────────────────────────── */
+@theme inline {
+  --font-sans: 'Noto Sans TC', sans-serif;
+  --font-heading: var(--font-sans);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-heading: var(--heading);
+  --color-text-secondary: var(--text-secondary);
+  --color-remind: var(--remind);
+  --color-remind-strong: var(--remind-strong);
+  --color-remind-subtle: var(--remind-subtle);
+  --color-warning: var(--warning);
+  --color-warning-strong: var(--warning-strong);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-progress: var(--progress);
+  --color-success: var(--success);
+
+  --color-nav: var(--nav);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-nav-border: var(--nav-border);
+  --color-nav-active: var(--nav-active);
+  --color-nav-active-foreground: var(--nav-active-foreground);
+  --color-fab: var(--fab);
+  --color-fab-foreground: var(--fab-foreground);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ───────────────────────────────────────────────────────────
+   文字樣式
+   來源：Figma 的文字樣式。一個 class 同時設定字級、行高、粗細、字距。
+   用法：<h2 class="type-title">我的通報</h2>
+   ─────────────────────────────────────────────────────────── */
+/* 大標：區塊標題，例如「我的通報」 */
+@utility type-title {
+  font-size: 22px;
+  line-height: 33px;
+  font-weight: 700;
+  letter-spacing: 0.44px;
+}
+/* 卡片標題 */
+@utility type-card-title {
+  font-size: 18px;
+  line-height: 25px;
+  font-weight: 700;
+}
+/* 好彼管家的問候語 */
+@utility type-greeting {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 700;
+  letter-spacing: 0.36px;
+}
+/* 內文：設計稿是 14px，為了長輩閱讀放大到 16px */
+@utility type-body {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: 0.4px;
+}
+/* 內文粗體 */
+@utility type-body-strong {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+/* 「看全部」這類文字連結 */
+@utility type-link {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+}
+/* 日期、更新時間 */
+@utility type-date {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+}
+/* 按鈕文字 */
+@utility type-button {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+/* 底部導覽列的文字 */
+@utility type-nav {
+  font-size: 13px;
+  line-height: 21px;
+  font-weight: 500;
+  letter-spacing: 0.26px;
+}
+/* 標籤（Badge） */
+@utility type-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+}
+
+/* 頂部區塊的漸層：由下方的淺藍漸變到上方的白色 */
+@utility bg-header-panel {
+  background-image: linear-gradient(
+    2.63deg,
+    var(--color-blue-100) 10.7%,
+    #e6f1f7 53%,
+    #ffffff 95.3%
+  );
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
-    @apply bg-background text-foreground;
-    @apply font-sans;
-    }
+    @apply bg-background font-sans text-foreground;
+  }
 }
