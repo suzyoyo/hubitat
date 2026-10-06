@@ -28,7 +28,8 @@
 - 元件盤點頁：`/playground`（`src/views/PlaygroundView.vue`，各分類在 `src/views/playground/`），第一區是設計 Token 一覽
 - ✅ Step 7 完成：Vue Router、三端外框（`src/layouts/AppShell.vue`）、角色設定（`src/config/roles.js`）；各分頁目前是佔位頁
 - ✅ Step 8 完成：設計 Token（`src/style.css`）、Noto Sans TC、外框彩色版、按鈕與輸入框放大到 44px
-- wireframe 大致完成（2026-10-06），接下來做 Step 9（假資料），之後逐頁製作畫面
+- ✅ Step 9 第一批完成：住戶端首頁需要的假資料（使用者、通報、公告、會議）
+- wireframe 大致完成（2026-10-06）。接下來逐頁製作畫面，從住戶端首頁開始；每做一頁再補它需要的假資料與元件
 - Step 10（PWA）可隨時進行
 
 ## 使用者角色與 wireframe
@@ -49,6 +50,14 @@
 - 內文是 16px（設計稿 14px，團隊決定放大）
 - 卡片：`rounded-card`（20px）+ `shadow-card`
 - 外框顏色變數：`--nav`、`--nav-active`、`--fab` 等
+
+## 假資料（`src/mocks/`）
+- `data/*.js`：純資料，每個檔案開頭用註解說明欄位；狀態、類別用對照表（例如 `REPORT_STATUSES`）把資料值轉成顯示文字
+- `api.js`：假 API，全部回傳 Promise 並延遲 400ms。畫面只透過這裡拿資料，不直接 import `data/`（對照表除外）
+- `MOCK_TODAY`（`2026-09-29`）：假裝的「今天」，讓畫面和設計稿一致
+- 時間用 ISO 字串（`2026-09-25T14:30`），顯示時用 `src/lib/date.js` 轉換
+- 分批建立：做到哪個畫面，才加那個畫面需要的資料
+- Figma 團隊另外在建元件，做到用得上的內頁時才轉成 Vue 元件
 
 ## 待辦提醒
 - 【之後】產品完成後要做一個網頁版使用手冊（給不會用的人看的說明），現在先不處理
