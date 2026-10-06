@@ -1,7 +1,7 @@
 # 好彼社區 Hubitat｜專案初始化步驟計畫
 
 技術選擇：Vue 3 + **JavaScript（不使用 TypeScript）** + Vite + Tailwind CSS + shadcn-vue
-產品形態：手機優先、可假裝成 APP 的網頁（PWA / WebView 風格）
+產品形態：只做手機版、可假裝成 APP 的網頁（PWA / WebView 風格），桌機版不做
 工作方式：**一次只做一步 → 你確認沒問題 → 我 commit → 再做下一步**
 
 ---
@@ -65,13 +65,16 @@
 
 ---
 
-以下步驟依賴 wireframe，等你畫面定案後再進行。
+以下步驟依賴 wireframe（2026-10-06 已大致完成，Figma 連結與區塊見 `CLAUDE.md`）。
 
 ## Step 7｜手機殼 App Shell（依賴 wireframe）
 - 安裝並設定 Vue Router
-- 建立手機版外框：置中容器、頂部標題列、底部導覽列
-- 桌機版（管委會）是否用 Sidebar 版型，依 wireframe 決定
+- 三端以網址區分：`/resident`（住戶）、`/committee`（管委會）、`/staff`（管理人員）；`/` 是角色選擇頁
+- 建立共用外框：置中容器、頂部列（好彼社區 + 通知鈴鐺）、底部浮動導覽列、右側「＋」按鈕
+- 每個底部分頁先做一個空白佔位頁；畫面內容之後再逐頁製作
+- 元件盤點頁搬到 `/playground`
 - viewport 與安全區域設定
+- 只做手機版，不做桌機版 Sidebar
 - **Commit**：`feat: add mobile app shell and routing`
 
 ## Step 8｜設計 Token（依賴 wireframe / 品牌）
@@ -87,7 +90,7 @@
 | 實體 | 說明 |
 |---|---|
 | Community | 社區 |
-| User | 角色：住戶 / 管委會 / 廠商 |
+| User | 角色：住戶 / 管委會 / 管理人員 |
 | RepairTicket | 報修單 |
 | TicketStatusLog | 報修進度紀錄（閉環的核心） |
 | Vendor | 廠商名冊 |
@@ -116,4 +119,4 @@
 - [ ] repo 名稱與 `owner/repo`
 - [x] 套件管理器：npm
 - [ ] 專案名稱（資料夾與 package name）
-- [ ] wireframe 完成的大致時間，決定 Step 7–9 何時開始
+- [x] wireframe 已大致完成（2026-10-06），開始 Step 7–9

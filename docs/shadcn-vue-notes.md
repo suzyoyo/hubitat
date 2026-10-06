@@ -47,7 +47,7 @@ import { Button } from '@/components/ui/button'
 | 報修進度 | Stepper、Progress |
 | 報修單與評價表單 | Field、Form、Textarea、Radio Group、Slider |
 | 廠商名冊、施工日誌列表 | Item、Card、Avatar、Badge |
-| 管委會查找資料（桌機） | Data Table、Sidebar、Command |
+| 管委會查找資料 | Command（桌機版不做，Data Table、Sidebar 暫不使用） |
 | 分類切換 | Tabs |
 | 載入中、沒資料 | Skeleton、Spinner、Empty |
 | 好彼管家對話式引導 | Bubble、Message（尚未讀文件，需確認用途） |
@@ -55,6 +55,6 @@ import { Button } from '@/components/ui/button'
 
 ## 做「假裝 APP 的網頁」注意
 1. PWA 不歸 shadcn-vue 管，可安裝與離線另用 `vite-plugin-pwa`（一般知識，非上述文件內容）
-2. 手機優先：Drawer / Sheet / 底部 Tab；管委會桌機版再用 Sidebar + Data Table
+2. 只做手機版：Drawer / Sheet / 底部 Tab；桌機版不做
 3. 長輩友善需自行調整：放大字級、觸控區至少約 44px、提高對比
 4. 中文字型需另外指定
