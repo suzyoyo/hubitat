@@ -28,8 +28,8 @@
 - 元件盤點頁：`/playground`（`src/views/PlaygroundView.vue`，各分類在 `src/views/playground/`），第一區是設計 Token 一覽
 - ✅ Step 7 完成：Vue Router、三端外框（`src/layouts/AppShell.vue`）、角色設定（`src/config/roles.js`）；各分頁目前是佔位頁
 - ✅ Step 8 完成：設計 Token（`src/style.css`）、Noto Sans TC、外框彩色版、按鈕與輸入框放大到 44px
-- ✅ Step 9 第一批完成：住戶端首頁需要的假資料（使用者、通報、公告、會議）
-- wireframe 大致完成（2026-10-06）。接下來逐頁製作畫面，從住戶端首頁開始；每做一頁再補它需要的假資料與元件
+- Step 9 假資料進行中：依 `docs/data-model.md` 分三批建立（進度見該文件最後的「建立進度」）。全部建完後再逐頁製作畫面，從住戶端首頁開始
+- wireframe 大致完成（2026-10-06）
 - Step 10（PWA）可隨時進行
 
 ## 使用者角色與 wireframe
@@ -52,11 +52,15 @@
 - 外框顏色變數：`--nav`、`--nav-active`、`--fab` 等
 
 ## 假資料（`src/mocks/`）
-- `data/*.js`：純資料，每個檔案開頭用註解說明欄位；狀態、類別用對照表（例如 `REPORT_STATUSES`）把資料值轉成顯示文字
-- `api.js`：假 API，全部回傳 Promise 並延遲 400ms。畫面只透過這裡拿資料，不直接 import `data/`（對照表除外）
-- `MOCK_TODAY`（`2026-09-29`）：假裝的「今天」，讓畫面和設計稿一致
+- 完整規劃在 `docs/data-model.md`（14 種資料、彼此的關係、wireframe 不一致處的統一方式）。三端看同一批資料
+- `data/*.js`：純資料，每個檔案開頭用註解說明欄位；狀態、類別用對照表（例如 `VENDOR_STATUSES`）把資料值轉成顯示文字
+- `api/`：假 API，每種資料一個檔案，由 `api/index.js` 統一匯出（`import { getVendors } from '@/mocks/api'`）。全部回傳 Promise 並延遲 400ms。畫面只透過這裡拿資料，不直接 import `data/`（對照表除外）
+- 角色權限：函式可傳入 `role`，假 API 會拿掉該角色不能看的欄位（合約金額與檔案、維修費用只有管委會看得到）
+- 會隨日期變的狀態不存在資料裡，由假 API 計算（合約即將到期、設備保養逾期等）
+- `MOCK_TODAY`（`2026-10-01`）：假裝的「今天」
+- 示範主角：李伯伯（`u-c04`），住戶兼修繕委員；管理人員端是張管理員
 - 時間用 ISO 字串（`2026-09-25T14:30`），顯示時用 `src/lib/date.js` 轉換
-- 分批建立：做到哪個畫面，才加那個畫面需要的資料
+- `api/temporary.js` 與 `data/reports.js` 是第一版的通報資料，第二批會被「案件」取代
 - Figma 團隊另外在建元件，做到用得上的內頁時才轉成 Vue 元件
 
 ## 待辦提醒

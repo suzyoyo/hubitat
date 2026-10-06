@@ -32,7 +32,7 @@ export const REPORT_CATEGORIES = {
 export const reports = [
   {
     id: 'r-001',
-    reporterId: 'u-001',
+    reporterId: 'u-c04',
     category: 'facility',
     location: '1F 大廳',
     subject: '感應門故障',
@@ -53,7 +53,7 @@ export const reports = [
   },
   {
     id: 'r-002',
-    reporterId: 'u-001',
+    reporterId: 'u-c04',
     category: 'facility',
     location: '地下室 B2',
     subject: '梯廳燈不亮',
@@ -72,7 +72,7 @@ export const reports = [
   },
   {
     id: 'r-003',
-    reporterId: 'u-001',
+    reporterId: 'u-c04',
     category: 'facility',
     location: '頂樓花園',
     subject: '灑水噴頭漏水',
@@ -88,7 +88,7 @@ export const reports = [
   },
   {
     id: 'r-004',
-    reporterId: 'u-001',
+    reporterId: 'u-c04',
     category: 'violation',
     location: '8F 住戶',
     subject: '夜間裝潢噪音',
@@ -106,7 +106,7 @@ export const reports = [
   },
   {
     id: 'r-005',
-    reporterId: 'u-001',
+    reporterId: 'u-c04',
     category: 'facility',
     location: '停車場 B1',
     subject: '車道反光鏡歪斜',
