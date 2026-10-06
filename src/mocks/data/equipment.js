@@ -77,6 +77,7 @@ export const equipment = [
         title: '更換曳引機鋼索',
         vendorId: 'v-001',
         cost: 28000,
+        caseId: 'CASE-20260630-001',
       },
       { id: 'er-003', date: '2026-05-10', type: 'maintenance', title: '定期保養', vendorId: 'v-001' },
       {
@@ -86,6 +87,7 @@ export const equipment = [
         title: '車廂門感應器維修',
         vendorId: 'v-001',
         cost: 4500,
+        caseId: 'CASE-20260312-001',
       },
       { id: 'er-101', date: '2026-08-12', type: 'maintenance', title: '定期保養', vendorId: 'v-001' },
       { id: 'er-102', date: '2026-06-10', type: 'maintenance', title: '定期保養', vendorId: 'v-001' },
@@ -113,7 +115,15 @@ export const equipment = [
     lastMaintainedAt: '2026-09-05',
     records: [
       { id: 'er-005', date: '2026-09-05', type: 'maintenance', title: '定期保養', vendorId: 'v-001' },
-      { id: 'er-006', date: '2026-06-12', type: 'repair', title: '門機異音檢修', vendorId: 'v-001', cost: 3200 },
+      {
+        id: 'er-006',
+        date: '2026-06-12',
+        type: 'repair',
+        title: '門機異音檢修',
+        vendorId: 'v-001',
+        cost: 3200,
+        caseId: 'CASE-20260610-001',
+      },
       { id: 'er-007', date: '2026-05-10', type: 'maintenance', title: '定期保養', vendorId: 'v-001' },
     ],
   },
@@ -132,6 +142,15 @@ export const equipment = [
     lastMaintainedAt: '2026-09-12',
     records: [
       { id: 'er-008', date: '2026-09-12', type: 'maintenance', title: '定期保養', vendorId: 'v-001' },
+      {
+        id: 'er-023',
+        date: '2026-01-20',
+        type: 'repair',
+        title: '更換樓層按鈕面板',
+        vendorId: 'v-001',
+        cost: 3500,
+        caseId: 'CASE-20260117-001',
+      },
     ],
   },
   {

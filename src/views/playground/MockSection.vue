@@ -4,18 +4,26 @@ import { onMounted, ref } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatFullDate } from '@/lib/date'
+import { formatDateTime, formatFullDate } from '@/lib/date'
 import {
   MOCK_TODAY,
+  getAnnouncements,
+  getCases,
   getCommitteeMembers,
   getContracts,
   getCurrentUser,
   getEquipmentList,
+  getMyReports,
+  getNotifications,
+  getQuickSaves,
   getStaffMembers,
+  getTasks,
   getVendors,
 } from '@/mocks/api'
+import { ANNOUNCEMENT_TYPES } from '@/mocks/data/announcements'
 import { CONTRACT_STATUSES } from '@/mocks/data/contracts'
 import { EQUIPMENT_DISPLAY_STATUSES } from '@/mocks/data/equipment'
+import { TASK_DISPLAY_STATUSES } from '@/mocks/data/tasks'
 import { VENDOR_STATUSES } from '@/mocks/data/vendors'
 
 // 畫面要用的資料，一開始都是空的
@@ -26,6 +34,12 @@ const staff = ref([])
 const vendors = ref([])
 const contracts = ref([])
 const equipment = ref([])
+const cases = ref([])
+const myReports = ref([])
+const tasks = ref([])
+const announcements = ref([])
+const notifications = ref([])
+const quickSaves = ref([])
 
 // async / await：等資料回來再繼續往下執行
 async function loadData() {
@@ -48,6 +62,23 @@ async function loadData() {
   vendors.value = vendorList
   contracts.value = contractList
   equipment.value = equipmentList
+
+  // 第二批：需要先知道「是誰」才能查的資料，所以放在取得使用者之後
+  const [caseList, reportList, taskList, announcementList, notificationList, quickSaveList] =
+    await Promise.all([
+      getCases(), // 管理端：未結案的案件
+      getMyReports(resident.id, 'active'), // 住戶端：我進行中的通報
+      getTasks(), // 未結案的交辦
+      getAnnouncements(resident.id), // 住戶看得到的公告
+      getNotifications(resident.id, 'resident'), // 住戶身分的通知
+      getQuickSaves(staffUser.id, true), // 管理人員還沒補齊的留存
+    ])
+  cases.value = caseList
+  myReports.value = reportList
+  tasks.value = taskList
+  announcements.value = announcementList
+  notifications.value = notificationList
+  quickSaves.value = quickSaveList
   loading.value = false
 }
 
@@ -138,6 +169,101 @@ function daysText(days) {
           </div>
           <p class="type-date text-text-secondary">{{ item.place }}｜廠商：{{ item.vendorName || '無' }}</p>
           <p class="type-date text-muted-foreground">下次保養：{{ daysText(item.daysToMaintenance) }}</p>
+        </div>
+      </div>
+
+      <!-- ── 第二批：案件、交辦、公告、通知、留存 ── -->
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          案件（管理端）getCases()：未結案 {{ cases.length }} 件
+        </h3>
+        <div v-for="item in cases" :key="item.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ item.title }}</p>
+            <Badge variant="secondary" class="shrink-0">{{ item.statusLabel }}</Badge>
+          </div>
+          <p class="type-date text-text-secondary">
+            {{ item.areaName }}・{{ item.categoryLabel }}
+            <span v-if="item.isPrivate">・私密案件</span>
+            <span v-if="item.isOverdue" class="text-destructive">・逾期 {{ item.overdueDays }} 天</span>
+          </p>
+          <p class="type-date text-muted-foreground">
+            負責：{{ item.assigneeLabel || '尚未指派' }}｜{{ item.vendorName || '尚未派廠商' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          我的通報（住戶端）getMyReports()：進行中 {{ myReports.length }} 件
+        </h3>
+        <p class="text-xs text-muted-foreground">和上面是同一份資料，但標題、狀態、說明都是給住戶看的版本</p>
+        <div v-for="report in myReports" :key="report.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ report.displayTitle }}</p>
+            <Badge variant="secondary" class="shrink-0">{{ report.statusLabel }}</Badge>
+          </div>
+          <p class="type-date text-text-secondary">{{ report.latestReply.text }}</p>
+          <p class="type-date text-muted-foreground">更新於 {{ formatDateTime(report.updatedAt) }}</p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">交辦 getTasks()：未結案 {{ tasks.length }} 項</h3>
+        <div v-for="task in tasks" :key="task.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ task.title }}</p>
+            <Badge variant="secondary" class="shrink-0">
+              {{ TASK_DISPLAY_STATUSES[task.displayStatus].label }}
+            </Badge>
+          </div>
+          <p class="type-date text-text-secondary">{{ task.assignerLabel }} → {{ task.assigneeLabel }}</p>
+          <p class="type-date text-muted-foreground">
+            #{{ task.id }}・期限 {{ formatDateTime(task.deadline) }}
+            <span v-if="task.caseTitle">・關聯：{{ task.caseTitle }}</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          公告（住戶端）getAnnouncements()：{{ announcements.length }} 則
+        </h3>
+        <div v-for="item in announcements" :key="item.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ item.title }}</p>
+            <Badge variant="outline" class="shrink-0">{{ ANNOUNCEMENT_TYPES[item.type].label }}</Badge>
+          </div>
+          <p class="type-date text-muted-foreground">
+            {{ formatDateTime(item.startAt) }} 起・{{ item.scopeLabel }}
+            <span v-if="item.relatedToMe">・與我有關</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          通知（住戶身分）getNotifications()：{{ notifications.length }} 則
+        </h3>
+        <div v-for="item in notifications" :key="item.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ item.title }}</p>
+            <span class="shrink-0 type-date text-muted-foreground">{{ item.timeText }}</span>
+          </div>
+          <p class="type-date text-text-secondary">{{ item.body }}</p>
+          <p v-if="!item.read" class="type-date text-primary">未讀</p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          留存（張管理員待補）getQuickSaves()：{{ quickSaves.length }} 筆
+        </h3>
+        <div v-for="item in quickSaves" :key="item.id" class="rounded-lg border bg-card p-3">
+          <p class="type-body-strong">{{ item.name || '（未命名）' }}</p>
+          <p class="type-date text-text-secondary">{{ item.note }}</p>
+          <p class="type-date text-muted-foreground">留存於 {{ formatDateTime(item.savedAt) }}</p>
         </div>
       </div>
     </template>

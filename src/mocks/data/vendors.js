@@ -166,4 +166,14 @@ export const vendors = [
     contacts: [{ name: '洪小姐', title: '客服', phone: '02-2933-1100', isEmergency: false }],
     createdAt: '2022-05-01',
   },
+  {
+    id: 'v-013',
+    name: '金城五金',
+    taxId: '44556677',
+    categories: ['plumbing'],
+    services: ['門窗鎖具', '信箱維修', '五金更換'],
+    status: 'active',
+    contacts: [{ name: '金老闆', title: '負責人', phone: '02-2766-8899', isEmergency: false }],
+    createdAt: '2025-06-10',
+  },
 ]

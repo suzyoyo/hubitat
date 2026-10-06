@@ -1,6 +1,7 @@
 // 廠商相關的假 API
 import { equipment } from '../data/equipment'
 import { vendors } from '../data/vendors'
+import { caseStatsOfVendor } from './cases'
 import { contractStatus, currentContractOf } from './contracts'
 import { delay } from './helpers'
 
@@ -60,6 +61,8 @@ export async function getVendorById(id) {
     maintenanceDone = new Set(months).size
   }
 
+  const repairStats = caseStatsOfVendor(id)
+
   return {
     ...vendor,
     contractId: contract ? contract.id : null,
@@ -69,7 +72,10 @@ export async function getVendorById(id) {
     stats: {
       maintenanceDone,
       maintenancePlanned: contract && contract.visits ? contract.visits : null,
-      repairCount: serviceRecords.filter((record) => record.type === 'repair').length,
+      // 報修統計（從案件算出來）
+      repairCount: repairStats.count, // 結案的報修件數
+      averageRepairDays: repairStats.averageDays, // 從通報到完成的平均天數
+      averageScore: repairStats.averageScore, // 平均評分
     },
   }
 }

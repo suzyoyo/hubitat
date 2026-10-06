@@ -68,3 +68,32 @@ export function addMonths(value, months) {
   const dd = String(newDay).padStart(2, '0')
   return `${newYear}-${mm}-${dd}`
 }
+
+// 把時間換算成「從某個固定起點算起的分鐘數」，方便兩個時間相減
+function toMinutes(value) {
+  const { year, month, day, time } = parse(value)
+  const [hour = 0, minute = 0] = time ? time.split(':').map(Number) : []
+  return Date.UTC(year, month - 1, day, hour, minute) / 60000
+}
+
+// '2026-09-25T14:30' → '14:30'
+export function formatTime(value) {
+  return parse(value).time
+}
+
+// 把時間顯示成「多久以前」，now 是現在的時間
+//   10 分鐘內的事 → '10 分鐘前'
+//   今天稍早     → '2 小時前'
+//   昨天         → '昨天 09:00'
+//   更早         → '9/25'
+export function formatRelativeTime(value, now) {
+  const minutes = toMinutes(now) - toMinutes(value)
+  const daysAgo = diffDays(value.split('T')[0], now.split('T')[0])
+  if (daysAgo === 0) {
+    if (minutes < 1) return '剛剛'
+    if (minutes < 60) return `${minutes} 分鐘前`
+    return `${Math.floor(minutes / 60)} 小時前`
+  }
+  if (daysAgo === 1) return `昨天 ${formatTime(value)}`
+  return formatDate(value)
+}

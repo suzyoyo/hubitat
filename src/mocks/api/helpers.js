@@ -4,6 +4,9 @@
 // 合約「7 天後到期」、設備「保養逾期 11 天」這些文字，都是用這個日期算出來的
 export const MOCK_TODAY = '2026-10-01'
 
+// 假裝「現在」的時間，用來算「2 小時前」「今天 18:00 前」這類文字
+export const MOCK_NOW = '2026-10-01T13:42'
+
 // 等待一段時間（毫秒）再繼續，用來模擬網路延遲
 export function delay(ms = 400) {
   return new Promise((resolve) => setTimeout(resolve, ms))
