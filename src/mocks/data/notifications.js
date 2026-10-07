@@ -91,7 +91,7 @@ export const notifications = [
     userId: 'u-c04',
     role: 'committee',
     title: '住戶在會議紀錄留言',
-    body: '2026 年第 3 次管委會：想請問電梯保養廠商續約後…',
+    body: '2026 年第 3 次管委會：想請問地下室防水工程大概什麼時候…',
     at: '2026-10-01T13:40',
     read: false,
     link: { type: 'meeting', id: 'm-2026-03' },
@@ -104,7 +104,7 @@ export const notifications = [
     body: '社區公基金支出提案：中庭植栽更新',
     at: '2026-10-01T12:42',
     read: false,
-    link: { type: 'proposal', id: 'P-2026-088' },
+    link: { type: 'proposal', id: 'P-2026-087' },
   },
   {
     id: 'n-103',

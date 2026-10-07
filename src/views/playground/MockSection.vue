@@ -13,16 +13,23 @@ import {
   getContracts,
   getCurrentUser,
   getEquipmentList,
+  getLegalDocuments,
+  getMeetings,
   getMyReports,
+  getMyTodos,
   getNotifications,
+  getProposals,
   getQuickSaves,
+  getResidentOpinions,
   getStaffMembers,
   getTasks,
   getVendors,
 } from '@/mocks/api'
 import { ANNOUNCEMENT_TYPES } from '@/mocks/data/announcements'
 import { CONTRACT_STATUSES } from '@/mocks/data/contracts'
+import { LEGAL_DOCUMENT_STATUSES } from '@/mocks/data/documents'
 import { EQUIPMENT_DISPLAY_STATUSES } from '@/mocks/data/equipment'
+import { PROPOSAL_STATUSES } from '@/mocks/data/proposals'
 import { TASK_DISPLAY_STATUSES } from '@/mocks/data/tasks'
 import { VENDOR_STATUSES } from '@/mocks/data/vendors'
 
@@ -40,6 +47,12 @@ const tasks = ref([])
 const announcements = ref([])
 const notifications = ref([])
 const quickSaves = ref([])
+const committeeTodos = ref({ items: [], counts: {}, total: 0 })
+const staffTodos = ref({ items: [], counts: {}, total: 0 })
+const proposals = ref([])
+const opinions = ref([])
+const meetings = ref([])
+const legalDocuments = ref([])
 
 // async / await：等資料回來再繼續往下執行
 async function loadData() {
@@ -79,6 +92,23 @@ async function loadData() {
   announcements.value = announcementList
   notifications.value = notificationList
   quickSaves.value = quickSaveList
+
+  // 第三批：會議、提案、文件，以及彙整出來的待辦與住戶意見
+  const [committeeTodoResult, staffTodoResult, proposalList, opinionList, meetingList, documentList] =
+    await Promise.all([
+      getMyTodos(committeeUser.id, 'committee'), // 李委員的待辦
+      getMyTodos(staffUser.id, 'staff'), // 張管理員的待辦
+      getProposals(committeeUser.id), // 提案（會標出李委員簽了沒）
+      getResidentOpinions(true), // 還沒回覆的住戶意見
+      getMeetings('resident', resident.id), // 住戶看得到的會議
+      getLegalDocuments(), // 法定文件
+    ])
+  committeeTodos.value = committeeTodoResult
+  staffTodos.value = staffTodoResult
+  proposals.value = proposalList
+  opinions.value = opinionList
+  meetings.value = meetingList
+  legalDocuments.value = documentList
   loading.value = false
 }
 
@@ -91,6 +121,13 @@ function daysText(days) {
   if (days < 0) return `逾期 ${-days} 天`
   if (days === 0) return '今天'
   return `${days} 天後`
+}
+
+// 待辦的到期說明：「7 天後到期」「今天到期」「逾期 3 天」「沒有期限」
+function dueText(item) {
+  if (!item.dueAt) return '沒有期限'
+  if (item.daysLeft < 0) return daysText(item.daysLeft)
+  return `${daysText(item.daysLeft)}到期`
 }
 </script>
 
@@ -264,6 +301,98 @@ function daysText(days) {
           <p class="type-body-strong">{{ item.name || '（未命名）' }}</p>
           <p class="type-date text-text-secondary">{{ item.note }}</p>
           <p class="type-date text-muted-foreground">留存於 {{ formatDateTime(item.savedAt) }}</p>
+        </div>
+      </div>
+
+      <!-- ── 第三批：待辦、提案、住戶意見、會議、文件 ── -->
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          我的待辦（李委員）getMyTodos()：{{ committeeTodos.total }} 件
+        </h3>
+        <p class="text-xs text-muted-foreground">不另外存資料，從交辦、案件、提案、合約、文件、留存彙整而來</p>
+        <div v-for="item in committeeTodos.items" :key="item.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ item.title }}</p>
+            <Badge variant="outline" class="shrink-0">{{ item.kindLabel }}</Badge>
+          </div>
+          <p class="type-date text-text-secondary">{{ item.hint }}</p>
+          <p class="type-date" :class="item.daysLeft < 0 ? 'text-destructive' : 'text-muted-foreground'">
+            {{ dueText(item) }}
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          我的待辦（張管理員）getMyTodos()：{{ staffTodos.total }} 件
+        </h3>
+        <div v-for="item in staffTodos.items" :key="item.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ item.title }}</p>
+            <Badge variant="outline" class="shrink-0">{{ item.kindLabel }}</Badge>
+          </div>
+          <p class="type-date text-text-secondary">{{ item.hint }}</p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">提案 getProposals()：{{ proposals.length }} 件</h3>
+        <div v-for="proposal in proposals" :key="proposal.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ proposal.title }}</p>
+            <Badge variant="secondary" class="shrink-0">{{ PROPOSAL_STATUSES[proposal.status].label }}</Badge>
+          </div>
+          <p class="type-date text-text-secondary">
+            {{ proposal.proposerLabel }}・已簽 {{ proposal.signedCount }}/{{ proposal.totalCount }}
+          </p>
+          <p class="type-date" :class="proposal.needsMySign ? 'text-destructive' : 'text-muted-foreground'">
+            {{ proposal.needsMySign ? '等我簽核' : proposal.mySignature ? '我已簽核' : '已結束' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          住戶意見（待回覆）getResidentOpinions()：{{ opinions.length }} 則
+        </h3>
+        <div v-for="item in opinions" :key="item.id" class="rounded-lg border bg-card p-3">
+          <p class="type-body-strong">{{ item.text }}</p>
+          <p class="type-date text-text-secondary">{{ item.authorLabel }}・{{ formatDateTime(item.at) }}</p>
+          <p class="type-date text-muted-foreground">{{ item.meetingTitle }}</p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          會議（住戶端）getMeetings()：{{ meetings.length }} 場
+        </h3>
+        <div v-for="meeting in meetings" :key="meeting.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ meeting.title }}</p>
+            <Badge variant="outline" class="shrink-0">{{ meeting.typeLabel }}</Badge>
+          </div>
+          <p class="type-date text-text-secondary">{{ meeting.summary }}</p>
+          <p class="type-date text-muted-foreground">
+            {{ formatFullDate(meeting.heldAt) }} 召開・決議 {{ meeting.resolutionCount }} 條
+            <span v-if="meeting.myComments.length">・我的留言 {{ meeting.myComments.length }} 則</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-medium text-muted-foreground">
+          法定文件 getLegalDocuments()：{{ legalDocuments.length }} 項
+        </h3>
+        <div v-for="doc in legalDocuments" :key="doc.id" class="rounded-lg border bg-card p-3">
+          <div class="flex items-start justify-between gap-2">
+            <p class="type-body-strong">{{ doc.name }}</p>
+            <Badge variant="secondary" class="shrink-0">{{ LEGAL_DOCUMENT_STATUSES[doc.status].label }}</Badge>
+          </div>
+          <p class="type-date text-muted-foreground">
+            {{ doc.typeLabel }}・效期至 {{ formatFullDate(doc.expiresAt) }}
+            <span v-if="doc.isPublic">・公開給住戶</span>
+          </p>
         </div>
       </div>
     </template>

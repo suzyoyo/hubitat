@@ -28,7 +28,8 @@
 - 元件盤點頁：`/playground`（`src/views/PlaygroundView.vue`，各分類在 `src/views/playground/`），第一區是設計 Token 一覽
 - ✅ Step 7 完成：Vue Router、三端外框（`src/layouts/AppShell.vue`）、角色設定（`src/config/roles.js`）；各分頁目前是佔位頁
 - ✅ Step 8 完成：設計 Token（`src/style.css`）、Noto Sans TC、外框彩色版、按鈕與輸入框放大到 44px
-- Step 9 假資料進行中：依 `docs/data-model.md` 分三批建立（進度見該文件最後的「建立進度」）。全部建完後再逐頁製作畫面，從住戶端首頁開始
+- ✅ Step 9 完成：三端的假資料全部建好（14 種資料 + 我的待辦、決議事項、交接包、搜尋等彙整功能），規劃見 `docs/data-model.md`
+- 接下來逐頁製作畫面，從住戶端首頁開始；Figma 團隊的元件建好後再開始
 - wireframe 大致完成（2026-10-06）
 - Step 10（PWA）可隨時進行
 
@@ -62,7 +63,9 @@
 - 案件（`cases.js`）是住戶的「通報」也是管理端的「案件」：管理端用 `getCases` / `getCaseById`，住戶端用 `getMyReports` / `getReportById`，兩邊拿到的欄位和狀態文字不同
 - 示範主角：李伯伯（`u-c04`），住戶兼修繕委員；管理人員端是張管理員
 - 時間用 ISO 字串（`2026-09-25T14:30`），顯示時用 `src/lib/date.js` 轉換
-- `api/temporary.js` 與 `data/meetings.js` 是第一版的會議資料，第三批會擴充並取代
+- 彙整類的功能不另外存資料，由假 API 從其他資料算出來：`getMyTodos`（我的待辦）、`getResolutions`（決議事項）、`getResidentOpinions`（住戶意見＝會議的住戶留言）、`getHandoverPackage`（交接包）、`search`（搜尋）
+- 會議：管委會看得到全部；住戶與管理人員只看得到已發布的「住戶版內容」，留言只看得到自己的
+- 盤點頁 `/playground` 最下面的「假資料」區可以看到各種資料實際載入的樣子
 - Figma 團隊另外在建元件，做到用得上的內頁時才轉成 Vue 元件
 
 ## 待辦提醒
