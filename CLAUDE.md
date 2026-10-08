@@ -29,7 +29,9 @@
 - ✅ Step 7 完成：Vue Router、三端外框（`src/layouts/AppShell.vue`）、角色設定（`src/config/roles.js`）；各分頁目前是佔位頁
 - ✅ Step 8 完成：設計 Token（`src/style.css`）、Noto Sans TC、外框彩色版、按鈕與輸入框放大到 44px
 - ✅ Step 9 完成：三端的假資料全部建好（14 種資料 + 我的待辦、決議事項、交接包、搜尋等彙整功能），規劃見 `docs/data-model.md`
-- 接下來逐頁製作畫面，從住戶端首頁開始；Figma 團隊的元件建好後再開始
+- **下一步**：逐頁製作畫面，從住戶端首頁開始（彩色版設計稿 node `758:11251`）。開始前先問我：Figma 團隊的元件建好了沒、放在哪裡
+  - 首頁需要的假 API：`getCurrentUser('resident')`、`getMyReports(userId, 'active')`、`getAnnouncements(userId)`、`getMeetings('resident', userId)`
+  - 首頁還有「無通報」的版本（node `102:71`）
 - wireframe 大致完成（2026-10-06）
 - Step 10（PWA）可隨時進行
 
@@ -71,7 +73,11 @@
 ## 待辦提醒
 - 【之後】產品完成後要做一個網頁版使用手冊（給不會用的人看的說明），現在先不處理
 - 【設計待決定】對比度偏低，目前完全照設計稿：白字在品牌藍（`--primary` / `--nav-active`）約 2 : 1、白字在 `--fab` 紅約 3 : 1。之後要調整時改 `style.css` 的 `:root` 變數即可
-- 【之後】首頁的問候語與吉祥物放在 `AppHeader` 的 slot；吉祥物圖片尚未加入專案
+- 【之後】首頁的問候語與吉祥物放在 `AppHeader` 的 slot。吉祥物圖片我已放在 `src/assets/IP/`（`1.png`～`6.png`，尚未 commit）：每張約 3MB，用在網頁前要先壓縮、縮小尺寸，並確認每張是什麼姿勢、用在哪裡
+- 專案根目錄的 `第一組＿好彼社區 Hubitat.pdf` 是我的個人檔案，**不要 commit**（已用 `.git/info/exclude` 在本機排除）
+- 給組員看的假資料進度整理：https://claude.ai/code/artifact/fbdedca5-8868-4f7e-954e-5f8e9b94e09d
+- 【之後】住戶端新增了「加入管委會」流程（2026-10-08 設計稿新增，尚未做假資料與畫面）：我的頁的「身分」區塊 → 輸入邀請碼或掃 QR Code → 確認邀請 → 接受完成（任期開始日才生效）。做到「我的」頁時要補邀請碼的假資料
+- 【之後】導覽列的「社區檔案」設計稿已改名為「社區」：住戶端已改；管委會、管理人員做到時再改（`src/config/roles.js` 的 `managementTabs`），並一起對照 Kit 的導覽列樣式
 - 【之後】管委會、管理人員的「＋」按鈕目前連到佔位頁，設計是彈出「全域新增選單」
 - 【觀察中】`npm audit` 有 7 個 moderate 弱點，來自 shadcn-vue CLI 的相依套件（不會打包進網頁）；勿用 `npm audit fix --force`（會把 shadcn-vue 降回 0.10.5）
 
