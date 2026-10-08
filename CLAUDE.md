@@ -29,9 +29,11 @@
 - ✅ Step 7 完成：Vue Router、三端外框（`src/layouts/AppShell.vue`）、角色設定（`src/config/roles.js`）；各分頁目前是佔位頁
 - ✅ Step 8 完成：設計 Token（`src/style.css`）、Noto Sans TC、外框彩色版、按鈕與輸入框放大到 44px
 - ✅ Step 9 完成：三端的假資料全部建好（14 種資料 + 我的待辦、決議事項、交接包、搜尋等彙整功能），規劃見 `docs/data-model.md`
-- **下一步**：逐頁製作畫面，從住戶端首頁開始（彩色版設計稿 node `758:11251`）。開始前先問我：Figma 團隊的元件建好了沒、放在哪裡
-  - 首頁需要的假 API：`getCurrentUser('resident')`、`getMyReports(userId, 'active')`、`getAnnouncements(userId)`、`getMeetings('resident', userId)`
-  - 首頁還有「無通報」的版本（node `102:71`）
+- ✅ 住戶端首頁完成（2026-10-08）：`src/views/resident/HomeView.vue`，有通報／無通報兩種狀態都做了
+  - 元件名稱對應好彼 Kit：`AppGreeting`、`SectionHeader`（`src/components/app/`）、`ReportCard`（`report/`）、`NoticeHomeCard`（`notice/`）、`MeetingCard`（`meeting/`）
+  - 首頁連出去的內頁目前是佔位頁：`/resident/reports`、`/resident/reports/:id`、`/resident/announcements`、`/resident/meetings/:id`
+  - 問候語顯示「今天」正在進行的公告（優先與我有關的）；公告卡片只放與我有關的前 2 則
+- **下一步**：做首頁連出去的內頁（我的通報、通報詳情、社區公告），或「我的」頁與加入管委會流程，開始前先問我要做哪一個
 - wireframe 大致完成（2026-10-06）
 - Step 10（PWA）可隨時進行
 
@@ -51,7 +53,13 @@
 - 三層：基礎色階（`@theme`，覆蓋 Tailwind 的 blue / red / gray；orange 用 Tailwind 內建的，不覆蓋）→ 語意色（`:root`）→ 接到 Tailwind（`@theme inline`）。換色改 `:root`
 - 文字樣式用 `type-` 開頭的 class：`type-title`、`type-card-title`、`type-body`、`type-label` 等（不要用 `text-` 開頭，會和顏色 class 撞名）
 - 內文是 16px（設計稿 14px，團隊決定放大）
-- 卡片：`rounded-card`（20px）+ `shadow-card`
+- 卡片：好彼 Kit 的卡片圓角是 14px，新做的元件用 `rounded-xl` + `shadow-card`。`rounded-card`（20px）是舊值，只剩角色選擇頁和 playground 在用，還沒決定要不要改
+- 徽章（`src/components/ui/badge/index.js`，對照 Kit 的 Badge，高 22px）：
+  - `default` 淺藍底、深藍字：分類，或「已收到」這類還沒開始處理的狀態
+  - `secondary` 淺橘底、深橘字：進行中的狀態，例如「處理中」「施工中」
+  - `outline` 灰底、黑字、沒有外框：不需要強調的分類，例如「常態例會」「1F 大廳」
+- 通報狀態顏色（已定）：已收到＝淺藍、處理中＝淺橘。其他狀態（已受理、已完成、進行中、待處理）設計稿上還有兩三種顏色混用，尚未定案
+- 表單：必填只用紅色星號，不寫「必填」；選填用灰色小字「選填」，不要底色
 - 外框顏色變數：`--nav`、`--nav-active`、`--fab` 等
 
 ## 假資料（`src/mocks/`）
@@ -70,10 +78,20 @@
 - 盤點頁 `/playground` 最下面的「假資料」區可以看到各種資料實際載入的樣子
 - Figma 團隊另外在建元件，做到用得上的內頁時才轉成 Vue 元件
 
+## Figma 檔案
+- 設計稿：fileKey `S17Fjm0lNpOneka6BH0upt`，畫面在「mockup」頁，分成住戶端、管委會端、管理人員三個區塊（住戶端區塊 node `758:7722`，首頁 `758:7723`）
+- 好彼 Kit（元件庫）：fileKey `QN3qtb18bNf1syex8n5FTv`。從 shadcn 拉出來的基礎元件各一頁；自訂的產品元件（App/、Report/、Notice/、Meeting/、Admin/ 等）在「hubitat」頁
+- 在 Kit 調整元件高度時要用「綁變數」的方式，不要直接輸入數字；直接輸入會解掉變數，mockup 裡填滿寬度的實例就不會跟著變
+- 在 Kit 清除巢狀元件的覆寫前，先確認清掉後會退回什麼預設值（2026-10-08 曾因此讓通報卡片的徽章變回預設文字）
+- Figma 工具的截圖偶爾會落後於實際畫面，以讀到的資料為準，重要畫面請我在 Figma 裡確認
+
 ## 待辦提醒
 - 【之後】產品完成後要做一個網頁版使用手冊（給不會用的人看的說明），現在先不處理
 - 【設計待決定】對比度偏低，目前完全照設計稿：白字在品牌藍（`--primary` / `--nav-active`）約 2 : 1、白字在 `--fab` 紅約 3 : 1。之後要調整時改 `style.css` 的 `:root` 變數即可
-- 【之後】首頁的問候語與吉祥物放在 `AppHeader` 的 slot。吉祥物圖片我已放在 `src/assets/IP/`（`1.png`～`6.png`，尚未 commit）：每張約 3MB，用在網頁前要先壓縮、縮小尺寸，並確認每張是什麼姿勢、用在哪裡
+- 吉祥物原圖在 `src/assets/IP/`（`1.png`～`6.png`，每張約 3MB，**不要 commit**）：1 思考、2 開心奔跑、3 指向左上、4 驚訝坐著、5 坐著揮手、6 拿放大鏡流汗。用在網頁前要先縮小，縮好的放 `src/assets/mascot/`（首頁問候列用的是 3，存成 `pointing.png`）
+- 【之後】mockup 裡有些卡片是手工畫的框、不是 Kit 元件，不會跟著 Kit 變動，還沒清查
+- 【之後】Kit 缺「篩選標籤」元件，目前有 6 處借用 Button 手動調整（管委會端・社區檔案・公開文件）
+- 【之後】新增提案畫面有 4 個 Textarea 被縮成單行在用，應改成 Input
 - 專案根目錄的 `第一組＿好彼社區 Hubitat.pdf` 是我的個人檔案，**不要 commit**（已用 `.git/info/exclude` 在本機排除）
 - 給組員看的假資料進度整理：https://claude.ai/code/artifact/fbdedca5-8868-4f7e-954e-5f8e9b94e09d
 - 【之後】住戶端新增了「加入管委會」流程（2026-10-08 設計稿新增，尚未做假資料與畫面）：我的頁的「身分」區塊 → 輸入邀請碼或掃 QR Code → 確認邀請 → 接受完成（任期開始日才生效）。做到「我的」頁時要補邀請碼的假資料
