@@ -25,7 +25,7 @@ export const roles = [
     description: '查看社區狀態、通報問題',
     tabs: [
       { path: 'home', label: '首頁', icon: HouseIcon },
-      { path: 'files', label: '社區檔案', icon: FolderOpenIcon },
+      { path: 'files', label: '社區', icon: FolderOpenIcon },
       { path: 'me', label: '我的', icon: UserIcon },
     ],
     // fab：右下角的圓形按鈕（Floating Action Button）

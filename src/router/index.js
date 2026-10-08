@@ -3,7 +3,22 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { roles } from '@/config/roles'
 import AppShell from '@/layouts/AppShell.vue'
 import PlaceholderView from '@/views/PlaceholderView.vue'
+import ResidentHomeView from '@/views/resident/HomeView.vue'
 import RoleSelectView from '@/views/RoleSelectView.vue'
+
+// 已經做好的頁面：「哪一端/哪個分頁」對應哪個畫面
+// 沒列在這裡的分頁，先顯示佔位頁
+const pages = {
+  'resident/home': ResidentHomeView,
+}
+
+// 住戶端首頁會連過去、但還沒做的內頁，先用佔位頁
+const residentPlaceholders = [
+  { path: 'reports', title: '我的通報' },
+  { path: 'reports/:id', title: '通報詳情' },
+  { path: 'announcements', title: '社區公告' },
+  { path: 'meetings/:id', title: '會議紀錄' },
+]
 
 // 依照 roles 設定，替每一端產生一組路由
 // 例如住戶端會產生 /resident/home、/resident/files、/resident/me …
@@ -14,10 +29,10 @@ const roleRoutes = roles.map((role) => ({
   redirect: `/${role.id}/home`, // 只打 /resident 時自動轉到首頁
   // children：顯示在外框「中間」的頁面
   children: [
-    // 每個底部分頁一個佔位頁
+    // 每個底部分頁一頁：做好的用真的畫面，還沒做的用佔位頁
     ...role.tabs.map((tab) => ({
       path: tab.path,
-      component: PlaceholderView,
+      component: pages[`${role.id}/${tab.path}`] ?? PlaceholderView,
       meta: { title: `${role.label}端・${tab.label}` },
     })),
     {
@@ -30,6 +45,11 @@ const roleRoutes = roles.map((role) => ({
       component: PlaceholderView,
       meta: { title: `${role.label}端・${role.fab.title}` },
     },
+    ...(role.id === 'resident' ? residentPlaceholders : []).map((page) => ({
+      path: page.path,
+      component: PlaceholderView,
+      meta: { title: `${role.label}端・${page.title}` },
+    })),
   ],
 }))
 

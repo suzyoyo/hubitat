@@ -17,9 +17,12 @@ const basePath = computed(() => `/${props.roleId}`)
 <template>
   <!-- 只做手機版：寬螢幕上限制最大寬度並置中 -->
   <div class="mx-auto min-h-dvh max-w-md bg-background">
+    <!-- 背景的淡藍光暈：固定在畫面左下角，不會跟著內容捲動，也不會擋到點擊 -->
+    <div class="pointer-events-none fixed inset-0 mx-auto max-w-md bg-page-glow" />
     <AppHeader :notifications-to="`${basePath}/notifications`" />
     <!-- pb-32：留空間給固定在底部的導覽列，內容才不會被蓋住 -->
-    <main class="pb-32">
+    <!-- relative：讓內容疊在光暈的上面 -->
+    <main class="relative pb-32">
       <!-- RouterView：目前網址對應的頁面會顯示在這裡 -->
       <RouterView />
     </main>

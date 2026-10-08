@@ -70,7 +70,7 @@
    ─────────────────────────────────────────────────────────── */
 :root {
   /* shadcn-vue 元件會用到的變數 */
-  --background: #f6f6f6; /* 頁面背景（彩色版首頁的底色） */
+  --background: var(--color-gray-50); /* 頁面背景 surface/background */
   --foreground: var(--color-gray-950); /* 主要文字 text/main */
   --card: #ffffff; /* 卡片底色 surface/card */
   --card-foreground: var(--color-gray-950);
@@ -270,13 +270,24 @@
   letter-spacing: 0.6px;
 }
 
-/* 頂部區塊的漸層：由下方的淺藍漸變到上方的白色 */
+/* 首頁問候列的漸層：由下方的淺藍漸變到上方的白色 */
 @utility bg-header-panel {
   background-image: linear-gradient(
-    2.63deg,
-    var(--color-blue-100) 10.7%,
-    #e6f1f7 53%,
-    #ffffff 95.3%
+    -6.8deg,
+    var(--color-blue-100) 12.5%,
+    #e6f1f7 80.6%,
+    #ffffff 148.7%
+  );
+}
+
+/* 頁面背景的光暈：從畫面左下角往上散開的淡藍色 */
+@utility bg-page-glow {
+  background-image: radial-gradient(
+    ellipse 209% 120% at 37% 100%,
+    rgb(34 148 241 / 0.21) 0%,
+    rgb(73 165 234 / 0.12) 19%,
+    rgb(111 183 226 / 0.03) 38%,
+    transparent 75%
   );
 }
 
