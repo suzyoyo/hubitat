@@ -18,9 +18,10 @@
 ## 工作方式（重要）
 1. **一次只做一步**，做完說明結果與如何驗證
 2. 等我確認沒問題，**才 commit**
-3. 步驟依 `docs/setup-plan.md`
-4. Commit 訊息用英文、簡短（例如 `chore: add tailwindcss`）
-5. 回覆使用繁體中文
+3. **不直接 commit 到 `main`**（2026-10-09 起）：照 `docs/git-workflow.md`，一個頁面開一個分支（例如 `resident/reports`），做完開 PR，由 013 看過才合併。Claude 幫我做事時也照這個流程
+4. 寫程式照 `docs/dev-guide.md`；做完元件要更新 `docs/component-map.md` 的狀態，放在同一個 PR
+5. Commit 訊息用英文、簡短（例如 `chore: add tailwindcss`）
+6. 回覆使用繁體中文
 
 ## 目前進度
 - repo：`suzyoyo/hubitat`，分支 `main`
@@ -33,7 +34,15 @@
   - 元件名稱對應好彼 Kit：`AppGreeting`、`SectionHeader`（`src/components/app/`）、`ReportCard`（`report/`）、`NoticeHomeCard`（`notice/`）、`MeetingCard`（`meeting/`）
   - 首頁連出去的內頁目前是佔位頁：`/resident/reports`、`/resident/reports/:id`、`/resident/announcements`、`/resident/meetings/:id`
   - 問候語顯示「今天」正在進行的公告（優先與我有關的）；公告卡片只放與我有關的前 2 則
-- **下一步**：做首頁連出去的內頁（我的通報、通報詳情、社區公告），或「我的」頁與加入管委會流程，開始前先問我要做哪一個
+- ✅ 開發規格書與分工完成（2026-10-09）：我（suzy）和組員 013 共同開發，兩人程度相近、都參與設計、都是第一次用分支和 PR
+  - `docs/dev-guide.md`：開發規範（資料夾、命名、寫新頁面的步驟、樣式、拿資料、不要做的事、尚未定案的事）
+  - `docs/git-workflow.md`：分工與 Git 流程
+  - `docs/component-map.md`：Kit 的 61 個產品元件對照程式檔案與完成狀態；第 5 節列了 Kit 本身待確認的問題
+  - 分工：suzy 做住戶端、013 做管委會端；管理人員端先不做，等管委會端做出幾頁再看哪些畫面共用
+  - 共用的東西（`style.css`、`roles.js`、外框、`components/ui/`、`src/mocks/`）由 suzy 負責
+  - 路由已依三端拆開：`src/router/resident.js`、`committee.js`、`staff.js` 各有 `views`（做好的畫面）與 `innerPages`（內頁清單），`index.js` 負責組合，平常不用改
+- **下一步**：繼續做住戶端畫面：首頁連出去的內頁（我的通報、通報詳情、社區公告），或「我的」頁與加入管委會流程，開始前先問我要做哪一個
+  - 開始前先確認 013 已被加為 repo 協作者（GitHub → Settings → Collaborators），否則沒有人能看 PR
 - wireframe 大致完成（2026-10-06）
 - Step 10（PWA）可隨時進行
 
@@ -53,7 +62,7 @@
 - 三層：基礎色階（`@theme`，覆蓋 Tailwind 的 blue / red / gray；orange 用 Tailwind 內建的，不覆蓋）→ 語意色（`:root`）→ 接到 Tailwind（`@theme inline`）。換色改 `:root`
 - 文字樣式用 `type-` 開頭的 class：`type-title`、`type-card-title`、`type-body`、`type-label` 等（不要用 `text-` 開頭，會和顏色 class 撞名）
 - 內文是 16px（設計稿 14px，團隊決定放大）
-- 卡片：好彼 Kit 的卡片圓角是 14px，新做的元件用 `rounded-xl` + `shadow-card`。`rounded-card`（20px）是舊值，只剩角色選擇頁和 playground 在用，還沒決定要不要改
+- 卡片：好彼 Kit 的卡片圓角是 14px，新做的元件用 `rounded-xl` + `shadow-card`。`rounded-card`（20px）是舊值，shadcn 的 `<Card>`（`src/components/ui/card/Card.vue`）、角色選擇頁和 playground 還在用，還沒決定要不要改
 - 徽章（`src/components/ui/badge/index.js`，對照 Kit 的 Badge，高 22px）：
   - `default` 淺藍底、深藍字：分類，或「已收到」這類還沒開始處理的狀態
   - `secondary` 淺橘底、深橘字：進行中的狀態，例如「處理中」「施工中」
