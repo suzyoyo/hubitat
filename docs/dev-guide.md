@@ -9,7 +9,7 @@
 - 假資料的完整規劃：[data-model.md](data-model.md)
 - shadcn-vue 的用法筆記：[shadcn-vue-notes.md](shadcn-vue-notes.md)
 - 分工、分支與 PR 怎麼操作：[git-workflow.md](git-workflow.md)
-- Kit 元件與程式元件對照：`component-map.md`（尚未撰寫）
+- Kit 元件與程式元件對照：[component-map.md](component-map.md)
 
 ## 目錄
 
