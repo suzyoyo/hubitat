@@ -8,7 +8,7 @@
 
 - 假資料的完整規劃：[data-model.md](data-model.md)
 - shadcn-vue 的用法筆記：[shadcn-vue-notes.md](shadcn-vue-notes.md)
-- 分支與 PR 怎麼操作：`git-workflow.md`（尚未撰寫）
+- 分工、分支與 PR 怎麼操作：[git-workflow.md](git-workflow.md)
 - Kit 元件與程式元件對照：`component-map.md`（尚未撰寫）
 
 ## 目錄
@@ -675,7 +675,7 @@ const contracts = await getContracts('staff') // 拿到的資料不會有金額
 | 對比度偏低 | 白字在品牌藍上約 2 : 1、白字在「＋」按鈕的紅色上約 3 : 1，長輩可能看不清楚 | 完全照設計稿。之後要調整時只改 `style.css` 的 `:root` |
 | 管委會、管理人員的導覽列 | 設計稿已把「社區檔案」改名為「社區」，只有住戶端改了 | 做到那兩端時再改 `roles.js` 的 `managementTabs` |
 | 管委會、管理人員的「＋」按鈕 | 設計是彈出「全域新增選單」，目前連到佔位頁 | 維持佔位頁 |
-| 管委會和管理人員共用的頁面放哪 | 兩端的分頁相同，有些頁面可能長得一樣 | 談分工時決定 |
+| 管委會和管理人員共用的頁面放哪 | 兩端的分頁相同，有些頁面可能長得一樣 | 管理人員端先不做。等管委會端做出幾頁後再決定（見 [git-workflow.md](git-workflow.md#1-分工)） |
 | 篩選標籤 | Kit 沒有這個元件，設計稿有 6 處是借用 Button 手動調整 | 做到時先討論，不要各做一個 |
 | 用詞 | 住戶端叫「通報」，通知裡出現「報修」 | 畫面上一律用「通報」 |
 | mockup 裡手工畫的卡片 | 有些卡片不是 Kit 元件，不會跟著 Kit 變動，還沒清查 | 以 Kit 的元件為準 |
