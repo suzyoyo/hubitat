@@ -14,7 +14,7 @@ const managementTabs = [
   { path: 'home', label: '首頁', icon: HouseIcon },
   { path: 'cases', label: '案件', icon: WrenchIcon },
   { path: 'vendors', label: '廠商', icon: UsersIcon },
-  { path: 'files', label: '社區檔案', icon: FolderOpenIcon },
+  { path: 'files', label: '社區', icon: FolderOpenIcon },
   { path: 'me', label: '我的', icon: UserRoundIcon },
 ]
 

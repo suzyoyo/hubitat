@@ -65,7 +65,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 |---|---|---|---|
 | `App/Header` | `app/AppHeader.vue` | 🟡 | 變體 Type：**Brand**（首頁品牌列）已做；**Page**（內頁：返回＋置中標題＋右側按鈕）還沒做。做第一個內頁時就會需要 |
 | `App/Bottom Nav` | `app/BottomNav.vue` | ✅ | 住戶端 3 個分頁 |
-| `App/Bottom Nav 管委會` | `app/BottomNav.vue` | 🟡 | 和上面是同一個檔案，分頁由 `roles.js` 傳入。5 個分頁的版本能用，但還沒對照 Kit 的樣式，「社區檔案」也還沒改名為「社區」 |
+| `App/Bottom Nav 管委會` | `app/BottomNav.vue` | 🟡 | 和上面是同一個檔案，分頁由 `roles.js` 傳入。5 個分頁的版本能用，但還沒對照 Kit 的樣式|
 | `App/Nav Item` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/FAB` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/Greeting` | `app/AppGreeting.vue` | ✅ | |
