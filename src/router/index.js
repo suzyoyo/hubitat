@@ -19,11 +19,16 @@ const roleRoutes = roles.map((role) => {
   const { views, innerPages } = pageLists[role.id]
 
   // 產生一頁的路由：做好的用真的畫面，還沒做的用佔位頁
-  function page(path, title) {
+  // isTab：是不是底部分頁。外框會用它決定頂部列的樣子、要不要顯示底部導覽
+  function page(path, title, isTab = false) {
     return {
       path,
       component: views[path] ?? PlaceholderView,
-      meta: { title: `${role.label}端・${title}` },
+      meta: {
+        title: `${role.label}端・${title}`, // 佔位頁上顯示的名稱
+        pageTitle: title, // 頂部列顯示的標題
+        isTab,
+      },
     }
   }
 
@@ -34,7 +39,7 @@ const roleRoutes = roles.map((role) => {
     redirect: `/${role.id}/home`, // 只打 /resident 時自動轉到首頁
     // children：顯示在外框「中間」的頁面
     children: [
-      ...role.tabs.map((tab) => page(tab.path, tab.label)), // 底部分頁
+      ...role.tabs.map((tab) => page(tab.path, tab.label, true)), // 底部分頁
       page('notifications', '通知'), // 右上角的鈴鐺
       page(role.fab.path, role.fab.title), // 右下角的「＋」按鈕
       ...innerPages.map((item) => page(item.path, item.title)), // 內頁
