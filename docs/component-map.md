@@ -83,7 +83,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
-| `Report/Card` | `report/ReportCard.vue` | 🟡 | 變體 Type：**Compact**（首頁摘要）、**Empty**（目前無通報）已做；**Full**（我的通報列表：送出日期＋管委會回覆＋動作）還沒做 |
+| `Report/Card` | `report/ReportCard.vue` | ✅ | 變體 Type 三種都做了：**Compact**（首頁摘要）、**Full**（我的通報列表：送出日期＋管委會回覆＋編輯按鈕）、**Empty**（目前無通報）。用 `type` prop 切換 Compact／Full，不傳 `report` 就是 Empty。Full 的編輯按鈕由 `editTo` 決定要不要顯示 |
 | `Report/Summary` | `report/ReportSummary.vue` | ⬜ | 通報摘要卡。變體 Visibility：Public／Private（Private 加註「僅你本人與管委會可見」） |
 | `Report/Progress Card` | `report/ReportProgressCard.vue` | ⬜ | 「處理進度」卡片，裡面用到下面三個 |
 | `Report/Stepper` | `report/ReportStepper.vue` | ⬜ | 三步驟進度條。變體 Current：1／2／3。可以用基礎元件 `ui/stepper` 當底 |
@@ -128,7 +128,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
-| `Feedback/Empty State` | `feedback/FeedbackEmptyState.vue` | ⬜ | 空狀態：圖示＋標題＋說明＋按鈕。變體 Container：Plain／Card。可以用基礎元件 `ui/empty` 當底 |
+| `Feedback/Empty State` | `feedback/FeedbackEmptyState.vue` | ⬜ | 空狀態：圖示＋標題＋說明＋按鈕。變體 Container：Plain／Card。可以用基礎元件 `ui/empty` 當底。住戶端「我的通報」的空狀態先直接用 `ui/empty`＋吉祥物寫在頁面裡（設計稿沒畫），做這個元件時再換過來 |
 | `Feedback/Haobi Tip` | `feedback/FeedbackHaobiTip.vue` | ⬜ | 好彼管家提示框：頭像＋標籤＋訊息 |
 | `Feedback/Toast` | ➖ | ➖ | 用基礎元件 `ui/sonner`（`toast('訊息')`）。樣式和 Kit 不同時調整 sonner，不另外做元件 |
 | `Feedback/Dialog Header` | ➖ | ➖ | 用基礎元件 dialog 的標題，需要先加 dialog |
