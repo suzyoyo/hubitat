@@ -2,6 +2,7 @@
 // 住戶端・通報詳情：看一筆通報的處理進度，也可以補充說明、換照片或撤回
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import ReportProgressCard from '@/components/report/ReportProgressCard.vue'
 import ReportSummary from '@/components/report/ReportSummary.vue'
 import { getCurrentUser, getReportById } from '@/mocks/api'
 
@@ -20,6 +21,9 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-4 px-5 pt-4">
-    <ReportSummary v-if="report" :report="report" />
+    <template v-if="report">
+      <ReportSummary :report="report" />
+      <ReportProgressCard :report="report" />
+    </template>
   </div>
 </template>
