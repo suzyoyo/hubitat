@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { formatDate, formatDateTime } from '@/lib/date'
+import { reportBadgeVariant } from '@/lib/report'
 
 const props = defineProps({
   // getMyReports() 回傳的其中一筆；不傳就顯示「目前無通報」
@@ -21,12 +22,8 @@ const props = defineProps({
   editTo: { type: String, default: '' },
 })
 
-// 徽章顏色：「處理中」是淺橘（secondary），「已收到」「已完成」是淺藍（default）
-// status 是 pending 代表管委會還沒受理，住戶看到的是「已收到」
-const badgeVariant = computed(() => {
-  if (props.report.isOpen && props.report.status !== 'pending') return 'secondary'
-  return 'default'
-})
+// 徽章顏色依通報的狀態決定（規則寫在 src/lib/report.js，通報摘要卡也用同一份）
+const badgeVariant = computed(() => reportBadgeVariant(props.report))
 
 // Compact 的外觀：左邊一條紅線，所以只有右邊是圓角
 const compactClass = 'block rounded-r-xl border-l-[5px] border-warning bg-card p-4 shadow-card'
