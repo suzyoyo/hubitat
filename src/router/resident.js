@@ -1,5 +1,6 @@
 // 住戶端的頁面清單
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
+import AnnouncementsView from '@/views/resident/AnnouncementsView.vue'
 import HomeView from '@/views/resident/HomeView.vue'
 import ReportsView from '@/views/resident/ReportsView.vue'
 
@@ -10,6 +11,7 @@ export default {
   views: {
     home: HomeView,
     reports: ReportsView,
+    announcements: AnnouncementsView,
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
