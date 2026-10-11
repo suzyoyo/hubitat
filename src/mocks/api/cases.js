@@ -3,7 +3,7 @@
 //   presentForManagement：管委會、管理人員看的（完整）
 //   presentForResident：  住戶看的（簡化的狀態、只給住戶看的進度說明）
 import { diffDays } from '@/lib/date'
-import { CASE_STATUSES, cases } from '../data/cases'
+import { CASE_STATUSES, CASE_VISIBILITY, cases } from '../data/cases'
 import { ISSUE_CATEGORIES } from '../data/community'
 import { equipment } from '../data/equipment'
 import { vendors } from '../data/vendors'
@@ -74,6 +74,8 @@ function presentForResident(item, userId) {
     subject: item.subject,
     displayTitle: `${item.place}｜${item.subject}`,
     visibility: item.isPrivate ? 'private' : 'public', // 對應 CASE_VISIBILITY
+    // 公開狀態的顯示文字，例如「公共區域・公開顯示」
+    visibilityLabel: CASE_VISIBILITY[item.isPrivate ? 'private' : 'public'].note,
     status: item.status,
     statusLabel: CASE_STATUSES[item.status].residentLabel,
     isOpen: isOpen(item),
