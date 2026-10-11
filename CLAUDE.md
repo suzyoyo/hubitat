@@ -46,9 +46,13 @@
   - `ReportCard` 三種變體都做了：用 `type` 切換 Compact／Full，不傳 `report` 是 Empty；徽章顏色依狀態自動決定
   - 空狀態是設計稿沒畫的，用 `ui/empty` + 拿放大鏡的好彼管家（`src/assets/mascot/searching.png`，原圖 6）
   - review 後還沒定案的事（分頁按鈕高度、件數徽章、分頁外框）記在 `docs/dev-guide.md` 第 8 節
-- 🚧 住戶端「通報詳情」頁進行中：分支 `resident/report-detail`，`src/views/resident/ReportDetailView.vue`
-  - 設計稿的詳情頁同時是編輯頁（補充說明、照片、撤回通報、確認修改），「我的通報」的「編輯通報 / 補充」按鈕也是連到這裡
-- **下一步**：做完通報詳情後，繼續住戶端畫面：社區公告、「我的」頁與加入管委會流程、新增通報流程，開始前先問我要做哪一個
+- 🚧 住戶端「通報詳情」頁（`src/views/resident/ReportDetailView.vue`）分兩個 PR 做：
+  - ✅ 第一部分「看」（分支 `resident/report-detail`）：通報摘要卡 `ReportSummary`、處理進度卡 `ReportProgressCard`（裡面是 `ReportStepper`、`ReportRecord`），載入中與找不到通報的畫面
+  - ⬜ 第二部分「改」（還沒開始）：補充說明、照片、撤回通報、確認修改。假 API 目前沒有存檔和撤回的函式，要先新增；撤回需要確認對話框
+  - 設計稿的詳情頁同時是編輯頁，「我的通報」的「編輯通報 / 補充」按鈕也是連到這裡
+  - 徽章顏色的規則放在 `src/lib/report.js`（`reportBadgeVariant`），`ReportCard` 和 `ReportSummary` 共用
+  - 保密通報的公開狀態文字定為「僅你本人與管委會可見」（`CASE_VISIBILITY.private.note`）；進度條還沒到的步驟下面不顯示文字
+- **下一步**：通報詳情的第二部分，或其他住戶端畫面（社區公告、「我的」頁與加入管委會流程、新增通報流程），開始前先問我要做哪一個
 - 013 已是 repo 協作者（hakukanojyo），PR 互相 review 的流程已經跑過（PR #1～#4）
 - wireframe 大致完成（2026-10-06）
 - Step 10（PWA）可隨時進行
