@@ -32,7 +32,7 @@
 - ✅ Step 9 完成：三端的假資料全部建好（14 種資料 + 我的待辦、決議事項、交接包、搜尋等彙整功能），規劃見 `docs/data-model.md`
 - ✅ 住戶端首頁完成（2026-10-08）：`src/views/resident/HomeView.vue`，有通報／無通報兩種狀態都做了
   - 元件名稱對應好彼 Kit：`AppGreeting`、`SectionHeader`（`src/components/app/`）、`ReportCard`（`report/`）、`NoticeHomeCard`（`notice/`）、`MeetingCard`（`meeting/`）
-  - 首頁連出去的內頁目前是佔位頁：`/resident/reports`、`/resident/reports/:id`、`/resident/announcements`、`/resident/meetings/:id`
+  - 首頁連出去的內頁還是佔位頁的：`/resident/announcements`、`/resident/meetings/:id`
   - 問候語顯示「今天」正在進行的公告（優先與我有關的）；公告卡片只放與我有關的前 2 則
 - ✅ 開發規格書與分工完成（2026-10-09）：我（suzy）和組員 013 共同開發，兩人程度相近、都參與設計、都是第一次用分支和 PR
   - `docs/dev-guide.md`：開發規範（資料夾、命名、寫新頁面的步驟、樣式、拿資料、不要做的事、尚未定案的事）
@@ -41,8 +41,19 @@
   - 分工：suzy 做住戶端、013 做管委會端；管理人員端先不做，等管委會端做出幾頁再看哪些畫面共用
   - 共用的東西（`style.css`、`roles.js`、外框、`components/ui/`、`src/mocks/`）由 suzy 負責
   - 路由已依三端拆開：`src/router/resident.js`、`committee.js`、`staff.js` 各有 `views`（做好的畫面）與 `innerPages`（內頁清單），`index.js` 負責組合，平常不用改
-- **下一步**：繼續做住戶端畫面：首頁連出去的內頁（我的通報、通報詳情、社區公告），或「我的」頁與加入管委會流程，開始前先問我要做哪一個
-  - 開始前先確認 013 已被加為 repo 協作者（GitHub → Settings → Collaborators），否則沒有人能看 PR
+- ✅ 住戶端「我的通報」頁完成（2026-10-11 合併，PR #3）：`src/views/resident/ReportsView.vue`
+  - 「進行中」「已完成」兩個分頁；載入中、沒資料、有資料三種狀態都做了
+  - `ReportCard` 三種變體都做了：用 `type` 切換 Compact／Full，不傳 `report` 是 Empty；徽章顏色依狀態自動決定
+  - 空狀態是設計稿沒畫的，用 `ui/empty` + 拿放大鏡的好彼管家（`src/assets/mascot/searching.png`，原圖 6）
+  - review 後還沒定案的事（分頁按鈕高度、件數徽章、分頁外框）記在 `docs/dev-guide.md` 第 8 節
+- 🚧 住戶端「通報詳情」頁（`src/views/resident/ReportDetailView.vue`）分兩個 PR 做：
+  - ✅ 第一部分「看」（分支 `resident/report-detail`）：通報摘要卡 `ReportSummary`、處理進度卡 `ReportProgressCard`（裡面是 `ReportStepper`、`ReportRecord`），載入中與找不到通報的畫面
+  - ⬜ 第二部分「改」（還沒開始）：補充說明、照片、撤回通報、確認修改。假 API 目前沒有存檔和撤回的函式，要先新增；撤回需要確認對話框
+  - 設計稿的詳情頁同時是編輯頁，「我的通報」的「編輯通報 / 補充」按鈕也是連到這裡
+  - 徽章顏色的規則放在 `src/lib/report.js`（`reportBadgeVariant`），`ReportCard` 和 `ReportSummary` 共用
+  - 保密通報的公開狀態文字定為「僅你本人與管委會可見」（`CASE_VISIBILITY.private.note`）；進度條還沒到的步驟下面不顯示文字
+- **下一步**：通報詳情的第二部分，或其他住戶端畫面（社區公告、「我的」頁與加入管委會流程、新增通報流程），開始前先問我要做哪一個
+- 013 已是 repo 協作者（hakukanojyo），PR 互相 review 的流程已經跑過（PR #1～#4）
 - wireframe 大致完成（2026-10-06）
 - Step 10（PWA）可隨時進行
 
@@ -107,7 +118,8 @@
 - 【之後】住戶端新增了「加入管委會」流程（2026-10-08 設計稿新增，尚未做假資料與畫面）：我的頁的「身分」區塊 → 輸入邀請碼或掃 QR Code → 確認邀請 → 接受完成（任期開始日才生效）。做到「我的」頁時要補邀請碼的假資料
 - 【之後】管委會、管理人員的導覽列（5 個分頁）還沒對照 Kit 的樣式。分頁名稱「社區檔案」→「社區」三端都改完了（2026-10-10）；角色選擇頁管委會的說明文字還寫「社區檔案」，那是開發預覽用的頁面，先不改
 - 【之後】管委會、管理人員的「＋」按鈕目前連到佔位頁，設計是彈出「全域新增選單」
-- 【設計待決定】住戶端「我的通報」（`src/views/resident/ReportsView.vue`）：選到「已完成」分頁時，旁邊的件數徽章和分頁底色都是淺藍，會融在一起只剩數字。設計稿只畫了沒選中的樣子。要跟設計確認選中時徽章的樣子（例如改白底），以及「進行中」要不要也顯示件數
+- 【設計待決定】住戶端「我的通報」的分頁（`src/views/resident/ReportsView.vue`）：按鈕高度 35px 要修到 44px、選中「已完成」時件數徽章和底色融在一起、分頁沒有外框不容易看出可以切換。013 提案改成「看過的分頁不顯示件數、在列表上方顯示進行中件數」（需要已讀狀態，假資料還沒有）；「進行中」不加件數。詳見 `docs/dev-guide.md` 第 8 節
+- 【設計待決定】「編輯通報 / 補充」按鈕樣式：等設計稿三端統一後再修（PR #3 的 review 意見，還沒記進 dev-guide）
 - 【觀察中】`npm audit` 有 7 個 moderate 弱點，來自 shadcn-vue CLI 的相依套件（不會打包進網頁）；勿用 `npm audit fix --force`（會把 shadcn-vue 降回 0.10.5）
 
 ## 注意事項

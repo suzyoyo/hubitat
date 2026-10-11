@@ -50,7 +50,7 @@ export const CASE_SOURCES = {
 // 公開或保密（住戶通報時選的「問題類型」）
 export const CASE_VISIBILITY = {
   public: { label: '公共設施修繕', note: '公共區域・公開顯示' },
-  private: { label: '住戶違規', note: '住戶違規・不公開顯示' },
+  private: { label: '住戶違規', note: '僅你本人與管委會可見' },
 }
 
 export const cases = [
