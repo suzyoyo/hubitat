@@ -70,10 +70,11 @@ import { Spinner } from '@/components/ui/spinner'
     <div class="space-y-2">
       <h3 class="text-sm font-medium text-muted-foreground">Badge</h3>
       <div class="flex flex-wrap gap-2">
-        <Badge>施工中</Badge>
-        <Badge variant="secondary">待處理</Badge>
+        <!-- 文字用住戶端的例子：紅＝正在影響你、橘＝要你動手、藍＝跟你有關、灰＝已結束或分類 -->
+        <Badge variant="destructive">施工中</Badge>
+        <Badge variant="secondary">待投票</Badge>
+        <Badge>處理中</Badge>
         <Badge variant="outline">已完成</Badge>
-        <Badge variant="destructive">逾期</Badge>
       </div>
     </div>
 
