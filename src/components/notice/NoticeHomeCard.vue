@@ -67,7 +67,7 @@ const badgeVariant = computed(() => {
     <div v-else-if="notice.place" class="py-2">
       <p class="type-body-strong">地點：{{ notice.place }}</p>
     </div>
-    <p class="text-base leading-5 text-muted-foreground">
+    <p class="type-date text-muted-foreground">
       {{ formatDateRange(startDate, endDate) }}
     </p>
   </article>

@@ -20,7 +20,7 @@ defineProps({
       <Badge :variant="reportBadgeVariant(report)">{{ report.statusLabel }}</Badge>
     </div>
     <!-- flex-wrap：螢幕比較窄、一行放不下時，公開狀態會自動換到下一行 -->
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-base leading-5 text-muted-foreground">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 type-date text-muted-foreground">
       <p>送出於 {{ formatDate(report.submittedAt) }}</p>
       <p class="flex items-center gap-1.5">
         <!-- component :is：依條件決定要用哪一個圖示元件 -->

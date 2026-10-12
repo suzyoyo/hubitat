@@ -242,10 +242,11 @@
   line-height: 20px;
   font-weight: 500;
 }
-/* 日期、更新時間 */
+/* 日期、更新時間、負責單位這類補充資訊
+   2026-10-12：從 14px 放大到 16px（和內文一樣大，長輩比較好讀）。通常搭配 text-muted-foreground 的灰色來和內文區分 */
 @utility type-date {
-  font-size: 14px;
-  line-height: 21px;
+  font-size: 16px;
+  line-height: 20px;
   font-weight: 400;
 }
 /* 按鈕文字 */
