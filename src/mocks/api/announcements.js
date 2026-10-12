@@ -45,15 +45,39 @@ function present(item, role) {
 
 // ── 住戶端 ────────────────────────────────────────────────
 
+// 已讀紀錄：誰看過哪些公告，例如 { 'u-c04': Set { 'an-001', 'an-002' } }
+// 現在沒有後端，先記在記憶體裡：換頁還會記得，重新整理網頁就會清空（全部變回未讀）
+const readIdsByUser = {}
+
+function hasRead(userId, id) {
+  return readIdsByUser[userId]?.has(id) ?? false
+}
+
 // 取得住戶看得到的公告：已發布、還沒結束，依開始時間排序
-// 每則會多一個 relatedToMe：是否「與我有關」
+// 每則會多兩個欄位：
+//   relatedToMe 是否「與我有關」
+//   isRead      這位住戶看過了沒
 export async function getAnnouncements(userId) {
   await delay()
   const user = findUser(userId)
   return announcements
     .filter((item) => item.status === 'published' && item.endAt >= MOCK_NOW)
     .toSorted((a, b) => a.startAt.localeCompare(b.startAt))
-    .map((item) => ({ ...present(item, 'resident'), relatedToMe: isRelatedTo(item, user) }))
+    .map((item) => ({
+      ...present(item, 'resident'),
+      relatedToMe: isRelatedTo(item, user),
+      isRead: hasRead(userId, item.id),
+    }))
+}
+
+// 把幾則公告記成「這位住戶看過了」；ids 是公告編號的清單，例如 ['an-001', 'an-002']
+export async function markAnnouncementsRead(userId, ids) {
+  await delay()
+  // 這位住戶還沒有紀錄的話，先建立一個空的 Set（Set 是不會重複的清單）
+  readIdsByUser[userId] ??= new Set()
+  for (const id of ids) {
+    readIdsByUser[userId].add(id)
+  }
 }
 
 // ── 管理端 ────────────────────────────────────────────────
