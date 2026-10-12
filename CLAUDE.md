@@ -75,11 +75,11 @@
 - 文字樣式用 `type-` 開頭的 class：`type-title`、`type-card-title`、`type-body`、`type-label` 等（不要用 `text-` 開頭，會和顏色 class 撞名）
 - 內文是 16px（設計稿 14px，團隊決定放大）
 - 卡片：好彼 Kit 的卡片圓角是 14px，新做的元件用 `rounded-xl` + `shadow-card`。`rounded-card`（20px）是舊值，shadcn 的 `<Card>`（`src/components/ui/card/Card.vue`）、角色選擇頁和 playground 還在用，還沒決定要不要改
-- 徽章（`src/components/ui/badge/index.js`，對照 Kit 的 Badge，高 22px）：
-  - `default` 淺藍底、深藍字：分類，或「已收到」這類還沒開始處理的狀態
-  - `secondary` 淺橘底、深橘字：進行中的狀態，例如「處理中」「施工中」
-  - `outline` 灰底、黑字、沒有外框：不需要強調的分類，例如「常態例會」「1F 大廳」
-- 通報狀態顏色（已定）：已收到＝淺藍、處理中＝淺橘。其他狀態（已受理、已完成、進行中、待處理）設計稿上還有兩三種顏色混用，尚未定案
+- 徽章（`src/components/ui/badge/index.js`，對照 Kit 的 Badge，高 22px）：顏色代表「需不需要注意」，住戶端和管理端的意思不同，完整規則與例子在 `docs/dev-guide.md` 第 5 節（2026-10-11 定案，來源是 013 整理的《管委會端規格：角色權限與狀態顏色》）
+  - 住戶端：紅 `destructive`＝今天就會影響你（施工中、今天開始、緊急公告）；橘 `secondary`＝需要你動手做（待投票、請補充通報資料）；藍 `default`＝跟你有關但不用做什麼（與你相關、明天開始、已收到、處理中）；灰 `outline`＝已結束或只是分類（已完成、公告類型、一般日期）
+  - 管理端：紅＝已經出問題（逾期、尚未受理）；橘＝輪到你處理或快到期；藍＝進行中、在等別人；灰＝已結束、正常或分類
+  - 住戶端不顯示逾期天數、附議人數、處理人姓名
+  - 紅色徽章的色值用我們色階裡的（`bg-warning-subtle text-red-800`），和 Kit 的 `#ffdbdc` / `#e7000b` 不完全相同
 - 表單：必填只用紅色星號，不寫「必填」；選填用灰色小字「選填」，不要底色
 - 外框顏色變數：`--nav`、`--nav-active`、`--fab` 等
 
