@@ -1,52 +1,26 @@
 <script setup>
 // 社區公告頁的公告卡（對應 Figma 的 Notice/Card）
-// 類型／時間／範圍三個徽章＋標題＋日期時間＋影響範圍或地點＋負責單位與「查看詳情」
-import { computed } from 'vue'
+// 類型、範圍兩個徽章＋標題＋日期時間＋影響範圍或地點＋負責單位與「查看詳情」
+// 徽章不寫日期和「進行中」這類狀態：日期已經在內文的「日期時間」那一行
 import { ChevronRightIcon, ClockIcon, MapPinIcon, TriangleAlertIcon } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
-import { countDays, diffDays, formatDateWithWeekday } from '@/lib/date'
 import { noticeDateText, noticeOrganizerLabel } from '@/lib/notice'
-import { MOCK_TODAY } from '@/mocks/api'
 
-const props = defineProps({
+defineProps({
   // getAnnouncements() 回傳的其中一則
   notice: { type: Object, required: true },
 })
 
 // 點卡片時通知頁面（會把這則公告一起傳出去），由頁面打開詳情彈窗
 defineEmits(['detail'])
-
-// '2026-10-05T09:00' → '2026-10-05'
-const startDate = computed(() => props.notice.startAt.split('T')[0])
-const endDate = computed(() => props.notice.endAt.split('T')[0])
-// 是不是同一天開始、同一天結束
-const isOneDay = computed(() => startDate.value === endDate.value)
-
-// 時間徽章：文字和顏色一起決定（住戶端的徽章規則見 docs/dev-guide.md 第 5 節）
-//   進行中、今天 → 紅（destructive）：今天就會影響你
-//   明天         → 藍（default）：跟你有關，但還不用做什麼
-//   更之後       → 灰（outline）：一般日期
-const timeBadge = computed(() => {
-  const dateText = formatDateWithWeekday(startDate.value)
-  if (props.notice.isOngoing) {
-    // 只有一天的公告不用寫「共 1 天」
-    const text = isOneDay.value ? '進行中' : `進行中・共 ${countDays(startDate.value, endDate.value)} 天`
-    return { variant: 'destructive', text }
-  }
-  const days = diffDays(MOCK_TODAY, startDate.value)
-  if (days <= 0) return { variant: 'destructive', text: `今天 ${dateText}` }
-  if (days === 1) return { variant: 'default', text: `明天 ${dateText}` }
-  return { variant: 'outline', text: dateText }
-})
 </script>
 
 <template>
   <!-- relative：讓「查看詳情」的可點擊範圍可以蓋滿這張卡片（見最下面的說明） -->
   <article class="relative space-y-3 rounded-xl bg-card p-4 shadow-card">
-    <!-- 三個徽章：類型（灰）、時間、範圍。放不下會自動換行 -->
+    <!-- 兩個徽章：類型（灰）、範圍。放不下會自動換行 -->
     <div class="flex flex-wrap items-center gap-2">
       <Badge variant="outline">{{ notice.typeLabel }}</Badge>
-      <Badge :variant="timeBadge.variant">{{ timeBadge.text }}</Badge>
       <!-- 與我有關的用藍色標出來；其他的只顯示範圍 -->
       <Badge v-if="notice.relatedToMe">與你相關・{{ notice.scopeLabel }}</Badge>
       <Badge v-else variant="outline">{{ notice.scopeLabel }}</Badge>
