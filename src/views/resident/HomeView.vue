@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import MeetingCard from '@/components/meeting/MeetingCard.vue'
+import NoticeDetailDialog from '@/components/notice/NoticeDetailDialog.vue'
 import NoticeHomeCard from '@/components/notice/NoticeHomeCard.vue'
 import ReportCard from '@/components/report/ReportCard.vue'
 import { Button } from '@/components/ui/button'
@@ -22,6 +23,16 @@ const loading = ref(true)
 const reports = ref([]) // 我進行中的通報
 const allNotices = ref([]) // 住戶看得到的所有公告
 const meetings = ref([]) // 已發布的會議
+
+// 公告詳情彈窗：detailNotice 是要顯示哪一則，detailOpen 是彈窗開還是關
+const detailNotice = ref(null)
+const detailOpen = ref(false)
+
+// 點公告卡片時：記下是哪一則，然後打開彈窗
+function openDetail(notice) {
+  detailNotice.value = notice
+  detailOpen.value = true
+}
 
 // onMounted：畫面一出現就去拿資料
 onMounted(async () => {
@@ -95,7 +106,7 @@ const greeting = computed(() => {
             v-for="notice in homeNotices"
             :key="notice.id"
             :notice="notice"
-            to="/resident/announcements"
+            @detail="openDetail"
           />
           <MeetingCard
             v-if="latestMeeting"
@@ -105,5 +116,8 @@ const greeting = computed(() => {
         </template>
       </section>
     </div>
+
+    <!-- 公告詳情彈窗：平常看不到，detailOpen 變成 true 才會出現 -->
+    <NoticeDetailDialog v-model:open="detailOpen" :notice="detailNotice" />
   </div>
 </template>

@@ -100,13 +100,14 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
-| `Notice/Home Card` | `notice/NoticeHomeCard.vue` | ✅ | 首頁的社區公告卡 |
-| `Notice/Card` | `notice/NoticeCard.vue` | ⬜ | 社區公告頁的完整公告卡 |
+| `Notice/Home Card` | `notice/NoticeHomeCard.vue` | ✅ | 首頁的社區公告卡，右上角是狀態徽章（施工中、明天開始、3 天後開始）。整張可以點，點了送出 `detail` 事件，由頁面打開詳情彈窗 |
+| `Notice/Card` | `notice/NoticeCard.vue` | ✅ | 社區公告頁的完整公告卡：類型、範圍兩個徽章＋日期時間＋影響範圍或地點＋負責單位。沒有日期徽章（2026-10-12 決定拿掉，Kit 還有，待更新）。整張可以點，點了送出 `detail` 事件 |
+| （Kit 沒有元件，設計稿是「查看詳情彈窗」） | `notice/NoticeDetailDialog.vue` | ✅ | 公告詳情彈窗，首頁和社區公告頁共用。傳 `notice`，用 `v-model:open` 控制開關。設計稿的「留言給管委會」按鈕還沒放，等留言功能做的時候再加 |
 | `Meeting/Card` | `meeting/MeetingCard.vue` | 🟡 | 變體 Type：**Summary**（首頁會議摘要）已做；**Latest**（最新會議：3 條決議重點）還沒做 |
 | `Meeting/Point` | `meeting/MeetingPoint.vue` | ⬜ | 決議重點的一條：勾選圖示＋文字 |
 | `Meeting/Head` | `meeting/MeetingHead.vue` | ⬜ | 會議紀錄頁首：主辦機關、標題、日期、出席 |
 | `Meeting/Case` | `meeting/MeetingCase.vue` | ⬜ | 會議全文的案由，可展開收合。變體 State：Open／Closed。需要先加基礎元件 accordion |
-| `Calendar/Card` | `calendar/CalendarCard.vue` | ⬜ | 社區行事曆卡：兩週日期＋活動圓點 |
+| `Calendar/Card` | `calendar/CalendarCard.vue` | ✅ | 社區行事曆卡：從這個星期日開始的兩週日期＋公告圓點（實心＝與我有關、空心＝其他）。傳 `notices`。只顯示、不能點 |
 | `Calendar/Day` | ➖ | ➖ | 行事曆的單一日期。寫在 `CalendarCard.vue` 裡面即可 |
 | `Comment/Thread` | `comment/CommentThread.vue` | ⬜ | 一串留言。變體 Status：已回覆／待回覆 |
 | `Comment/Bubble` | `comment/CommentBubble.vue` | ⬜ | 一則留言。變體 From：我的留言／管委會回覆 |
@@ -128,11 +129,11 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
-| `Feedback/Empty State` | `feedback/FeedbackEmptyState.vue` | ⬜ | 空狀態：圖示＋標題＋說明＋按鈕。變體 Container：Plain／Card。可以用基礎元件 `ui/empty` 當底。住戶端「我的通報」的空狀態先直接用 `ui/empty`＋吉祥物寫在頁面裡（設計稿沒畫），做這個元件時再換過來 |
+| `Feedback/Empty State` | `feedback/FeedbackEmptyState.vue` | ⬜ | 空狀態：圖示＋標題＋說明＋按鈕。變體 Container：Plain／Card。可以用基礎元件 `ui/empty` 當底。住戶端「我的通報」（Plain）和「社區公告」（Card）的空狀態先直接用 `ui/empty`＋吉祥物寫在頁面裡，做這個元件時再換過來 |
 | `Feedback/Haobi Tip` | `feedback/FeedbackHaobiTip.vue` | ⬜ | 好彼管家提示框：頭像＋標籤＋訊息 |
 | `Feedback/Toast` | ➖ | ➖ | 用基礎元件 `ui/sonner`（`toast('訊息')`）。樣式和 Kit 不同時調整 sonner，不另外做元件 |
-| `Feedback/Dialog Header` | ➖ | ➖ | 用基礎元件 dialog 的標題，需要先加 dialog |
-| `Feedback/Dialog Actions` | ➖ | ➖ | 用基礎元件 dialog 的按鈕區 |
+| `Feedback/Dialog Header` | ➖ | ➖ | 用基礎元件 dialog 的標題（`DialogTitle`）。用法見 `notice/NoticeDetailDialog.vue` |
+| `Feedback/Dialog Actions` | ➖ | ➖ | 用基礎元件 dialog 的按鈕區。關閉用的按鈕用 `DialogClose` 包起來 |
 | `Feedback/Modal Backdrop` | ➖ | ➖ | 基礎元件 dialog、drawer、sheet 已經內建半透明背景 |
 | `Notification/Item` | `notification/NotificationItem.vue` | ⬜ | 通知的一筆。變體 Type：留言回覆／報修進度／公告；State：未讀／已讀 |
 | `Common/Icon Tile` | `common/IconTile.vue` | ✅ | 圖示方塊。變體 Style 用 `variant` prop 切換：`soft`（預設）／`square`（不叫 `style`，會和 HTML 的 style 屬性撞名）。圖示用 slot 放進去：`<IconTile><UsersIcon /></IconTile>` |
@@ -187,7 +188,7 @@ import { Button } from '@/components/ui/button'
 | Calendar | `calendar` | ⬜ | |
 | Checkbox | `checkbox` | ⬜ | |
 | Combobox | `combobox` | ⬜ | |
-| Dialog | `dialog` | ⬜ | `Feedback/Dialog Header`、`Dialog Actions` 會用到 |
+| Dialog | `dialog` | ✅ | 2026-10-12 加入。公告詳情彈窗在用；通報詳情的撤回確認之後也會用到 |
 | Native Select | `native-select` | ⬜ | |
 | Toggle & Toggle Group | `toggle`、`toggle-group` | ⬜ | |
 | Kbd | ➖ | ➖ | 顯示鍵盤按鍵用的，手機版用不到 |

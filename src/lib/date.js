@@ -14,6 +14,29 @@ export function formatDate(value) {
   return `${month}/${day}`
 }
 
+// 星期幾，回傳 0～6：0 是星期日，6 是星期六
+export function weekdayIndex(value) {
+  const { year, month, day } = parse(value)
+  return new Date(Date.UTC(year, month - 1, day)).getUTCDay()
+}
+
+// '2026-10-05T09:00' → '10/5（一）'
+export function formatDateWithWeekday(value) {
+  const { month, day } = parse(value)
+  const weekday = '日一二三四五六'[weekdayIndex(value)]
+  return `${month}/${day}（${weekday}）`
+}
+
+// 往後加幾天（負數是往前）：addDays('2026-10-01', 3) → '2026-10-04'
+// 跨月會自動進位：addDays('2026-10-01', -4) → '2026-09-27'
+export function addDays(value, days) {
+  const { year, month, day } = parse(value)
+  const date = new Date(Date.UTC(year, month - 1, day + days))
+  const mm = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const dd = String(date.getUTCDate()).padStart(2, '0')
+  return `${date.getUTCFullYear()}-${mm}-${dd}`
+}
+
 // '2026-09-25T14:30' → '9/25 14:30'
 export function formatDateTime(value) {
   const { month, day, time } = parse(value)
