@@ -2,8 +2,11 @@
 // 管委會端・首頁：問候列、我的待辦、捷徑、住戶意見、公告與動態
 import { ChevronRightIcon, CircleCheckIcon, FileTextIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
+import AdminTodoCard from '@/components/admin/AdminTodoCard.vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
 import IconTile from '@/components/common/IconTile.vue'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { MOCK_NOW, getCurrentUser, getMyTodos } from '@/mocks/api'
 
@@ -34,6 +37,25 @@ const greeting = computed(() => {
   return { title: `${hello.value}！今天有`, subtitle: `${todos.value.total} 件待辦事項喔！` }
 })
 
+// 首頁只放最前面的 2 筆待辦，其餘的按「查看全部待辦事項」
+const homeTodos = computed(() => todos.value.items.slice(0, 2))
+
+// 待辦的 link.type 對應到哪一種頁面
+const TODO_LINK_PATHS = {
+  case: 'cases',
+  task: 'tasks',
+  proposal: 'proposals',
+  announcement: 'announcements',
+  contract: 'contracts',
+  legalDocument: 'documents',
+  quickSave: 'quick-saves',
+}
+
+// 一筆待辦點了要去哪裡，例如 { type: 'case', id: 'CASE-1' } → '/committee/cases/CASE-1'
+function todoLink(todo) {
+  return `/committee/${TODO_LINK_PATHS[todo.link.type]}/${todo.link.id}`
+}
+
 // 捷徑方塊：不是 Kit 元件，直接寫在頁面裡
 const shortcuts = [
   { title: '交辦進度', icon: CircleCheckIcon, to: '/committee/tasks' },
@@ -47,6 +69,27 @@ const shortcuts = [
     <Skeleton v-else class="h-[104px] rounded-t-none rounded-b-3xl" />
 
     <div class="space-y-8 px-5 pt-5">
+      <section class="space-y-3">
+        <!-- 標題右邊是件數徽章，不是「看全部」，所以不用 SectionHeader -->
+        <div class="flex items-center justify-between">
+          <h2 class="type-title text-heading">我的待辦</h2>
+          <Badge v-if="!loading && todos.total" variant="secondary">待處理 {{ todos.total }} 件</Badge>
+        </div>
+        <template v-if="loading">
+          <Skeleton v-for="n in 2" :key="n" class="h-[124px] rounded-xl" />
+        </template>
+        <!-- 設計稿沒畫沒有待辦的樣子 -->
+        <div v-else-if="!homeTodos.length" class="rounded-xl bg-card p-4 shadow-card">
+          <p class="type-body text-muted-foreground">目前沒有待辦事項</p>
+        </div>
+        <template v-else>
+          <AdminTodoCard v-for="todo in homeTodos" :key="todo.id" :todo="todo" :to="todoLink(todo)" />
+        </template>
+        <Button as-child class="w-full">
+          <RouterLink to="/committee/todos">查看全部待辦事項</RouterLink>
+        </Button>
+      </section>
+
       <div class="grid grid-cols-2 gap-3">
         <RouterLink
           v-for="shortcut in shortcuts"
