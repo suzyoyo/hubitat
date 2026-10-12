@@ -1,11 +1,15 @@
 <script setup>
 // 管委會端・公告詳情：一則公告的時間、地點、內容說明與發布紀錄
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { formatFullDate, formatTime } from '@/lib/date'
 import { getAnnouncementById } from '@/mocks/api'
+import { ANNOUNCEMENT_STATUSES } from '@/mocks/data/announcements'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 // useRoute()：取得目前路由的資訊
@@ -22,6 +26,39 @@ onMounted(async () => {
   announcement.value = await getAnnouncementById(route.params.id, 'committee')
   loading.value = false
 })
+
+// 狀態徽章的顏色（dev-guide 第 5 節管理端的規則）
+//   待補、已退回 → 橘：要發布的人動手
+//   待審核       → 藍：流程進行中，在等審核的人
+//   已發布、已撤回 → 灰：正常或已結束
+const STATUS_BADGE_VARIANTS = {
+  draft: 'secondary',
+  rejected: 'secondary',
+  pending: 'default',
+  published: 'outline',
+  withdrawn: 'outline',
+}
+
+// 日期時間（照管委會設計稿，有年份）
+//   一天： '2026/10/12 09:00–12:00'
+//   多天： '2026/10/05～2026/10/07'，有每日時段的話換行接在後面
+function dateText(item) {
+  const startDate = item.startAt.split('T')[0]
+  const endDate = item.endAt.split('T')[0]
+  if (startDate === endDate) {
+    return `${formatFullDate(startDate)} ${formatTime(item.startAt)}–${formatTime(item.endAt)}`
+  }
+  const days = `${formatFullDate(startDate)}～${formatFullDate(endDate)}`
+  return item.timeText ? `${days}\n${item.timeText}` : days
+}
+
+// 第一張卡下面的資訊列：label 是左邊的標籤，value 是右邊的內容
+const basicRows = computed(() => [
+  { label: '日期時間', value: dateText(announcement.value) },
+  // 活動有地點就顯示地點，其他顯示影響範圍
+  { label: '地點／影響範圍', value: announcement.value.place || announcement.value.scopeLabel },
+  { label: '主辦／負責單位', value: announcement.value.organizer },
+])
 </script>
 
 <template>
@@ -46,7 +83,23 @@ onMounted(async () => {
       </Button>
     </Empty>
 
-    <!-- 有資料：卡片在第 3、4 步做，先顯示標題確認資料拿到了 -->
-    <p v-else class="type-card-title">{{ announcement.title }}</p>
+    <!-- 有資料 -->
+    <template v-else>
+      <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
+        <div class="flex items-center justify-between">
+          <Badge variant="outline">{{ announcement.typeLabel }}</Badge>
+          <Badge :variant="STATUS_BADGE_VARIANTS[announcement.status]">
+            {{ ANNOUNCEMENT_STATUSES[announcement.status].label }}
+          </Badge>
+        </div>
+        <h2 class="type-card-title text-foreground">{{ announcement.title }}</h2>
+        <Separator />
+        <div v-for="row in basicRows" :key="row.label" class="flex items-start gap-3">
+          <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
+          <!-- whitespace-pre-line：值裡的 \n 會換行 -->
+          <p class="min-w-0 flex-1 text-right whitespace-pre-line type-body-strong text-foreground">{{ row.value }}</p>
+        </div>
+      </section>
+    </template>
   </div>
 </template>
