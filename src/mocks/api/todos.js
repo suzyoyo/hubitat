@@ -34,16 +34,19 @@ export const TODO_KINDS = {
 
 // 建立一筆待辦
 //   kind 種類 / title 標題 / hint 第二行的說明
+//   createdAt 建立時間：交辦、提案、公告是建立或送出的時間，案件是通報時間，留存是留存時間；
+//             快到期的合約、文件是系統依日期提醒的，沒有建立時間，是 null
 //   dueAt 到期時間（沒有期限就是 null）
 //   link 點了要去哪裡：type 資料種類、id 編號
 //   isUrgent 是否緊急（案件由通報的人標示；其他種類不傳，預設是 false）
-function todo(kind, title, hint, dueAt, link, isUrgent = false) {
+function todo(kind, title, hint, createdAt, dueAt, link, isUrgent = false) {
   return {
     id: `${kind}-${link.id}`,
     kind,
     kindLabel: TODO_KINDS[kind].label,
     title,
     hint,
+    createdAt,
     dueAt,
     // 距離到期還有幾天：0 是今天，負數是已經過了幾天；沒有期限是 null
     daysLeft: dueAt ? diffDays(MOCK_TODAY, dueAt.split('T')[0]) : null,
@@ -57,7 +60,7 @@ function incompleteQuickSaves(userId) {
   return quickSaves
     .filter((item) => item.ownerId === userId && !item.resolved)
     .map((item) =>
-      todo('incomplete', item.name || '未命名的留存', '已留存，尚待補齊資料', null, {
+      todo('incomplete', item.name || '未命名的留存', '已留存，尚待補齊資料', item.savedAt, null, {
         type: 'quickSave',
         id: item.id,
       }),
@@ -69,7 +72,7 @@ function assignedTasks(userId) {
   return tasks
     .filter((task) => task.assigneeId === userId && task.status === 'in_progress')
     .map((task) =>
-      todo('assigned', task.title, `交辦人：${userLabel(task.assignerId)}`, task.deadline, {
+      todo('assigned', task.title, `交辦人：${userLabel(task.assignerId)}`, task.createdAt, task.deadline, {
         type: 'task',
         id: task.id,
       }),
@@ -84,7 +87,7 @@ function committeeTodos(userId) {
   for (const task of tasks) {
     if (task.assignerId === userId && task.status === 'reported') {
       items.push(
-        todo('confirm', task.title, `${userLabel(task.assigneeId)} 已回報完成`, task.deadline, {
+        todo('confirm', task.title, `${userLabel(task.assigneeId)} 已回報完成`, task.createdAt, task.deadline, {
           type: 'task',
           id: task.id,
         }),
@@ -97,7 +100,7 @@ function committeeTodos(userId) {
     const signed = proposal.signatures.some((sign) => sign.userId === userId)
     if (proposalStatus(proposal) === 'signing' && !signed) {
       items.push(
-        todo('sign', proposal.title, `發起人：${userLabel(proposal.proposerId)}`, proposal.deadline, {
+        todo('sign', proposal.title, `發起人：${userLabel(proposal.proposerId)}`, proposal.createdAt, proposal.deadline, {
           type: 'proposal',
           id: proposal.id,
         }),
@@ -110,7 +113,7 @@ function committeeTodos(userId) {
     for (const item of announcements) {
       if (item.status === 'pending') {
         items.push(
-          todo('review', item.title, `${userLabel(item.authorId)} 送出`, item.startAt, {
+          todo('review', item.title, `${userLabel(item.authorId)} 送出`, item.createdAt, item.startAt, {
             type: 'announcement',
             id: item.id,
           }),
@@ -125,7 +128,7 @@ function committeeTodos(userId) {
     if (item.assigneeId === userId && open) {
       const vendor = vendors.find((entry) => entry.id === item.vendorId)
       const hint = vendor ? `廠商：${vendor.name}` : '尚未派廠商'
-      items.push(todo('my_case', item.title, hint, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
+      items.push(todo('my_case', item.title, hint, item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
     }
   }
 
@@ -134,7 +137,7 @@ function committeeTodos(userId) {
     if (contractStatus(contract) === 'expiring') {
       const vendor = vendors.find((entry) => entry.id === contract.vendorId)
       items.push(
-        todo('expiring', `${contract.service}合約（${vendor.name}）`, '合約即將到期', contract.endDate, {
+        todo('expiring', `${contract.service}合約（${vendor.name}）`, '合約即將到期', null, contract.endDate, {
           type: 'contract',
           id: contract.id,
         }),
@@ -146,10 +149,10 @@ function committeeTodos(userId) {
   for (const doc of legalDocuments) {
     const status = legalDocumentStatus(doc)
     if (status === 'expiring') {
-      items.push(todo('expiring', doc.name, '文件即將到期', doc.expiresAt, { type: 'legalDocument', id: doc.id }))
+      items.push(todo('expiring', doc.name, '文件即將到期', null, doc.expiresAt, { type: 'legalDocument', id: doc.id }))
     }
     if (status === 'missing') {
-      items.push(todo('incomplete', `${doc.name}缺件，請上傳`, '尚未上傳檔案', doc.dueAt, { type: 'legalDocument', id: doc.id }))
+      items.push(todo('incomplete', `${doc.name}缺件，請上傳`, '尚未上傳檔案', null, doc.dueAt, { type: 'legalDocument', id: doc.id }))
     }
   }
 
@@ -169,7 +172,7 @@ function staffTodos(userId) {
     if (kind === 'to_verify') hint = '廠商已完工，請確認後標記完成'
     // 新報修沒有期限，用通報時間排序；其他用處理期限
     const dueAt = kind === 'new_case' ? item.reportedAt : (item.deadline ?? null)
-    items.push(todo(kind, item.title, hint, dueAt, { type: 'case', id: item.id }, item.isUrgent))
+    items.push(todo(kind, item.title, hint, item.reportedAt, dueAt, { type: 'case', id: item.id }, item.isUrgent))
   }
 
   return [...items, ...incompleteQuickSaves(userId)]
