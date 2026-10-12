@@ -8,7 +8,7 @@ import { ISSUE_CATEGORIES } from '../data/community'
 import { equipment } from '../data/equipment'
 import { vendors } from '../data/vendors'
 import { areaName } from './community'
-import { MOCK_TODAY, delay } from './helpers'
+import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
 import { findUser, userLabel } from './users'
 
 // 是否未結案
@@ -93,6 +93,8 @@ function presentForResident(item, userId) {
     },
     supporterCount: item.supporters.length,
     isMine: item.reporterId === userId, // 是我通報的，還是我按了「我也遇到了」
+    // 能不能修改或撤回：要是我自己通報的，而且還沒結案
+    canEdit: item.reporterId === userId && isOpen(item),
   }
 }
 
@@ -175,6 +177,45 @@ export async function getReportById(id, userId) {
   if (!item) return undefined
   if (item.isPrivate && item.reporterId !== userId) return undefined
   return presentForResident(item, userId)
+}
+
+// 找出「這位住戶可以修改」的案件：要是他自己通報的，而且還沒結案
+// 找不到或不能改的話回傳 undefined
+function findEditableCase(id, userId) {
+  const item = cases.find((entry) => entry.id === id)
+  if (!item || item.reporterId !== userId || !isOpen(item)) return undefined
+  return item
+}
+
+// 修改通報（住戶用）：只能改補充說明和照片，地點和主旨送出後就不能改
+//   changes 可以傳 description（補充說明）、photos（照片檔名的清單），沒傳的不會動
+// 回傳修改後的通報；不能改的話（不是自己的、已經結案）回傳 undefined
+// 修改只存在記憶體，重新整理網頁會變回原本的假資料
+export async function updateReport(id, userId, changes) {
+  await delay()
+  const item = findEditableCase(id, userId)
+  if (!item) return undefined
+  if (changes.description !== undefined) item.description = changes.description
+  if (changes.photos !== undefined) item.photos = [...changes.photos]
+  return presentForResident(item, userId)
+}
+
+// 撤回通報（住戶用）：狀態改成「已取消」，並留下一筆紀錄
+// 撤回後不會再出現在「我的通報」，管理端的未結案列表也看不到
+// 回傳 true 代表撤回成功；不能撤回的話（不是自己的、已經結案）回傳 false
+export async function withdrawReport(id, userId) {
+  await delay()
+  const item = findEditableCase(id, userId)
+  if (!item) return false
+  item.status = 'cancelled'
+  item.logs.push({
+    at: MOCK_NOW,
+    actorId: userId,
+    label: '住戶撤回',
+    text: '通報人撤回通報',
+    residentText: '你已撤回這筆通報。',
+  })
+  return true
 }
 
 // 新增通報時「確認是否重複」：找出同一個地點、公開、還沒結案的通報
