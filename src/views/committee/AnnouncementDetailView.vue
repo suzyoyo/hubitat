@@ -39,17 +39,25 @@ const STATUS_BADGE_VARIANTS = {
   withdrawn: 'outline',
 }
 
+// '2026-10-01T14:20' → '2026/10/01 14:20'
+function fullDateTime(value) {
+  return `${formatFullDate(value)} ${formatTime(value)}`
+}
+
 // 日期時間（照管委會設計稿，有年份）
-//   一天： '2026/10/12 09:00–12:00'
-//   多天： '2026/10/05～2026/10/07'，有每日時段的話換行接在後面
+//   一天：               '2026/10/12 09:00–12:00'
+//   多天、有每日時段：   '2026/10/05～2026/10/07' 換行 '每日 09:00–17:00'
+//   多天、沒有每日時段： '2026/09/28 18:00～' 換行 '2026/09/29 12:00'（頭尾的時間都要寫）
 function dateText(item) {
   const startDate = item.startAt.split('T')[0]
   const endDate = item.endAt.split('T')[0]
   if (startDate === endDate) {
     return `${formatFullDate(startDate)} ${formatTime(item.startAt)}–${formatTime(item.endAt)}`
   }
-  const days = `${formatFullDate(startDate)}～${formatFullDate(endDate)}`
-  return item.timeText ? `${days}\n${item.timeText}` : days
+  if (item.timeText) {
+    return `${formatFullDate(startDate)}～${formatFullDate(endDate)}\n${item.timeText}`
+  }
+  return `${fullDateTime(item.startAt)}～\n${fullDateTime(item.endAt)}`
 }
 
 // 第一張卡下面的資訊列：label 是左邊的標籤，value 是右邊的內容
@@ -60,14 +68,12 @@ const basicRows = computed(() => [
   { label: '主辦／負責單位', value: announcement.value.organizer },
 ])
 
-// '2026-10-01T14:20' → '2026/10/01 14:20'
-function fullDateTime(value) {
-  return `${formatFullDate(value)} ${formatTime(value)}`
-}
-
 // 審核欄的文字（審核規則見 docs/data-model.md 的公告）
 function reviewText(item) {
-  if (item.status === 'rejected') return `${item.reviewerLabel} 退回`
+  if (item.status === 'draft') return '尚未送出審核'
+  if (item.status === 'rejected') {
+    return `${item.reviewerLabel} 退回\n${fullDateTime(item.rejectedAt)}\n原因：${item.rejectReason}`
+  }
   if (item.reviewerLabel) return `${item.reviewerLabel} 審核通過`
   if (item.needsReview) return '待審核'
   return item.isUrgent ? '緊急公告，免審核' : '委員發布，免審核'
@@ -82,7 +88,9 @@ const publishRows = computed(() => {
     { label: '審核', value: reviewText(item) },
   ]
   if (item.status === 'withdrawn') {
-    rows.push({ label: '撤回', value: `${item.withdrawnByLabel}\n${fullDateTime(item.withdrawnAt)}` })
+    // 撤回原因是選填，有寫才顯示
+    const reason = item.withdrawReason ? `\n原因：${item.withdrawReason}` : ''
+    rows.push({ label: '撤回', value: `${item.withdrawnByLabel}\n${fullDateTime(item.withdrawnAt)}${reason}` })
   }
   return rows
 })
