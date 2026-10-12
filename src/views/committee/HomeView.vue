@@ -36,8 +36,10 @@ onMounted(async () => {
   ])
   todos.value = todoList
   opinions.value = opinionList
-  // 已經結束的公告不放首頁
-  announcements.value = announcementList.filter((item) => !item.hasEnded)
+  // 已經結束的公告不放首頁；照開始時間排，進行中的會在最前面
+  announcements.value = announcementList
+    .filter((item) => !item.hasEnded)
+    .toSorted((a, b) => a.startAt.localeCompare(b.startAt))
   loading.value = false
 })
 
