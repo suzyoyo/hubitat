@@ -1,6 +1,7 @@
 <script setup>
-// 住戶端・社區公告：列出社區的公告，分成「與我有關」「社區公告」兩個分頁
+// 住戶端・社區公告：最上面是兩週的行事曆，下面列出公告，分成「與我有關」「社區公告」兩個分頁
 import { computed, onMounted, ref, watch } from 'vue'
+import CalendarCard from '@/components/calendar/CalendarCard.vue'
 import NoticeCard from '@/components/notice/NoticeCard.vue'
 import NoticeDetailDialog from '@/components/notice/NoticeDetailDialog.vue'
 import { Badge } from '@/components/ui/badge'
@@ -84,6 +85,10 @@ watch(currentTab, markCurrentTabRead)
 <template>
   <!-- v-model：分頁切換時，currentTab 會跟著變 -->
   <Tabs v-model="currentTab" class="gap-4 px-5 pt-4">
+    <!-- 行事曆放全部的公告，不跟著分頁切換 -->
+    <Skeleton v-if="loading" class="h-[216px] rounded-xl" />
+    <CalendarCard v-else :notices="notices" />
+
     <!-- 整列高 44px（設計稿 35px），長輩比較好按 -->
     <TabsList class="h-11! w-full rounded-xl border border-border bg-background p-1">
       <!-- TabsTrigger 與 TabsContent 用相同的 value 配對 -->
