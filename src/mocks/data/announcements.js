@@ -15,9 +15,11 @@
 //   push        推播對象：'affected' 影響範圍內住戶 / 'all' 全社區 / 'none' 不推播
 //   status      狀態，見下方 ANNOUNCEMENT_STATUSES
 //   authorId    發布（送出）的人
-//   createdAt   送出時間
+//   createdAt   送出時間（待補的公告還沒送出，寫的是建立時間）
 //   publishedAt 正式發布的時間（還沒發布就不寫）
-//   reviewerId  審核的人（免審核、或還沒審核就不寫）
+//   reviewerId  審核的人：審核通過或退回的那一位（免審核、或還沒審核就不寫）
+//   rejectedAt  退回時間  ┐ 已退回的公告才有
+//   rejectReason 退回原因 ┘ 從下方 REJECT_REASONS 選一個
 //   withdrawnAt 撤回時間  ┐
 //   withdrawnBy 撤回的人  ├ 已撤回的公告才有
 //   withdrawReason 撤回原因（選填）┘
@@ -198,6 +200,45 @@ export const announcements = [
     createdAt: '2026-10-01T13:30',
     caseId: 'CASE-20260922-002',
     equipmentId: 'e-003',
+  },
+
+  // ── 待補（管理人員先建立、資料還沒補齊，還沒送出審核）──────────
+  {
+    id: 'an-013',
+    type: 'maintenance',
+    title: '垃圾集中場清洗消毒',
+    content: '垃圾集中場例行清洗消毒，詳細時段與注意事項待廠商確認後補上。',
+    startAt: '2026-10-15T09:00',
+    endAt: '2026-10-15T11:00',
+    areaIds: ['area-outdoor'],
+    organizer: '管理室',
+    isUrgent: false,
+    push: 'affected',
+    status: 'draft',
+    authorId: 'u-s02',
+    createdAt: '2026-10-01T11:20',
+  },
+
+  // ── 已退回（管理人員送出後，被主委或副主委退回）──────────────
+  {
+    id: 'an-014',
+    type: 'construction',
+    title: 'B 棟梯間牆面粉刷',
+    content: 'B 棟 1F 至 5F 梯間牆面重新粉刷，施工期間請留意未乾油漆並避免碰觸牆面。',
+    startAt: '2026-10-12T09:00',
+    endAt: '2026-10-14T17:00',
+    timeText: '每日 09:00–17:00',
+    areaIds: ['area-b'],
+    impact: 'B 棟梯間施工期間可通行，請避免碰觸牆面。',
+    organizer: '昇益工程行',
+    isUrgent: false,
+    push: 'affected',
+    status: 'rejected',
+    authorId: 'u-s01',
+    createdAt: '2026-09-30T16:00',
+    reviewerId: 'u-c01',
+    rejectedAt: '2026-10-01T08:30',
+    rejectReason: '日期錯誤',
   },
 
   // ── 已撤回 ──────────────────────────────────────────────
