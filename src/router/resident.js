@@ -2,6 +2,7 @@
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 import AnnouncementsView from '@/views/resident/AnnouncementsView.vue'
 import HomeView from '@/views/resident/HomeView.vue'
+import ReportDetailView from '@/views/resident/ReportDetailView.vue'
 import ReportsView from '@/views/resident/ReportsView.vue'
 
 export default {
@@ -11,6 +12,7 @@ export default {
   views: {
     home: HomeView,
     reports: ReportsView,
+    'reports/:id': ReportDetailView,
     announcements: AnnouncementsView,
   },
 

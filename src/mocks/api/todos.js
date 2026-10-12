@@ -36,7 +36,8 @@ export const TODO_KINDS = {
 //   kind 種類 / title 標題 / hint 第二行的說明
 //   dueAt 到期時間（沒有期限就是 null）
 //   link 點了要去哪裡：type 資料種類、id 編號
-function todo(kind, title, hint, dueAt, link) {
+//   isUrgent 是否緊急（案件由通報的人標示；其他種類不傳，預設是 false）
+function todo(kind, title, hint, dueAt, link, isUrgent = false) {
   return {
     id: `${kind}-${link.id}`,
     kind,
@@ -47,6 +48,7 @@ function todo(kind, title, hint, dueAt, link) {
     // 距離到期還有幾天：0 是今天，負數是已經過了幾天；沒有期限是 null
     daysLeft: dueAt ? diffDays(MOCK_TODAY, dueAt.split('T')[0]) : null,
     link,
+    isUrgent,
   }
 }
 
@@ -123,7 +125,7 @@ function committeeTodos(userId) {
     if (item.assigneeId === userId && open) {
       const vendor = vendors.find((entry) => entry.id === item.vendorId)
       const hint = vendor ? `廠商：${vendor.name}` : '尚未派廠商'
-      items.push(todo('my_case', item.title, hint, item.deadline ?? null, { type: 'case', id: item.id }))
+      items.push(todo('my_case', item.title, hint, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
     }
   }
 
@@ -167,7 +169,7 @@ function staffTodos(userId) {
     if (kind === 'to_verify') hint = '廠商已完工，請確認後標記完成'
     // 新報修沒有期限，用通報時間排序；其他用處理期限
     const dueAt = kind === 'new_case' ? item.reportedAt : (item.deadline ?? null)
-    items.push(todo(kind, item.title, hint, dueAt, { type: 'case', id: item.id }))
+    items.push(todo(kind, item.title, hint, dueAt, { type: 'case', id: item.id }, item.isUrgent))
   }
 
   return [...items, ...incompleteQuickSaves(userId)]

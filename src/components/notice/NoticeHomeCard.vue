@@ -33,14 +33,24 @@ const statusText = computed(() => {
   if (days === 1) return '明天開始'
   return `${days} 天後開始`
 })
+
+// 標籤顏色（住戶端的徽章規則）
+//   進行中、今天開始 → 紅（destructive）：今天就會影響你
+//   明天開始         → 藍（default）：跟你有關，但還不用做什麼
+//   更之後           → 灰（outline）：一般日期
+const badgeVariant = computed(() => {
+  const days = diffDays(MOCK_TODAY, startDate.value)
+  if (props.notice.isOngoing || days <= 0) return 'destructive'
+  if (days === 1) return 'default'
+  return 'outline'
+})
 </script>
 
 <template>
   <RouterLink :to="to" class="block space-y-3 rounded-xl bg-card p-4 shadow-card">
     <div class="flex items-center gap-1">
       <h3 class="min-w-0 flex-1 type-greeting">{{ notice.title }}</h3>
-      <!-- 進行中用橘色（和「處理中」同一種），還沒開始的用灰色 -->
-      <Badge :variant="notice.isOngoing ? 'secondary' : 'outline'">{{ statusText }}</Badge>
+      <Badge :variant="badgeVariant">{{ statusText }}</Badge>
     </div>
     <!-- 有影響範圍說明就顯示影響範圍；活動類沒有，改顯示地點 -->
     <div v-if="notice.impact" class="space-y-0.5 py-2">
