@@ -89,7 +89,7 @@ export const cases = [
     category: 'leak',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
+    isUrgent: true,
     reporterId: 'u-r01',
     reportedAt: '2026-09-25T10:12',
     description:
