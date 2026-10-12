@@ -37,7 +37,7 @@ const vendors = [
           <ItemDescription>永安電梯 · 預計明天到場</ItemDescription>
         </ItemContent>
         <ItemActions>
-          <Badge>施工中</Badge>
+          <Badge variant="destructive">施工中</Badge>
         </ItemActions>
       </Item>
     </div>
