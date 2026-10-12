@@ -60,7 +60,7 @@ import { Spinner } from '@/components/ui/spinner'
           <p class="text-sm">電梯運行時有明顯摩擦聲，已通知維修廠商。</p>
         </CardContent>
         <CardFooter class="gap-2">
-          <Badge>施工中</Badge>
+          <Badge variant="destructive">施工中</Badge>
           <span class="text-sm text-muted-foreground">永安電梯</span>
         </CardFooter>
       </Card>
