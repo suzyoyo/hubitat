@@ -32,7 +32,8 @@
 - ✅ Step 9 完成：三端的假資料全部建好（14 種資料 + 我的待辦、決議事項、交接包、搜尋等彙整功能），規劃見 `docs/data-model.md`
 - ✅ 住戶端首頁完成（2026-10-08）：`src/views/resident/HomeView.vue`，有通報／無通報兩種狀態都做了
   - 元件名稱對應好彼 Kit：`AppGreeting`、`SectionHeader`（`src/components/app/`）、`ReportCard`（`report/`）、`NoticeHomeCard`（`notice/`）、`MeetingCard`（`meeting/`）
-  - 首頁連出去的內頁還是佔位頁的：`/resident/announcements`、`/resident/meetings/:id`
+  - 首頁連出去的內頁還是佔位頁的：`/resident/meetings/:id`
+  - 首頁的公告卡點了是開詳情彈窗（`NoticeDetailDialog`），不是連到公告列表；要看全部按「看全部」
   - 問候語顯示「今天」正在進行的公告（優先與我有關的）；公告卡片只放與我有關的前 2 則
 - ✅ 開發規格書與分工完成（2026-10-09）：我（suzy）和組員 013 共同開發，兩人程度相近、都參與設計、都是第一次用分支和 PR
   - `docs/dev-guide.md`：開發規範（資料夾、命名、寫新頁面的步驟、樣式、拿資料、不要做的事、尚未定案的事）
@@ -52,8 +53,14 @@
   - 設計稿的詳情頁同時是編輯頁，「我的通報」的「編輯通報 / 補充」按鈕也是連到這裡
   - 徽章顏色的規則放在 `src/lib/report.js`（`reportBadgeVariant`），`ReportCard` 和 `ReportSummary` 共用
   - 保密通報的公開狀態文字定為「僅你本人與管委會可見」（`CASE_VISIBILITY.private.note`）；進度條還沒到的步驟下面不顯示文字
-- **下一步**：通報詳情的第二部分，或其他住戶端畫面（社區公告、「我的」頁與加入管委會流程、新增通報流程），開始前先問我要做哪一個
-- 013 已是 repo 協作者（hakukanojyo），PR 互相 review 的流程已經跑過（PR #1～#4）
+- ✅ 住戶端「社區公告」頁（2026-10-12，分支 `resident/announcements`）：`src/views/resident/AnnouncementsView.vue`
+  - 由上到下：社區行事曆 `CalendarCard`（`calendar/`，兩週日期＋圓點，不能點）、「與我有關／社區公告」分頁、公告卡 `NoticeCard`；載入中、空狀態（卡片樣式＋吉祥物）都做了
+  - 分頁上的數字是「還沒看過的則數」，打開那個分頁就算看過、數字消失。已讀紀錄在假 API 的記憶體裡（`isRead`、`markAnnouncementsRead`），重新整理網頁會清空。從首頁彈窗看公告目前不算已讀
+  - 公告詳情彈窗 `NoticeDetailDialog`（`notice/`）首頁和公告頁共用；兩種公告卡都是整張可點、送出 `detail` 事件。設計稿的「留言給管委會」按鈕還沒放，等留言功能
+  - 公告卡和彈窗共用的規則放在 `src/lib/notice.js`（日期文字、主辦／負責）
+  - 公告卡的徽章（2026-10-12 決定）：列表的 `NoticeCard` 只有類型、範圍兩個徽章，不放日期徽章（覺得太多，日期看內文）；首頁的 `NoticeHomeCard` 保留右上角的狀態徽章（施工中、今天開始＝紅；明天開始＝藍；N 天後開始＝灰）。Kit 的 `Notice/Card` 還有日期徽章，要跟著拿掉。活動的內容說明叫「活動說明」，其他叫「注意事項」
+- **下一步**：通報詳情的第二部分，或其他住戶端畫面（「我的」頁與加入管委會流程、新增通報流程、會議紀錄），開始前先問我要做哪一個
+- 013 已是 repo 協作者（hakukanojyo），PR 互相 review 的流程已經跑過（PR #1～#8）
 - wireframe 大致完成（2026-10-06）
 - Step 10（PWA）可隨時進行
 
@@ -124,6 +131,7 @@
 - 【觀察中】`npm audit` 有 7 個 moderate 弱點，來自 shadcn-vue CLI 的相依套件（不會打包進網頁）；勿用 `npm audit fix --force`（會把 shadcn-vue 降回 0.10.5）
 
 ## 注意事項
+- 用 `npx shadcn-vue@latest add` 加元件時，指令會順手改壞 `src/style.css`（字型換成 Geist）、升級 `package.json` 的套件、並問要不要覆蓋 `button`（選 N）。加完要還原這些檔案，只留新的元件資料夾，步驟在 `docs/shadcn-vue-notes.md`
 - shadcn-vue 的 JavaScript 版：在 `components.json` 設 `"typescript": false`。官方 JS 文件範例的 alias 路徑寫 `./*`，但 Vite 專案原始碼在 `src/`，請以 `./src/*` 為準並驗證
 - 長輩也是使用者：字級、觸控區（至少約 44px）、對比要留意
 - PWA 功能（manifest、Service Worker）另用 `vite-plugin-pwa`，不屬於 shadcn-vue，延後處理

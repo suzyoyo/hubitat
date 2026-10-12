@@ -27,6 +27,20 @@ import { Button } from '@/components/ui/button'
 </template>
 ```
 
+## 用指令加元件之後一定要檢查（2026-10-12 踩到）
+`npx shadcn-vue@latest add <名稱>` 除了新增元件，還可能順手改到別的檔案。2026-10-12 加 `dialog` 時發生了三件事：
+
+1. **`src/style.css` 被改壞**：Noto Sans TC 的字型載入被刪掉、換成 Geist，檔案最後還多了一段 `@layer base`
+2. **`package.json`、`package-lock.json` 被升級**：`reka-ui` 和 `@lucide/vue` 的版本被往上調
+3. **問要不要覆蓋 `button`**：`dialog` 會用到 `button`，指令想用官方版本蓋掉我們改過的。一定要選 **N**
+
+所以每次加完元件：
+
+1. 執行 `git status`，確認多出來的只有 `src/components/ui/<名稱>/` 這個新資料夾
+2. 其他被改到的檔案全部還原：`git checkout -- src/style.css package.json package-lock.json`
+3. 執行 `npm install`，把套件裝回原本的版本
+4. 執行 `npm run build`，並打開畫面確認字型還是 Noto Sans TC
+
 ## JavaScript 版設定
 - `components.json` 設 `"typescript": false`
 - 官方 JS 文件的 jsconfig 範例寫 `"@/*": ["./*"]`，但 Vite 專案原始碼在 `src/`，以 `./src/*` 為準並驗證
