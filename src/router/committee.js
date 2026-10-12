@@ -13,5 +13,8 @@ export default {
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
   // title 是還沒做好時，佔位頁上顯示的名稱
-  innerPages: [],
+  innerPages: [
+    { path: 'tasks', title: '交辦進度' },
+    { path: 'proposals', title: '提案與簽核' },
+  ],
 }
