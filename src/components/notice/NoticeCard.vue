@@ -4,7 +4,8 @@
 import { computed } from 'vue'
 import { ChevronRightIcon, ClockIcon, MapPinIcon, TriangleAlertIcon } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
-import { countDays, diffDays, formatDateWithWeekday, formatTime } from '@/lib/date'
+import { countDays, diffDays, formatDateWithWeekday } from '@/lib/date'
+import { noticeDateText, noticeOrganizerLabel } from '@/lib/notice'
 import { MOCK_TODAY } from '@/mocks/api'
 
 const props = defineProps({
@@ -12,7 +13,7 @@ const props = defineProps({
   notice: { type: Object, required: true },
 })
 
-// 按下「查看詳情」時通知頁面，由頁面決定要做什麼
+// 點卡片時通知頁面（會把這則公告一起傳出去），由頁面打開詳情彈窗
 defineEmits(['detail'])
 
 // '2026-10-05T09:00' → '2026-10-05'
@@ -37,24 +38,11 @@ const timeBadge = computed(() => {
   if (days === 1) return { variant: 'default', text: `明天 ${dateText}` }
   return { variant: 'outline', text: dateText }
 })
-
-// 日期時間那一行
-//   一天： '10/10（六）09:00–12:00'（全形括號本身就有留白，後面不用再加空格）
-//   多天： '10/5（一）～10/7（三）'，每日時段（timeText）寫在下一行
-const dateText = computed(() => {
-  const start = formatDateWithWeekday(startDate.value)
-  if (isOneDay.value) {
-    return `${start}${formatTime(props.notice.startAt)}–${formatTime(props.notice.endAt)}`
-  }
-  return `${start}～${formatDateWithWeekday(endDate.value)}`
-})
-
-// 活動是「主辦」，其他（施工、維護…）是「負責」
-const organizerLabel = computed(() => (props.notice.type === 'activity' ? '主辦' : '負責'))
 </script>
 
 <template>
-  <article class="space-y-3 rounded-xl bg-card p-4 shadow-card">
+  <!-- relative：讓「查看詳情」的可點擊範圍可以蓋滿這張卡片（見最下面的說明） -->
+  <article class="relative space-y-3 rounded-xl bg-card p-4 shadow-card">
     <!-- 三個徽章：類型（灰）、時間、範圍。放不下會自動換行 -->
     <div class="flex flex-wrap items-center gap-2">
       <Badge variant="outline">{{ notice.typeLabel }}</Badge>
@@ -70,7 +58,7 @@ const organizerLabel = computed(() => (props.notice.type === 'activity' ? '主�
     <div class="flex items-center gap-2.5">
       <ClockIcon class="size-5 shrink-0" />
       <p class="min-w-0 flex-1 type-body">
-        日期時間：{{ dateText }}
+        日期時間：{{ noticeDateText(notice) }}
         <!-- 多天的公告才有每日時段，另起一行 -->
         <template v-if="notice.timeText"><br />{{ notice.timeText }}</template>
       </p>
@@ -88,12 +76,13 @@ const organizerLabel = computed(() => (props.notice.type === 'activity' ? '主�
 
     <div class="flex items-center gap-2">
       <p class="min-w-0 flex-1 type-date text-muted-foreground">
-        {{ organizerLabel }}：{{ notice.organizer }}
+        {{ noticeOrganizerLabel(notice) }}：{{ notice.organizer }}
       </p>
-      <!-- h-11 是 44px 的可點擊範圍；-mr-2.5 讓箭頭對齊卡片內容的右邊 -->
+      <!-- h-11 是 44px 高；-mr-2.5 讓箭頭對齊卡片內容的右邊 -->
+      <!-- after:absolute after:inset-0：把可點擊範圍放大到整張卡片，點卡片任何地方都等於按這顆按鈕 -->
       <button
         type="button"
-        class="-mr-2.5 flex h-11 shrink-0 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
+        class="-mr-2.5 flex h-11 shrink-0 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading after:absolute after:inset-0"
         @click="$emit('detail', notice)"
       >
         查看詳情

@@ -2,6 +2,7 @@
 // 住戶端・社區公告：列出社區的公告，分成「與我有關」「社區公告」兩個分頁
 import { computed, onMounted, ref, watch } from 'vue'
 import NoticeCard from '@/components/notice/NoticeCard.vue'
+import NoticeDetailDialog from '@/components/notice/NoticeDetailDialog.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
@@ -15,6 +16,17 @@ const loading = ref(true)
 const userId = ref('') // 我是誰，記已讀時要用
 const notices = ref([]) // 住戶看得到的所有公告（已發布、還沒結束），依開始時間排序
 const currentTab = ref('related') // 目前選到的分頁：'related' 或 'all'
+
+// 詳情彈窗：detailNotice 是要顯示哪一則，detailOpen 是彈窗開還是關
+// 分成兩個，關閉時內容才不會在彈窗消失前先變空白
+const detailNotice = ref(null)
+const detailOpen = ref(false)
+
+// 點公告卡片時：記下是哪一則，然後打開彈窗
+function openDetail(notice) {
+  detailNotice.value = notice
+  detailOpen.value = true
+}
 
 // 兩個分頁的設定與各自的公告
 // relatedToMe 是假 API 給的：全社區的公告，或影響到我住的那一棟
@@ -109,8 +121,17 @@ watch(currentTab, markCurrentTabRead)
       </Empty>
       <!-- 有資料 -->
       <template v-else>
-        <NoticeCard v-for="notice in tab.notices" :key="notice.id" :notice="notice" />
+        <!-- @detail：卡片被點的時候，執行 openDetail（卡片會把那則公告傳進來） -->
+        <NoticeCard
+          v-for="notice in tab.notices"
+          :key="notice.id"
+          :notice="notice"
+          @detail="openDetail"
+        />
       </template>
     </TabsContent>
+
+    <!-- 詳情彈窗：平常看不到，detailOpen 變成 true 才會出現 -->
+    <NoticeDetailDialog v-model:open="detailOpen" :notice="detailNotice" />
   </Tabs>
 </template>

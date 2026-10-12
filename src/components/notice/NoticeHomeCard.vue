@@ -9,9 +9,10 @@ import { MOCK_TODAY } from '@/mocks/api'
 const props = defineProps({
   // getAnnouncements() 回傳的其中一則
   notice: { type: Object, required: true },
-  // 點卡片要連到哪一頁
-  to: { type: String, required: true },
 })
+
+// 點卡片時通知頁面（會把這則公告一起傳出去），由頁面打開詳情彈窗
+defineEmits(['detail'])
 
 // 各類型「進行中」的說法
 const ONGOING_WORDS = {
@@ -47,9 +48,15 @@ const badgeVariant = computed(() => {
 </script>
 
 <template>
-  <RouterLink :to="to" class="block space-y-3 rounded-xl bg-card p-4 shadow-card">
+  <!-- relative：讓標題按鈕的可點擊範圍可以蓋滿這張卡片 -->
+  <article class="relative space-y-3 rounded-xl bg-card p-4 shadow-card">
     <div class="flex items-center gap-1">
-      <h3 class="min-w-0 flex-1 type-greeting">{{ notice.title }}</h3>
+      <h3 class="min-w-0 flex-1 type-greeting">
+        <!-- 按鈕只包標題，再用 after:absolute after:inset-0 把可點擊範圍放大到整張卡片 -->
+        <button type="button" class="text-left after:absolute after:inset-0" @click="$emit('detail', notice)">
+          {{ notice.title }}
+        </button>
+      </h3>
       <Badge :variant="badgeVariant">{{ statusText }}</Badge>
     </div>
     <!-- 有影響範圍說明就顯示影響範圍；活動類沒有，改顯示地點 -->
@@ -63,5 +70,5 @@ const badgeVariant = computed(() => {
     <p class="text-base leading-5 text-muted-foreground">
       {{ formatDateRange(startDate, endDate) }}
     </p>
-  </RouterLink>
+  </article>
 </template>
