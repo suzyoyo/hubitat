@@ -1,12 +1,15 @@
 // 管委會端的頁面清單
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 // 寫法可以參考住戶端的 resident.js
+import HomeView from '@/views/committee/HomeView.vue'
 
 export default {
   // 已經做好的畫面：「網址」對應「畫面」
   // 網址只寫 /committee/ 後面那一段，例如 'home'、'cases/:id'
   // 沒列在這裡的頁面，會先顯示佔位頁
-  views: {},
+  views: {
+    home: HomeView,
+  },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
   // title 是還沒做好時，佔位頁上顯示的名稱
