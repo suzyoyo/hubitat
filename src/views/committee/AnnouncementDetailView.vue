@@ -121,7 +121,7 @@ const publishRows = computed(() => {
         </div>
         <h2 class="type-card-title text-foreground">{{ announcement.title }}</h2>
         <Separator />
-        <div v-for="row in basicRows" :key="row.label" class="flex items-start gap-3">
+        <div v-for="row in basicRows" :key="row.label" class="flex items-baseline gap-3">
           <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
           <!-- whitespace-pre-line：值裡的 \n 會換行 -->
           <p class="min-w-0 flex-1 text-right whitespace-pre-line type-body-strong text-foreground">{{ row.value }}</p>
@@ -135,7 +135,7 @@ const publishRows = computed(() => {
 
       <section class="space-y-3.5 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">發布紀錄</h2>
-        <div v-for="row in publishRows" :key="row.label" class="flex items-start gap-3">
+        <div v-for="row in publishRows" :key="row.label" class="flex items-baseline gap-3">
           <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
           <p class="min-w-0 flex-1 text-right whitespace-pre-line type-body-strong text-foreground">{{ row.value }}</p>
         </div>
