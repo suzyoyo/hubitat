@@ -99,7 +99,7 @@ const textStyles = [
   { class: 'type-body', spec: '16 / 24', sample: '住戶反應自動感應門反應遲緩且有摩擦異音。' },
   { class: 'type-body-strong', spec: '16 / 24 中粗', sample: '影響範圍：A 棟前門電梯暫停使用' },
   { class: 'type-link', spec: '16 / 20 中粗', sample: '看全部' },
-  { class: 'type-date', spec: '14 / 21', sample: '更新於 9/25 14:30' },
+  { class: 'type-date', spec: '16 / 20', sample: '更新於 9/25 14:30' },
   { class: 'type-button', spec: '14 / 20 粗體', sample: '閱讀完整會議紀錄' },
   { class: 'type-nav', spec: '13 / 21 中粗', sample: '社區檔案' },
   { class: 'type-label', spec: '12 / 16 中粗', sample: '處理中' },

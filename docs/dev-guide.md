@@ -468,7 +468,7 @@ const latestReport = computed(() => reports.value[0])
 | `type-body` | 內文 | 16px |
 | `type-body-strong` | 內文裡要強調的字 | 16px 中粗 |
 | `type-link` | 「看全部」這類文字連結 | 16px 中粗 |
-| `type-date` | 日期、更新時間 | 14px |
+| `type-date` | 日期、更新時間、負責單位這類補充資訊。通常搭配 `text-muted-foreground` | 16px |
 | `type-button` | 按鈕文字（Button 已內建，不用自己加） | 14px 粗體 |
 | `type-nav` | 底部導覽列 | 13px |
 | `type-label` | 徽章 | 12px |

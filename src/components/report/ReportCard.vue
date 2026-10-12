@@ -46,7 +46,7 @@ const compactClass = 'block rounded-r-xl border-l-[5px] border-warning bg-card p
       </h3>
       <Badge :variant="badgeVariant">{{ report.statusLabel }}</Badge>
     </div>
-    <p class="text-base leading-5 text-muted-foreground">送出於 {{ formatDate(report.submittedAt) }}</p>
+    <p class="type-date text-muted-foreground">送出於 {{ formatDate(report.submittedAt) }}</p>
     <!-- 管委會還沒回覆時，latestReply 是 undefined，這一塊就不顯示 -->
     <div v-if="report.latestReply" class="space-y-1 py-2.5">
       <p class="type-body-strong">管委會回覆</p>
@@ -76,7 +76,7 @@ const compactClass = 'block rounded-r-xl border-l-[5px] border-warning bg-card p
     <Separator />
     <div class="flex items-center gap-2.5">
       <ClockIcon class="size-5 shrink-0" />
-      <p class="min-w-0 flex-1 text-base leading-5">更新於 {{ formatDateTime(report.updatedAt) }}</p>
+      <p class="min-w-0 flex-1 type-date">更新於 {{ formatDateTime(report.updatedAt) }}</p>
       <ChevronRightIcon class="size-5 shrink-0" />
     </div>
   </RouterLink>
