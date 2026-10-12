@@ -2,23 +2,42 @@
 // 管委會端・首頁：問候列、我的待辦、捷徑、住戶意見、公告與動態
 import { ChevronRightIcon, CircleCheckIcon, FileTextIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
+import AdminNoticeCard from '@/components/admin/AdminNoticeCard.vue'
 import AdminTodoCard from '@/components/admin/AdminTodoCard.vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
+import SectionHeader from '@/components/app/SectionHeader.vue'
 import IconTile from '@/components/common/IconTile.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { MOCK_NOW, getCurrentUser, getMyTodos } from '@/mocks/api'
+import {
+  MOCK_NOW,
+  getCurrentUser,
+  getManagedAnnouncements,
+  getMyTodos,
+  getResidentOpinions,
+} from '@/mocks/api'
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
 const loading = ref(true)
 // 我的待辦：getMyTodos() 回傳 items（每一筆待辦）和 total（共幾件）
 const todos = ref({ items: [], total: 0 })
+const opinions = ref([]) // 還沒回覆的住戶意見
+const announcements = ref([]) // 已發布的公告
 
 // onMounted：畫面一出現就去拿資料
 onMounted(async () => {
   const user = await getCurrentUser('committee')
-  todos.value = await getMyTodos(user.id, 'committee')
+  // Promise.all：三種資料同時去拿，全部回來才往下走，比一個一個等來得快
+  const [todoList, opinionList, announcementList] = await Promise.all([
+    getMyTodos(user.id, 'committee'),
+    getResidentOpinions(true),
+    getManagedAnnouncements('published'),
+  ])
+  todos.value = todoList
+  opinions.value = opinionList
+  // 已經結束的公告不放首頁
+  announcements.value = announcementList.filter((item) => !item.hasEnded)
   loading.value = false
 })
 
@@ -106,6 +125,39 @@ const shortcuts = [
           <p class="type-body-strong text-foreground">{{ shortcut.title }}</p>
         </RouterLink>
       </div>
+
+      <section class="space-y-3">
+        <SectionHeader title="住戶意見" to="/committee/opinions" />
+        <Skeleton v-if="loading" class="h-[122px] rounded-xl" />
+        <div v-else-if="!opinions.length" class="rounded-xl bg-card p-4 shadow-card">
+          <p class="type-body text-muted-foreground">目前沒有待回覆的意見</p>
+        </div>
+        <!-- 橫向捲動：-mx-5 px-5 讓卡片可以捲到螢幕邊緣，pb-1 留空間給卡片陰影，scrollbar-width:none 隱藏捲軸 -->
+        <div v-else class="-mx-5 flex gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none]">
+          <AdminNoticeCard
+            v-for="opinion in opinions"
+            :key="opinion.id"
+            :opinion="opinion"
+            :to="`/committee/meetings/${opinion.meetingId}`"
+          />
+        </div>
+      </section>
+
+      <section class="space-y-3 pb-5">
+        <SectionHeader title="公告與動態" to="/committee/announcements" />
+        <Skeleton v-if="loading" class="h-[178px] rounded-xl" />
+        <div v-else-if="!announcements.length" class="rounded-xl bg-card p-4 shadow-card">
+          <p class="type-body text-muted-foreground">目前沒有公告</p>
+        </div>
+        <div v-else class="-mx-5 flex gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none]">
+          <AdminNoticeCard
+            v-for="announcement in announcements"
+            :key="announcement.id"
+            :announcement="announcement"
+            :to="`/committee/announcements/${announcement.id}`"
+          />
+        </div>
+      </section>
     </div>
   </div>
 </template>

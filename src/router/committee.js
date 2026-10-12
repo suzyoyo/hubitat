@@ -17,6 +17,9 @@ export default {
     { path: 'tasks', title: '交辦進度' },
     { path: 'proposals', title: '提案與簽核' },
     { path: 'todos', title: '我的待辦' },
+    { path: 'opinions', title: '住戶意見' },
+    { path: 'announcements', title: '公告與動態' },
+    { path: 'meetings/:id', title: '會議詳情' },
     // 待辦點進去的詳情頁
     { path: 'cases/:id', title: '案件詳情' },
     { path: 'tasks/:id', title: '交辦詳情' },
