@@ -1,5 +1,5 @@
 // 公告相關的假 API
-import { announcements } from '../data/announcements'
+import { ANNOUNCEMENT_TYPES, announcements } from '../data/announcements'
 import { areaName } from './community'
 import { MOCK_NOW, delay, omit } from './helpers'
 import { findUser, userLabel } from './users'
@@ -30,6 +30,7 @@ function isRelatedTo(item, user) {
 function present(item, role) {
   const full = {
     ...item,
+    typeLabel: ANNOUNCEMENT_TYPES[item.type].label,
     scopeLabel: scopeLabel(item.areaIds),
     authorLabel: userLabel(item.authorId),
     reviewerLabel: item.reviewerId ? userLabel(item.reviewerId) : '',

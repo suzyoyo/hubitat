@@ -14,6 +14,14 @@ export function formatDate(value) {
   return `${month}/${day}`
 }
 
+// '2026-10-05T09:00' → '10/5（一）'
+export function formatDateWithWeekday(value) {
+  const { year, month, day } = parse(value)
+  // getUTCDay() 回傳 0～6，0 是星期日
+  const weekday = '日一二三四五六'[new Date(Date.UTC(year, month - 1, day)).getUTCDay()]
+  return `${month}/${day}（${weekday}）`
+}
+
 // '2026-09-25T14:30' → '9/25 14:30'
 export function formatDateTime(value) {
   const { month, day, time } = parse(value)
