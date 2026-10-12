@@ -135,7 +135,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Feedback/Dialog Actions` | ➖ | ➖ | 用基礎元件 dialog 的按鈕區 |
 | `Feedback/Modal Backdrop` | ➖ | ➖ | 基礎元件 dialog、drawer、sheet 已經內建半透明背景 |
 | `Notification/Item` | `notification/NotificationItem.vue` | ⬜ | 通知的一筆。變體 Type：留言回覆／報修進度／公告；State：未讀／已讀 |
-| `Common/Icon Tile` | `common/IconTile.vue` | ⬜ | 圖示方塊。變體 Style：Soft／Square |
+| `Common/Icon Tile` | `common/IconTile.vue` | ✅ | 圖示方塊。變體 Style 用 `variant` prop 切換：`soft`（預設）／`square`（不叫 `style`，會和 HTML 的 style 屬性撞名）。圖示用 slot 放進去：`<IconTile><UsersIcon /></IconTile>` |
 | `Common/Separator` | ➖ | ➖ | 用基礎元件 `ui/separator` |
 | `Form/Radio Option` | `form/FormRadioOption.vue` | ⬜ | 整塊可點的單選項。可以用基礎元件 `ui/radio-group` 當底 |
 
@@ -145,8 +145,8 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
-| `Admin/Todo Card` | `admin/AdminTodoCard.vue` | ⬜ | 待辦卡。變體 Type：緊急／一般 |
-| `Admin/Notice Card` | `admin/AdminNoticeCard.vue` | ⬜ | 變體 Type：公告／住戶意見 |
+| `Admin/Todo Card` | `admin/AdminTodoCard.vue` | ✅ | 待辦卡。傳 `getMyTodos()` 的一筆 `todo` 進去。變體 Type 沒有做成 prop，依 `todo.isUrgent` 自動切換；期限徽章和緊急的標示方式和 Kit 不同，見[第 4 節](#4-kit-和程式不一樣的地方)。左上角的建立日期要等 `getMyTodos()` 帶出 `createdAt` 才會顯示 |
+| `Admin/Notice Card` | `admin/AdminNoticeCard.vue` | ✅ | 變體 Type 沒有做成 prop：傳 `announcement`（`getManagedAnnouncements()` 的一筆）是公告，傳 `opinion`（`getResidentOpinions()` 的一筆）是住戶意見。住戶意見的標題用留言所在的會議名稱 |
 | `Admin/Action Card` | `admin/AdminActionCard.vue` | ⬜ | 變體 Footer：按鈕／文字 |
 | `Admin/Meeting Card` | `admin/AdminMeetingCard.vue` | ⬜ | 變體 State：待整理／待發布／已發布 |
 | `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ⬜ | 廠商卡 |
@@ -210,6 +210,8 @@ import { Button } from '@/components/ui/button'
 | 文字屬性 | 每段文字一個屬性 | 傳一整筆資料 | 見[第 1 節](#1-怎麼讀這份表) |
 | Admin/ 的屬性名稱 | 中文（標題、說明） | 英文 | 程式的命名一律用英文 |
 | 半透明背景、提示訊息 | 自己畫的元件 | 用 shadcn-vue 內建的 | 內建的已經處理好動畫和鍵盤操作 |
+| `Admin/Todo Card` 的期限 | 「緊急」是紅色徽章、「一般」是灰字 | 一律用徽章，照 [dev-guide.md 第 5 節](dev-guide.md#徽章badge)管理端的顏色：逾期、今日到期紅色，剩餘 N 天橘色 | 同一個狀態只用一種顏色。逾期的待辦不管有沒有標緊急都要看得出來 |
+| `Admin/Todo Card` 的緊急 | 用紅色徽章標示 | 整張卡片底色改成 `bg-red-50` | 徽章已經用來顯示期限。`red-50` 還沒有語意色，之後要調整 Kit |
 
 ---
 
