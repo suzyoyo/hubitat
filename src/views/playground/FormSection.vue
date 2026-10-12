@@ -1,5 +1,5 @@
 <script setup>
-// 表單元件：field, input, textarea, radio-group, slider
+// 表單元件：field, input, textarea, radio-group, slider, toggle-group, select
 import { ref } from 'vue'
 import {
   Field,
@@ -10,14 +10,24 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
 import { Textarea } from '@/components/ui/textarea'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
 // ref()：建立會自動更新畫面的資料；v-model 會把輸入框和這些資料綁在一起
 const title = ref('')
 const detail = ref('')
 const urgency = ref('normal')
 const rating = ref([4]) // Slider 的值是陣列（因為可以有多個拉桿）
+const filter = ref('all')
+const sort = ref('due')
 </script>
 
 <template>
@@ -70,9 +80,34 @@ const rating = ref([4]) // Slider 的值是陣列（因為可以有多個拉桿�
         <FieldLabel>廠商服務評分：{{ rating[0] }} 分</FieldLabel>
         <Slider v-model="rating" :min="1" :max="5" :step="1" />
       </Field>
+
+      <!-- ToggleGroup：一排按鈕選一個，用來做篩選標籤（還沒照 Kit 調整樣式） -->
+      <Field>
+        <FieldLabel>篩選</FieldLabel>
+        <ToggleGroup v-model="filter" type="single" variant="outline">
+          <ToggleGroupItem value="all">全部</ToggleGroupItem>
+          <ToggleGroupItem value="case">案件</ToggleGroupItem>
+          <ToggleGroupItem value="sign">待簽核</ToggleGroupItem>
+        </ToggleGroup>
+      </Field>
+
+      <!-- Select：下拉選單，用來做排序（還沒照 Kit 調整樣式） -->
+      <Field>
+        <FieldLabel>排序</FieldLabel>
+        <Select v-model="sort">
+          <SelectTrigger class="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="due">到期日</SelectItem>
+            <SelectItem value="urgent">緊急優先</SelectItem>
+            <SelectItem value="created">建立日期（新→舊）</SelectItem>
+          </SelectContent>
+        </Select>
+      </Field>
     </FieldGroup>
 
     <!-- 即時顯示表單資料，看 v-model 的效果 -->
-    <pre class="overflow-x-auto rounded-lg bg-muted p-3 text-xs">{{ { title, detail, urgency, rating } }}</pre>
+    <pre class="overflow-x-auto rounded-lg bg-muted p-3 text-xs">{{ { title, detail, urgency, rating, filter, sort } }}</pre>
   </section>
 </template>
