@@ -3,6 +3,7 @@
 // 寫法可以參考住戶端的 resident.js
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
+import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TodosView from '@/views/committee/TodosView.vue'
 
 export default {
@@ -13,6 +14,7 @@ export default {
     home: HomeView,
     'announcements/:id': AnnouncementDetailView,
     todos: TodosView,
+    proposals: ProposalsView,
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
@@ -20,6 +22,7 @@ export default {
   innerPages: [
     { path: 'tasks', title: '交辦進度' },
     { path: 'proposals', title: '提案與簽核' },
+    { path: 'proposals/new', title: '新增提案' },
     { path: 'todos', title: '我的待辦' },
     { path: 'opinions', title: '住戶意見' },
     { path: 'announcements', title: '公告與動態' },
