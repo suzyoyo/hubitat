@@ -33,25 +33,29 @@
 
 | 東西 | 誰負責 | 另一個人要改時 |
 |---|---|---|
-| 設計 Token（`src/style.css`） | suzy | 先說，單獨開一個 PR |
-| 三端設定與外框（`src/config/roles.js`、`src/layouts/`、`src/components/app/` 的外框） | suzy | 先說，單獨開一個 PR |
-| 基礎元件（`src/components/ui/`） | suzy | 先說，單獨開一個 PR |
-| 假資料（`src/mocks/`） | suzy | 新增可以直接做；修改或刪除既有的要先說 |
+| 設計 Token（`src/style.css`） | suzy | 直接改 `main`，改完在群組說一聲 |
+| 三端設定與外框（`src/config/roles.js`、`src/layouts/`、`src/components/app/` 的外框） | suzy | 直接改 `main`，改完在群組說一聲 |
+| 基礎元件（`src/components/ui/`） | suzy | 直接改 `main`，改完在群組說一聲 |
+| 假資料（`src/mocks/`）、共用小工具（`src/lib/`） | suzy | 直接改 `main`，改完在群組說一聲 |
 | 產品元件（`src/components/report/`、`notice/`、`meeting/` 等） | 誰先用到誰做 | 動手前在群組說一聲「我要做 XXX 元件」，避免兩人各做一個 |
-| 規格文件（`docs/`） | 兩人都可以改 | 改規則要對方同意 |
+| 規格文件（`docs/`） | 兩人都可以改 | 改規則要對方同意；同意後直接改 `main` |
 
-「單獨開一個 PR」的意思是：共用檔案的修改不要和自己頁面的修改混在同一個 PR 裡。
+共用的東西不用開 PR（2026-10-13 起），但不要和自己頁面的修改混在同一個分支裡：在 `main` 上改、commit、push，再回到自己的分支把 `main` 合進來。
 
-> **為什麼**：共用檔案會影響對方的頁面。單獨一個 PR，對方才看得清楚改了什麼、會不會影響到他。
+> **為什麼要說一聲**：共用檔案會影響對方的頁面。對方知道你改了什麼，畫面出問題時才知道從哪裡找。
 
 ---
 
 ## 2. 四條規則
 
-1. **不直接改 `main`。** `main` 永遠是「可以正常執行」的版本。
-2. **一個頁面開一個分支。** 做完就合併、刪掉，下一個頁面再開新的。
-3. **對方看過才合併。** 自己不合併自己的 PR。
-4. **每次開始工作前，先拿最新的 `main`。**
+2026-10-13 起改成這樣，目的是不用互相等，做得比較快：
+
+1. **頁面一頁一個分支，做完就合進 `main`。** 開 PR、自己合併，不用等對方 review。不要等全部做完才一起合，衝突會越積越多。
+2. **共用的東西直接改 `main`，改完在群組說一聲。** 見[第 1 節的「共用的東西」](#共用的東西)。
+3. **合併後對方有空再看。** 看到問題就留言，或開一個新的分支修。
+4. **每次開始工作前，先拿最新的 `main`。** 開新分支前、對方說改了共用的東西時，都要拿一次。
+
+不管哪一條，`main` 都要是「可以正常執行」的版本：合併或 push 到 `main` 之前，先跑 `npm run build` 確認沒有錯誤。
 
 ---
 
@@ -134,8 +138,9 @@ git switch -c resident/reports
 |---|---|
 | 住戶端・我的通報 | `resident/reports` |
 | 管委會端・首頁 | `committee/home` |
-| 改共用的東西 | `shared/` 開頭，例如 `shared/badge-colors` |
+| 改共用的東西 | 不用開分支，直接在 `main` 改（見[第 1 節](#共用的東西)） |
 | 改文件 | `docs/` 開頭，例如 `docs/update-dev-guide` |
+| 合併後照對方的意見修改 | `fix/` 開頭，例如 `fix/report-card-spacing` |
 
 想確認自己現在在哪個分支：
 
@@ -191,9 +196,8 @@ git push
 
 1. 打開 GitHub 的 repo 頁面，上方會出現黃色提示「resident/reports had recent pushes」，按 **Compare & pull request**。
 2. 填寫標題和說明（格式見下方）。
-3. 右邊 **Reviewers** 選對方。
-4. 按 **Create pull request**。
-5. 在群組跟對方說一聲，貼上 PR 的連結。
+3. 按 **Create pull request**。不用選 Reviewers。
+4. 在群組跟對方說一聲，貼上 PR 的連結，對方有空再看。
 
 **PR 標題**：和 commit 訊息一樣的寫法，例如 `feat: add resident reports page`。
 
@@ -216,9 +220,27 @@ git push
 
 「要注意的地方」寫這些：有沒有改到共用的檔案、有沒有和設計稿不一樣的地方、有沒有碰到[尚未定案的事](dev-guide.md#8-尚未定案的事)。沒有就寫「無」。
 
-### 步驟 6：等對方看，照意見修改
+### 步驟 6：自己合併
 
-對方留言要你修改時，**在同一個分支繼續改**，commit 後再 push，PR 會自動更新，不用重新開。
+確認 PR 的 **Files changed** 只有這次要的檔案，按 **Merge pull request**，合併後按 **Delete branch** 把 GitHub 上的分支刪掉。
+
+### 步驟 7：對方看過後，照意見修改
+
+對方是在合併**之後**才看的，所以要修改時，從最新的 `main` 開一個新分支（例如 `fix/report-card-spacing`）改，再開 PR、自己合併：
+
+```bash
+git switch main
+```
+
+```bash
+git pull
+```
+
+```bash
+git switch -c fix/report-card-spacing
+```
+
+改完之後：
 
 ```bash
 git add .
@@ -229,12 +251,8 @@ git commit -m "fix: adjust report card spacing"
 ```
 
 ```bash
-git push
+git push -u origin fix/report-card-spacing
 ```
-
-### 步驟 7：合併
-
-對方按下 **Approve** 之後，由**對方**按 **Merge pull request**，合併後按 **Delete branch** 把 GitHub 上的分支刪掉。
 
 ### 步驟 8：回到 main，準備下一個頁面
 
@@ -258,7 +276,7 @@ git branch -d resident/reports
 
 ## 6. 幫對方看 PR
 
-收到對方的 PR 時，盡量在一天內看完，不要讓對方卡住。
+對方的 PR 是合併之後才看的，不會卡住對方，有空再看就好。但最好在對方開始下一頁之前看完，問題才不會一路帶下去。
 
 ### 怎麼看
 
@@ -296,8 +314,8 @@ git switch committee/home
 
 在 **Files changed** 分頁右上角按 **Review changes**：
 
-- **Approve**：沒問題，可以合併。接著按 **Merge pull request**。
-- **Request changes**：有一定要改的地方，寫清楚哪裡、為什麼。
+- **Approve**：沒問題。
+- **Request changes**：有一定要改的地方，寫清楚哪裡、為什麼。對方會開新的分支修。
 - **Comment**：只是提問或建議，不擋合併。
 
 想針對某一行留言，把滑鼠移到那一行左邊，按出現的 **＋**。
