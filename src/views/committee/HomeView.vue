@@ -10,6 +10,7 @@ import IconTile from '@/components/common/IconTile.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { greetingWord } from '@/lib/date'
 import { todoLink } from '@/lib/todo'
 import {
   MOCK_NOW,
@@ -44,19 +45,14 @@ onMounted(async () => {
   loading.value = false
 })
 
-// 依現在幾點決定問候語
-const hello = computed(() => {
-  const hour = Number(MOCK_NOW.split('T')[1].split(':')[0]) // '2026-10-01T13:42' → 13
-  if (hour < 11) return '早安'
-  if (hour < 18) return '午安'
-  return '晚安'
-})
+// 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
+const hello = greetingWord(MOCK_NOW)
 
 // 問候列的兩行字：提醒今天有幾件待辦
 const greeting = computed(() => {
   // 設計稿沒畫沒有待辦的樣子，先用這句
-  if (todos.value.total === 0) return { title: `${hello.value}！`, subtitle: '今天沒有待辦事項喔！' }
-  return { title: `${hello.value}！今天有`, subtitle: `${todos.value.total} 件待辦事項喔！` }
+  if (todos.value.total === 0) return { title: `${hello}！`, subtitle: '今天沒有待辦事項喔！' }
+  return { title: `${hello}！今天有`, subtitle: `${todos.value.total} 件待辦事項喔！` }
 })
 
 // 首頁只放最前面的 2 筆待辦，其餘的按「查看全部待辦事項」

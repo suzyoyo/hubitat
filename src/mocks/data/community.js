@@ -8,7 +8,7 @@ export const community = {
   householdCount: 120, // 戶數
   phone: '02-2345-6789',
   status: '正常營運',
-  updatedBy: 'u-c01', // 最後修改的人（對應 users.js 的 id）
+  updatedBy: 'u-c04', // 最後修改的人（對應 users.js 的 id）
   updatedAt: '2026-09-01',
 }
 
@@ -121,5 +121,5 @@ export const keys = [
   { id: 'k-1', name: '機房與頂樓鑰匙', keeperId: 'u-s01' },
   { id: 'k-2', name: '消防受信總機室', keeperId: 'u-s01' },
   { id: 'k-3', name: '游泳池機房', keeperId: 'u-s01' },
-  { id: 'k-4', name: '管委會辦公室保險櫃', keeperId: 'u-c01' },
+  { id: 'k-4', name: '管委會辦公室保險櫃', keeperId: 'u-c04' },
 ]

@@ -1,6 +1,7 @@
 <script setup>
-// 基礎元件：button, card, badge, avatar, separator, skeleton, spinner, empty
-import { InboxIcon } from '@lucide/vue'
+// 基礎元件：button, card, badge, alert, avatar, separator, skeleton, spinner, empty
+import { InboxIcon, InfoIcon, TriangleAlertIcon } from '@lucide/vue'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -76,6 +77,21 @@ import { Spinner } from '@/components/ui/spinner'
         <Badge>處理中</Badge>
         <Badge variant="outline">已完成</Badge>
       </div>
+    </div>
+
+    <div class="space-y-2">
+      <h3 class="text-sm font-medium text-muted-foreground">Alert</h3>
+      <!-- 圖示直接放在 Alert 裡面，第一個子元素是圖示時會自動排成左邊一欄 -->
+      <Alert>
+        <InfoIcon />
+        <AlertTitle>法定效力說明</AlertTitle>
+        <AlertDescription>逐一簽核僅為委員意見紀錄，不等於開會表決。需執行之提案仍送管委會決議。</AlertDescription>
+      </Alert>
+      <Alert variant="destructive">
+        <TriangleAlertIcon />
+        <AlertTitle>換屆交接尚未完成</AlertTitle>
+        <AlertDescription>新一屆委員已就任，請在 10/31 前完成交接。</AlertDescription>
+      </Alert>
     </div>
 
     <!-- Avatar：沒有圖片時顯示 Fallback 文字 -->

@@ -71,7 +71,7 @@ const shownTodos = computed(() => {
       <p class="type-body text-muted-foreground">{{ type === 'all' ? '目前沒有待辦事項' : '沒有這類待辦' }}</p>
     </div>
     <template v-else>
-      <p class="type-date text-muted-foreground">共 {{ shownTodos.length }} 個待辦</p>
+      <p class="type-date text-muted-foreground">共 {{ shownTodos.length }} 件待辦</p>
       <AdminActionCard v-for="todo in shownTodos" :key="todo.id" :todo="todo" :to="todoLink(todo)" />
     </template>
   </div>
