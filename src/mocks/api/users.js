@@ -34,7 +34,7 @@ export function findUser(id) {
   return users.find((user) => user.id === id)
 }
 
-// 把成員 id 轉成「修繕委員 李委員」「總幹事 王小姐」這種顯示文字
+// 把成員 id 轉成「主委 李委員」「總幹事 王小姐」這種顯示文字
 export function userLabel(id) {
   const user = findUser(id)
   if (!user) return ''

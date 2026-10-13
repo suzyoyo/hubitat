@@ -17,7 +17,7 @@ export const TERM = {
   endDate: '2027-06-30',
 }
 
-// 委員職稱：short 是簡稱，用在簽核名單這種空間小的地方（例如「王主委」）
+// 委員職稱：short 是簡稱，用在簽核名單這種空間小的地方（例如「李主委」）
 // canReviewAnnouncement：能不能審核公告（只有主委、副主委可以）
 export const COMMITTEE_TITLES = {
   chair: { label: '主委', short: '主委', canReviewAnnouncement: true },
