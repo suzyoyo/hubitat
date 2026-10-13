@@ -15,6 +15,7 @@ import { getAreas, getCurrentUser, getSimilarReports, supportReport } from '@/mo
 import PlaceStep from './new-report/PlaceStep.vue'
 import SimilarStep from './new-report/SimilarStep.vue'
 import SupportedDone from './new-report/SupportedDone.vue'
+import TypeStep from './new-report/TypeStep.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -33,6 +34,7 @@ const form = reactive({
   areaId: '', // 範圍，例如 'area-a'
   place: '', // 地點，例如 '1F 大廳'；選「其他」的話是住戶自己填的
   isOtherPlace: false, // 地點是不是選了「其他」
+  visibility: '', // 類型：'public' 公共設施問題（公開）/ 'private' 涉及住戶行為（保密）
 })
 
 // 把填到一半的資料清空（做完之後用，下次再進來是全新的）
@@ -40,6 +42,7 @@ function resetForm() {
   form.areaId = ''
   form.place = ''
   form.isOtherPlace = false
+  form.visibility = ''
 }
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
@@ -62,6 +65,7 @@ onMounted(async () => {
 const canGoNext = computed(() => {
   // trim()：去掉頭尾的空白，只打空白不算有填
   if (step.value === 1) return form.place.trim() !== ''
+  if (step.value === 3) return form.visibility !== ''
   return true
 })
 
@@ -115,7 +119,7 @@ async function support(report) {
     <ReportFlowProgress v-if="inFlow" :step="step" />
 
     <!-- pb：留空間給固定在底部的按鈕區，內容才不會被蓋住。完成頁有兩個上下排的按鈕，要留多一點 -->
-    <div class="px-5 pt-4" :class="inFlow ? 'pb-24' : 'pb-40'">
+    <div class="px-5 pt-4" :class="inFlow ? 'pb-32' : 'pb-40'">
       <!-- 載入中 -->
       <div v-if="loading" class="space-y-4">
         <Skeleton class="h-[102px] rounded-lg" />
@@ -134,7 +138,9 @@ async function support(report) {
 
       <SupportedDone v-else-if="step === 'supported'" :report="supportedReport" />
 
-      <!-- 第 3 步之後還沒做 -->
+      <TypeStep v-else-if="step === 3" v-model="form.visibility" />
+
+      <!-- 第 4 步之後還沒做 -->
       <p v-else class="type-body text-muted-foreground">第 {{ step }} 步還沒製作。</p>
     </div>
 
@@ -143,6 +149,10 @@ async function support(report) {
     </BottomCta>
     <BottomCta v-else-if="step === 2">
       <Button :disabled="supportingId !== ''" @click="goToStep(3)">都不是，我要通報新問題</Button>
+    </BottomCta>
+    <!-- 還沒選的時候，按鈕下面多一行提醒 -->
+    <BottomCta v-else-if="step === 3" :note="canGoNext ? '' : '請先選擇一項類型，才能繼續。'">
+      <Button :disabled="!canGoNext" @click="goToStep(4)">下一步</Button>
     </BottomCta>
     <!-- 完成頁：兩個按鈕上下排。replace：離開之後按返回不會再回到完成頁 -->
     <BottomCta v-else-if="step === 'supported'" vertical>

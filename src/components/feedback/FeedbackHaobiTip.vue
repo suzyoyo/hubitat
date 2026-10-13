@@ -22,7 +22,7 @@ defineProps({
     <div class="min-w-0 flex-1 space-y-1 py-3.5 text-blue-950">
       <p class="type-body-strong">好彼管家</p>
       <p class="type-greeting">{{ title }}</p>
-      <p v-if="description" class="type-body">{{ description }}</p>
+      <p v-if="description" class="type-date text-muted-foreground">{{ description }}</p>
     </div>
   </div>
 </template>
