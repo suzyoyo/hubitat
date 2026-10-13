@@ -1,6 +1,7 @@
 // 管委會端的頁面清單
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 // 寫法可以參考住戶端的 resident.js
+import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
 
 export default {
@@ -9,6 +10,7 @@ export default {
   // 沒列在這裡的頁面，會先顯示佔位頁
   views: {
     home: HomeView,
+    'announcements/:id': AnnouncementDetailView,
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
