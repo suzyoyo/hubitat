@@ -91,6 +91,7 @@
 - 附議的住戶
 - 處理進度紀錄（時間、誰、做了什麼）
 - 施工日誌、完工備註與照片、廠商評分
+- **住戶修改與撤回**：`getReportById` 回傳的通報有 `canEdit`（是我自己通報的，而且還沒結案）。`updateReport(id, userId, changes)` 改補充說明和照片（地點、主旨不能改）；`withdrawReport(id, userId, reason)` 把狀態改成已取消並留一筆紀錄，撤回原因（`withdrawReason`）選填。兩個都只改記憶體，重新整理網頁會變回原本的假資料
 
 **狀態對照**（同一筆案件，三端顯示的文字不同）
 

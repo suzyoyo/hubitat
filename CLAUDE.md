@@ -47,9 +47,15 @@
   - `ReportCard` 三種變體都做了：用 `type` 切換 Compact／Full，不傳 `report` 是 Empty；徽章顏色依狀態自動決定
   - 空狀態是設計稿沒畫的，用 `ui/empty` + 拿放大鏡的好彼管家（`src/assets/mascot/searching.png`，原圖 6）
   - review 後還沒定案的事（分頁按鈕高度、件數徽章、分頁外框）記在 `docs/dev-guide.md` 第 8 節
-- 🚧 住戶端「通報詳情」頁（`src/views/resident/ReportDetailView.vue`）分兩個 PR 做：
+- ✅ 住戶端「通報詳情」頁（`src/views/resident/ReportDetailView.vue`）分兩個 PR 做完：
   - ✅ 第一部分「看」（分支 `resident/report-detail`）：通報摘要卡 `ReportSummary`、處理進度卡 `ReportProgressCard`（裡面是 `ReportStepper`、`ReportRecord`），載入中與找不到通報的畫面
-  - ⬜ 第二部分「改」（還沒開始）：補充說明、照片、撤回通報、確認修改。假 API 目前沒有存檔和撤回的函式，要先新增；撤回需要確認對話框
+  - ✅ 第二部分「改」（2026-10-13，分支 `resident/report-edit`）：補充說明（200 字）、照片（最多 3 張）、確認修改、撤回通報
+    - 只有自己通報、還沒結案的才能改和撤回，假 API 用 `canEdit` 告訴畫面；已完成的、只是按「我也遇到了」的都只能看
+    - 「補充說明」就是原本的問題描述（`description`），地點和主旨不能改
+    - 假 API 新增 `updateReport`、`withdrawReport(id, userId, reason)`，都只改記憶體，重新整理網頁會變回原本的假資料
+    - 新元件：`app/BottomCta`（固定在底部的按鈕區）、`report/ReportPhotoTile`（照片格，只做了 preview、add 兩種）、`report/ReportWithdrawDialog`（撤回確認彈窗，撤回原因選填）
+    - 照片只顯示圖示和檔名（假資料只有檔名，沒有圖檔）
+    - 底部按鈕下面的「撤回後…無法復原」拿掉了（和彈窗裡的說明重複），Figma 的通報詳情兩個畫面還有，要跟著拿掉
   - 設計稿的詳情頁同時是編輯頁，「我的通報」的「編輯通報 / 補充」按鈕也是連到這裡
   - 徽章顏色的規則放在 `src/lib/report.js`（`reportBadgeVariant`），`ReportCard` 和 `ReportSummary` 共用
   - 保密通報的公開狀態文字定為「僅你本人與管委會可見」（`CASE_VISIBILITY.private.note`）；進度條還沒到的步驟下面不顯示文字
@@ -67,8 +73,9 @@
     - 緊急待辦的底色 `bg-red-50` 要加語意色（例如 `--warning-surface`），並一起看「紅色徽章疊在淺紅底上不明顯」的問題（013 想最後一起調顏色）
     - 「早安／午安／晚安」的判斷在住戶端和管委會端首頁各寫了一份，要搬到 `src/lib/date.js` 共用
   - 還沒處理的小事：公告卡片橫向排列時，內容少的卡片底部會多一塊空白；「查看全部待辦事項」按鈕在載入中和沒有待辦時也會顯示
-- **下一步**：通報詳情的第二部分，或其他住戶端畫面（「我的」頁與加入管委會流程、新增通報流程、會議紀錄），開始前先問我要做哪一個
-- 013 已是 repo 協作者（hakukanojyo），PR 互相 review 的流程已經跑過（PR #1～#8）
+- **下一步**：先做「拿掉公告的 `impact`」（見下一行），再來是其他住戶端畫面（「我的」頁與加入管委會流程、新增通報流程、會議紀錄），開始前先問我要做哪一個
+- ⬜ 拿掉公告的 `impact`（影響範圍說明）（2026-10-13 和 013 決定，PR #13 的討論）：發布公告的表單沒有地方可以填這段文字，所以不留。住戶端三個用到的地方（`NoticeHomeCard`、`NoticeCard`、`NoticeDetailDialog`）改成顯示公告的內容說明，太長就只顯示前面一部分；假資料和 `docs/data-model.md` 的 `impact` 也要拿掉。由 suzy 開 PR
+- 013 已是 repo 協作者（hakukanojyo），PR 互相 review 的流程已經跑過（PR #1～#14）
 - wireframe 大致完成（2026-10-06）
 - Step 10（PWA）可隨時進行
 

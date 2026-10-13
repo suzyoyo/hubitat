@@ -70,7 +70,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/FAB` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/Greeting` | `app/AppGreeting.vue` | ✅ | |
 | `App/Section Header` | `app/SectionHeader.vue` | ✅ | 沒傳 `to` 就不顯示「看全部」 |
-| `App/Bottom CTA` | `app/BottomCta.vue` | ⬜ | 畫面底部固定的主要按鈕區，可加一行輔助說明、可加第二個按鈕 |
+| `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
 | `App/Drawer Content` | `app/DrawerContent.vue` | ⬜ | 從底部滑出的面板內容。外層用基礎元件 `ui/drawer` |
 | `App/Menu Item` | `app/MenuItem.vue` | ⬜ | 選單的一列：圖示＋文字。「全域新增選單」會用到 |
@@ -92,7 +92,8 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Report/Similar Card` | `report/ReportSimilarCard.vue` | ⬜ | 相似通報卡。變體 Type：Similar（可按「我也遇到了」）／Joined（已加入） |
 | `Report/Flow Progress` | `report/ReportFlowProgress.vue` | ⬜ | 新增通報流程頂部的進度。變體 Step：1～5。進度條用基礎元件 `ui/progress` |
 | `Report/Review Row` | `report/ReportReviewRow.vue` | ⬜ | 確認送出頁的一列：欄位名稱＋值＋「修改」按鈕 |
-| `Report/Photo Tile` | `report/ReportPhotoTile.vue` | ⬜ | 照片格。變體 Type：Preview／Add／Thumbnail；Size：Large／Small |
+| `Report/Photo Tile` | `report/ReportPhotoTile.vue` | 🟡 | 照片格。變體 Type 用 `type` prop 切換：`preview`（預設，傳 `name` 檔名）／`add`。選好照片送出 `pick` 事件（帶檔名），按刪除送出 `remove`。假資料只有檔名，預覽區先放圖示＋檔名。「更換」「刪除」按鈕高 44px（Kit 是 28px）。還沒做：Thumbnail、Size Small（新增通報流程會用到） |
+| （Kit 沒有元件，設計稿是「住戶端-通報詳情-撤回確認」） | `report/ReportWithdrawDialog.vue` | ✅ | 撤回通報的確認彈窗：標題＋說明＋撤回原因（選填）＋「取消／確認撤回」。用 `v-model:open` 控制開關，按「確認撤回」送出 `confirm` 事件（帶原因），真的去撤回是頁面的工作；撤回中傳 `pending` 讓按鈕不能按 |
 
 ### C. 公告與會議
 
@@ -190,7 +191,7 @@ import { Button } from '@/components/ui/button'
 | Combobox | `combobox` | ⬜ | 要打字搜尋的選單才用。只是點選的下拉選單用 `select`（見下方），選項的樣子照 Kit 這一頁的「Combobox Item」：文字＋右邊打勾 |
 | Dialog | `dialog` | ✅ | 2026-10-12 加入。公告詳情彈窗在用；通報詳情的撤回確認之後也會用到 |
 | Native Select | `native-select` | ⬜ | |
-| Toggle & Toggle Group | `toggle`、`toggle-group` | ✅ | 2026-10-12 加入，還沒照 Kit 調整樣式。篩選標籤會用 `toggle-group` 當底，包成產品元件 `common/FilterChips.vue` |
+| Toggle & Toggle Group | `toggle`、`toggle-group` | ✅ | 2026-10-12 加入，還沒照 Kit 調整樣式。篩選標籤會用 `toggle-group` 當底，包成產品元件 `common/FilterChips.vue`，規則見 [dev-guide.md 第 5 節](dev-guide.md#篩選篩選標籤下拉選單) |
 | Kbd | ➖ | ➖ | 顯示鍵盤按鍵用的，手機版用不到 |
 
 專案裡有、但 Kit 沒有獨立頁面的基礎元件：`empty`、`label`、`progress`、`select`、`sheet`、`skeleton`、`slider`、`sonner`、`spinner`、`stepper`。
@@ -233,4 +234,3 @@ import { Button } from '@/components/ui/button'
 | 頁面名稱拼錯 | 基礎元件的 Seperator 應為 Separator |
 | 有些元件沒有說明 | `App/Drawer Content`、`App/Menu Item`、`App/Bottom CTA 三按鈕`、`Comment/` 兩個、`Message/Sheet Content`、`Calendar/Day`、`Notification/Item`、`Common/` 兩個、`Form/Radio Option`、`Feedback/Toast` 與 Dialog 三個、`Admin/Notification Item`、`Admin/Equipment Row` |
 | Admin/ 的說明都一樣 | 8 個卡片的說明是同一段樣式描述，沒有寫各自的用途 |
-| 還缺的元件 | 篩選標籤（設計稿有 6 處借用 Button 手動調整） |
