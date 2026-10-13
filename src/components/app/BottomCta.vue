@@ -5,7 +5,7 @@
 //     <Button variant="outline">取消</Button>
 //     <Button>送出</Button>
 //   </BottomCta>
-// 注意：這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 pb-28）
+// 注意：這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 pb-24；有 note 那一行時要留多一點，例如 pb-32）
 
 defineProps({
   // 按鈕下面的一行灰色說明；不傳就不顯示
