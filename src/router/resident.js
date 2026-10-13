@@ -2,6 +2,7 @@
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 import AnnouncementsView from '@/views/resident/AnnouncementsView.vue'
 import HomeView from '@/views/resident/HomeView.vue'
+import JoinCommitteeView from '@/views/resident/JoinCommitteeView.vue'
 import MeView from '@/views/resident/MeView.vue'
 import NewReportView from '@/views/resident/NewReportView.vue'
 import ReportDetailView from '@/views/resident/ReportDetailView.vue'
@@ -14,6 +15,7 @@ export default {
   views: {
     home: HomeView,
     me: MeView,
+    'me/join': JoinCommitteeView, // 「我的」頁的「加入管委會」
     reports: ReportsView,
     'reports/:id': ReportDetailView,
     announcements: AnnouncementsView,
@@ -32,5 +34,6 @@ export default {
     { path: 'me/notifications', title: '通知設定' },
     { path: 'me/help', title: '使用說明' },
     { path: 'me/account', title: '帳號與安全' },
+    { path: 'me/join', title: '加入管委會' },
   ],
 }

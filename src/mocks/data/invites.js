@@ -13,6 +13,9 @@
 //   respondedAt  回覆的時間
 // 「過期了沒」會隨時間變，不存在資料裡，由假 API 用 expiresAt 算
 
+// 邀請碼是幾位數
+export const INVITE_CODE_LENGTH = 6
+
 // 邀請碼的狀態：message 是不能用的時候，輸入頁要顯示的提示
 export const INVITE_STATUSES = {
   valid: { label: '可以使用', message: '' },

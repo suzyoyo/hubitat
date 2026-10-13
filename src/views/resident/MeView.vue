@@ -8,6 +8,7 @@ import {
   CircleHelpIcon,
   LockIcon,
   UserRoundIcon,
+  UsersIcon,
 } from '@lucide/vue'
 import MenuItem from '@/components/app/MenuItem.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
@@ -98,7 +99,7 @@ onMounted(async () => {
           <!-- 身分只是分類，用灰色徽章 -->
           <Badge variant="outline">住戶</Badge>
         </div>
-        <Separator v-if="loading || isCommittee" />
+        <Separator />
         <!-- 載入中還不知道是不是委員，先放一塊灰色的 -->
         <Skeleton v-if="loading" class="my-3.5 h-11" />
         <MenuItem
@@ -108,6 +109,15 @@ onMounted(async () => {
           to="/committee/home"
         >
           <ArrowLeftRightIcon />
+        </MenuItem>
+        <!-- 還不是委員：可以輸入邀請碼加入 -->
+        <MenuItem
+          v-else
+          title="加入管委會"
+          description="輸入主委給你的邀請碼，或掃描 QR Code"
+          to="/resident/me/join"
+        >
+          <UsersIcon />
         </MenuItem>
       </div>
     </section>
