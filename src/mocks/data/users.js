@@ -96,6 +96,10 @@ export const users = [
   { id: 'u-r04', name: '許先生', surname: '許', roles: ['resident'], building: 'C', unit: '4樓之1' },
 ]
 
+// 住戶端可以切換的示範住戶（在 /playground 的「假資料」區切換）
+// 第一個是預設；陳先生不是委員，用來看「加入管委會」流程
+export const DEMO_RESIDENT_IDS = ['u-c04', 'u-r01']
+
 // 還沒有登入功能：先固定每個角色「目前登入」的是誰
 export const CURRENT_USER_IDS = {
   resident: 'u-c04', // 李伯伯

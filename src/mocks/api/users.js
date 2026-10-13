@@ -2,6 +2,7 @@
 import {
   COMMITTEE_TITLES,
   CURRENT_USER_IDS,
+  DEMO_RESIDENT_IDS,
   STAFF_TITLES,
   TERM,
   users,
@@ -49,11 +50,33 @@ export function userLabel(id) {
   return user.name
 }
 
+// 住戶端的示範住戶：預設是李伯伯，可以在 /playground 切換成不是委員的陳先生
+// 選了誰記在瀏覽器的 localStorage，重新整理網頁也還在；只影響這台裝置
+const DEMO_RESIDENT_KEY = 'hubitat-demo-resident'
+
+// 取得示範住戶可以選的人
+export function getDemoResidents() {
+  return DEMO_RESIDENT_IDS.map((id) => findUser(id))
+}
+
+// 取得現在選的示範住戶 id；沒選過（或存了不在名單裡的值）就用預設的
+export function getDemoResidentId() {
+  const saved = localStorage.getItem(DEMO_RESIDENT_KEY)
+  return DEMO_RESIDENT_IDS.includes(saved) ? saved : CURRENT_USER_IDS.resident
+}
+
+// 切換示範住戶
+export function setDemoResidentId(id) {
+  localStorage.setItem(DEMO_RESIDENT_KEY, id)
+}
+
 // 取得某個角色目前登入的使用者
 // 回傳的資料會多出 displayName、titleLabel、shortName 三個欄位
 export async function getCurrentUser(role = 'resident') {
   await delay()
-  const user = findUser(CURRENT_USER_IDS[role])
+  // 住戶端看示範住戶選了誰；管委會、管理人員是固定的
+  const id = role === 'resident' ? getDemoResidentId() : CURRENT_USER_IDS[role]
+  const user = findUser(id)
   return { ...user, currentRole: role, ...describeUser(user, role) }
 }
 

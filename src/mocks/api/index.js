@@ -9,6 +9,7 @@
 
 export { MOCK_NOW, MOCK_TODAY } from './helpers'
 export * from './users'
+export * from './invites'
 export * from './community'
 export * from './vendors'
 export * from './contracts'

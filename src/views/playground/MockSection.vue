@@ -12,6 +12,8 @@ import {
   getCommitteeMembers,
   getContracts,
   getCurrentUser,
+  getDemoResidentId,
+  getDemoResidents,
   getEquipmentList,
   getLegalDocuments,
   getMeetings,
@@ -24,6 +26,7 @@ import {
   getStaffMembers,
   getTasks,
   getVendors,
+  setDemoResidentId,
 } from '@/mocks/api'
 import { ANNOUNCEMENT_TYPES } from '@/mocks/data/announcements'
 import { CONTRACT_STATUSES } from '@/mocks/data/contracts'
@@ -53,6 +56,17 @@ const proposals = ref([])
 const opinions = ref([])
 const meetings = ref([])
 const legalDocuments = ref([])
+
+// 住戶端的示範住戶：可以選的人、現在選了誰
+const demoResidents = getDemoResidents()
+const demoResidentId = ref(getDemoResidentId())
+
+// 切換示範住戶：存起來，再重新拿一次資料
+function changeDemoResident(id) {
+  setDemoResidentId(id)
+  demoResidentId.value = id
+  loadData()
+}
 
 // async / await：等資料回來再繼續往下執行
 async function loadData() {
@@ -139,6 +153,22 @@ function dueText(item) {
         <p class="text-xs text-muted-foreground">假裝今天是 {{ formatFullDate(MOCK_TODAY) }}</p>
       </div>
       <Button size="sm" variant="outline" @click="loadData">重新載入</Button>
+    </div>
+
+    <!-- 切換住戶端的示範住戶：選了以後，整個住戶端都會變成這個人的資料 -->
+    <div class="space-y-2">
+      <h3 class="text-sm font-medium text-muted-foreground">住戶端示範住戶（選了會記在這個瀏覽器）</h3>
+      <div class="flex gap-2">
+        <Button
+          v-for="resident in demoResidents"
+          :key="resident.id"
+          size="sm"
+          :variant="resident.id === demoResidentId ? 'default' : 'outline'"
+          @click="changeDemoResident(resident.id)"
+        >
+          {{ resident.name }}（{{ resident.roles.includes('committee') ? '委員' : '一般住戶' }}）
+        </Button>
+      </div>
     </div>
 
     <!-- 載入中：顯示灰色佔位框 -->
