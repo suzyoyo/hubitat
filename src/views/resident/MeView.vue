@@ -44,12 +44,12 @@ const fontSize = ref(fontSizes.some((item) => item.value === savedFontSize) ? sa
 // watch：fontSize 一改變，就把新的值存進抽屜
 watch(fontSize, (value) => localStorage.setItem(FONT_SIZE_KEY, value))
 
-// 「系統與支援」的四列
+// 「系統與支援」的四列；to 是點了要去的頁面（都還是佔位頁）
 const supportItems = [
-  { label: '通知設定', icon: BellIcon },
-  { label: '使用說明', icon: CircleHelpIcon },
-  { label: '帳號與安全', icon: LockIcon },
-  { label: '版本資訊', icon: InfoIcon },
+  { label: '通知設定', icon: BellIcon, to: '/resident/me/notifications' },
+  { label: '使用說明', icon: CircleHelpIcon, to: '/resident/me/help' },
+  { label: '帳號與安全', icon: LockIcon, to: '/resident/me/account' },
+  { label: '版本資訊', icon: InfoIcon, to: '/resident/me/version' },
 ]
 
 // onMounted：畫面一出現就去拿資料
@@ -71,7 +71,12 @@ onMounted(async () => {
   <div class="space-y-8 px-5 pt-4">
     <!-- 個人資料 -->
     <Skeleton v-if="loading" class="h-[108px] rounded-xl" />
-    <div v-else class="flex items-center gap-3.5 rounded-xl bg-card p-4 shadow-card">
+    <!-- 整張卡可以點，連到個人資料（還是佔位頁） -->
+    <RouterLink
+      v-else
+      to="/resident/me/profile"
+      class="flex items-center gap-3.5 rounded-xl bg-card p-4 shadow-card"
+    >
       <div class="flex size-14 shrink-0 items-center justify-center rounded-xl bg-muted">
         <UserRoundIcon class="size-6" />
       </div>
@@ -82,7 +87,7 @@ onMounted(async () => {
         <p class="type-date text-muted-foreground">{{ user.building }} 棟 {{ user.unit }}</p>
       </div>
       <ChevronRightIcon class="size-5 shrink-0" />
-    </div>
+    </RouterLink>
 
     <!-- 身分 -->
     <section class="space-y-3">
@@ -141,12 +146,15 @@ onMounted(async () => {
         <template v-for="(item, index) in supportItems" :key="item.label">
           <!-- 第一列上面不用分隔線 -->
           <Separator v-if="index > 0" />
-          <!-- 還沒有 to，所以先不能點、沒有箭頭 -->
-          <MenuItem :title="item.label"><component :is="item.icon" /></MenuItem>
+          <MenuItem :title="item.label" :to="item.to"><component :is="item.icon" /></MenuItem>
         </template>
       </div>
     </section>
 
-    <Button variant="outline" class="w-full">登出帳號</Button>
+    <!-- 還沒有登入功能，登出先回到角色選擇頁 -->
+    <!-- as-child：讓 Button 的外觀套在裡面的 RouterLink 上，按下去就是換頁 -->
+    <Button as-child variant="outline" class="w-full">
+      <RouterLink to="/">登出帳號</RouterLink>
+    </Button>
   </div>
 </template>
