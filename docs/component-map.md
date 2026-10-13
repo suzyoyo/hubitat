@@ -185,7 +185,7 @@ import { Button } from '@/components/ui/button'
 | Tabs | `ui/tabs` | ✅ | |
 | Textarea | `ui/textarea` | ✅ | |
 | Accordion | `accordion` | ⬜ | `Meeting/Case`、`Timeline/Month` 會用到 |
-| Alert | `alert` | ⬜ | |
+| Alert | `alert` | ✅ | 2026-10-13 加入。已照 Kit 調整：說明的字是深色；字級照專案放大成 16px（Kit 是 14px）。圖示直接放在 `<Alert>` 裡的第一個位置。提案與簽核的「法定效力說明」、管委會首頁的「換屆交接提示」會用到 |
 | Calendar | `calendar` | ⬜ | |
 | Checkbox | `checkbox` | ⬜ | |
 | Combobox | `combobox` | ⬜ | 要打字搜尋的選單才用。只是點選的下拉選單用 `select`（見下方），選項的樣子照 Kit 這一頁的「Combobox Item」：文字＋右邊打勾 |
