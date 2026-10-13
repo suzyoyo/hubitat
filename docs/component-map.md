@@ -190,7 +190,7 @@ import { Button } from '@/components/ui/button'
 | Combobox | `combobox` | ⬜ | 要打字搜尋的選單才用。只是點選的下拉選單用 `select`（見下方），選項的樣子照 Kit 這一頁的「Combobox Item」：文字＋右邊打勾 |
 | Dialog | `dialog` | ✅ | 2026-10-12 加入。公告詳情彈窗在用；通報詳情的撤回確認之後也會用到 |
 | Native Select | `native-select` | ⬜ | |
-| Toggle & Toggle Group | `toggle`、`toggle-group` | ✅ | 2026-10-12 加入，還沒照 Kit 調整樣式。篩選標籤會用 `toggle-group` 當底，包成產品元件 `common/FilterChips.vue` |
+| Toggle & Toggle Group | `toggle`、`toggle-group` | ✅ | 2026-10-12 加入，還沒照 Kit 調整樣式。篩選標籤會用 `toggle-group` 當底，包成產品元件 `common/FilterChips.vue`，規則見 [dev-guide.md 第 5 節](dev-guide.md#篩選篩選標籤下拉選單) |
 | Kbd | ➖ | ➖ | 顯示鍵盤按鍵用的，手機版用不到 |
 
 專案裡有、但 Kit 沒有獨立頁面的基礎元件：`empty`、`label`、`progress`、`select`、`sheet`、`skeleton`、`slider`、`sonner`、`spinner`、`stepper`。
@@ -233,4 +233,3 @@ import { Button } from '@/components/ui/button'
 | 頁面名稱拼錯 | 基礎元件的 Seperator 應為 Separator |
 | 有些元件沒有說明 | `App/Drawer Content`、`App/Menu Item`、`App/Bottom CTA 三按鈕`、`Comment/` 兩個、`Message/Sheet Content`、`Calendar/Day`、`Notification/Item`、`Common/` 兩個、`Form/Radio Option`、`Feedback/Toast` 與 Dialog 三個、`Admin/Notification Item`、`Admin/Equipment Row` |
 | Admin/ 的說明都一樣 | 8 個卡片的說明是同一段樣式描述，沒有寫各自的用途 |
-| 還缺的元件 | 篩選標籤（設計稿有 6 處借用 Button 手動調整） |
