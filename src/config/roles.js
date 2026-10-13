@@ -30,7 +30,7 @@ export const roles = [
     ],
     // fab：右下角的圓形按鈕（Floating Action Button）
     // text 是顯示在按鈕上的字（沒有就只顯示＋），title 是按下後那一頁的標題
-    fab: { path: 'report', title: '新增通報', text: '通報' },
+    fab: { path: 'reports/new', title: '新增通報', text: '通報' },
   },
   {
     id: 'committee',

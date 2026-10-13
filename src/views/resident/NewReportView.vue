@@ -3,7 +3,7 @@
 //   1 選地點 → 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出
 //   第 2 步如果按了「我也遇到了」，就不用再通報，直接到完成頁（step=supported）
 // 每一步的畫面放在 new-report/ 資料夾，這個檔案負責記住填到一半的資料、決定現在顯示哪一步
-// 現在是第幾步記在網址上（/resident/report?step=2），所以按返回會回到上一步，不會直接離開
+// 現在是第幾步記在網址上（/resident/reports/new?step=2），所以按返回會回到上一步，不會直接離開
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'

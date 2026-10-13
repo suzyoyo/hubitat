@@ -87,7 +87,7 @@ const greeting = computed(() => {
         />
         <!-- as-child：讓 Button 的外觀套在裡面的 RouterLink 上，按下去就是換頁 -->
         <Button as-child class="w-full">
-          <RouterLink to="/resident/report">新增通報</RouterLink>
+          <RouterLink to="/resident/reports/new">新增通報</RouterLink>
         </Button>
       </section>
 

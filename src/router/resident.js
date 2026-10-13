@@ -15,7 +15,7 @@ export default {
     reports: ReportsView,
     'reports/:id': ReportDetailView,
     announcements: AnnouncementsView,
-    report: NewReportView, // 右下角「通報」按鈕
+    'reports/new': NewReportView, // 右下角「通報」按鈕（網址定在 src/config/roles.js 的 fab）
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）

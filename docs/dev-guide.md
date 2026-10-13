@@ -256,7 +256,7 @@ defineProps({
 - 全小寫英文，三端的開頭固定是 `/resident`、`/committee`、`/staff`
 - 清單頁用複數：`/resident/reports`
 - 詳情頁在清單後面加 `:id`：`/resident/reports/:id`
-- 「新增」在清單後面加 `new`：`/committee/tasks/new`（新增交辦）、`/committee/proposals/new`（新增提案）。住戶端的 `/resident/report`（新增通報）是「＋」按鈕的網址，定在 `roles.js`，先不改（2026-10-13）
+- 「新增」在清單後面加 `new`：`/committee/tasks/new`（新增交辦）、`/committee/proposals/new`（新增提案）、`/resident/reports/new`（新增通報，是「＋」按鈕的網址，定在 `roles.js`）
 
 底部分頁的網址（`home`、`cases`、`vendors`、`files`、`me`）定義在 `src/config/roles.js`，不要在別處另外寫。
 
@@ -398,7 +398,7 @@ const latestReport = computed(() => reports.value[0])
 
 ```vue
 <Button as-child class="w-full">
-  <RouterLink to="/resident/report">新增通報</RouterLink>
+  <RouterLink to="/resident/reports/new">新增通報</RouterLink>
 </Button>
 ```
 
