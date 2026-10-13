@@ -609,7 +609,7 @@ const latestReport = computed(() => reports.value[0])
 
 | | Kit | 程式 |
 |---|---|---|
-| 篩選標籤・沒選中 | Button Small、外框、膠囊形 | `common/FilterChips.vue`（還沒做） |
+| 篩選標籤・沒選中 | Button Small、外框、膠囊形 | `common/FilterChips.vue`（用法見 `views/committee/ProposalsView.vue`） |
 | 篩選標籤・選中 | Button Small、藍底、膠囊形 | 同上 |
 | 下拉選單的按鈕 | Button Small、外框、膠囊形＋⌄ | `common/FilterSelect.vue`（用法見 `views/committee/TodosView.vue`） |
 | 下拉選單的選項 | Combobox 頁的選項：文字＋右邊打勾 | `ui/select`，選項放大到 44px、字 16px |
