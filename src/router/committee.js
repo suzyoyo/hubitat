@@ -3,6 +3,7 @@
 // 寫法可以參考住戶端的 resident.js
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
+import TodosView from '@/views/committee/TodosView.vue'
 
 export default {
   // 已經做好的畫面：「網址」對應「畫面」
@@ -11,6 +12,7 @@ export default {
   views: {
     home: HomeView,
     'announcements/:id': AnnouncementDetailView,
+    todos: TodosView,
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）

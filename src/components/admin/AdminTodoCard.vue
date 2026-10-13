@@ -7,6 +7,7 @@ import { computed } from 'vue'
 import { ChevronRightIcon } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/date'
+import { todoDeadlineBadge } from '@/lib/todo'
 
 const props = defineProps({
   // getMyTodos() 回傳的 items 其中一筆
@@ -15,14 +16,8 @@ const props = defineProps({
   to: { type: String, default: '' },
 })
 
-// 期限徽章：逾期、今天到期是紅色，還沒到期是橘色；沒有期限就不顯示
-const deadlineBadge = computed(() => {
-  const days = props.todo.daysLeft
-  if (days === null) return null
-  if (days < 0) return { text: `逾期 ${-days} 天`, variant: 'destructive' }
-  if (days === 0) return { text: '今日到期', variant: 'destructive' }
-  return { text: `剩餘 ${days} 天`, variant: 'secondary' }
-})
+// 期限徽章的規則放在 src/lib/todo.js，AdminActionCard 也用同一份
+const deadlineBadge = computed(() => todoDeadlineBadge(props.todo))
 </script>
 
 <template>

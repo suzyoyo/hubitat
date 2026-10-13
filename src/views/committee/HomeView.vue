@@ -10,6 +10,7 @@ import IconTile from '@/components/common/IconTile.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { todoLink } from '@/lib/todo'
 import {
   MOCK_NOW,
   getCurrentUser,
@@ -60,22 +61,6 @@ const greeting = computed(() => {
 
 // 首頁只放最前面的 2 筆待辦，其餘的按「查看全部待辦事項」
 const homeTodos = computed(() => todos.value.items.slice(0, 2))
-
-// 待辦的 link.type 對應到哪一種頁面
-const TODO_LINK_PATHS = {
-  case: 'cases',
-  task: 'tasks',
-  proposal: 'proposals',
-  announcement: 'announcements',
-  contract: 'contracts',
-  legalDocument: 'documents',
-  quickSave: 'quick-saves',
-}
-
-// 一筆待辦點了要去哪裡，例如 { type: 'case', id: 'CASE-1' } → '/committee/cases/CASE-1'
-function todoLink(todo) {
-  return `/committee/${TODO_LINK_PATHS[todo.link.type]}/${todo.link.id}`
-}
 
 // 捷徑方塊：不是 Kit 元件，直接寫在頁面裡
 const shortcuts = [

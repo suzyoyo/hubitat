@@ -149,7 +149,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 |---|---|---|---|
 | `Admin/Todo Card` | `admin/AdminTodoCard.vue` | ✅ | 待辦卡。傳 `getMyTodos()` 的一筆 `todo` 進去。變體 Type 沒有做成 prop，依 `todo.isUrgent` 自動切換；期限徽章和緊急的標示方式和 Kit 不同，見[第 4 節](#4-kit-和程式不一樣的地方)。左上角的建立日期要等 `getMyTodos()` 帶出 `createdAt` 才會顯示 |
 | `Admin/Notice Card` | `admin/AdminNoticeCard.vue` | ✅ | 變體 Type 沒有做成 prop：傳 `announcement`（`getManagedAnnouncements()` 的一筆）是公告，傳 `opinion`（`getResidentOpinions()` 的一筆）是住戶意見。住戶意見的標題用留言所在的會議名稱 |
-| `Admin/Action Card` | `admin/AdminActionCard.vue` | ⬜ | 變體 Footer：按鈕／文字 |
+| `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`。變體 Footer 只做了「按鈕」（統一寫「前往完成」，連到 `to`）；「文字」（例如「等待交辦人確認」）還沒做，有頁面用到再加。期限徽章、緊急底色和 `AdminTodoCard` 一樣，規則在 `src/lib/todo.js` |
 | `Admin/Meeting Card` | `admin/AdminMeetingCard.vue` | ⬜ | 變體 State：待整理／待發布／已發布 |
 | `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ⬜ | 廠商卡 |
 | `Admin/Case Card` | `admin/AdminCaseCard.vue` | ⬜ | 案件卡 |
@@ -196,7 +196,7 @@ import { Button } from '@/components/ui/button'
 
 專案裡有、但 Kit 沒有獨立頁面的基礎元件：`empty`、`label`、`progress`、`select`、`sheet`、`skeleton`、`slider`、`sonner`、`spinner`、`stepper`。
 
-`select`（2026-10-12 加入）：點選的下拉選單，例如排序。Kit 的下拉選項在 Combobox 頁；選項預設高 28px，用的時候要放大到 44px、字 16px。
+`select`（2026-10-12 加入）：點選的下拉選單，例如排序。Kit 的下拉選項在 Combobox 頁；選項預設高 28px，用的時候要放大到 44px、字 16px。篩選、排序的下拉一律用包好的 `common/FilterSelect.vue`（2026-10-13），已經放大好了，不用自己調。
 
 **圖示**：Kit 有 Lucide、Tabler、HugeIcons 三套圖示的頁面，程式只裝了 Lucide（`@lucide/vue`）。設計稿上的圖示如果在 Lucide 找不到，先跟對方確認，不要另外安裝第二套。
 
