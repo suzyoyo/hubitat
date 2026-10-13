@@ -187,13 +187,15 @@ import { Button } from '@/components/ui/button'
 | Alert | `alert` | ⬜ | |
 | Calendar | `calendar` | ⬜ | |
 | Checkbox | `checkbox` | ⬜ | |
-| Combobox | `combobox` | ⬜ | |
+| Combobox | `combobox` | ⬜ | 要打字搜尋的選單才用。只是點選的下拉選單用 `select`（見下方），選項的樣子照 Kit 這一頁的「Combobox Item」：文字＋右邊打勾 |
 | Dialog | `dialog` | ✅ | 2026-10-12 加入。公告詳情彈窗在用；通報詳情的撤回確認之後也會用到 |
 | Native Select | `native-select` | ⬜ | |
-| Toggle & Toggle Group | `toggle`、`toggle-group` | ⬜ | |
+| Toggle & Toggle Group | `toggle`、`toggle-group` | ✅ | 2026-10-12 加入，還沒照 Kit 調整樣式。篩選標籤會用 `toggle-group` 當底，包成產品元件 `common/FilterChips.vue` |
 | Kbd | ➖ | ➖ | 顯示鍵盤按鍵用的，手機版用不到 |
 
-專案裡有、但 Kit 沒有獨立頁面的基礎元件：`empty`、`label`、`progress`、`sheet`、`skeleton`、`slider`、`sonner`、`spinner`、`stepper`。
+專案裡有、但 Kit 沒有獨立頁面的基礎元件：`empty`、`label`、`progress`、`select`、`sheet`、`skeleton`、`slider`、`sonner`、`spinner`、`stepper`。
+
+`select`（2026-10-12 加入）：點選的下拉選單，例如排序。Kit 的下拉選項在 Combobox 頁；選項預設高 28px，用的時候要放大到 44px、字 16px。
 
 **圖示**：Kit 有 Lucide、Tabler、HugeIcons 三套圖示的頁面，程式只裝了 Lucide（`@lucide/vue`）。設計稿上的圖示如果在 Lucide 找不到，先跟對方確認，不要另外安裝第二套。
 
