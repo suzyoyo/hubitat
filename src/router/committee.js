@@ -5,6 +5,7 @@ import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue
 import HomeView from '@/views/committee/HomeView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
+import TasksView from '@/views/committee/TasksView.vue'
 import TodosView from '@/views/committee/TodosView.vue'
 
 export default {
@@ -15,6 +16,7 @@ export default {
     home: HomeView,
     'announcements/:id': AnnouncementDetailView,
     todos: TodosView,
+    tasks: TasksView,
     proposals: ProposalsView,
     'tasks/:id': TaskDetailView,
   },
@@ -23,6 +25,7 @@ export default {
   // title 是還沒做好時，佔位頁上顯示的名稱
   innerPages: [
     { path: 'tasks', title: '交辦進度' },
+    { path: 'tasks/new', title: '新增交辦' },
     { path: 'proposals', title: '提案與簽核' },
     { path: 'proposals/new', title: '新增提案' },
     { path: 'todos', title: '我的待辦' },
