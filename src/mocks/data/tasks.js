@@ -11,6 +11,8 @@
 //   caseId     關聯的案件（沒有就不寫）
 //   report     對方的完成回報：at 時間 / note 備註 / files 附件（還沒回報就不寫）
 //   doneAt     交辦人確認完成的時間（還沒確認就不寫）
+//   returnNote 交辦人退回的原因：at 時間 / note 原因（沒被退回過就不寫；只留最近一次）
+//   withdrawReason 交辦人撤回的原因：at 時間 / note 原因（沒撤回就不寫）
 
 // 存在資料裡的狀態
 export const TASK_STATUSES = {

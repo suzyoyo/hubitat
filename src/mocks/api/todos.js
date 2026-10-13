@@ -68,15 +68,17 @@ function incompleteQuickSaves(userId) {
 }
 
 // 交辦給我、還在進行中的
+//   被退回過的，提示改成退回原因，讓對方知道要改什麼
 function assignedTasks(userId) {
   return tasks
     .filter((task) => task.assigneeId === userId && task.status === 'in_progress')
-    .map((task) =>
-      todo('assigned', task.title, `交辦人：${userLabel(task.assignerId)}`, task.createdAt, task.deadline, {
+    .map((task) => {
+      const hint = task.returnNote ? `已退回：${task.returnNote.note}` : `交辦人：${userLabel(task.assignerId)}`
+      return todo('assigned', task.title, hint, task.createdAt, task.deadline, {
         type: 'task',
         id: task.id,
-      }),
-    )
+      })
+    })
 }
 
 function committeeTodos(userId) {
