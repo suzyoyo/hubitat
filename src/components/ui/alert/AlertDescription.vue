@@ -15,7 +15,7 @@ const props = defineProps({
     data-slot="alert-description"
     :class="
       cn(
-        'text-foreground type-body text-balance md:text-pretty [&_p:not(:last-child)]:mb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground',
+        'text-foreground type-body [&_p:not(:last-child)]:mb-4 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground',
         props.class,
       )
     "
