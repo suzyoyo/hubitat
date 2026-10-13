@@ -9,6 +9,7 @@ import NoticeHomeCard from '@/components/notice/NoticeHomeCard.vue'
 import ReportCard from '@/components/report/ReportCard.vue'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { greetingWord } from '@/lib/date'
 import {
   MOCK_NOW,
   MOCK_TODAY,
@@ -55,13 +56,8 @@ const latestReport = computed(() => reports.value[0])
 const homeNotices = computed(() => allNotices.value.filter((item) => item.relatedToMe).slice(0, 2))
 const latestMeeting = computed(() => meetings.value[0])
 
-// 依現在幾點決定問候語
-const hello = computed(() => {
-  const hour = Number(MOCK_NOW.split('T')[1].split(':')[0]) // '2026-10-01T13:42' → 13
-  if (hour < 11) return '早安'
-  if (hour < 18) return '午安'
-  return '晚安'
-})
+// 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
+const hello = greetingWord(MOCK_NOW)
 
 // 問候列的兩行字：提醒「今天」社區有什麼事
 const greeting = computed(() => {
@@ -69,8 +65,8 @@ const greeting = computed(() => {
   const todayNotices = allNotices.value.filter((item) => item.startAt.split('T')[0] <= MOCK_TODAY)
   // 優先提醒與我有關的；沒有的話，提醒社區裡其他地方的
   const notice = todayNotices.find((item) => item.relatedToMe) ?? todayNotices[0]
-  if (!notice) return { title: `${hello.value}！`, subtitle: '今天社區一切平安喔！' }
-  return { title: `${hello.value}！今天有`, subtitle: `${notice.title}喔！` }
+  if (!notice) return { title: `${hello}！`, subtitle: '今天社區一切平安喔！' }
+  return { title: `${hello}！今天有`, subtitle: `${notice.title}喔！` }
 })
 </script>
 

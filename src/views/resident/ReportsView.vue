@@ -47,11 +47,12 @@ const tabs = computed(() => [
     <!-- 整列高 44px（設計稿 33px），長輩比較好按 -->
     <TabsList class="h-11! w-full rounded-xl bg-background p-1">
       <!-- TabsTrigger 與 TabsContent 用相同的 value 配對 -->
+      <!-- before:…：按鈕看起來大約 35px 高，用看不見的 before 往上下各補 8px，可以點的範圍超過 44px（dev-guide 第 5 節「可以點的範圍」） -->
       <TabsTrigger
         v-for="tab in tabs"
         :key="tab.value"
         :value="tab.value"
-        class="text-base text-muted-foreground data-active:bg-secondary data-active:text-secondary-foreground"
+        class="text-base text-muted-foreground before:absolute before:inset-x-0 before:-inset-y-2 data-active:bg-secondary data-active:text-secondary-foreground"
       >
         {{ tab.label }}
         <!-- 「已完成」旁邊顯示件數；0 件就不顯示 -->
