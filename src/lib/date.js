@@ -104,6 +104,15 @@ export function formatTime(value) {
   return parse(value).time
 }
 
+// 依現在幾點決定問候語（首頁的問候列用）：'2026-10-01T13:42' → '午安'
+//   11 點前是早安，18 點前是午安，之後是晚安
+export function greetingWord(now) {
+  const hour = Number(formatTime(now).split(':')[0]) // '13:42' → 13
+  if (hour < 11) return '早安'
+  if (hour < 18) return '午安'
+  return '晚安'
+}
+
 // 把時間顯示成「多久以前」，now 是現在的時間
 //   10 分鐘內的事 → '10 分鐘前'
 //   今天稍早     → '2 小時前'
