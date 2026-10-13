@@ -111,7 +111,7 @@ export const cases = [
         at: '2026-09-26T09:30',
         actorId: 'u-c04',
         label: '已受理',
-        text: '修繕委員 李委員受理並設定處理期限',
+        text: '主委 李委員受理並設定處理期限',
         residentText: '管委會已受理。',
       },
       {
@@ -155,7 +155,7 @@ export const cases = [
         at: '2026-09-23T09:10',
         actorId: 'u-c01',
         label: '已受理',
-        text: '主委 王委員受理，指派大同電梯檢修',
+        text: '修繕委員 王委員受理，指派大同電梯檢修',
         residentText: '管委會已受理，已請電梯廠商檢修。',
       },
       {
@@ -194,7 +194,7 @@ export const cases = [
     supporters: [],
     logs: [
       { at: '2026-09-18T10:00', actorId: 'u-s01', label: '巡查登記', text: '總幹事 王小姐巡查登記，附 2 張照片' },
-      { at: '2026-09-19T11:20', actorId: 'u-c04', label: '已受理', text: '修繕委員 李委員受理，指派昇益工程行' },
+      { at: '2026-09-19T11:20', actorId: 'u-c04', label: '已受理', text: '主委 李委員受理，指派昇益工程行' },
       { at: '2026-09-24T08:30', actorId: 'u-s02', label: '施工', text: '昇益工程行進場，預計 10/01 完工' },
     ],
   },
@@ -253,7 +253,7 @@ export const cases = [
         at: '2026-09-28T10:00',
         actorId: 'u-c01',
         label: '已受理',
-        text: '主委 王委員受理，將先行勸導',
+        text: '修繕委員 王委員受理，將先行勸導',
         residentText: '管委會已受理。',
       },
     ],
@@ -415,7 +415,7 @@ export const cases = [
         text: '李伯伯（A 棟 8 樓）通報',
         residentText: '已收到通報，好彼管家已轉交管委會。',
       },
-      { at: '2026-09-09T10:00', actorId: 'u-c01', label: '已受理', text: '主委 王委員受理', residentText: '管委會已受理。' },
+      { at: '2026-09-09T10:00', actorId: 'u-c01', label: '已受理', text: '修繕委員 王委員受理', residentText: '管委會已受理。' },
       {
         at: '2026-09-10T14:00',
         actorId: 'u-c01',

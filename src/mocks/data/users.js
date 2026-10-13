@@ -35,7 +35,7 @@ export const STAFF_TITLES = {
 }
 
 export const users = [
-  // 示範用的主角：李伯伯是住戶，同時也是修繕委員（管委會端顯示「李委員」）
+  // 示範用的主角：李伯伯是住戶，同時也是主委（管委會端顯示「李委員」）
   {
     id: 'u-c04',
     name: '李伯伯',
@@ -43,7 +43,7 @@ export const users = [
     roles: ['resident', 'committee'],
     building: 'A',
     unit: '8樓之1',
-    committeeTitle: 'repair',
+    committeeTitle: 'chair',
   },
 
   // 其他委員（委員本身也都是住戶）
@@ -54,7 +54,7 @@ export const users = [
     roles: ['resident', 'committee'],
     building: 'A',
     unit: '5樓之1',
-    committeeTitle: 'chair',
+    committeeTitle: 'repair',
   },
   {
     id: 'u-c02',

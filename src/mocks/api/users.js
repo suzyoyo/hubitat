@@ -9,14 +9,14 @@ import {
 import { delay } from './helpers'
 
 // 依「目前用哪個身分看」決定要顯示的名稱與職稱
-// 例如李伯伯：住戶身分是「李伯伯」，管委會身分是「李委員」「修繕委員」
+// 例如李伯伯：住戶身分是「李伯伯」，管委會身分是「李委員」「主委」
 export function describeUser(user, role) {
   if (role === 'committee' && user.committeeTitle) {
     const title = COMMITTEE_TITLES[user.committeeTitle]
     return {
       displayName: `${user.surname}委員`, // 李委員
-      titleLabel: title.label, // 修繕委員
-      shortName: `${user.surname}${title.short}`, // 李修繕
+      titleLabel: title.label, // 主委
+      shortName: `${user.surname}${title.short}`, // 李主委
     }
   }
   if (role === 'staff' && user.staffTitle) {
