@@ -201,18 +201,20 @@ export async function updateReport(id, userId, changes) {
 }
 
 // 撤回通報（住戶用）：狀態改成「已取消」，並留下一筆紀錄
+//   reason 撤回原因，選填；有寫的話管理端的紀錄會看到
 // 撤回後不會再出現在「我的通報」，管理端的未結案列表也看不到
 // 回傳 true 代表撤回成功；不能撤回的話（不是自己的、已經結案）回傳 false
-export async function withdrawReport(id, userId) {
+export async function withdrawReport(id, userId, reason = '') {
   await delay()
   const item = findEditableCase(id, userId)
   if (!item) return false
   item.status = 'cancelled'
+  if (reason) item.withdrawReason = reason
   item.logs.push({
     at: MOCK_NOW,
     actorId: userId,
     label: '住戶撤回',
-    text: '通報人撤回通報',
+    text: reason ? `通報人撤回通報，原因：${reason}` : '通報人撤回通報',
     residentText: '你已撤回這筆通報。',
   })
   return true

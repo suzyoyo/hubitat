@@ -26,6 +26,7 @@
 //   completion  完工紀錄：at 時間 / note 備註 / photos 照片（還沒完工就不寫）
 //   rating      廠商評分：score 1～5 分 / comment 評語（還沒評就不寫）
 //   closedAt    結案時間（還沒結案就不寫）
+//   withdrawReason 撤回原因（住戶撤回時選填，沒寫就沒有這一項）
 
 // 案件狀態：同一個狀態，管理端和住戶端顯示的文字不同
 //   label         管委會、管理人員看到的
