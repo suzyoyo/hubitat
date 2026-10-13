@@ -231,11 +231,11 @@ async function submit() {
     <BottomCta v-else-if="step === 5" note="送出即表示你同意社區公約與通報規範。">
       <Button :disabled="submitting" @click="submit">送出通報</Button>
     </BottomCta>
+    <!-- 兩個完成頁：按鈕上下排。replace：離開之後按返回不會再回到完成頁 -->
     <BottomCta v-else-if="step === 'submitted'" vertical>
       <Button @click="router.replace('/resident/reports')">查看我的通報</Button>
       <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
     </BottomCta>
-    <!-- 完成頁：兩個按鈕上下排。replace：離開之後按返回不會再回到完成頁 -->
     <BottomCta v-else-if="step === 'supported'" vertical>
       <Button @click="router.replace(`/resident/reports/${supportedReport.id}`)">查看這件通報</Button>
       <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
