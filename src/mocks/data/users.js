@@ -17,7 +17,7 @@ export const TERM = {
   endDate: '2027-06-30',
 }
 
-// 委員職稱：short 是簡稱，用在簽核名單這種空間小的地方（例如「王主委」）
+// 委員職稱：short 是簡稱，用在簽核名單這種空間小的地方（例如「李主委」）
 // canReviewAnnouncement：能不能審核公告（只有主委、副主委可以）
 export const COMMITTEE_TITLES = {
   chair: { label: '主委', short: '主委', canReviewAnnouncement: true },
@@ -35,7 +35,7 @@ export const STAFF_TITLES = {
 }
 
 export const users = [
-  // 示範用的主角：李伯伯是住戶，同時也是修繕委員（管委會端顯示「李委員」）
+  // 示範用的主角：李伯伯是住戶，同時也是主委（管委會端顯示「李委員」）
   {
     id: 'u-c04',
     name: '李伯伯',
@@ -43,7 +43,7 @@ export const users = [
     roles: ['resident', 'committee'],
     building: 'A',
     unit: '8樓之1',
-    committeeTitle: 'repair',
+    committeeTitle: 'chair',
   },
 
   // 其他委員（委員本身也都是住戶）
@@ -54,7 +54,7 @@ export const users = [
     roles: ['resident', 'committee'],
     building: 'A',
     unit: '5樓之1',
-    committeeTitle: 'chair',
+    committeeTitle: 'repair',
   },
   {
     id: 'u-c02',
