@@ -611,11 +611,12 @@ const latestReport = computed(() => reports.value[0])
 |---|---|---|
 | 篩選標籤・沒選中 | Button Small、外框、膠囊形 | `common/FilterChips.vue`（還沒做） |
 | 篩選標籤・選中 | Button Small、藍底、膠囊形 | 同上 |
-| 下拉選單的按鈕 | Button Small、外框、膠囊形＋⌄ | `common/FilterSelect.vue`（還沒做） |
+| 下拉選單的按鈕 | Button Small、外框、膠囊形＋⌄ | `common/FilterSelect.vue`（用法見 `views/committee/TodosView.vue`） |
 | 下拉選單的選項 | Combobox 頁的選項：文字＋右邊打勾 | `ui/select`，選項放大到 44px、字 16px |
 
 - 高度看起來 **32px**（Kit 的 Button Small 已改成 32px，對應程式 `Button` 的 `size="xs"`），可以點的範圍照上一節補到 44px。
 - 膠囊形在 `FilterChips`、`FilterSelect` 裡用 `rounded-full` 加，不要改 `ui/button`。
+- 字至少 **14px**，和一般按鈕一樣（`type-button`）。`xs` 預設的字是 12px（`text-xs`），太小，`FilterChips`、`FilterSelect` 要蓋掉。
 - 篩選、排序一律用這兩個元件，不要在頁面裡各自拼，所有列表頁的篩選才會長得一樣。
 - 篩選標籤是單選：點已經選中的那一個，不能變成「什麼都沒選」（`toggle-group` 預設會這樣，`FilterChips` 要擋掉）。
 
