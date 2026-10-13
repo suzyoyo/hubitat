@@ -10,6 +10,7 @@ import {
   LockIcon,
   UserRoundIcon,
 } from '@lucide/vue'
+import MenuItem from '@/components/app/MenuItem.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -76,11 +77,7 @@ onMounted(async () => {
           <Badge variant="outline">住戶</Badge>
         </div>
         <Separator />
-        <div class="flex items-center gap-3 py-3.5">
-          <ArrowLeftRightIcon class="size-5 shrink-0" />
-          <p class="flex-1 type-body">切換至管委會</p>
-          <ChevronRightIcon class="size-5 shrink-0" />
-        </div>
+        <MenuItem title="切換至管委會" to="/committee/home"><ArrowLeftRightIcon /></MenuItem>
       </div>
     </section>
 
@@ -118,11 +115,8 @@ onMounted(async () => {
         <template v-for="(item, index) in supportItems" :key="item.label">
           <!-- 第一列上面不用分隔線 -->
           <Separator v-if="index > 0" />
-          <div class="flex items-center gap-3 py-3.5">
-            <component :is="item.icon" class="size-5 shrink-0" />
-            <p class="flex-1 type-body">{{ item.label }}</p>
-            <ChevronRightIcon class="size-5 shrink-0" />
-          </div>
+          <!-- 還沒有 to，所以先不能點、沒有箭頭 -->
+          <MenuItem :title="item.label"><component :is="item.icon" /></MenuItem>
         </template>
       </div>
     </section>
