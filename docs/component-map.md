@@ -70,7 +70,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/FAB` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/Greeting` | `app/AppGreeting.vue` | ✅ | |
 | `App/Section Header` | `app/SectionHeader.vue` | ✅ | 沒傳 `to` 就不顯示「看全部」 |
-| `App/Bottom CTA` | `app/BottomCta.vue` | ⬜ | 畫面底部固定的主要按鈕區，可加一行輔助說明、可加第二個按鈕 |
+| `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
 | `App/Drawer Content` | `app/DrawerContent.vue` | ⬜ | 從底部滑出的面板內容。外層用基礎元件 `ui/drawer` |
 | `App/Menu Item` | `app/MenuItem.vue` | ⬜ | 選單的一列：圖示＋文字。「全域新增選單」會用到 |
