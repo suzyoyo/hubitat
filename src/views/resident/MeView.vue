@@ -1,12 +1,11 @@
 <script setup>
-// 住戶端・我的：個人資料、身分、顯示設定、系統與支援、登出
+// 住戶端・我的：個人資料、身分、顯示設定、系統與支援、登出、版本
 import { computed, onMounted, ref, watch } from 'vue'
 import {
   ArrowLeftRightIcon,
   BellIcon,
   ChevronRightIcon,
   CircleHelpIcon,
-  InfoIcon,
   LockIcon,
   UserRoundIcon,
 } from '@lucide/vue'
@@ -18,6 +17,8 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getCommunity, getCurrentUser, getMyTodos } from '@/mocks/api'
+// 版本號直接讀專案最外層的 package.json，改版時只要改那裡
+import { version } from '../../../package.json'
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
 const loading = ref(true)
@@ -44,12 +45,11 @@ const fontSize = ref(fontSizes.some((item) => item.value === savedFontSize) ? sa
 // watch：fontSize 一改變，就把新的值存進抽屜
 watch(fontSize, (value) => localStorage.setItem(FONT_SIZE_KEY, value))
 
-// 「系統與支援」的四列；to 是點了要去的頁面（都還是佔位頁）
+// 「系統與支援」的三列；to 是點了要去的頁面（都還是佔位頁）
 const supportItems = [
   { label: '通知設定', icon: BellIcon, to: '/resident/me/notifications' },
   { label: '使用說明', icon: CircleHelpIcon, to: '/resident/me/help' },
   { label: '帳號與安全', icon: LockIcon, to: '/resident/me/account' },
-  { label: '版本資訊', icon: InfoIcon, to: '/resident/me/version' },
 ]
 
 // onMounted：畫面一出現就去拿資料
@@ -156,5 +156,8 @@ onMounted(async () => {
     <Button as-child variant="outline" class="w-full">
       <RouterLink to="/">登出帳號</RouterLink>
     </Button>
+
+    <!-- 版本只是一行字，不另外做一頁 -->
+    <p class="text-center type-date text-muted-foreground">好彼社區 V{{ version }}</p>
   </div>
 </template>

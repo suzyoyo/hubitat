@@ -32,6 +32,5 @@ export default {
     { path: 'me/notifications', title: '通知設定' },
     { path: 'me/help', title: '使用說明' },
     { path: 'me/account', title: '帳號與安全' },
-    { path: 'me/version', title: '版本資訊' },
   ],
 }
