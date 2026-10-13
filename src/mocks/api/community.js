@@ -33,7 +33,7 @@ export async function getInternalContacts() {
   return internalContacts.map((contact) => {
     // 沒有 userId 的是固定單位（例如中控室），直接回傳
     if (!contact.userId) return contact
-    // 委員顯示成「王委員・主委」，管理人員顯示成「王小姐・總幹事」
+    // 委員顯示成「李委員・主委」，管理人員顯示成「王小姐・總幹事」
     const user = findUser(contact.userId)
     const info = describeUser(user, user.committeeTitle ? 'committee' : 'staff')
     return { ...contact, name: info.displayName, note: info.titleLabel }

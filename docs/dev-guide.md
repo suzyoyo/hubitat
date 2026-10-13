@@ -105,7 +105,7 @@ npm run dev
 
 假資料裡的「我」是固定的，三端各有一個：
 
-- **住戶端、管委會端**：李伯伯，A 棟 8 樓之 1 的住戶，同時是管委會的修繕委員
+- **住戶端、管委會端**：李伯伯，A 棟 8 樓之 1 的住戶，同時是管委會的**主委**（2026-10-13 從修繕委員改成主委，才看得到交辦、審核公告這些只有主委、副主委能做的事）
 - **管理人員端**：張管理員
 
 假資料的「今天」固定是 **2026 年 10 月 1 日**，所以畫面上的「3 天後到期」「逾期 11 天」不會隨著真實日期改變。
@@ -609,7 +609,7 @@ const latestReport = computed(() => reports.value[0])
 
 | | Kit | 程式 |
 |---|---|---|
-| 篩選標籤・沒選中 | Button Small、外框、膠囊形 | `common/FilterChips.vue`（還沒做） |
+| 篩選標籤・沒選中 | Button Small、外框、膠囊形 | `common/FilterChips.vue`（用法見 `views/committee/ProposalsView.vue`） |
 | 篩選標籤・選中 | Button Small、藍底、膠囊形 | 同上 |
 | 下拉選單的按鈕 | Button Small、外框、膠囊形＋⌄ | `common/FilterSelect.vue`（用法見 `views/committee/TodosView.vue`） |
 | 下拉選單的選項 | Combobox 頁的選項：文字＋右邊打勾 | `ui/select`，選項放大到 44px、字 16px |

@@ -73,7 +73,7 @@ function dateText(value) {
   <div class="space-y-3 px-5 pt-4 pb-5">
     <!-- 新增交辦的頁面還沒做，先連到佔位頁 -->
     <Button as-child class="w-full">
-      <RouterLink to="/committee/task"><PlusIcon />新增交辦</RouterLink>
+      <RouterLink to="/committee/tasks/new"><PlusIcon />新增交辦</RouterLink>
     </Button>
     <FilterSelect v-model="status" label="狀態" :options="STATUS_FILTERS" />
 

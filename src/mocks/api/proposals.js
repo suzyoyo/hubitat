@@ -59,7 +59,7 @@ function present(proposal, userId) {
       const sign = proposal.signatures.find((item) => item.userId === member.id)
       return {
         userId: member.id,
-        shortName: describeUser(member, 'committee').shortName, // 王主委
+        shortName: describeUser(member, 'committee').shortName, // 李主委
         isMe: member.id === userId,
         signedAt: sign ? sign.at : null,
       }
