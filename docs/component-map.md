@@ -73,7 +73,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字；加上 `vertical` 按鈕改成上下排（完成頁用）。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
 | `App/Drawer Content` | `app/DrawerContent.vue` | ⬜ | 從底部滑出的面板內容。外層用基礎元件 `ui/drawer` |
-| `App/Menu Item` | `app/MenuItem.vue` | ⬜ | 選單的一列：圖示＋文字。「全域新增選單」會用到 |
+| `App/Menu Item` | `app/MenuItem.vue` | ✅ | 選單的一列：圖示＋標題＋箭頭。圖示用 slot 放進去；`description` 是標題下面的灰色說明；有傳 `to` 才能點、才有箭頭。住戶端「我的」頁在用，「全域新增選單」也會用到。設計稿「我的」頁的這幾列用的是基礎元件 Item，不是 `App/Menu Item`，兩個長得一樣不一樣還沒對過 |
 | `App/Message` | `app/AppMessage.vue` | ⬜ | 用途待確認，見[第 5 節](#5-需要跟設計確認的事) |
 | `_Drawer Slot` | ➖ | ➖ | 底線開頭是 Kit 內部用的零件，程式不用做 |
 

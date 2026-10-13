@@ -2,6 +2,7 @@
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 import AnnouncementsView from '@/views/resident/AnnouncementsView.vue'
 import HomeView from '@/views/resident/HomeView.vue'
+import MeView from '@/views/resident/MeView.vue'
 import NewReportView from '@/views/resident/NewReportView.vue'
 import ReportDetailView from '@/views/resident/ReportDetailView.vue'
 import ReportsView from '@/views/resident/ReportsView.vue'
@@ -12,6 +13,7 @@ export default {
   // 沒列在這裡的頁面，會先顯示佔位頁
   views: {
     home: HomeView,
+    me: MeView,
     reports: ReportsView,
     'reports/:id': ReportDetailView,
     announcements: AnnouncementsView,
@@ -25,5 +27,10 @@ export default {
     { path: 'reports/:id', title: '通報詳情' },
     { path: 'announcements', title: '社區公告' },
     { path: 'meetings/:id', title: '會議紀錄' },
+    // 「我的」頁連出去的頁面
+    { path: 'me/profile', title: '個人資料' },
+    { path: 'me/notifications', title: '通知設定' },
+    { path: 'me/help', title: '使用說明' },
+    { path: 'me/account', title: '帳號與安全' },
   ],
 }
