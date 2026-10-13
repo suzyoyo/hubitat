@@ -1,6 +1,6 @@
 <script setup>
 // 住戶端・我的：個人資料、身分、顯示設定、系統與支援、登出
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import {
   ArrowLeftRightIcon,
   BellIcon,
@@ -17,12 +17,18 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getCommunity, getCurrentUser } from '@/mocks/api'
+import { getCommunity, getCurrentUser, getMyTodos } from '@/mocks/api'
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
 const loading = ref(true)
 const user = ref(null) // 我是誰
 const community = ref(null) // 社區基本資料（要顯示社區名稱）
+const todoTotal = ref(0) // 我在管委會那邊有幾件待辦（不是委員就是 0）
+
+// 我是不是委員：是的話才有「切換至管委會」
+const isCommittee = computed(() => user.value?.roles.includes('committee'))
+// 「切換至管委會」下面的說明；沒有待辦就不顯示
+const switchHint = computed(() => (todoTotal.value ? `有 ${todoTotal.value} 件事等你處理` : ''))
 
 // 字體大小：目前只有外觀，選了不會真的改變文字大小
 const fontSizes = [
@@ -46,6 +52,11 @@ onMounted(async () => {
   const [me, communityInfo] = await Promise.all([getCurrentUser('resident'), getCommunity()])
   user.value = me
   community.value = communityInfo
+  // 委員才有待辦；待辦要用管委會的身分去拿
+  if (isCommittee.value) {
+    const todos = await getMyTodos(me.id, 'committee')
+    todoTotal.value = todos.total
+  }
   loading.value = false
 })
 </script>
@@ -76,8 +87,17 @@ onMounted(async () => {
           <!-- 身分只是分類，用灰色徽章 -->
           <Badge variant="outline">住戶</Badge>
         </div>
-        <Separator />
-        <MenuItem title="切換至管委會" to="/committee/home"><ArrowLeftRightIcon /></MenuItem>
+        <Separator v-if="loading || isCommittee" />
+        <!-- 載入中還不知道是不是委員，先放一塊灰色的 -->
+        <Skeleton v-if="loading" class="my-3.5 h-11" />
+        <MenuItem
+          v-else-if="isCommittee"
+          title="切換至管委會"
+          :description="switchHint"
+          to="/committee/home"
+        >
+          <ArrowLeftRightIcon />
+        </MenuItem>
       </div>
     </section>
 
