@@ -12,7 +12,7 @@
 //   reporterId  通報人（對應 users.js）
 //   reportedAt  通報時間
 //   description 通報人寫的問題描述
-//   photos      照片檔名
+//   photos      照片或影片的檔名（欄位名稱沿用 photos，影片也放這裡，例如 '異音.mp4'）
 //   status      狀態，見下方 CASE_STATUSES
 //   deadline    處理期限（還沒設定就不寫）。「逾期」是用今天的日期算出來的
 //   assigneeId  負責人（還沒指派就不寫）

@@ -11,7 +11,9 @@ import BottomCta from '@/components/app/BottomCta.vue'
 import ReportFlowProgress from '@/components/report/ReportFlowProgress.vue'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { REPORT_TYPES } from '@/lib/report'
 import { getAreas, getCurrentUser, getSimilarReports, supportReport } from '@/mocks/api'
+import DescribeStep from './new-report/DescribeStep.vue'
 import PlaceStep from './new-report/PlaceStep.vue'
 import SimilarStep from './new-report/SimilarStep.vue'
 import SupportedDone from './new-report/SupportedDone.vue'
@@ -35,6 +37,9 @@ const form = reactive({
   place: '', // 地點，例如 '1F 大廳'；選「其他」的話是住戶自己填的
   isOtherPlace: false, // 地點是不是選了「其他」
   visibility: '', // 類型：'public' 公共設施問題（公開）/ 'private' 涉及住戶行為（保密）
+  subject: '', // 通報問題（標題），必填
+  description: '', // 補充說明，選填
+  photos: [], // 照片或影片的檔名，選填
 })
 
 // 把填到一半的資料清空（做完之後用，下次再進來是全新的）
@@ -43,6 +48,9 @@ function resetForm() {
   form.place = ''
   form.isOtherPlace = false
   form.visibility = ''
+  form.subject = ''
+  form.description = ''
+  form.photos = []
 }
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
@@ -66,7 +74,15 @@ const canGoNext = computed(() => {
   // trim()：去掉頭尾的空白，只打空白不算有填
   if (step.value === 1) return form.place.trim() !== ''
   if (step.value === 3) return form.visibility !== ''
+  if (step.value === 4) return form.subject.trim() !== ''
   return true
+})
+
+// 第 4 步最上面那一行：前面選的範圍、地點、類型，例如「A 棟・1F 大廳・公共設施問題」
+const contextText = computed(() => {
+  const area = areas.value.find((item) => item.id === form.areaId)
+  // ?. 和 ??：還沒選的時候 area、類型都找不到，就用空字串，不要讓畫面壞掉
+  return [area?.name ?? '', form.place.trim(), REPORT_TYPES[form.visibility]?.label ?? ''].join('・')
 })
 
 // 前往第幾步。用 push 才會留下紀錄，按返回可以回到上一步
@@ -140,7 +156,15 @@ async function support(report) {
 
       <TypeStep v-else-if="step === 3" v-model="form.visibility" />
 
-      <!-- 第 4 步之後還沒做 -->
+      <DescribeStep
+        v-else-if="step === 4"
+        v-model:subject="form.subject"
+        v-model:description="form.description"
+        v-model:photos="form.photos"
+        :context="contextText"
+      />
+
+      <!-- 第 5 步還沒做 -->
       <p v-else class="type-body text-muted-foreground">第 {{ step }} 步還沒製作。</p>
     </div>
 
@@ -153,6 +177,9 @@ async function support(report) {
     <!-- 還沒選的時候，按鈕下面多一行提醒 -->
     <BottomCta v-else-if="step === 3" :note="canGoNext ? '' : '請先選擇一項類型，才能繼續。'">
       <Button :disabled="!canGoNext" @click="goToStep(4)">下一步</Button>
+    </BottomCta>
+    <BottomCta v-else-if="step === 4">
+      <Button :disabled="!canGoNext" @click="goToStep(5)">下一步：確認資料</Button>
     </BottomCta>
     <!-- 完成頁：兩個按鈕上下排。replace：離開之後按返回不會再回到完成頁 -->
     <BottomCta v-else-if="step === 'supported'" vertical>

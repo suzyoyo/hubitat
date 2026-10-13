@@ -189,7 +189,7 @@ function findEditableCase(id, userId) {
 }
 
 // 修改通報（住戶用）：只能改補充說明和照片，地點和主旨送出後就不能改
-//   changes 可以傳 description（補充說明）、photos（照片檔名的清單），沒傳的不會動
+//   changes 可以傳 description（補充說明）、photos（照片或影片檔名的清單），沒傳的不會動
 // 回傳修改後的通報；不能改的話（不是自己的、已經結案）回傳 undefined
 // 修改只存在記憶體，重新整理網頁會變回原本的假資料
 export async function updateReport(id, userId, changes) {
@@ -228,7 +228,7 @@ export async function withdrawReport(id, userId, reason = '') {
 //     isPrivate   是否保密：false 公共設施問題（公開）/ true 涉及住戶行為（保密）
 //     subject     主旨（簡短），例如 '感應門故障'
 //     description 問題描述
-//     photos      照片檔名的清單，沒有就傳 []
+//     photos      照片或影片檔名的清單，沒有就傳 []
 // 分類先一律歸「其他」，之後由管理人員調整；新通報只存在記憶體，重新整理網頁就不見了
 export async function createReport(userId, input) {
   await delay()
@@ -257,7 +257,7 @@ export async function createReport(userId, input) {
       {
         at: MOCK_NOW,
         label: '住戶通報',
-        text: `${reporterLabel(userId)}通報${input.photos.length ? `，附 ${input.photos.length} 張照片` : ''}`,
+        text: `${reporterLabel(userId)}通報${input.photos.length ? `，附 ${input.photos.length} 個照片或影片` : ''}`,
         residentText: '已收到，好彼管家已通知管理人員。',
       },
     ],

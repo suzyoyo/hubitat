@@ -5,25 +5,26 @@ import { LockIcon, UsersIcon } from '@lucide/vue'
 import FeedbackHaobiTip from '@/components/feedback/FeedbackHaobiTip.vue'
 import { Badge } from '@/components/ui/badge'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { REPORT_TYPES } from '@/lib/report'
 
 // 選到的類型：'public' 公開、'private' 保密，還沒選是空字串。頁面用 v-model 綁定
 // 值和假資料的 CASE_VISIBILITY 用同一組（public / private）
 const visibility = defineModel({ type: String, default: '' })
 
-// 兩個選項的文字和圖示
+// 兩個選項的文字和圖示。類型名稱和「公開處理／保密處理」放在 src/lib/report.js，後面的步驟也會用到
 const OPTIONS = [
   {
     value: 'public',
-    title: '公共設施問題',
-    badge: '公開處理',
+    title: REPORT_TYPES.public.label,
+    badge: REPORT_TYPES.public.tag,
     example: '例：設備故障、走道漏水、地下室照明太暗、門禁感應異常',
     icon: UsersIcon,
     note: '會公開給全體住戶，其他住戶可以看到，也能按「我也遇到了」。',
   },
   {
     value: 'private',
-    title: '涉及住戶行為',
-    badge: '保密處理',
+    title: REPORT_TYPES.private.label,
+    badge: REPORT_TYPES.private.tag,
     example: '例：鄰居深夜噪音、私自違規停車、走廊雜物堆放',
     icon: LockIcon,
     note: '只有管委會與管理室看得到，不會顯示給其他住戶。',

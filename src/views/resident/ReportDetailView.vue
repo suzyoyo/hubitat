@@ -4,7 +4,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import BottomCta from '@/components/app/BottomCta.vue'
-import ReportPhotoTile from '@/components/report/ReportPhotoTile.vue'
+import ReportPhotoGrid from '@/components/report/ReportPhotoGrid.vue'
 import ReportProgressCard from '@/components/report/ReportProgressCard.vue'
 import ReportSummary from '@/components/report/ReportSummary.vue'
 import ReportWithdrawDialog from '@/components/report/ReportWithdrawDialog.vue'
@@ -13,6 +13,7 @@ import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { REPORT_DESCRIPTION_MAX } from '@/lib/report'
 import { getCurrentUser, getReportById, updateReport, withdrawReport } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
@@ -29,21 +30,20 @@ const report = ref(null)
 
 const userId = ref('') // 我是誰，存檔時要用
 
-// 補充說明最多幾個字
-const DESCRIPTION_MAX = 200
+// 字數的上限放在 src/lib/report.js，和新增通報用同一組
+const DESCRIPTION_MAX = REPORT_DESCRIPTION_MAX
 // 輸入框裡目前的文字。和 report.description 分開放，按「確認修改」才會真的存進去
 const description = ref('')
-// 照片最多幾張（和新增通報一樣）
-const PHOTO_MAX = 3
 // 畫面上目前的照片檔名。和 report.photos 分開放，按「確認修改」才會真的存進去
 const photos = ref([])
 // saving：存檔還在路上時是 true，按鈕先不能按，避免連按兩次
 const saving = ref(false)
 
-// 「確認修改」能不能按：說明或照片有改過、說明不是空白、而且不是正在存檔
+// 「確認修改」能不能按：說明或照片有改過，而且不是正在存檔
+// 說明可以是空的：新增通報時它是選填
 const canSave = computed(() => {
   const text = description.value.trim() // trim()：去掉頭尾的空白和換行
-  if (saving.value || text === '') return false
+  if (saving.value) return false
   // 兩個陣列不能直接用 === 比，所以先各自接成一串文字再比
   const photosChanged = photos.value.join('|') !== report.value.photos.join('|')
   return text !== report.value.description || photosChanged
@@ -54,16 +54,6 @@ function fillForm() {
   description.value = report.value.description
   // [...陣列]：複製一份。直接用同一個陣列的話，改畫面上的照片會連原本的資料一起改到
   photos.value = [...report.value.photos]
-}
-
-// 更換第 index 張照片（index 從 0 開始）
-function replacePhoto(index, fileName) {
-  photos.value[index] = fileName
-}
-
-// 刪除第 index 張照片：splice(從哪裡開始, 刪幾個)
-function removePhoto(index) {
-  photos.value.splice(index, 1)
 }
 
 // onMounted：畫面一出現就去拿資料
@@ -160,24 +150,10 @@ async function withdraw(reason) {
         </div>
 
         <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <!-- 照片不是單一個輸入框，所以用 p，不用 Label -->
-            <p class="type-body-strong text-foreground">照片</p>
-            <p class="type-date text-muted-foreground">{{ photos.length }} / {{ PHOTO_MAX }} 張</p>
-          </div>
-          <!-- grid-cols-2：一排兩格，放不下會自動換到下一排 -->
-          <div class="grid grid-cols-2 gap-3">
-            <!-- v-for 的 (photo, index)：index 是第幾張，從 0 開始 -->
-            <ReportPhotoTile
-              v-for="(photo, index) in photos"
-              :key="photo + index"
-              :name="photo"
-              @pick="replacePhoto(index, $event)"
-              @remove="removePhoto(index)"
-            />
-            <!-- 還沒滿才顯示「新增照片」；選好的照片加到最後面 -->
-            <ReportPhotoTile v-if="photos.length < PHOTO_MAX" type="add" @pick="photos.push($event)" />
-          </div>
+          <!-- 照片不是單一個輸入框，所以用 p，不用 Label -->
+          <p class="type-body-strong text-foreground">現場照片／影片</p>
+          <!-- 照片格和下面的說明是共用的元件，和新增通報長得一樣 -->
+          <ReportPhotoGrid v-model="photos" />
         </div>
 
         <!-- 設計稿在按鈕下面還有一行「撤回後…無法復原」，和撤回彈窗裡的說明重複，所以拿掉 -->
