@@ -21,9 +21,10 @@ defineProps({
         <h3 class="min-w-0 flex-1 type-greeting">{{ meeting.title }}</h3>
         <Badge variant="outline">{{ meeting.typeLabel }}</Badge>
       </div>
-      <div class="space-y-0.5 py-2">
+      <div class="space-y-1.5 py-2">
         <p class="type-body-strong">重點決議</p>
-        <p class="type-body">{{ meeting.summary }}</p>
+        <!-- 內容用灰色，和首頁公告卡的內容說明一樣 -->
+        <p class="type-body text-muted-foreground">{{ meeting.summary }}</p>
       </div>
       <p class="type-date text-muted-foreground">{{ formatDate(meeting.heldAt) }} 召開</p>
     </div>

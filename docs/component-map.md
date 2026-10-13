@@ -101,10 +101,10 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
-| `Notice/Home Card` | `notice/NoticeHomeCard.vue` | ✅ | 首頁的社區公告卡，右上角是狀態徽章（施工中、明天開始、3 天後開始）。整張可以點，點了送出 `detail` 事件，由頁面打開詳情彈窗 |
-| `Notice/Card` | `notice/NoticeCard.vue` | ✅ | 社區公告頁的完整公告卡：類型、範圍兩個徽章＋日期時間＋影響範圍或地點＋負責單位。沒有日期徽章（2026-10-12 決定拿掉，Kit 還有，待更新）。整張可以點，點了送出 `detail` 事件 |
+| `Notice/Home Card` | `notice/NoticeHomeCard.vue` | ✅ | 首頁的社區公告卡，右上角是狀態徽章（施工中、明天開始、3 天後開始）。中間是地點（活動類），或影響範圍＋公告內容說明的前兩行（灰色，超過用「…」）。整張可以點，點了送出 `detail` 事件，由頁面打開詳情彈窗 |
+| `Notice/Card` | `notice/NoticeCard.vue` | ✅ | 社區公告頁的完整公告卡：類型、範圍兩個徽章＋日期時間＋地點（活動類）或「注意事項」（公告內容說明的前兩行）＋負責單位。沒有日期徽章（2026-10-12 決定拿掉，Kit 還有，待更新）。整張可以點，點了送出 `detail` 事件 |
 | （Kit 沒有元件，設計稿是「查看詳情彈窗」） | `notice/NoticeDetailDialog.vue` | ✅ | 公告詳情彈窗，首頁和社區公告頁共用。傳 `notice`，用 `v-model:open` 控制開關。設計稿的「留言給管委會」按鈕還沒放，等留言功能做的時候再加 |
-| `Meeting/Card` | `meeting/MeetingCard.vue` | 🟡 | 變體 Type：**Summary**（首頁會議摘要）已做；**Latest**（最新會議：3 條決議重點）還沒做 |
+| `Meeting/Card` | `meeting/MeetingCard.vue` | 🟡 | 變體 Type：**Summary**（首頁會議摘要）已做；**Latest**（最新會議：3 條決議重點）還沒做。重點決議的內容是灰色，和首頁公告卡一致 |
 | `Meeting/Point` | `meeting/MeetingPoint.vue` | ⬜ | 決議重點的一條：勾選圖示＋文字 |
 | `Meeting/Head` | `meeting/MeetingHead.vue` | ⬜ | 會議紀錄頁首：主辦機關、標題、日期、出席 |
 | `Meeting/Case` | `meeting/MeetingCase.vue` | ⬜ | 會議全文的案由，可展開收合。變體 State：Open／Closed。需要先加基礎元件 accordion |
