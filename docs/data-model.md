@@ -91,6 +91,7 @@
 - 附議的住戶
 - 處理進度紀錄（時間、誰、做了什麼）
 - 施工日誌、完工備註與照片、廠商評分
+- **住戶新增與附議**：`createReport(userId, input)` 新增一筆通報（狀態是待受理、分類先歸「其他」）；`supportReport(id, userId)` 對別人公開、還沒結案的通報按「我也遇到了」。`getSimilarReports(areaId, place, userId)` 找同一個地點的相似通報，每筆有 `isMine`（我通報的）、`hasSupported`（我按過了）。都只改記憶體
 - **住戶修改與撤回**：`getReportById` 回傳的通報有 `canEdit`（是我自己通報的，而且還沒結案）。`updateReport(id, userId, changes)` 改補充說明和照片（地點、主旨不能改）；`withdrawReport(id, userId, reason)` 把狀態改成已取消並留一筆紀錄，撤回原因（`withdrawReason`）選填。兩個都只改記憶體，重新整理網頁會變回原本的假資料
 
 **狀態對照**（同一筆案件，三端顯示的文字不同）

@@ -93,6 +93,7 @@ function presentForResident(item, userId) {
     },
     supporterCount: item.supporters.length,
     isMine: item.reporterId === userId, // 是我通報的，還是我按了「我也遇到了」
+    hasSupported: item.supporters.includes(userId), // 我按過「我也遇到了」
     // 能不能修改或撤回：要是我自己通報的，而且還沒結案
     canEdit: item.reporterId === userId && isOpen(item),
   }
@@ -218,6 +219,62 @@ export async function withdrawReport(id, userId, reason = '') {
     residentText: '你已撤回這筆通報。',
   })
   return true
+}
+
+// 新增通報（住戶用），回傳新增好的通報
+//   input 要傳：
+//     areaId      範圍，例如 'area-a'
+//     place       地點名稱，例如 '1F 大廳'
+//     isPrivate   是否保密：false 公共設施問題（公開）/ true 涉及住戶行為（保密）
+//     subject     主旨（簡短），例如 '感應門故障'
+//     description 問題描述
+//     photos      照片檔名的清單，沒有就傳 []
+// 分類先一律歸「其他」，之後由管理人員調整；新通報只存在記憶體，重新整理網頁就不見了
+export async function createReport(userId, input) {
+  await delay()
+  // 編號：CASE-今天的日期-流水號。流水號是今天已經有幾件再加 1，補成三位數
+  const datePart = MOCK_TODAY.replaceAll('-', '') // '2026-10-01' → '20261001'
+  const todayCount = cases.filter((item) => item.id.startsWith(`CASE-${datePart}`)).length
+  const id = `CASE-${datePart}-${String(todayCount + 1).padStart(3, '0')}`
+
+  const item = {
+    id,
+    place: input.place,
+    subject: input.subject,
+    title: `${areaName(input.areaId)} ${input.place}${input.subject}`,
+    areaId: input.areaId,
+    category: 'other',
+    source: 'resident',
+    isPrivate: input.isPrivate,
+    isUrgent: false,
+    reporterId: userId,
+    reportedAt: MOCK_NOW,
+    description: input.description,
+    photos: [...input.photos],
+    status: 'pending',
+    supporters: [],
+    logs: [
+      {
+        at: MOCK_NOW,
+        label: '住戶通報',
+        text: `${reporterLabel(userId)}通報${input.photos.length ? `，附 ${input.photos.length} 張照片` : ''}`,
+        residentText: '已收到，好彼管家已通知管理人員。',
+      },
+    ],
+  }
+  cases.push(item)
+  return presentForResident(item, userId)
+}
+
+// 對別人的通報按「我也遇到了」（附議），回傳更新後的通報
+// 只能對公開、還沒結案、不是自己通報的按；按過了再按一次不會重複計算
+// 不能按的話回傳 undefined
+export async function supportReport(id, userId) {
+  await delay()
+  const item = cases.find((entry) => entry.id === id)
+  if (!item || item.isPrivate || !isOpen(item) || item.reporterId === userId) return undefined
+  if (!item.supporters.includes(userId)) item.supporters.push(userId)
+  return presentForResident(item, userId)
 }
 
 // 新增通報時「確認是否重複」：找出同一個地點、公開、還沒結案的通報
