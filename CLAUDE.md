@@ -128,7 +128,7 @@
 - 【設計待決定】對比度偏低，目前完全照設計稿：白字在品牌藍（`--primary` / `--nav-active`）約 2 : 1、白字在 `--fab` 紅約 3 : 1。之後要調整時改 `style.css` 的 `:root` 變數即可
 - 吉祥物原圖在 `src/assets/IP/`（`1.png`～`6.png`，每張約 3MB，**不要 commit**）：1 思考、2 開心奔跑、3 指向左上、4 驚訝坐著、5 坐著揮手、6 拿放大鏡流汗。用在網頁前要先縮小，縮好的放 `src/assets/mascot/`（首頁問候列用的是 3，存成 `pointing.png`）
 - 【之後】mockup 裡有些卡片是手工畫的框、不是 Kit 元件，不會跟著 Kit 變動，還沒清查
-- 【之後】Kit 缺「篩選標籤」元件，目前有 6 處借用 Button 手動調整（管委會端・社區檔案・公開文件）
+- 篩選的規則 2026-10-13 定案（013 寫的，`docs/dev-guide.md` 第 5 節「篩選」）：選項含「全部」4 個以內用篩選標籤、5 個以上用下拉選單，排序也用下拉；看起來 32px、可以點的範圍補到 44px；不帶件數。Kit 裡就是 Button Small 膠囊形，不另外做元件；程式要包成 `common/FilterChips.vue`、`common/FilterSelect.vue`（都還沒做，013 做「我的待辦」時會做）。設計稿原本借用 Button 手動調整的 6 處（管委會端・社區檔案・公開文件）還沒對過新規則
 - 【之後】新增提案畫面有 4 個 Textarea 被縮成單行在用，應改成 Input
 - 專案根目錄的 `第一組＿好彼社區 Hubitat.pdf` 是我的個人檔案，**不要 commit**（已用 `.git/info/exclude` 在本機排除）
 - 給組員看的假資料進度整理：https://claude.ai/code/artifact/fbdedca5-8868-4f7e-954e-5f8e9b94e09d
