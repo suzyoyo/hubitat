@@ -4,6 +4,7 @@
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
+import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TodosView from '@/views/committee/TodosView.vue'
 
 export default {
@@ -15,6 +16,7 @@ export default {
     'announcements/:id': AnnouncementDetailView,
     todos: TodosView,
     proposals: ProposalsView,
+    'tasks/:id': TaskDetailView,
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
