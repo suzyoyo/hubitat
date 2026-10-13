@@ -70,7 +70,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/FAB` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/Greeting` | `app/AppGreeting.vue` | ✅ | |
 | `App/Section Header` | `app/SectionHeader.vue` | ✅ | 沒傳 `to` 就不顯示「看全部」 |
-| `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
+| `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字；加上 `vertical` 按鈕改成上下排（完成頁用）。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
 | `App/Drawer Content` | `app/DrawerContent.vue` | ⬜ | 從底部滑出的面板內容。外層用基礎元件 `ui/drawer` |
 | `App/Menu Item` | `app/MenuItem.vue` | ⬜ | 選單的一列：圖示＋文字。「全域新增選單」會用到 |
@@ -89,7 +89,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Report/Stepper` | `report/ReportStepper.vue` | ✅ | 三步驟進度條。沒有 Current 的 prop，傳通報的 `steps`（三個階段的時間）進去，元件自己算走到第幾步；已完成時三步都打勾。還沒到的步驟下面不顯示日期（設計稿寫「尚未完成」）。沒有用 `ui/stepper`，那是給可以點的表單流程用的 |
 | `Report/Step` | ➖ | ➖ | 進度條的單一圓點（Done／Current／Todo）。寫在 `ReportStepper.vue` 裡面即可 |
 | `Report/Record` | `report/ReportRecord.vue` | ✅ | 處理紀錄的一筆。變體 State 用 `latest` prop 切換：不傳是 Past（灰色），傳了是 Latest（深色粗體） |
-| `Report/Similar Card` | `report/ReportSimilarCard.vue` | ⬜ | 相似通報卡。變體 Type：Similar（可按「我也遇到了」）／Joined（已加入） |
+| `Report/Similar Card` | `report/ReportSimilarCard.vue` | ✅ | 相似通報卡。傳 `getSimilarReports()` 的一筆 `report`。變體 Type 用 `type` prop 切換：`similar`（預設，有「我也遇到了」按鈕，按了送出 `support` 事件）／`joined`（完成頁用，沒有按鈕，多一行「原始通報內容」）。自己通報的、已經按過的不顯示按鈕，改顯示一句說明（設計稿沒畫） |
 | `Report/Flow Progress` | `report/ReportFlowProgress.vue` | ✅ | 新增通報流程頂部的進度：步驟名稱＋百分比＋進度條。傳 `step`（1～5），名稱和百分比元件自己算。進度條用基礎元件 `ui/progress` |
 | `Report/Review Row` | `report/ReportReviewRow.vue` | ⬜ | 確認送出頁的一列：欄位名稱＋值＋「修改」按鈕 |
 | `Report/Photo Tile` | `report/ReportPhotoTile.vue` | 🟡 | 照片格。變體 Type 用 `type` prop 切換：`preview`（預設，傳 `name` 檔名）／`add`。選好照片送出 `pick` 事件（帶檔名），按刪除送出 `remove`。假資料只有檔名，預覽區先放圖示＋檔名。「更換」「刪除」按鈕高 44px（Kit 是 28px）。還沒做：Thumbnail、Size Small（新增通報流程會用到） |
