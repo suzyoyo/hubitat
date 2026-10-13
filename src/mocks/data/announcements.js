@@ -8,7 +8,7 @@
 //   endAt       結束時間  ┘
 //   timeText    每日時段的說明文字（多日的公告用，沒有就不寫）
 //   areaIds     影響範圍（對應 community.js 的 areas）；['all'] 代表全社區
-//   impact      影響範圍的文字說明（沒有就不寫）
+//               會怎麼影響寫在 content 裡，沒有另外的欄位（發布公告的表單只有選地點）
 //   place       活動地點（活動類公告用）
 //   organizer   主辦或負責單位
 //   isUrgent    是否標示為緊急
@@ -61,7 +61,6 @@ export const announcements = [
     endAt: '2026-10-07T17:00',
     timeText: '每日 09:00–17:00',
     areaIds: ['all'],
-    impact: '各棟公設地下室、1F 中庭花園與垃圾集中場，施作期間請緊閉門窗。',
     organizer: '環安病媒防治',
     isUrgent: false,
     push: 'all',
@@ -79,7 +78,6 @@ export const announcements = [
     startAt: '2026-10-10T09:00',
     endAt: '2026-10-10T12:00',
     areaIds: ['area-a'],
-    impact: 'A 棟電梯暫停使用，請改走樓梯或使用 B 棟電梯。',
     organizer: '大同電梯',
     isUrgent: false,
     push: 'affected',
@@ -98,7 +96,6 @@ export const announcements = [
     startAt: '2026-10-09T08:00',
     endAt: '2026-10-09T18:00',
     areaIds: ['area-pool'],
-    impact: '游泳池及淋浴更衣間暫停開放一日，健身房正常開放。',
     organizer: '欣欣機電',
     isUrgent: false,
     push: 'none',
@@ -118,7 +115,6 @@ export const announcements = [
     endAt: '2026-10-01T17:00',
     timeText: '每日 08:30–17:00',
     areaIds: ['area-b'],
-    impact: 'B 棟頂樓暫停開放；貨梯於上午時段優先供施工使用。',
     organizer: '昇益工程行',
     isUrgent: false,
     push: 'affected',
@@ -172,7 +168,6 @@ export const announcements = [
     startAt: '2026-10-01T14:00',
     endAt: '2026-10-01T18:00',
     areaIds: ['area-parking'],
-    impact: '地下停車場 B2 車道暫時封閉，請改走 B1 車道。',
     organizer: '管理室',
     isUrgent: true,
     push: 'all',
@@ -191,7 +186,6 @@ export const announcements = [
     startAt: '2026-10-06T10:00',
     endAt: '2026-10-06T11:30',
     areaIds: ['area-c'],
-    impact: 'C 棟電梯暫停使用約 1.5 小時。',
     organizer: '管理室',
     isUrgent: false,
     push: 'affected',
@@ -229,7 +223,6 @@ export const announcements = [
     endAt: '2026-10-14T17:00',
     timeText: '每日 09:00–17:00',
     areaIds: ['area-b'],
-    impact: 'B 棟梯間施工期間可通行，請避免碰觸牆面。',
     organizer: '昇益工程行',
     isUrgent: false,
     push: 'affected',
@@ -250,7 +243,6 @@ export const announcements = [
     startAt: '2026-10-13T10:00',
     endAt: '2026-10-13T12:00',
     areaIds: ['area-a'],
-    impact: '健身房局部重訓區暫時封閉 2 小時，跑步機區正常使用。',
     organizer: '立信水電行',
     isUrgent: false,
     push: 'none',
@@ -273,7 +265,6 @@ export const announcements = [
     startAt: '2026-09-28T18:00',
     endAt: '2026-09-29T12:00',
     areaIds: ['area-parking'],
-    impact: '地下停車場暫時封閉。',
     organizer: '管理室',
     isUrgent: true,
     push: 'all',
@@ -290,7 +281,6 @@ export const announcements = [
     startAt: '2026-08-15T07:00',
     endAt: '2026-08-15T12:00',
     areaIds: ['all'],
-    impact: '全社區停水。',
     organizer: '立信水電行',
     isUrgent: true,
     push: 'all',
@@ -307,7 +297,6 @@ export const announcements = [
     startAt: '2026-06-03T21:30',
     endAt: '2026-06-04T12:00',
     areaIds: ['area-b'],
-    impact: 'B 棟電梯暫停使用。',
     organizer: '管理室',
     isUrgent: true,
     push: 'affected',
