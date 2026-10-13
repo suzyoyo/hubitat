@@ -1,6 +1,6 @@
 <script setup>
 // 首頁的社區公告卡（對應 Figma 的 Notice/Home Card）
-// 標題＋狀態標籤、影響範圍、日期
+// 標題＋狀態標籤、地點或影響範圍（加上內容說明的前兩行）、日期
 import { computed } from 'vue'
 import { Badge } from '@/components/ui/badge'
 import { diffDays, formatDateRange } from '@/lib/date'
@@ -59,13 +59,14 @@ const badgeVariant = computed(() => {
       </h3>
       <Badge :variant="badgeVariant">{{ statusText }}</Badge>
     </div>
-    <!-- 有影響範圍說明就顯示影響範圍；活動類沒有，改顯示地點 -->
-    <div v-if="notice.impact" class="space-y-0.5 py-2">
-      <p class="type-body-strong">影響範圍：{{ notice.scopeLabel }}</p>
-      <p class="type-body">{{ notice.impact }}</p>
-    </div>
-    <div v-else-if="notice.place" class="py-2">
+    <!-- 活動類顯示地點；其他顯示影響範圍，下面接公告的內容說明 -->
+    <div v-if="notice.place" class="py-2">
       <p class="type-body-strong">地點：{{ notice.place }}</p>
+    </div>
+    <div v-else class="space-y-1.5 py-2">
+      <p class="type-body-strong">影響範圍：{{ notice.scopeLabel }}</p>
+      <!-- line-clamp-2：內容太長時只顯示兩行，後面用「…」，完整內容點進彈窗看 -->
+      <p class="line-clamp-2 type-body text-muted-foreground">{{ notice.content }}</p>
     </div>
     <p class="type-date text-muted-foreground">
       {{ formatDateRange(startDate, endDate) }}

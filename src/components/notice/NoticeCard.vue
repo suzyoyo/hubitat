@@ -1,6 +1,6 @@
 <script setup>
 // 社區公告頁的公告卡（對應 Figma 的 Notice/Card）
-// 類型、範圍兩個徽章＋標題＋日期時間＋影響範圍或地點＋負責單位與「查看詳情」
+// 類型、範圍兩個徽章＋標題＋日期時間＋地點或注意事項＋負責單位與「查看詳情」
 // 徽章不寫日期和「進行中」這類狀態：日期已經在內文的「日期時間」那一行
 import { ChevronRightIcon, ClockIcon, MapPinIcon, TriangleAlertIcon } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
@@ -38,14 +38,15 @@ defineEmits(['detail'])
       </p>
     </div>
 
-    <!-- 有影響範圍說明就顯示影響範圍；活動類沒有，改顯示地點 -->
-    <div v-if="notice.impact" class="flex items-center gap-2.5">
-      <TriangleAlertIcon class="size-5 shrink-0" />
-      <p class="min-w-0 flex-1 type-body">影響範圍：{{ notice.impact }}</p>
-    </div>
-    <div v-else-if="notice.place" class="flex items-center gap-2.5">
+    <!-- 活動類顯示地點；其他顯示注意事項，也就是公告的內容說明（影響哪裡看上面的範圍徽章） -->
+    <div v-if="notice.place" class="flex items-center gap-2.5">
       <MapPinIcon class="size-5 shrink-0" />
       <p class="min-w-0 flex-1 type-body">地點：{{ notice.place }}</p>
+    </div>
+    <div v-else class="flex items-center gap-2.5">
+      <TriangleAlertIcon class="size-5 shrink-0" />
+      <!-- line-clamp-2：內容太長時只顯示兩行，後面用「…」，完整內容點「查看詳情」看 -->
+      <p class="line-clamp-2 min-w-0 flex-1 type-body">注意事項：{{ notice.content }}</p>
     </div>
 
     <div class="flex items-center gap-2">

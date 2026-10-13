@@ -53,7 +53,7 @@ const open = defineModel('open', { type: Boolean, default: false })
           </div>
         </div>
 
-        <!-- 活動類顯示地點；其他顯示影響範圍（影響哪裡＋會怎麼影響） -->
+        <!-- 活動類顯示地點；其他顯示影響範圍（影響哪裡；會怎麼影響看下面的注意事項） -->
         <div class="flex items-center gap-2.5">
           <MapPinIcon class="size-5 shrink-0" />
           <div v-if="notice.place" class="min-w-0 flex-1 space-y-1">
@@ -62,10 +62,7 @@ const open = defineModel('open', { type: Boolean, default: false })
           </div>
           <div v-else class="min-w-0 flex-1 space-y-1">
             <p class="type-body-strong">影響範圍</p>
-            <p class="type-body text-muted-foreground">
-              {{ notice.scopeLabel }}
-              <template v-if="notice.impact"><br />{{ notice.impact }}</template>
-            </p>
+            <p class="type-body text-muted-foreground">{{ notice.scopeLabel }}</p>
           </div>
         </div>
 
