@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate, formatTime } from '@/lib/date'
+import { taskStatusBadge } from '@/lib/task'
 import { getCurrentUser, getTasks } from '@/mocks/api'
-import { TASK_DISPLAY_STATUSES } from '@/mocks/data/tasks'
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
 const loading = ref(true)
@@ -43,25 +43,6 @@ const shownTasks = computed(() => {
 
 // 還沒結案的件數：放在篩選下面當總覽，不跟著篩選變
 const openCount = computed(() => tasks.value.filter((task) => task.isOpen).length)
-
-// 狀態徽章的顏色（dev-guide 第 5 節，管理端那張表）
-//   已逾期 → 紅：已經出問題；待確認 → 橘：輪到我（交辦人）確認
-//   進行中 → 藍：在等對方做；已完成、已撤回 → 灰
-const STATUS_VARIANTS = {
-  overdue: 'destructive',
-  reported: 'secondary',
-  in_progress: 'default',
-  done: 'outline',
-  withdrawn: 'outline',
-}
-
-// 徽章文字：已逾期改成顯示逾期幾天；待確認寫成「待我確認」，看的人是交辦人，讓他知道輪到自己
-//   其他用對照表的文字
-function statusText(task) {
-  if (task.displayStatus === 'overdue') return `逾期 ${-task.daysLeft} 天`
-  if (task.displayStatus === 'reported') return '待我確認'
-  return TASK_DISPLAY_STATUSES[task.displayStatus].label
-}
 
 // '2026-09-30T18:00' → '2026/09/30 18:00'（管委會端的日期有年份）
 function dateText(value) {
@@ -100,7 +81,8 @@ function dateText(value) {
         >
           <div class="flex items-center gap-1.5">
             <p class="min-w-0 flex-1 type-date text-muted-foreground">#{{ task.id }}</p>
-            <Badge :variant="STATUS_VARIANTS[task.displayStatus]">{{ statusText(task) }}</Badge>
+            <!-- 徽章的顏色和文字規則在 lib/task.js，和交辦詳情共用 -->
+            <Badge :variant="taskStatusBadge(task).variant">{{ taskStatusBadge(task).text }}</Badge>
           </div>
           <h3 class="type-card-title text-foreground">{{ task.title }}</h3>
           <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
