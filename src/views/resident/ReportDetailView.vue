@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import BottomCta from '@/components/app/BottomCta.vue'
+import ReportPhotoTile from '@/components/report/ReportPhotoTile.vue'
 import ReportProgressCard from '@/components/report/ReportProgressCard.vue'
 import ReportSummary from '@/components/report/ReportSummary.vue'
 import { Button } from '@/components/ui/button'
@@ -29,22 +30,46 @@ const userId = ref('') // 我是誰，存檔時要用
 const DESCRIPTION_MAX = 200
 // 輸入框裡目前的文字。和 report.description 分開放，按「確認修改」才會真的存進去
 const description = ref('')
+// 照片最多幾張（和新增通報一樣）
+const PHOTO_MAX = 3
+// 畫面上目前的照片檔名。和 report.photos 分開放，按「確認修改」才會真的存進去
+const photos = ref([])
 // saving：存檔還在路上時是 true，按鈕先不能按，避免連按兩次
 const saving = ref(false)
 
-// 「確認修改」能不能按：有改過、不是空白、而且不是正在存檔
+// 「確認修改」能不能按：說明或照片有改過、說明不是空白、而且不是正在存檔
 const canSave = computed(() => {
   const text = description.value.trim() // trim()：去掉頭尾的空白和換行
-  return !saving.value && text !== '' && text !== report.value.description
+  if (saving.value || text === '') return false
+  // 兩個陣列不能直接用 === 比，所以先各自接成一串文字再比
+  const photosChanged = photos.value.join('|') !== report.value.photos.join('|')
+  return text !== report.value.description || photosChanged
 })
+
+// 把通報目前的內容放進輸入框和照片格（一開始、存檔之後都會用到）
+function fillForm() {
+  description.value = report.value.description
+  // [...陣列]：複製一份。直接用同一個陣列的話，改畫面上的照片會連原本的資料一起改到
+  photos.value = [...report.value.photos]
+}
+
+// 更換第 index 張照片（index 從 0 開始）
+function replacePhoto(index, fileName) {
+  photos.value[index] = fileName
+}
+
+// 刪除第 index 張照片：splice(從哪裡開始, 刪幾個)
+function removePhoto(index) {
+  photos.value.splice(index, 1)
+}
 
 // onMounted：畫面一出現就去拿資料
 onMounted(async () => {
   const user = await getCurrentUser('resident')
   userId.value = user.id
   report.value = await getReportById(route.params.id, user.id)
-  // 把原本的補充說明放進輸入框（找不到通報時 report 是 undefined，所以用 ?.）
-  description.value = report.value?.description ?? ''
+  // 找不到通報時 report 是 undefined，就不用填了
+  if (report.value) fillForm()
   loading.value = false
 })
 
@@ -53,6 +78,7 @@ async function save() {
   saving.value = true
   const updated = await updateReport(report.value.id, userId.value, {
     description: description.value.trim(),
+    photos: photos.value,
   })
   saving.value = false
   // 假 API 回傳 undefined 代表不能改（例如剛好被結案了）
@@ -61,7 +87,7 @@ async function save() {
     return
   }
   report.value = updated
-  description.value = updated.description
+  fillForm()
   toast.success('已更新通報')
 }
 </script>
@@ -108,6 +134,27 @@ async function save() {
             :maxlength="DESCRIPTION_MAX"
             class="min-h-[132px]"
           />
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <!-- 照片不是單一個輸入框，所以用 p，不用 Label -->
+            <p class="type-body-strong text-foreground">照片</p>
+            <p class="type-date text-muted-foreground">{{ photos.length }} / {{ PHOTO_MAX }} 張</p>
+          </div>
+          <!-- grid-cols-2：一排兩格，放不下會自動換到下一排 -->
+          <div class="grid grid-cols-2 gap-3">
+            <!-- v-for 的 (photo, index)：index 是第幾張，從 0 開始 -->
+            <ReportPhotoTile
+              v-for="(photo, index) in photos"
+              :key="photo + index"
+              :name="photo"
+              @pick="replacePhoto(index, $event)"
+              @remove="removePhoto(index)"
+            />
+            <!-- 還沒滿才顯示「新增照片」；選好的照片加到最後面 -->
+            <ReportPhotoTile v-if="photos.length < PHOTO_MAX" type="add" @pick="photos.push($event)" />
+          </div>
         </div>
 
         <BottomCta>

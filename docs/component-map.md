@@ -92,7 +92,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Report/Similar Card` | `report/ReportSimilarCard.vue` | ⬜ | 相似通報卡。變體 Type：Similar（可按「我也遇到了」）／Joined（已加入） |
 | `Report/Flow Progress` | `report/ReportFlowProgress.vue` | ⬜ | 新增通報流程頂部的進度。變體 Step：1～5。進度條用基礎元件 `ui/progress` |
 | `Report/Review Row` | `report/ReportReviewRow.vue` | ⬜ | 確認送出頁的一列：欄位名稱＋值＋「修改」按鈕 |
-| `Report/Photo Tile` | `report/ReportPhotoTile.vue` | ⬜ | 照片格。變體 Type：Preview／Add／Thumbnail；Size：Large／Small |
+| `Report/Photo Tile` | `report/ReportPhotoTile.vue` | 🟡 | 照片格。變體 Type 用 `type` prop 切換：`preview`（預設，傳 `name` 檔名）／`add`。選好照片送出 `pick` 事件（帶檔名），按刪除送出 `remove`。假資料只有檔名，預覽區先放圖示＋檔名。「更換」「刪除」按鈕高 44px（Kit 是 28px）。還沒做：Thumbnail、Size Small（新增通報流程會用到） |
 
 ### C. 公告與會議
 
