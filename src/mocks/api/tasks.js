@@ -1,5 +1,5 @@
 // 交辦相關的假 API
-import { diffDays } from '@/lib/date'
+import { diffDays, formatFullDate, formatTime } from '@/lib/date'
 import { cases } from '../data/cases'
 import { notifications } from '../data/notifications'
 import { tasks } from '../data/tasks'
@@ -94,13 +94,21 @@ export async function confirmTask(id, userId) {
 
 // 退回：對方回報完成，但交辦人覺得還沒做好 → 改回進行中，請對方再做
 //   reason 必填。退回後會通知對方，這件交辦也會自動回到對方的待辦
-export async function returnTask(id, userId, reason) {
+//   newDeadline 新的完成期限（例如 '2026-10-05T18:00'），選填；要比現在晚
+//     原本的期限可能已經過了，不給新期限的話，對方一被退回就是「已逾期」
+export async function returnTask(id, userId, reason, newDeadline = '') {
   await delay()
   const task = findMyTask(id, userId, ['reported'])
   if (!task || !reason) return false
+  if (newDeadline && newDeadline <= MOCK_NOW) return false
   task.status = 'in_progress'
   task.returnNote = { at: MOCK_NOW, note: reason }
-  notifyAssignee(task, '交辦被退回', reason)
+  let message = reason
+  if (newDeadline) {
+    task.deadline = newDeadline
+    message += `（新期限 ${formatFullDate(newDeadline)} ${formatTime(newDeadline)}）`
+  }
+  notifyAssignee(task, '交辦被退回', message)
   return true
 }
 
