@@ -2,6 +2,7 @@
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 import AnnouncementsView from '@/views/resident/AnnouncementsView.vue'
 import HomeView from '@/views/resident/HomeView.vue'
+import NewReportView from '@/views/resident/NewReportView.vue'
 import ReportDetailView from '@/views/resident/ReportDetailView.vue'
 import ReportsView from '@/views/resident/ReportsView.vue'
 
@@ -14,6 +15,7 @@ export default {
     reports: ReportsView,
     'reports/:id': ReportDetailView,
     announcements: AnnouncementsView,
+    'reports/new': NewReportView, // 右下角「通報」按鈕（網址定在 src/config/roles.js 的 fab）
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）

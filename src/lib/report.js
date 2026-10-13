@@ -8,3 +8,16 @@
 export function reportBadgeVariant(report) {
   return report.isOpen ? 'default' : 'outline'
 }
+
+// 通報的兩種類型（住戶新增通報時選的）。key 和假資料的 CASE_VISIBILITY 一樣：public 公開、private 保密
+//   label 類型名稱 / tag 怎麼處理
+export const REPORT_TYPES = {
+  public: { label: '公共設施問題', tag: '公開處理' },
+  private: { label: '涉及住戶行為', tag: '保密處理' },
+}
+
+// 字數和檔案數的上限：新增通報和通報詳情（修改）用同一組
+export const REPORT_SUBJECT_MAX = 20 // 通報問題（標題）
+export const REPORT_DESCRIPTION_MAX = 200 // 補充說明
+export const REPORT_PHOTO_MAX = 3 // 照片和影片合計
+export const REPORT_VIDEO_MAX_MB = 50 // 一段影片最大幾 MB

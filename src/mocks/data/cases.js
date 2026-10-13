@@ -12,7 +12,7 @@
 //   reporterId  通報人（對應 users.js）
 //   reportedAt  通報時間
 //   description 通報人寫的問題描述
-//   photos      照片檔名
+//   photos      照片或影片的檔名（欄位名稱沿用 photos，影片也放這裡，例如 '異音.mp4'）
 //   status      狀態，見下方 CASE_STATUSES
 //   deadline    處理期限（還沒設定就不寫）。「逾期」是用今天的日期算出來的
 //   assigneeId  負責人（還沒指派就不寫）
@@ -330,8 +330,8 @@ export const cases = [
   {
     id: 'CASE-20260925-001',
     place: '地下室 B2',
-    subject: '梯廳燈不亮',
-    title: 'B2 梯廳燈不亮',
+    subject: '電梯口燈不亮',
+    title: 'B2 電梯口燈不亮',
     areaId: 'area-parking',
     category: 'lighting',
     source: 'resident',
@@ -339,7 +339,7 @@ export const cases = [
     isUrgent: false,
     reporterId: 'u-c04',
     reportedAt: '2026-09-25T08:40',
-    description: 'B2 梯廳靠車道側的燈不亮，晚上取車時很暗。',
+    description: 'B2 電梯口靠車道側的燈不亮，晚上取車時很暗。',
     photos: [],
     status: 'pending',
     supporters: [],

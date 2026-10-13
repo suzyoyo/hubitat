@@ -19,17 +19,18 @@ export const community = {
 //   name    範圍名稱
 //   type    'building' 棟別 / 'facility' 公設區域
 //   places  這個範圍底下的地點；active: false 表示已停用（不再讓人選，但舊資料仍看得到）
+//           common: true 表示住戶常會通報的地點，住戶新增通報時只列出這些，其他的請住戶選「其他」自己填
+//           （機房、水塔這類地方住戶很少去，但管理人員登記報修、設備位置還是會用到，所以不刪）
 export const areas = [
   {
     id: 'area-a',
     name: 'A 棟',
     type: 'building',
     places: [
-      { id: 'a-lobby', name: '1F 大廳', active: true },
-      { id: 'a-elevator', name: '電梯', active: true },
-      { id: 'a-hall', name: '梯廳', active: true },
-      { id: 'a-corridor', name: '各樓層走廊', active: true },
-      { id: 'a-stairs', name: '樓梯間', active: true },
+      { id: 'a-lobby', name: '1F 大廳', active: true, common: true },
+      { id: 'a-elevator', name: '電梯／電梯口', active: true, common: true },
+      { id: 'a-corridor', name: '各樓層走廊', active: true, common: true },
+      { id: 'a-stairs', name: '樓梯間', active: true, common: true },
       { id: 'a-roof', name: '頂樓', active: true },
       { id: 'a-mailbox', name: '信箱區', active: true },
       { id: 'a-machine', name: '1 樓機房', active: true },
@@ -41,11 +42,10 @@ export const areas = [
     name: 'B 棟',
     type: 'building',
     places: [
-      { id: 'b-lobby', name: '1F 大廳', active: true },
-      { id: 'b-elevator', name: '電梯', active: true },
-      { id: 'b-hall', name: '梯廳', active: true },
-      { id: 'b-corridor', name: '各樓層走廊', active: true },
-      { id: 'b-stairs', name: '樓梯間', active: true },
+      { id: 'b-lobby', name: '1F 大廳', active: true, common: true },
+      { id: 'b-elevator', name: '電梯／電梯口', active: true, common: true },
+      { id: 'b-corridor', name: '各樓層走廊', active: true, common: true },
+      { id: 'b-stairs', name: '樓梯間', active: true, common: true },
       { id: 'b-roof', name: '頂樓', active: true },
       { id: 'b-mailbox', name: '信箱區', active: true },
       { id: 'b-machine', name: '1 樓機房', active: true },
@@ -57,9 +57,8 @@ export const areas = [
     name: 'C 棟',
     type: 'building',
     places: [
-      { id: 'c-elevator', name: '電梯', active: true },
-      { id: 'c-hall', name: '梯廳', active: true },
-      { id: 'c-stairs', name: '樓梯間', active: true },
+      { id: 'c-elevator', name: '電梯／電梯口', active: true, common: true },
+      { id: 'c-stairs', name: '樓梯間', active: true, common: true },
       { id: 'c-roof', name: '頂樓', active: true },
       { id: 'c-mailbox', name: '信箱區', active: true },
     ],
@@ -69,9 +68,9 @@ export const areas = [
     name: '地下停車場',
     type: 'facility',
     places: [
-      { id: 'p-b1-lane', name: 'B1 車道', active: true },
-      { id: 'p-b2-lane', name: 'B2 車道', active: true },
-      { id: 'p-b2-hall', name: 'B2 梯廳', active: true },
+      { id: 'p-b1-lane', name: 'B1 車道', active: true, common: true },
+      { id: 'p-b2-lane', name: 'B2 車道', active: true, common: true },
+      { id: 'p-b2-hall', name: 'B2 電梯口', active: true, common: true },
       { id: 'p-machine', name: '地下室機房', active: true },
     ],
   },
@@ -80,8 +79,8 @@ export const areas = [
     name: '游泳池',
     type: 'facility',
     places: [
-      { id: 'pool-main', name: '泳池', active: true },
-      { id: 'pool-locker', name: '淋浴更衣間', active: true },
+      { id: 'pool-main', name: '泳池', active: true, common: true },
+      { id: 'pool-locker', name: '淋浴更衣間', active: true, common: true },
       { id: 'pool-machine', name: '泳池機房', active: true },
     ],
   },
@@ -90,10 +89,10 @@ export const areas = [
     name: '中庭與戶外',
     type: 'facility',
     places: [
-      { id: 'o-garden', name: '1F 中庭花園', active: true },
-      { id: 'o-roof-garden', name: '頂樓花園', active: true },
+      { id: 'o-garden', name: '1F 中庭花園', active: true, common: true },
+      { id: 'o-roof-garden', name: '頂樓花園', active: true, common: true },
       { id: 'o-water-tower', name: '頂樓水塔區', active: true },
-      { id: 'o-trash', name: '垃圾集中場', active: true },
+      { id: 'o-trash', name: '垃圾集中場', active: true, common: true },
     ],
   },
 ]

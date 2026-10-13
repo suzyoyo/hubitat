@@ -70,7 +70,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/FAB` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/Greeting` | `app/AppGreeting.vue` | ✅ | |
 | `App/Section Header` | `app/SectionHeader.vue` | ✅ | 沒傳 `to` 就不顯示「看全部」 |
-| `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
+| `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字；加上 `vertical` 按鈕改成上下排（完成頁用）。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
 | `App/Drawer Content` | `app/DrawerContent.vue` | ⬜ | 從底部滑出的面板內容。外層用基礎元件 `ui/drawer` |
 | `App/Menu Item` | `app/MenuItem.vue` | ⬜ | 選單的一列：圖示＋文字。「全域新增選單」會用到 |
@@ -89,10 +89,11 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Report/Stepper` | `report/ReportStepper.vue` | ✅ | 三步驟進度條。沒有 Current 的 prop，傳通報的 `steps`（三個階段的時間）進去，元件自己算走到第幾步；已完成時三步都打勾。還沒到的步驟下面不顯示日期（設計稿寫「尚未完成」）。沒有用 `ui/stepper`，那是給可以點的表單流程用的 |
 | `Report/Step` | ➖ | ➖ | 進度條的單一圓點（Done／Current／Todo）。寫在 `ReportStepper.vue` 裡面即可 |
 | `Report/Record` | `report/ReportRecord.vue` | ✅ | 處理紀錄的一筆。變體 State 用 `latest` prop 切換：不傳是 Past（灰色），傳了是 Latest（深色粗體） |
-| `Report/Similar Card` | `report/ReportSimilarCard.vue` | ⬜ | 相似通報卡。變體 Type：Similar（可按「我也遇到了」）／Joined（已加入） |
-| `Report/Flow Progress` | `report/ReportFlowProgress.vue` | ⬜ | 新增通報流程頂部的進度。變體 Step：1～5。進度條用基礎元件 `ui/progress` |
-| `Report/Review Row` | `report/ReportReviewRow.vue` | ⬜ | 確認送出頁的一列：欄位名稱＋值＋「修改」按鈕 |
-| `Report/Photo Tile` | `report/ReportPhotoTile.vue` | 🟡 | 照片格。變體 Type 用 `type` prop 切換：`preview`（預設，傳 `name` 檔名）／`add`。選好照片送出 `pick` 事件（帶檔名），按刪除送出 `remove`。假資料只有檔名，預覽區先放圖示＋檔名。「更換」「刪除」按鈕高 44px（Kit 是 28px）。還沒做：Thumbnail、Size Small（新增通報流程會用到） |
+| `Report/Similar Card` | `report/ReportSimilarCard.vue` | ✅ | 相似通報卡。傳 `getSimilarReports()` 的一筆 `report`。變體 Type 用 `type` prop 切換：`similar`（預設，有「我也遇到了」按鈕，按了送出 `support` 事件）／`joined`（完成頁用，沒有按鈕，多一行「原始通報內容」）。自己通報的、已經按過的不顯示按鈕，改顯示一句說明（設計稿沒畫） |
+| `Report/Flow Progress` | `report/ReportFlowProgress.vue` | ✅ | 新增通報流程頂部的進度：步驟名稱＋百分比＋進度條。傳 `step`（1～5），名稱和百分比元件自己算。進度條用基礎元件 `ui/progress` |
+| `Report/Review Row` | `report/ReportReviewRow.vue` | ✅ | 確認送出頁的一列：欄位名稱（`label`）＋內容（`value`）＋「修改」按鈕，按了送出 `edit` 事件。分隔線由外面的容器用 `divide-y` 畫，沒有做成 prop |
+| `Report/Photo Tile` | `report/ReportPhotoTile.vue` | ✅ | 照片格，新增通報和通報詳情共用。`type` 有兩種：`thumbnail`（預設，傳 `name` 檔名，下面一顆「刪除」文字按鈕，按了送出 `remove`）／`add`（虛線框的「新增」，選好檔案送出 `pick`，帶檔名）。照片和影片都可以選，影片（看副檔名）用攝影機圖示，超過 50MB 不收並跳提示。假資料只有檔名，所以只顯示圖示＋檔名。**和 Kit 不一樣**：沒有大張的 Preview 和「更換」（2026-10-13 決定兩頁統一用小張＋「刪除」，長輩比較看得懂文字；要換就先刪除再新增） |
+| （Kit 沒有元件） | `report/ReportPhotoGrid.vue` | ✅ | 照片／影片那一區：一排三格的 `ReportPhotoTile`＋下面一行說明（最多 3 個、影片 50MB 以內）。用 `v-model` 綁檔名的陣列。新增通報和通報詳情共用，兩頁才會長得一樣 |
 | （Kit 沒有元件，設計稿是「住戶端-通報詳情-撤回確認」） | `report/ReportWithdrawDialog.vue` | ✅ | 撤回通報的確認彈窗：標題＋說明＋撤回原因（選填）＋「取消／確認撤回」。用 `v-model:open` 控制開關，按「確認撤回」送出 `confirm` 事件（帶原因），真的去撤回是頁面的工作；撤回中傳 `pending` 讓按鈕不能按 |
 
 ### C. 公告與會議
@@ -131,7 +132,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
 | `Feedback/Empty State` | `feedback/FeedbackEmptyState.vue` | ⬜ | 空狀態：圖示＋標題＋說明＋按鈕。變體 Container：Plain／Card。可以用基礎元件 `ui/empty` 當底。住戶端「我的通報」（Plain）和「社區公告」（Card）的空狀態先直接用 `ui/empty`＋吉祥物寫在頁面裡，做這個元件時再換過來 |
-| `Feedback/Haobi Tip` | `feedback/FeedbackHaobiTip.vue` | ⬜ | 好彼管家提示框：頭像＋標籤＋訊息 |
+| `Feedback/Haobi Tip` | `feedback/FeedbackHaobiTip.vue` | 🟡 | 好彼管家提示框：頭像＋「好彼管家」＋主訊息（`title`）＋補充說明（`description`，選填）。頭像是思考的好彼管家（`assets/mascot/thinking.png`，原圖 1）。Kit 的「可加 Badge」還沒做 |
 | `Feedback/Toast` | ➖ | ➖ | 用基礎元件 `ui/sonner`（`toast('訊息')`）。樣式和 Kit 不同時調整 sonner，不另外做元件 |
 | `Feedback/Dialog Header` | ➖ | ➖ | 用基礎元件 dialog 的標題（`DialogTitle`）。用法見 `notice/NoticeDetailDialog.vue` |
 | `Feedback/Dialog Actions` | ➖ | ➖ | 用基礎元件 dialog 的按鈕區。關閉用的按鈕用 `DialogClose` 包起來 |
