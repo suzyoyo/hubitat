@@ -1,11 +1,16 @@
 <script setup>
-// 新增通報・第 3 步：選類型
+// 新增通報・第 3 步：選類型（住戶端、管委會端的新增通報共用）
 // 兩種選一種：公共設施問題（公開）、涉及住戶行為（保密）。這個選擇決定其他住戶看不看得到這筆通報
 import { LockIcon, UsersIcon } from '@lucide/vue'
 import FeedbackHaobiTip from '@/components/feedback/FeedbackHaobiTip.vue'
 import { Badge } from '@/components/ui/badge'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { REPORT_TYPES } from '@/lib/report'
+
+defineProps({
+  // 管委會、管理人員代住戶登記通報時傳 true：說明改成「通報住戶」，不是「你」
+  management: { type: Boolean, default: false },
+})
 
 // 選到的類型：'public' 公開、'private' 保密，還沒選是空字串。頁面用 v-model 綁定
 // 值和假資料的 CASE_VISIBILITY 用同一組（public / private）
@@ -34,7 +39,10 @@ const OPTIONS = [
 
 <template>
   <div class="space-y-4">
-    <FeedbackHaobiTip title="這是哪一類問題？" description="無論哪一類，你的姓名與戶號都不會被其他住戶看到。" />
+    <FeedbackHaobiTip
+      title="這是哪一類問題？"
+      :description="`無論哪一類，${management ? '通報住戶' : '你'}的姓名與戶號都不會被其他住戶看到。`"
+    />
 
     <!-- RadioGroup：一組單選，v-model 會記住選到哪一個 -->
     <RadioGroup v-model="visibility" class="gap-4">

@@ -73,7 +73,7 @@
   - 問候語「早安／午安／晚安」的規則在 `src/lib/date.js` 的 `greetingWord()`，住戶端和管委會端首頁共用（2026-10-13）
   - 還沒處理的小事：公告卡片橫向排列時，內容少的卡片底部會多一塊空白；「查看全部待辦事項」按鈕在載入中和沒有待辦時也會顯示
 - ✅ 住戶端「新增通報」流程完成（2026-10-13，分支 `resident/new-report`）：`src/views/resident/NewReportView.vue`，網址 `/resident/reports/new`（右下角「通報」按鈕）
-  - 五步：1 選地點 → 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出，加上兩個完成頁（送出、我也遇到了）。每一步的畫面在 `src/views/resident/new-report/`，`NewReportView.vue` 負責記住填到一半的資料、決定顯示哪一步
+  - 五步：1 選地點 → 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出，加上兩個完成頁（送出、我也遇到了）。每一步的畫面在 `src/components/report/`（`ReportPlaceStep`、`ReportSimilarStep`、`ReportTypeStep`、`ReportDescribeStep`、`ReportConfirmStep`、`ReportSupportedDone`，2026-10-14 從 `views/resident/new-report/` 搬過來，管委會端的新增通報也用；選類型、確認送出有 `management` 開關換成管委會的說法），送出的完成頁 `SubmittedDone` 還在 `new-report/`。`NewReportView.vue` 負責記住填到一半的資料、決定顯示哪一步
   - 第幾步記在網址上（`?step=2`），按返回會回到上一步；重新整理、或資料已經清空卻回到中間的步驟，都會回第 1 步
   - 選地點：只列出地點清單裡 `common: true` 的（住戶常會通報的），最後一個是「其他」可以自己填（例如住戶家門口，通報住戶行為時會用到）。「梯廳」和「電梯」合併成「電梯／電梯口」（2026-10-13，改的是共用的地點清單）
   - 確認是否重複：比對「同一個範圍、地點名稱一樣、公開、還沒結案」的通報，沒有就跳過這一步。假資料只有「A 棟・1F 大廳」對得上。自己通報的、已經按過「我也遇到了」的不顯示按鈕
@@ -171,7 +171,7 @@
 - 專案根目錄的 `第一組＿好彼社區 Hubitat.pdf` 是我的個人檔案，**不要 commit**（已用 `.git/info/exclude` 在本機排除）
 - 給組員看的假資料進度整理：https://claude.ai/code/artifact/fbdedca5-8868-4f7e-954e-5f8e9b94e09d
 - 【之後】管委會、管理人員的導覽列（5 個分頁）還沒對照 Kit 的樣式。分頁名稱「社區檔案」→「社區」三端都改完了（2026-10-10）；角色選擇頁管委會的說明文字還寫「社區檔案」，那是開發預覽用的頁面，先不改
-- 【之後】管委會、管理人員的「＋」按鈕目前連到佔位頁，設計是彈出「全域新增選單」
+- 管委會、管理人員的「＋」按鈕會在上方彈出「全域新增選單」（2026-10-14，`roles.js` 的 `fab.menu`、`BottomNav.vue`，用 `ui/popover`）；沒權限的項目不顯示（`canUseMenuItem`），還沒做的頁面連到佔位頁
 - 【設計待決定】住戶端「我的通報」的分頁（`src/views/resident/ReportsView.vue`）：選中「已完成」時件數徽章和底色融在一起、分頁沒有外框不容易看出可以切換。013 提案改成「看過的分頁不顯示件數、在列表上方顯示進行中件數」（需要已讀狀態，假資料還沒有）；「進行中」不加件數。詳見 `docs/dev-guide.md` 第 8 節。按鈕高度的部分 2026-10-13 做完了：「我的通報」和「社區公告」的分頁按鈕看起來的高度不變（約 35px），用 `before` 把可以點的範圍上下各補 8px，超過 44px
 - 【設計待決定】「編輯通報 / 補充」按鈕樣式：等設計稿三端統一後再修（PR #3 的 review 意見，還沒記進 dev-guide）。2026-10-12 起先跟著 Kit 的 `outline`（灰底、底部一條線）
 - 【觀察中】`npm audit` 有 7 個 moderate 弱點，來自 shadcn-vue CLI 的相依套件（不會打包進網頁）；勿用 `npm audit fix --force`（會把 shadcn-vue 降回 0.10.5）
