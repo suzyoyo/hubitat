@@ -1,6 +1,6 @@
 <script setup>
 // 管委會端的案件卡（對應 Figma 的 Admin/Case Card）
-// 第一行標題＋›；第二行左邊地點、右邊狀態徽章；第三行負責人和廠商
+// 第一行標題＋狀態徽章＋›；第二行地點；第三行負責人和廠商
 import { computed } from 'vue'
 import { ChevronRightIcon } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
@@ -38,14 +38,15 @@ const footerText = computed(() => {
 
 <template>
   <RouterLink :to="to" class="block space-y-3 rounded-xl bg-card p-4 shadow-card">
+    <!-- 第一行：標題、狀態徽章、›（徽章放在箭頭左邊，dev-guide 第 5 節） -->
     <div class="flex items-start gap-2">
       <h3 class="min-w-0 flex-1 type-card-title text-foreground">{{ item.title }}</h3>
-      <!-- mt-1：箭頭對齊標題第一行 -->
+      <!-- mt-0.5、mt-1：徽章和箭頭對齊標題第一行 -->
+      <Badge :variant="statusBadge.variant" class="mt-0.5 shrink-0">{{ statusBadge.text }}</Badge>
       <ChevronRightIcon class="mt-1 size-4 shrink-0" />
     </div>
-    <div class="flex items-center justify-between gap-2">
+    <div>
       <Badge variant="outline">{{ item.areaName }}</Badge>
-      <Badge :variant="statusBadge.variant">{{ statusBadge.text }}</Badge>
     </div>
     <p class="type-body text-muted-foreground">{{ footerText }}</p>
   </RouterLink>
