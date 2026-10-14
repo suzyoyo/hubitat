@@ -133,7 +133,7 @@ onMounted(async () => {
 //              影響範圍   活動地點   主辦單位   關聯案件設備   推播
 //   施工、維護   按鈕       －         －         有             有
 //   活動         －         打字       有         －             －
-//   其他         按鈕       －         有         －             －
+//   其他         按鈕       －         有         有             －
 const isWorks = computed(() => ['construction', 'maintenance'].includes(form.type))
 const isActivity = computed(() => form.type === 'activity')
 
@@ -205,9 +205,9 @@ function toInput() {
     organizer: isWorks.value ? (keep.organizer ?? '管理室') : form.organizer.trim(),
     // 推播：施工、維護照選的；活動通知全社區；其他通知影響範圍內住戶
     push: isWorks.value ? form.push : isActivity.value ? 'all' : 'affected',
-    // 關聯案件與設備只有施工、維護的表單有；其他類型修改時沿用原本的
-    caseId: isWorks.value ? (form.caseId === NONE ? '' : form.caseId) : keep.caseId,
-    equipmentId: isWorks.value ? (form.equipmentId === NONE ? '' : form.equipmentId) : keep.equipmentId,
+    // 關聯案件與設備：活動沒有，修改時沿用原本的
+    caseId: isActivity.value ? keep.caseId : form.caseId === NONE ? '' : form.caseId,
+    equipmentId: isActivity.value ? keep.equipmentId : form.equipmentId === NONE ? '' : form.equipmentId,
     isUrgent: form.isUrgent,
   }
 }
@@ -242,6 +242,12 @@ async function submit() {
   }
   // replace：換掉表單這一頁，按返回不會回到填好的表單
   router.replace(`/committee/announcements/${result.id}`)
+}
+
+// 點日期、時間框的任何地方，都直接跳出選日期或時間的畫面
+// （瀏覽器預設要點到右邊的小圖示才會跳出來；showPicker 是瀏覽器內建的功能）
+function openPicker(event) {
+  event.target.showPicker?.()
 }
 
 // 取消：回到上一頁；直接打網址進來的沒有上一頁，就回管委會首頁
@@ -383,11 +389,11 @@ function cancel() {
             <Label for="an-start-date" class="type-date text-muted-foreground">
               {{ form.dateMode === 'multi' ? '開始日期' : '日期' }}
             </Label>
-            <Input id="an-start-date" v-model="form.startDate" type="date" />
+            <Input id="an-start-date" v-model="form.startDate" type="date" @click="openPicker" />
           </div>
           <div v-if="form.dateMode === 'multi'" class="space-y-1.5">
             <Label for="an-end-date" class="type-date text-muted-foreground">結束日期</Label>
-            <Input id="an-end-date" v-model="form.endDate" type="date" :min="form.startDate" />
+            <Input id="an-end-date" v-model="form.endDate" type="date" :min="form.startDate" @click="openPicker" />
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -395,13 +401,13 @@ function cancel() {
             <Label for="an-start-time" class="type-date text-muted-foreground">
               {{ form.dateMode === 'multi' ? '每日開始時間' : '開始時間' }}
             </Label>
-            <Input id="an-start-time" v-model="form.startTime" type="time" />
+            <Input id="an-start-time" v-model="form.startTime" type="time" @click="openPicker" />
           </div>
           <div class="space-y-1.5">
             <Label for="an-end-time" class="type-date text-muted-foreground">
               {{ form.dateMode === 'multi' ? '每日結束時間' : '結束時間' }}
             </Label>
-            <Input id="an-end-time" v-model="form.endTime" type="time" />
+            <Input id="an-end-time" v-model="form.endTime" type="time" @click="openPicker" />
           </div>
         </div>
         <p v-if="shownErrors.date" class="type-date text-warning-strong">{{ shownErrors.date }}</p>
@@ -448,8 +454,8 @@ function cancel() {
         <p v-if="shownErrors.organizer" class="type-date text-warning-strong">{{ shownErrors.organizer }}</p>
       </div>
 
-      <!-- 施工、維護：關聯案件與設備（選填） -->
-      <section v-if="isWorks" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
+      <!-- 施工、維護、其他：關聯案件與設備（選填；設計稿的「其他」沒有，2026-10-14 決定加上） -->
+      <section v-if="!isActivity" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <div class="space-y-1">
           <div class="flex items-center gap-2">
             <h2 class="type-card-title text-foreground">關聯案件與設備</h2>
