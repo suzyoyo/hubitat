@@ -4,6 +4,7 @@
 import { computed, onMounted, ref } from 'vue'
 import AdminActionCard from '@/components/admin/AdminActionCard.vue'
 import FilterSelect from '@/components/common/FilterSelect.vue'
+import SortSelect from '@/components/common/SortSelect.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { todoLink } from '@/lib/todo'
@@ -90,10 +91,19 @@ const shownTodos = computed(() => {
       </TabsList>
     </Tabs>
 
-    <div class="grid grid-cols-2 gap-3">
+    <!-- 類型：6 個選項，用下拉選單（篩選的膠囊按鈕） -->
+    <div class="w-1/2">
       <FilterSelect v-model="type" label="類型" :options="TYPE_FILTERS" />
-      <!-- 已完成固定新的在前，不用排序 -->
-      <FilterSelect v-if="tab === 'open'" v-model="sort" label="排序" :options="SORT_OPTIONS" />
+    </div>
+
+    <!-- 同一行：左邊件數、右邊排序（灰色小字）。已完成固定新的在前，不用排序 -->
+    <div class="flex min-h-11 items-center justify-between gap-3">
+      <p class="type-date text-muted-foreground">
+        <template v-if="!loading">
+          {{ tab === 'done' ? `最近 ${DONE_TODO_DAYS} 天完成 ${shownTodos.length} 件` : `共 ${shownTodos.length} 件待辦` }}
+        </template>
+      </p>
+      <SortSelect v-if="tab === 'open'" v-model="sort" :options="SORT_OPTIONS" />
     </div>
 
     <template v-if="loading">
@@ -105,9 +115,6 @@ const shownTodos = computed(() => {
       <p v-else class="type-body text-muted-foreground">{{ type === 'all' ? '目前沒有待辦事項' : '沒有這類待辦' }}</p>
     </div>
     <template v-else>
-      <p class="type-date text-muted-foreground">
-        {{ tab === 'done' ? `最近 ${DONE_TODO_DAYS} 天完成 ${shownTodos.length} 件` : `共 ${shownTodos.length} 件待辦` }}
-      </p>
       <AdminActionCard v-for="todo in shownTodos" :key="todo.id" :todo="todo" :to="todoLink(todo)" />
     </template>
   </div>
