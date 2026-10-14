@@ -5,6 +5,7 @@ import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
+import MeView from '@/views/committee/MeView.vue'
 import NotificationsView from '@/views/committee/NotificationsView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
@@ -20,6 +21,7 @@ export default {
   // 沒列在這裡的頁面，會先顯示佔位頁
   views: {
     home: HomeView,
+    me: MeView,
     notifications: NotificationsView,
     cases: CasesView,
     vendors: VendorsView,
@@ -62,5 +64,13 @@ export default {
     { path: 'cases/new', title: '新增通報' },
     { path: 'files/upload', title: '上傳文件' },
     { path: 'quick-saves/new', title: '快速留存' },
+    // 「我的」頁點進去的頁面
+    { path: 'me/profile', title: '個人資料' },
+    { path: 'me/handover', title: '換屆交接' },
+    { path: 'me/settings', title: '社區設定' },
+    { path: 'me/urgent-log', title: '緊急標示使用紀錄' },
+    { path: 'me/notifications', title: '通知設定' },
+    { path: 'me/help', title: '使用說明' },
+    { path: 'me/account', title: '帳號與安全' },
   ],
 }
