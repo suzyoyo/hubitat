@@ -7,6 +7,11 @@ import { Badge } from '@/components/ui/badge'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { REPORT_TYPES } from '@/lib/report'
 
+defineProps({
+  // 管委會、管理人員代住戶登記報修時傳 true：說明改成「報修住戶」，不是「你」
+  management: { type: Boolean, default: false },
+})
+
 // 選到的類型：'public' 公開、'private' 保密，還沒選是空字串。頁面用 v-model 綁定
 // 值和假資料的 CASE_VISIBILITY 用同一組（public / private）
 const visibility = defineModel({ type: String, default: '' })
@@ -34,7 +39,10 @@ const OPTIONS = [
 
 <template>
   <div class="space-y-4">
-    <FeedbackHaobiTip title="這是哪一類問題？" description="無論哪一類，你的姓名與戶號都不會被其他住戶看到。" />
+    <FeedbackHaobiTip
+      title="這是哪一類問題？"
+      :description="`無論哪一類，${management ? '報修住戶' : '你'}的姓名與戶號都不會被其他住戶看到。`"
+    />
 
     <!-- RadioGroup：一組單選，v-model 會記住選到哪一個 -->
     <RadioGroup v-model="visibility" class="gap-4">
