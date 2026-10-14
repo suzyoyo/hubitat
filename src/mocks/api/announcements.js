@@ -145,12 +145,19 @@ export async function withdrawAnnouncement(id, userId, reason = '') {
   return true
 }
 
-// 復原撤回（管理端用）：剛撤回後按 toast 上的「復原」→ 變回已發布
+// 復原撤回（管理端用）：剛撤回後按 toast 上的「復原」→ 變回已發布，撤回時發給住戶的通知也收回
 // 只有撤回的那個人能復原；回傳 true 代表成功
 export async function restoreAnnouncement(id, userId) {
   await delay()
   const item = announcements.find((entry) => entry.id === id)
   if (!item || item.status !== 'withdrawn' || item.withdrawnBy !== userId) return false
+  // 撤回時發給住戶的「公告已撤回」通知收回來，住戶就不會看到一則已經不成立的通知
+  // （從後面往前刪，刪掉一筆後前面的位置不會跑掉）
+  for (let index = notifications.length - 1; index >= 0; index--) {
+    const notice = notifications[index]
+    const isWithdrawNotice = notice.link.id === id && notice.title === '公告已撤回' && notice.at === item.withdrawnAt
+    if (isWithdrawNotice) notifications.splice(index, 1)
+  }
   item.status = 'published'
   delete item.withdrawnAt
   delete item.withdrawnBy
@@ -228,27 +235,56 @@ export async function createAnnouncement(userId, input) {
   return present(item, 'committee')
 }
 
+// 發通知給主委和副主委（例如管理人員修改了公告），發到管委會端
+function notifyChairs(item, title) {
+  for (const user of users) {
+    if (!COMMITTEE_TITLES[user.committeeTitle]?.canReviewAnnouncement) continue
+    notifications.push({
+      id: `n-${item.id}-${notifications.length + 1}`,
+      userId: user.id,
+      role: 'committee',
+      title,
+      body: item.title,
+      at: MOCK_NOW,
+      read: false,
+      link: { type: 'announcement', id: item.id },
+    })
+  }
+}
+
 // 修改公告（管理端用），回傳修改後的公告；不能改的話回傳 undefined
 //   changes 和 createAnnouncement 的 input 一樣，要傳完整的表單內容（沒傳的欄位會被清掉）
 // 已發布的 → 改完立刻生效，不用重新審核，並通知住戶「公告已更新」
-// 已撤回的 → 「修改並重新發布」：變回已發布、發布時間改成現在、清掉撤回紀錄
+//            管理人員改的，另外通知主委和副主委「XX 修改了公告」（2026-10-14，PR #35 suzy 的建議）
+// 已撤回的 → 「修改並重新發布」：清掉撤回紀錄
+//            管理人員的公告（不緊急）→ 變回待審核，等主委或副主委審核（住戶已經收到撤回通知，等於一則新公告）
+//            其他 → 變回已發布、發布時間改成現在
 export async function updateAnnouncement(id, userId, changes) {
   await delay()
   const item = announcements.find((entry) => entry.id === id)
   if (!item || !['published', 'withdrawn'].includes(item.status) || item.endAt < MOCK_NOW) return undefined
   if (!canManage(item, userId)) return undefined
+  const editorIsStaff = findUser(userId).roles.includes('staff')
   // 先清掉表單的欄位，再放進新的（例如從多日改成單日，timeText 就要拿掉）
   for (const key of FORM_FIELDS) delete item[key]
   Object.assign(item, pickFormFields(changes))
   if (item.status === 'withdrawn') {
-    item.status = 'published'
-    item.publishedAt = MOCK_NOW
     delete item.withdrawnAt
     delete item.withdrawnBy
     delete item.withdrawReason
-    notifyResidents(item, `新公告：${item.title}`)
+    if (editorIsStaff && announcementNeedsReview(item)) {
+      // 重新送審：之前的審核和發布時間都不算了
+      item.status = 'pending'
+      delete item.reviewerId
+      delete item.publishedAt
+    } else {
+      item.status = 'published'
+      item.publishedAt = MOCK_NOW
+      notifyResidents(item, `新公告：${item.title}`)
+    }
   } else {
     notifyResidents(item, `公告已更新：${item.title}`)
+    if (editorIsStaff) notifyChairs(item, `${userLabel(userId)} 修改了公告`)
   }
   return present(item, 'committee')
 }
