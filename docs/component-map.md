@@ -185,7 +185,7 @@ import { Button } from '@/components/ui/button'
 | Seperator | `ui/separator` | ✅ | Kit 的頁面名稱拼錯了，程式用正確的拼法 separator |
 | Tabs | `ui/tabs` | ✅ | |
 | Textarea | `ui/textarea` | ✅ | |
-| Accordion | `accordion` | ⬜ | `Meeting/Case`、`Timeline/Month` 會用到 |
+| Accordion | `ui/accordion` | ✅ | 2026-10-14 加入，還是 shadcn-vue 原本的樣子（字是 14px），還沒照 Kit 調整。`Meeting/Case`、`Timeline/Month` 會用到，做這兩個元件時在元件裡調整字級和外框。示範在 `/playground` 的「清單」區 |
 | Alert | `alert` | ✅ | 2026-10-13 加入。已照 Kit 調整：說明的字是深色；字級照專案放大成 16px（Kit 是 14px）。圖示直接放在 `<Alert>` 裡的第一個位置。提案與簽核的「法定效力說明」、管委會首頁的「換屆交接提示」會用到 |
 | Calendar | `calendar` | ⬜ | |
 | Checkbox | `checkbox` | ⬜ | |
