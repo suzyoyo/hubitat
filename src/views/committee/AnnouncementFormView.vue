@@ -65,7 +65,7 @@ const equipment = ref([])
 
 // 表單上每個欄位的值
 const form = reactive({
-  type: '',
+  type: 'construction', // 發布時預設是施工；修改時換成原本的類型
   title: '',
   content: '',
   dateMode: 'single', // 'single' 單日 / 'multi' 多日
@@ -165,7 +165,6 @@ const submitted = ref(false)
 
 const errors = computed(() => {
   const result = {}
-  if (!form.type) result.type = '請選擇公告類型'
   if (!form.title.trim()) result.title = `請填寫${labels.value.title}`
   if (!form.content.trim()) result.content = `請填寫${labels.value.content}`
   const multi = form.dateMode === 'multi'
@@ -176,9 +175,9 @@ const errors = computed(() => {
   } else if (form.endTime <= form.startTime) {
     result.date = '結束時間要比開始時間晚'
   }
-  if (!isActivity.value && form.type && form.areaIds.length === 0) result.areas = '請至少選一個範圍'
+  if (!isActivity.value && form.areaIds.length === 0) result.areas = '請至少選一個範圍'
   if (isActivity.value && !form.place.trim()) result.place = '請填寫活動地點'
-  if (form.type && !isWorks.value && !form.organizer.trim()) result.organizer = `請填寫${labels.value.organizer}`
+  if (!isWorks.value && !form.organizer.trim()) result.organizer = `請填寫${labels.value.organizer}`
   return result
 })
 
@@ -224,7 +223,7 @@ const pending = ref(false)
 async function submit() {
   submitted.value = true
   if (Object.keys(errors.value).length > 0) {
-    toast.error('還有欄位沒填好', { description: '請看紅字的地方。' })
+    toast.error('還有欄位沒填好')
     return
   }
   pending.value = true
@@ -297,238 +296,234 @@ function cancel() {
             {{ option.label }}
           </label>
         </RadioGroup>
-        <p v-if="shownErrors.type" class="type-date text-warning-strong">{{ shownErrors.type }}</p>
       </fieldset>
 
-      <!-- 還沒選類型時，下面的欄位先不出現（欄位會依類型不同） -->
-      <template v-if="form.type">
-        <div class="space-y-2">
-          <Label for="an-title" class="text-base">
-            {{ labels.title }} <span class="text-warning-strong">*</span>
-          </Label>
-          <Input id="an-title" v-model="form.title" maxlength="40" :aria-invalid="Boolean(shownErrors.title)" />
-          <p v-if="shownErrors.title" class="type-date text-warning-strong">{{ shownErrors.title }}</p>
-        </div>
+      <div class="space-y-2">
+        <Label for="an-title" class="text-base">
+          {{ labels.title }} <span class="text-warning-strong">*</span>
+        </Label>
+        <Input id="an-title" v-model="form.title" maxlength="40" :aria-invalid="Boolean(shownErrors.title)" />
+        <p v-if="shownErrors.title" class="type-date text-warning-strong">{{ shownErrors.title }}</p>
+      </div>
 
-        <!-- 活動、其他：內容在日期前面 -->
-        <div v-if="!isWorks" class="space-y-2">
-          <Label for="an-content" class="text-base">
-            {{ labels.content }} <span class="text-warning-strong">*</span>
-          </Label>
-          <Textarea
-            id="an-content"
-            v-model="form.content"
-            placeholder="請輸入公告內容詳情…"
-            :maxlength="CONTENT_MAX"
-            class="min-h-[100px]"
-            :aria-invalid="Boolean(shownErrors.content)"
-          />
-          <div class="flex gap-3">
-            <p class="min-w-0 flex-1 type-date text-warning-strong">{{ shownErrors.content }}</p>
-            <p class="shrink-0 type-date text-muted-foreground">{{ form.content.length }} / {{ CONTENT_MAX }} 字</p>
-          </div>
+      <!-- 活動、其他：內容在日期前面 -->
+      <div v-if="!isWorks" class="space-y-2">
+        <Label for="an-content" class="text-base">
+          {{ labels.content }} <span class="text-warning-strong">*</span>
+        </Label>
+        <Textarea
+          id="an-content"
+          v-model="form.content"
+          placeholder="請輸入公告內容詳情…"
+          :maxlength="CONTENT_MAX"
+          class="min-h-[100px]"
+          :aria-invalid="Boolean(shownErrors.content)"
+        />
+        <div class="flex gap-3">
+          <p class="min-w-0 flex-1 type-date text-warning-strong">{{ shownErrors.content }}</p>
+          <p class="shrink-0 type-date text-muted-foreground">{{ form.content.length }} / {{ CONTENT_MAX }} 字</p>
         </div>
+      </div>
 
-        <!-- 施工、維護、其他：影響範圍的按鈕（可多選） -->
-        <fieldset v-if="!isActivity" class="space-y-2">
-          <legend class="mb-2 flex items-center gap-2 text-base font-medium text-foreground">
-            {{ labels.areas }} <span class="text-warning-strong">*</span>
-            <span class="type-label text-muted-foreground">可多選</span>
-          </legend>
-          <p class="type-date text-muted-foreground">已選 {{ form.areaIds.length }} 項</p>
-          <!-- spacing="2"：按鈕之間留 8px，不黏在一起（和 FilterChips 一樣）-->
-          <!-- gap-y-3：上下兩排隔 12px，每顆往上下各補 6px 後剛好不會重疊 -->
-          <ToggleGroup
-            type="multiple"
-            :spacing="2"
-            :model-value="form.areaIds"
-            class="w-full flex-wrap justify-start gap-y-3"
-            @update:model-value="selectAreas"
+      <!-- 施工、維護、其他：影響範圍的按鈕（可多選） -->
+      <fieldset v-if="!isActivity" class="space-y-2">
+        <legend class="mb-2 flex items-center gap-2 text-base font-medium text-foreground">
+          {{ labels.areas }} <span class="text-warning-strong">*</span>
+          <span class="type-label text-muted-foreground">可多選</span>
+        </legend>
+        <p class="type-date text-muted-foreground">已選 {{ form.areaIds.length }} 項</p>
+        <!-- spacing="2"：按鈕之間留 8px，不黏在一起（和 FilterChips 一樣）-->
+        <!-- gap-y-3：上下兩排隔 12px，每顆往上下各補 6px 後剛好不會重疊 -->
+        <ToggleGroup
+          type="multiple"
+          :spacing="2"
+          :model-value="form.areaIds"
+          class="w-full flex-wrap justify-start gap-y-3"
+          @update:model-value="selectAreas"
+        >
+          <!-- 看起來 32px 高，after 往上下各補 6px，可以點的範圍是 44px（和篩選標籤一樣） -->
+          <ToggleGroupItem
+            v-for="option in areaOptions"
+            :key="option.value"
+            :value="option.value"
+            class="relative rounded-full border border-input bg-card px-4 type-button text-foreground after:absolute after:inset-x-0 after:-inset-y-1.5 data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground hover:data-[state=on]:bg-primary"
           >
-            <!-- 看起來 32px 高，after 往上下各補 6px，可以點的範圍是 44px（和篩選標籤一樣） -->
-            <ToggleGroupItem
-              v-for="option in areaOptions"
-              :key="option.value"
-              :value="option.value"
-              class="relative rounded-full border border-input bg-card px-4 type-button text-foreground after:absolute after:inset-x-0 after:-inset-y-1.5 data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground hover:data-[state=on]:bg-primary"
-            >
-              {{ option.label }}
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <p v-if="shownErrors.areas" class="type-date text-warning-strong">{{ shownErrors.areas }}</p>
-        </fieldset>
+            {{ option.label }}
+          </ToggleGroupItem>
+        </ToggleGroup>
+        <p v-if="shownErrors.areas" class="type-date text-warning-strong">{{ shownErrors.areas }}</p>
+      </fieldset>
 
-        <!-- 日期：單日／多日，再選日期和時間 -->
-        <fieldset class="space-y-2">
-          <legend class="mb-2 text-base font-medium text-foreground">
-            {{ labels.date }} <span class="text-warning-strong">*</span>
-          </legend>
-          <div class="grid grid-cols-2 gap-2">
-            <Button
-              type="button"
-              :variant="form.dateMode === 'single' ? 'default' : 'outline'"
-              :aria-pressed="form.dateMode === 'single'"
-              @click="form.dateMode = 'single'"
-            >
-              單日
-            </Button>
-            <Button
-              type="button"
-              :variant="form.dateMode === 'multi' ? 'default' : 'outline'"
-              :aria-pressed="form.dateMode === 'multi'"
-              @click="form.dateMode = 'multi'"
-            >
-              多日
-            </Button>
+      <!-- 日期：單日／多日，再選日期和時間 -->
+      <fieldset class="space-y-2">
+        <legend class="mb-2 text-base font-medium text-foreground">
+          {{ labels.date }} <span class="text-warning-strong">*</span>
+        </legend>
+        <div class="grid grid-cols-2 gap-2">
+          <Button
+            type="button"
+            :variant="form.dateMode === 'single' ? 'default' : 'outline'"
+            :aria-pressed="form.dateMode === 'single'"
+            @click="form.dateMode = 'single'"
+          >
+            單日
+          </Button>
+          <Button
+            type="button"
+            :variant="form.dateMode === 'multi' ? 'default' : 'outline'"
+            :aria-pressed="form.dateMode === 'multi'"
+            @click="form.dateMode = 'multi'"
+          >
+            多日
+          </Button>
+        </div>
+        <!-- 日期、時間先用手機內建的轉盤（type="date"、type="time"）；之後有月曆元件再換 -->
+        <div class="grid gap-2" :class="form.dateMode === 'multi' ? 'grid-cols-2' : 'grid-cols-1'">
+          <div class="space-y-1.5">
+            <Label for="an-start-date" class="type-date text-muted-foreground">
+              {{ form.dateMode === 'multi' ? '開始日期' : '日期' }}
+            </Label>
+            <Input id="an-start-date" v-model="form.startDate" type="date" />
           </div>
-          <!-- 日期、時間先用手機內建的轉盤（type="date"、type="time"）；之後有月曆元件再換 -->
-          <div class="grid gap-2" :class="form.dateMode === 'multi' ? 'grid-cols-2' : 'grid-cols-1'">
-            <div class="space-y-1.5">
-              <Label for="an-start-date" class="type-date text-muted-foreground">
-                {{ form.dateMode === 'multi' ? '開始日期' : '日期' }}
-              </Label>
-              <Input id="an-start-date" v-model="form.startDate" type="date" />
-            </div>
-            <div v-if="form.dateMode === 'multi'" class="space-y-1.5">
-              <Label for="an-end-date" class="type-date text-muted-foreground">結束日期</Label>
-              <Input id="an-end-date" v-model="form.endDate" type="date" :min="form.startDate" />
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div class="space-y-1.5">
-              <Label for="an-start-time" class="type-date text-muted-foreground">
-                {{ form.dateMode === 'multi' ? '每日開始時間' : '開始時間' }}
-              </Label>
-              <Input id="an-start-time" v-model="form.startTime" type="time" />
-            </div>
-            <div class="space-y-1.5">
-              <Label for="an-end-time" class="type-date text-muted-foreground">
-                {{ form.dateMode === 'multi' ? '每日結束時間' : '結束時間' }}
-              </Label>
-              <Input id="an-end-time" v-model="form.endTime" type="time" />
-            </div>
-          </div>
-          <p v-if="shownErrors.date" class="type-date text-warning-strong">{{ shownErrors.date }}</p>
-        </fieldset>
-
-        <!-- 施工、維護：內容在日期後面 -->
-        <div v-if="isWorks" class="space-y-2">
-          <Label for="an-content" class="text-base">
-            {{ labels.content }} <span class="text-warning-strong">*</span>
-          </Label>
-          <Textarea
-            id="an-content"
-            v-model="form.content"
-            placeholder="請輸入公告內容詳情…"
-            :maxlength="CONTENT_MAX"
-            class="min-h-[100px]"
-            :aria-invalid="Boolean(shownErrors.content)"
-          />
-          <div class="flex gap-3">
-            <p class="min-w-0 flex-1 type-date text-warning-strong">{{ shownErrors.content }}</p>
-            <p class="shrink-0 type-date text-muted-foreground">{{ form.content.length }} / {{ CONTENT_MAX }} 字</p>
+          <div v-if="form.dateMode === 'multi'" class="space-y-1.5">
+            <Label for="an-end-date" class="type-date text-muted-foreground">結束日期</Label>
+            <Input id="an-end-date" v-model="form.endDate" type="date" :min="form.startDate" />
           </div>
         </div>
-
-        <!-- 活動：活動地點（打字） -->
-        <div v-if="isActivity" class="space-y-2">
-          <Label for="an-place" class="text-base">活動地點 <span class="text-warning-strong">*</span></Label>
-          <Input id="an-place" v-model="form.place" placeholder="例如：A 棟中庭" maxlength="20" :aria-invalid="Boolean(shownErrors.place)" />
-          <p v-if="shownErrors.place" class="type-date text-warning-strong">{{ shownErrors.place }}</p>
-        </div>
-
-        <!-- 活動、其他：主辦單位 -->
-        <div v-if="!isWorks" class="space-y-2">
-          <Label for="an-organizer" class="text-base">
-            {{ labels.organizer }} <span class="text-warning-strong">*</span>
-          </Label>
-          <Input
-            id="an-organizer"
-            v-model="form.organizer"
-            placeholder="例如：管理委員會"
-            maxlength="20"
-            :aria-invalid="Boolean(shownErrors.organizer)"
-          />
-          <p v-if="shownErrors.organizer" class="type-date text-warning-strong">{{ shownErrors.organizer }}</p>
-        </div>
-
-        <!-- 施工、維護：關聯案件與設備（選填） -->
-        <section v-if="isWorks" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <h2 class="type-card-title text-foreground">關聯案件與設備</h2>
-              <Badge variant="outline">僅管委會可見</Badge>
-            </div>
-            <p class="type-date text-muted-foreground">會記錄到社區時間軸與設備紀錄</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="space-y-1.5">
+            <Label for="an-start-time" class="type-date text-muted-foreground">
+              {{ form.dateMode === 'multi' ? '每日開始時間' : '開始時間' }}
+            </Label>
+            <Input id="an-start-time" v-model="form.startTime" type="time" />
           </div>
           <div class="space-y-1.5">
-            <Label for="an-case" class="text-base">
-              關聯案件 <span class="type-label text-muted-foreground">選填</span>
+            <Label for="an-end-time" class="type-date text-muted-foreground">
+              {{ form.dateMode === 'multi' ? '每日結束時間' : '結束時間' }}
             </Label>
-            <Select v-model="form.caseId">
-              <SelectTrigger id="an-case" class="h-11 w-full bg-card type-body">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem :value="NONE" class="min-h-11 px-3 type-body">不關聯</SelectItem>
-                <SelectItem v-for="item in cases" :key="item.id" :value="item.id" class="min-h-11 px-3 type-body">
-                  {{ item.title }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <Input id="an-end-time" v-model="form.endTime" type="time" />
           </div>
-          <div class="space-y-1.5">
-            <Label for="an-equipment" class="text-base">
-              關聯設備 <span class="type-label text-muted-foreground">選填</span>
-            </Label>
-            <Select v-model="form.equipmentId">
-              <SelectTrigger id="an-equipment" class="h-11 w-full bg-card type-body">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem :value="NONE" class="min-h-11 px-3 type-body">不關聯</SelectItem>
-                <SelectItem v-for="item in equipment" :key="item.id" :value="item.id" class="min-h-11 px-3 type-body">
-                  {{ item.name }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </section>
+        </div>
+        <p v-if="shownErrors.date" class="type-date text-warning-strong">{{ shownErrors.date }}</p>
+      </fieldset>
 
-        <!-- 標示為緊急：開關先用 Toggle（還沒有 Switch 元件） -->
-        <section class="space-y-1.5 rounded-xl bg-card p-4 shadow-card">
-          <div class="flex items-center justify-between gap-3">
-            <p id="an-urgent-label" class="type-body-strong text-foreground">標示為緊急</p>
-            <Toggle
-              v-model="form.isUrgent"
-              variant="outline"
-              aria-labelledby="an-urgent-label"
-              class="relative h-8 min-w-16 rounded-full bg-card px-4 type-button after:absolute after:inset-x-0 after:-inset-y-1.5 data-[state=on]:border-warning data-[state=on]:bg-warning-subtle data-[state=on]:text-red-800"
-            >
-              {{ form.isUrgent ? '開啟' : '關閉' }}
-            </Toggle>
-          </div>
-          <p class="type-date text-muted-foreground">標示為緊急會直接發布，並同步通知管委會</p>
-        </section>
+      <!-- 施工、維護：內容在日期後面 -->
+      <div v-if="isWorks" class="space-y-2">
+        <Label for="an-content" class="text-base">
+          {{ labels.content }} <span class="text-warning-strong">*</span>
+        </Label>
+        <Textarea
+          id="an-content"
+          v-model="form.content"
+          placeholder="請輸入公告內容詳情…"
+          :maxlength="CONTENT_MAX"
+          class="min-h-[100px]"
+          :aria-invalid="Boolean(shownErrors.content)"
+        />
+        <div class="flex gap-3">
+          <p class="min-w-0 flex-1 type-date text-warning-strong">{{ shownErrors.content }}</p>
+          <p class="shrink-0 type-date text-muted-foreground">{{ form.content.length }} / {{ CONTENT_MAX }} 字</p>
+        </div>
+      </div>
 
-        <!-- 施工、維護：推播通知 -->
-        <fieldset v-if="isWorks" class="space-y-2">
-          <legend class="mb-2 text-base font-medium text-foreground">
-            推播通知 <span class="text-warning-strong">*</span>
-          </legend>
-          <RadioGroup v-model="form.push" class="gap-2">
-            <label
-              v-for="option in PUSH_OPTIONS"
-              :key="option.value"
-              class="flex min-h-[52px] items-center gap-3 rounded-xl border bg-card px-4 type-body text-foreground"
-              :class="option.value === form.push ? 'border-foreground' : 'border-border'"
-            >
-              <RadioGroupItem :value="option.value" class="size-5" />
-              {{ option.label }}
-            </label>
-          </RadioGroup>
-        </fieldset>
-      </template>
+      <!-- 活動：活動地點（打字） -->
+      <div v-if="isActivity" class="space-y-2">
+        <Label for="an-place" class="text-base">活動地點 <span class="text-warning-strong">*</span></Label>
+        <Input id="an-place" v-model="form.place" placeholder="例如：A 棟中庭" maxlength="20" :aria-invalid="Boolean(shownErrors.place)" />
+        <p v-if="shownErrors.place" class="type-date text-warning-strong">{{ shownErrors.place }}</p>
+      </div>
+
+      <!-- 活動、其他：主辦單位 -->
+      <div v-if="!isWorks" class="space-y-2">
+        <Label for="an-organizer" class="text-base">
+          {{ labels.organizer }} <span class="text-warning-strong">*</span>
+        </Label>
+        <Input
+          id="an-organizer"
+          v-model="form.organizer"
+          placeholder="例如：管理委員會"
+          maxlength="20"
+          :aria-invalid="Boolean(shownErrors.organizer)"
+        />
+        <p v-if="shownErrors.organizer" class="type-date text-warning-strong">{{ shownErrors.organizer }}</p>
+      </div>
+
+      <!-- 施工、維護：關聯案件與設備（選填） -->
+      <section v-if="isWorks" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <h2 class="type-card-title text-foreground">關聯案件與設備</h2>
+            <Badge variant="outline">僅管委會可見</Badge>
+          </div>
+          <p class="type-date text-muted-foreground">會記錄到社區時間軸與設備紀錄</p>
+        </div>
+        <div class="space-y-1.5">
+          <Label for="an-case" class="text-base">
+            關聯案件 <span class="type-label text-muted-foreground">選填</span>
+          </Label>
+          <Select v-model="form.caseId">
+            <SelectTrigger id="an-case" class="h-11 w-full bg-card type-body">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem :value="NONE" class="min-h-11 px-3 type-body">不關聯</SelectItem>
+              <SelectItem v-for="item in cases" :key="item.id" :value="item.id" class="min-h-11 px-3 type-body">
+                {{ item.title }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div class="space-y-1.5">
+          <Label for="an-equipment" class="text-base">
+            關聯設備 <span class="type-label text-muted-foreground">選填</span>
+          </Label>
+          <Select v-model="form.equipmentId">
+            <SelectTrigger id="an-equipment" class="h-11 w-full bg-card type-body">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem :value="NONE" class="min-h-11 px-3 type-body">不關聯</SelectItem>
+              <SelectItem v-for="item in equipment" :key="item.id" :value="item.id" class="min-h-11 px-3 type-body">
+                {{ item.name }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </section>
+
+      <!-- 標示為緊急：開關先用 Toggle（還沒有 Switch 元件） -->
+      <section class="space-y-1.5 rounded-xl bg-card p-4 shadow-card">
+        <div class="flex items-center justify-between gap-3">
+          <p id="an-urgent-label" class="type-body-strong text-foreground">標示為緊急</p>
+          <Toggle
+            v-model="form.isUrgent"
+            variant="outline"
+            aria-labelledby="an-urgent-label"
+            class="relative h-8 min-w-16 rounded-full bg-card px-4 type-button after:absolute after:inset-x-0 after:-inset-y-1.5 data-[state=on]:border-warning data-[state=on]:bg-warning-subtle data-[state=on]:text-red-800"
+          >
+            {{ form.isUrgent ? '開啟' : '關閉' }}
+          </Toggle>
+        </div>
+        <p class="type-date text-muted-foreground">標示為緊急會直接發布，並同步通知管委會</p>
+      </section>
+
+      <!-- 施工、維護：推播通知 -->
+      <fieldset v-if="isWorks" class="space-y-2">
+        <legend class="mb-2 text-base font-medium text-foreground">
+          推播通知 <span class="text-warning-strong">*</span>
+        </legend>
+        <RadioGroup v-model="form.push" class="gap-2">
+          <label
+            v-for="option in PUSH_OPTIONS"
+            :key="option.value"
+            class="flex min-h-[52px] items-center gap-3 rounded-xl border bg-card px-4 type-body text-foreground"
+            :class="option.value === form.push ? 'border-foreground' : 'border-border'"
+          >
+            <RadioGroupItem :value="option.value" class="size-5" />
+            {{ option.label }}
+          </label>
+        </RadioGroup>
+      </fieldset>
 
       <BottomCta vertical>
         <Button type="submit" :disabled="pending">{{ submitLabel }}</Button>
