@@ -5,7 +5,7 @@ import { PlusIcon, SearchIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
 import AdminVendorCard from '@/components/admin/AdminVendorCard.vue'
 import FilterChips from '@/components/common/FilterChips.vue'
-import FilterSelect from '@/components/common/FilterSelect.vue'
+import SortSelect from '@/components/common/SortSelect.vue'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
@@ -68,8 +68,9 @@ const shownVendors = computed(() => {
     </Button>
 
     <FilterChips v-model="status" :options="STATUS_FILTERS" fill />
-    <div class="w-1/2">
-      <FilterSelect v-model="sort" label="排序" :options="SORT_OPTIONS" />
+    <!-- 排序：灰色小字靠右 -->
+    <div class="flex justify-end">
+      <SortSelect v-model="sort" :options="SORT_OPTIONS" />
     </div>
 
     <template v-if="loading">
