@@ -5,26 +5,36 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
-import { getInviteByCode } from '@/mocks/api'
+import BottomCta from '@/components/app/BottomCta.vue'
+import { Button } from '@/components/ui/button'
+import { acceptInvite, declineInvite, getCurrentUser, getInviteByCode } from '@/mocks/api'
 import { INVITE_CODE_LENGTH } from '@/mocks/data/invites'
+import AcceptedDone from './join-committee/AcceptedDone.vue'
 import CodeStep from './join-committee/CodeStep.vue'
+import ConfirmStep from './join-committee/ConfirmStep.vue'
 
 const route = useRoute()
 const router = useRouter()
 
 // 現在是哪一步：看網址上的 step，沒有寫就是輸入邀請碼
-//   'code' 輸入邀請碼 / 'confirm' 確認邀請
-const step = computed(() => (route.query.step === 'confirm' ? 'confirm' : 'code'))
+//   'code' 輸入邀請碼 / 'confirm' 確認邀請 / 'done' 接受之後的完成頁
+const step = computed(() => {
+  if (route.query.step === 'confirm' || route.query.step === 'done') return route.query.step
+  return 'code'
+})
 
 const code = ref('') // 輸入的邀請碼
 const invite = ref(null) // 用邀請碼查到的邀請
 const error = ref('') // 邀請碼不能用時的提示
 const checking = ref(false) // 正在查邀請碼時是 true
+const userId = ref('') // 我是誰
 
 // onMounted：畫面一出現就檢查一次
 // 重新整理網頁後，查到的邀請會不見，所以不管網址寫哪一步都回到輸入邀請碼
-onMounted(() => {
+onMounted(async () => {
   if (step.value !== 'code') router.replace({ query: {} })
+  const user = await getCurrentUser('resident')
+  userId.value = user.id
 })
 
 // watch：code 一改變就檢查。滿 6 位數就去查，查到可以用的就自動到下一步
@@ -46,12 +56,50 @@ watch(code, async (value) => {
   router.push({ query: { step: 'confirm' } })
 })
 
-// 從確認邀請按返回回到這一步時，把邀請碼清空，讓住戶重新輸入
+// 回到輸入邀請碼時（例如從確認邀請按返回），把邀請碼清空，讓住戶重新輸入
+// 沒有查到邀請卻跑到後面的步驟（例如按瀏覽器的「下一頁」），就回到輸入邀請碼
 watch(step, (current) => {
-  if (current !== 'code') return
-  code.value = ''
-  invite.value = null
+  if (current === 'code') {
+    code.value = ''
+    invite.value = null
+  } else if (!invite.value) {
+    router.replace({ query: {} })
+  }
 })
+
+// ── 確認邀請：接受或婉拒 ──────────────────────────────
+
+// pending：接受或婉拒還在路上時是 true，按鈕先不能按，避免連按兩次
+const pending = ref(false)
+
+// 邀請碼剛好不能用了（例如在這一頁停太久過期了）：跳提示，回到輸入邀請碼
+function inviteGone() {
+  toast.error('這組邀請碼不能使用了', { description: '請主委重新提供邀請碼。' })
+  router.replace({ query: {} })
+}
+
+// 按了「接受邀請」
+async function accept() {
+  pending.value = true
+  const updated = await acceptInvite(invite.value.code, userId.value)
+  pending.value = false
+  // 假 API 回傳 undefined 代表邀請碼不能用了
+  if (!updated) return inviteGone()
+  invite.value = updated
+  // replace：用完成頁取代確認邀請，按返回才不會又回到這一頁再接受一次
+  router.replace({ query: { step: 'done' } })
+}
+
+// 在彈窗裡按了「確認婉拒」
+async function decline() {
+  pending.value = true
+  const ok = await declineInvite(invite.value.code, userId.value)
+  pending.value = false
+  if (!ok) return inviteGone()
+  toast.success('已婉拒邀請')
+  // replace：離開之後按返回不會再回到確認邀請
+  router.replace('/resident/me')
+}
 
 // 網頁沒辦法真的開相機掃描，先跳提示
 function scan() {
@@ -60,10 +108,25 @@ function scan() {
 </script>
 
 <template>
-  <div class="px-5 pt-4">
+  <!-- pb-40：完成頁有固定在底部的兩個按鈕，留空間才不會蓋住內容 -->
+  <div class="px-5 pt-4" :class="step === 'done' ? 'pb-40' : ''">
     <CodeStep v-if="step === 'code'" v-model="code" :error="error" :checking="checking" @scan="scan" />
 
-    <!-- 確認邀請：下一步做，先確認查到的邀請有帶過來 -->
-    <p v-else-if="invite" class="type-body">{{ invite.inviterName }}邀請你加入第 {{ invite.term }} 屆管理委員會</p>
+    <ConfirmStep
+      v-else-if="step === 'confirm' && invite"
+      :invite="invite"
+      :pending="pending"
+      @accept="accept"
+      @decline="decline"
+    />
+
+    <template v-else-if="step === 'done' && invite">
+      <AcceptedDone :invite="invite" />
+      <!-- 按鈕上下排。replace：離開之後按返回不會再回到完成頁 -->
+      <BottomCta vertical>
+        <Button @click="router.replace('/resident/me')">查看我的身分</Button>
+        <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
+      </BottomCta>
+    </template>
   </div>
 </template>
