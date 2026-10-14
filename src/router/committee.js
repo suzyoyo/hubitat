@@ -2,13 +2,19 @@
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 // 寫法可以參考住戶端的 resident.js
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
+import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
+import FilesView from '@/views/committee/FilesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
 import NewRepairView from '@/views/committee/NewRepairView.vue'
+import NotificationsView from '@/views/committee/NotificationsView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TasksView from '@/views/committee/TasksView.vue'
 import TodosView from '@/views/committee/TodosView.vue'
+import VendorDetailView from '@/views/committee/VendorDetailView.vue'
+import VendorListView from '@/views/committee/VendorListView.vue'
+import VendorsView from '@/views/committee/VendorsView.vue'
 
 export default {
   // 已經做好的畫面：「網址」對應「畫面」
@@ -16,7 +22,13 @@ export default {
   // 沒列在這裡的頁面，會先顯示佔位頁
   views: {
     home: HomeView,
+    notifications: NotificationsView,
     cases: CasesView,
+    files: FilesView,
+    vendors: VendorsView,
+    'vendors/list': VendorListView,
+    'vendors/:id': VendorDetailView,
+    'cases/:id': CaseDetailView,
     'announcements/:id': AnnouncementDetailView,
     todos: TodosView,
     tasks: TasksView,
@@ -38,6 +50,10 @@ export default {
     { path: 'meetings/:id', title: '會議詳情' },
     // 待辦點進去的詳情頁
     { path: 'cases/:id', title: '案件詳情' },
+    { path: 'vendors/list', title: '廠商名冊' },
+    { path: 'vendors/new', title: '新增廠商' },
+    { path: 'vendors/:id', title: '廠商詳細' },
+    { path: 'equipment/:id', title: '設備詳情' },
     { path: 'tasks/:id', title: '交辦詳情' },
     { path: 'proposals/:id', title: '提案詳情' },
     { path: 'announcements/:id', title: '公告詳情' },
@@ -50,5 +66,15 @@ export default {
     { path: 'cases/new', title: '新增通報' },
     { path: 'files/upload', title: '上傳文件' },
     { path: 'quick-saves/new', title: '快速留存' },
+    // 「社區」分頁點進去的頁面
+    { path: 'search', title: '搜尋' },
+    { path: 'meetings', title: '會議紀錄' },
+    { path: 'resolutions', title: '決議事項' },
+    { path: 'bylaws', title: '規約' },
+    { path: 'rules', title: '社區規則與慣例' },
+    { path: 'documents', title: '法定文件' },
+    { path: 'contracts', title: '廠商合約' },
+    { path: 'equipment', title: '設備清冊' },
+    { path: 'timeline', title: '社區時間軸' },
   ],
 }
