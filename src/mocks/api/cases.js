@@ -110,6 +110,8 @@ function presentForResident(item, userId) {
     isMine: item.reporterId === userId || isMyHousehold(item, userId),
     // 是不是管委會、管理人員代我這一戶登記的（只能看，不能修改或撤回）
     isOnBehalf: isMyHousehold(item, userId),
+    // 卡片、詳情頁顯示的文字：'管委會代為登記' / '管理人員代為登記'；不是代我這一戶登記的就是空字串
+    onBehalfLabel: isMyHousehold(item, userId) ? `${item.source === 'staff' ? '管理人員' : '管委會'}代為登記` : '',
     hasSupported: item.supporters.includes(userId), // 我按過「我也遇到了」
     // 能不能修改或撤回：要是我自己通報的，而且還沒結案
     canEdit: item.reporterId === userId && isOpen(item),
@@ -316,7 +318,8 @@ export async function createRepair(userId, input, role = 'committee') {
         actorId: userId,
         label: CASE_SOURCES[role].label,
         text: input.unit ? `${who} 代 ${unitLabel(input.unit)} 登記通報` : `${who} 登記通報`,
-        residentText: '管委會已代你登記，好彼管家已通知管理人員。',
+        // 住戶看到的說法統一，不寫代誰登記（看到的人不一定是那一戶，例如「確認是否重複」）
+        residentText: `${role === 'staff' ? '管理人員' : '管委會'}已登記，正在安排處理。`,
       },
     ],
   }
