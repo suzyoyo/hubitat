@@ -153,7 +153,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`。變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」只是提示（2026-10-13 從滿版藍色按鈕改過來，卡片變短，也不會整頁都是主要按鈕）；「按鈕」「文字」還沒做，有頁面用到再加。期限徽章、緊急底色和 `AdminTodoCard` 一樣，規則在 `src/lib/todo.js` |
 | `Admin/Meeting Card` | `admin/AdminMeetingCard.vue` | ⬜ | 變體 State：待整理／待發布／已發布 |
 | `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ⬜ | 廠商卡 |
-| `Admin/Case Card` | `admin/AdminCaseCard.vue` | ⬜ | 案件卡 |
+| `Admin/Case Card` | `admin/AdminCaseCard.vue` | ✅ | 案件卡：標題＋›、地點徽章＋狀態徽章、負責人｜廠商。整張卡可以點。狀態徽章：逾期、尚未受理紅；待驗收橘；已受理、施工中藍；已結案、已取消灰。prop 叫 `item`（`case` 是 JavaScript 的保留字）。管委會端「案件」分頁在用 |
 | `Admin/Contract Card` | `admin/AdminContractCard.vue` | ⬜ | 合約卡。合約金額只有管委會看得到，管理人員端要能正常顯示沒有金額的樣子 |
 | `Admin/Doc Card` | `admin/AdminDocCard.vue` | ⬜ | 文件卡 |
 | `Admin/Notification Item` | `admin/AdminNotificationItem.vue` | ⬜ | 通知的一筆。做之前先看能不能和 `Notification/Item` 共用 |
