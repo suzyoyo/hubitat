@@ -6,8 +6,16 @@ import { MOCK_NOW, delay, omit } from './helpers'
 import { COMMITTEE_TITLES, users } from '../data/users'
 import { findUser, userLabel } from './users'
 
+// 這個人能不能發布公告：主委、副主委、管理人員（財務、修繕、監察委員不能）
+export function canPublishAnnouncement(userId) {
+  const user = findUser(userId)
+  if (!user) return false
+  if (user.roles.includes('staff')) return true
+  return COMMITTEE_TITLES[user.committeeTitle]?.canReviewAnnouncement ?? false
+}
+
 // 這則公告需不需要審核
-//   委員發布的         → 不用審核
+//   主委、副主委發布的 → 不用審核
 //   管理人員發布的     → 要經過主委或副主委審核
 //   管理人員標示為緊急 → 不用審核
 export function announcementNeedsReview(item) {
@@ -191,7 +199,7 @@ function pickFormFields(input) {
   return result
 }
 
-// 發布公告（管理端用），回傳新增好的公告；不是委員或管理人員的話回傳 undefined
+// 發布公告（管理端用），回傳新增好的公告；不能發布的人（見 canPublishAnnouncement）回傳 undefined
 //   input 要傳：
 //     type        類型，見 ANNOUNCEMENT_TYPES
 //     title       標題
@@ -207,9 +215,7 @@ function pickFormFields(input) {
 // 新公告只存在記憶體，重新整理網頁就不見了
 export async function createAnnouncement(userId, input) {
   await delay()
-  // 委員和管理人員才能發布
-  const author = findUser(userId)
-  if (!author || !['committee', 'staff'].some((role) => author.roles.includes(role))) return undefined
+  if (!canPublishAnnouncement(userId)) return undefined
   // 新編號：現有最大的編號 + 1，例如 an-014 → an-015
   const maxNumber = Math.max(...announcements.map((item) => Number(item.id.slice(3))))
   const item = {

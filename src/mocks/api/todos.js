@@ -1,6 +1,6 @@
 // 我的待辦：不另外存資料，而是從交辦、案件、提案、公告、合約、文件、留存裡，
 // 挑出「跟我有關、還沒完成」的項目彙整而成
-import { diffDays } from '@/lib/date'
+import { addDays, diffDays } from '@/lib/date'
 import { announcements } from '../data/announcements'
 import { cases } from '../data/cases'
 import { contracts } from '../data/contracts'
@@ -199,4 +199,92 @@ export async function getMyTodos(userId, role) {
     counts[item.kind] = (counts[item.kind] ?? 0) + 1
   }
   return { items, counts, total: items.length }
+}
+
+// ── 已完成 ─────────────────────────────────────
+
+// 「已完成」看最近幾天
+export const DONE_TODO_DAYS = 30
+
+// 已完成的種類名稱：TODO_KINDS 的「等我簽核」「待我審核」是還沒做的說法，做完了要換掉
+const DONE_KIND_LABELS = {
+  assigned: '交辦給我的',
+  confirm: '我交辦的',
+  sign: '提案簽核',
+  review: '公告審核',
+  my_case: '我負責的案件',
+  to_verify: '我負責的案件',
+}
+
+// 建立一筆已完成的待辦（格式和 todo() 一樣，多一個 doneAt，沒有期限）
+//   kind 用 TODO_KINDS 的種類，「我的待辦」的類型篩選才能共用
+//   doneAt 完成的時間
+function doneTodo(kind, title, hint, doneAt, link) {
+  return { id: `${kind}-${link.id}`, kind, kindLabel: DONE_KIND_LABELS[kind], title, hint, doneAt, link }
+}
+
+// 我完成的事（管委會）。快到期文件、需補資料不算：它們是被處理掉，不是我做完的
+function committeeDoneTodos(userId) {
+  const items = []
+  for (const task of tasks) {
+    if (task.status !== 'done') continue
+    // 交辦給我、我做完而且交辦人確認了
+    if (task.assigneeId === userId) {
+      items.push(doneTodo('assigned', task.title, `交辦人：${userLabel(task.assignerId)}`, task.doneAt, { type: 'task', id: task.id }))
+    }
+    // 我交辦出去、我確認完成的
+    if (task.assignerId === userId) {
+      items.push(doneTodo('confirm', task.title, `已確認 ${userLabel(task.assigneeId)} 的回報`, task.doneAt, { type: 'task', id: task.id }))
+    }
+  }
+  // 我簽過的提案（不管提案通過了沒）
+  for (const proposal of proposals) {
+    const mine = proposal.signatures.find((sign) => sign.userId === userId)
+    if (mine) {
+      items.push(doneTodo('sign', proposal.title, '我已簽核', mine.at, { type: 'proposal', id: proposal.id }))
+    }
+  }
+  // 我審核過的公告：審核通過（已發布）或退回
+  for (const item of announcements) {
+    if (item.reviewerId !== userId) continue
+    if (item.rejectedAt) {
+      items.push(doneTodo('review', item.title, `已退回：${item.rejectReason}`, item.rejectedAt, { type: 'announcement', id: item.id }))
+    } else if (item.publishedAt) {
+      items.push(doneTodo('review', item.title, '審核通過', item.publishedAt, { type: 'announcement', id: item.id }))
+    }
+  }
+  // 我負責、已經結案的案件
+  for (const item of cases) {
+    if (item.assigneeId === userId && item.status === 'closed') {
+      items.push(doneTodo('my_case', item.title, '已結案', item.closedAt, { type: 'case', id: item.id }))
+    }
+  }
+  return items
+}
+
+// 我完成的事（管理人員）：交辦給我、已完成的，和我負責、已結案的案件
+function staffDoneTodos(userId) {
+  const items = []
+  for (const task of tasks) {
+    if (task.status === 'done' && task.assigneeId === userId) {
+      items.push(doneTodo('assigned', task.title, `交辦人：${userLabel(task.assignerId)}`, task.doneAt, { type: 'task', id: task.id }))
+    }
+  }
+  for (const item of cases) {
+    if (item.assigneeId === userId && item.status === 'closed') {
+      items.push(doneTodo('to_verify', item.title, '已結案', item.closedAt, { type: 'case', id: item.id }))
+    }
+  }
+  return items
+}
+
+// 取得我最近完成的事（「我的待辦」的「已完成」分頁）
+//   role 是 'committee' 或 'staff'
+// 只列最近 DONE_TODO_DAYS 天完成的，新的在前
+// 回傳的每一筆和 getMyTodos() 的 items 格式一樣，多了 doneAt（完成時間），沒有 dueAt、daysLeft
+export async function getMyDoneTodos(userId, role) {
+  await delay()
+  const raw = role === 'staff' ? staffDoneTodos(userId) : committeeDoneTodos(userId)
+  const since = addDays(MOCK_TODAY, -DONE_TODO_DAYS) // 例如 '2026-09-01'
+  return raw.filter((item) => item.doneAt >= since).toSorted((a, b) => b.doneAt.localeCompare(a.doneAt))
 }

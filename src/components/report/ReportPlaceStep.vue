@@ -1,5 +1,5 @@
 <script setup>
-// 新增通報・第 1 步：選地點
+// 新增通報・第 1 步：選地點（住戶端、管委會端的新增通報共用）
 // 先選範圍（A 棟、地下停車場…），選到的那一張卡片會展開，再選底下的地點（1F 大廳、電梯…）
 // 只列出住戶常會通報的地點（假資料裡 common: true 的），其他地方選「其他」自己填
 import { Building2Icon, CarIcon, TreesIcon, WavesIcon } from '@lucide/vue'
