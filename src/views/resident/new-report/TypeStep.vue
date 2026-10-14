@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { REPORT_TYPES } from '@/lib/report'
 
 defineProps({
-  // 管委會、管理人員代住戶登記報修時傳 true：說明改成「報修住戶」，不是「你」
+  // 管委會、管理人員代住戶登記通報時傳 true：說明改成「通報住戶」，不是「你」
   management: { type: Boolean, default: false },
 })
 
@@ -41,7 +41,7 @@ const OPTIONS = [
   <div class="space-y-4">
     <FeedbackHaobiTip
       title="這是哪一類問題？"
-      :description="`無論哪一類，${management ? '報修住戶' : '你'}的姓名與戶號都不會被其他住戶看到。`"
+      :description="`無論哪一類，${management ? '通報住戶' : '你'}的姓名與戶號都不會被其他住戶看到。`"
     />
 
     <!-- RadioGroup：一組單選，v-model 會記住選到哪一個 -->

@@ -11,7 +11,7 @@ import { REPORT_TYPES } from '@/lib/report'
 const props = defineProps({
   // 填好的通報：areaName、place、visibility、subject、description、photos
   form: { type: Object, required: true },
-  // 管委會、管理人員代住戶登記報修時傳 true：說明改成「報修住戶」、到「案件」追蹤
+  // 管委會、管理人員代住戶登記通報時傳 true：說明改成「通報住戶」、到「案件」追蹤
   management: { type: Boolean, default: false },
 })
 
@@ -22,7 +22,7 @@ const isPrivate = computed(() => props.form.visibility === 'private')
 
 // 最上面那一塊說明：這則通報誰看得到。公開和保密的說法不一樣
 const scopeText = computed(() => {
-  const who = props.management ? '報修住戶' : '你'
+  const who = props.management ? '通報住戶' : '你'
   return isPrivate.value
     ? `這則通報只有管委會與管理室看得到，不會顯示給其他住戶。${who}的姓名與戶號也不會被其他住戶看到。`
     : `這則通報會公開給全體住戶，管委會也會公開列管處理進度。${who}的姓名與戶號不會顯示。`
