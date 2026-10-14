@@ -8,6 +8,7 @@ import {
   CircleHelpIcon,
   LockIcon,
   UserRoundIcon,
+  UsersIcon,
 } from '@lucide/vue'
 import MenuItem from '@/components/app/MenuItem.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
@@ -16,7 +17,8 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getCommunity, getCurrentUser, getMyTodos } from '@/mocks/api'
+import { formatFullDate } from '@/lib/date'
+import { getCommunity, getCurrentUser, getMyAcceptedInvite, getMyTodos } from '@/mocks/api'
 // 版本號直接讀專案最外層的 package.json，改版時只要改那裡
 import { version } from '../../../package.json'
 
@@ -25,6 +27,7 @@ const loading = ref(true)
 const user = ref(null) // 我是誰
 const community = ref(null) // 社區基本資料（要顯示社區名稱）
 const todoTotal = ref(0) // 我在管委會那邊有幾件待辦（不是委員就是 0）
+const acceptedInvite = ref(null) // 我已經接受、還沒生效的管委會邀請（沒有就是 null）
 
 // 我是不是委員：是的話才有「切換至管委會」
 const isCommittee = computed(() => user.value?.roles.includes('committee'))
@@ -62,6 +65,10 @@ onMounted(async () => {
   if (isCommittee.value) {
     const todos = await getMyTodos(me.id, 'committee')
     todoTotal.value = todos.total
+  } else {
+    // 還不是委員：看看有沒有已經接受、等任期開始的邀請
+    // ?? null：假 API 沒找到會回傳 undefined，統一成 null
+    acceptedInvite.value = (await getMyAcceptedInvite(me.id)) ?? null
   }
   loading.value = false
 })
@@ -98,7 +105,7 @@ onMounted(async () => {
           <!-- 身分只是分類，用灰色徽章 -->
           <Badge variant="outline">住戶</Badge>
         </div>
-        <Separator v-if="loading || isCommittee" />
+        <Separator />
         <!-- 載入中還不知道是不是委員，先放一塊灰色的 -->
         <Skeleton v-if="loading" class="my-3.5 h-11" />
         <MenuItem
@@ -108,6 +115,24 @@ onMounted(async () => {
           to="/committee/home"
         >
           <ArrowLeftRightIcon />
+        </MenuItem>
+        <!-- 已經接受邀請、等任期開始：不能點，右邊用藍色徽章（跟你有關、但不用做什麼） -->
+        <div v-else-if="acceptedInvite" class="flex items-center gap-3 py-3.5">
+          <UsersIcon class="size-5 shrink-0" />
+          <div class="min-w-0 flex-1">
+            <p class="type-body">第 {{ acceptedInvite.term }} 屆管委會・{{ acceptedInvite.roleLabel }}</p>
+            <p class="type-date text-muted-foreground">{{ formatFullDate(acceptedInvite.startDate) }} 生效</p>
+          </div>
+          <Badge class="shrink-0">待生效</Badge>
+        </div>
+        <!-- 還不是委員：可以輸入邀請碼加入 -->
+        <MenuItem
+          v-else
+          title="加入管委會"
+          description="輸入主委給你的邀請碼，或掃描 QR Code"
+          to="/resident/me/join"
+        >
+          <UsersIcon />
         </MenuItem>
       </div>
     </section>
