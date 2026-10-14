@@ -145,10 +145,12 @@ export async function getCases(filters = {}) {
 }
 
 // 取得單一案件的詳情（管委會、管理人員用）
-export async function getCaseById(id) {
+// 有傳 userId 時，會多一個 canWithdraw：是這個人登記的、而且還沒結案，才能撤回
+export async function getCaseById(id, userId) {
   await delay()
   const item = cases.find((entry) => entry.id === id)
-  return item ? presentForManagement(item) : undefined
+  if (!item) return undefined
+  return { ...presentForManagement(item), canWithdraw: item.reporterId === userId && isOpen(item) }
 }
 
 // 某家廠商處理過的報修統計（廠商詳情頁用）
@@ -207,6 +209,9 @@ function findEditableCase(id, userId) {
   return item
 }
 
+// 撤回紀錄的標籤：看是誰通報的
+const WITHDRAW_LABELS = { resident: '住戶撤回', committee: '委員撤回', staff: '管理人員撤回' }
+
 // 修改通報（住戶用）：只能改補充說明和照片，地點和主旨送出後就不能改
 //   changes 可以傳 description（補充說明）、photos（照片或影片檔名的清單），沒傳的不會動
 // 回傳修改後的通報；不能改的話（不是自己的、已經結案）回傳 undefined
@@ -220,7 +225,8 @@ export async function updateReport(id, userId, changes) {
   return presentForResident(item, userId)
 }
 
-// 撤回通報（住戶用）：狀態改成「已取消」，並留下一筆紀錄
+// 撤回通報：狀態改成「已取消」，並留下一筆紀錄
+// 住戶撤回自己的通報；管委會、管理人員撤回自己登記的（包括代住戶登記的）
 //   reason 撤回原因，選填；有寫的話管理端的紀錄會看到
 // 撤回後不會再出現在「我的通報」，管理端的未結案列表也看不到
 // 回傳 true 代表撤回成功；不能撤回的話（不是自己的、已經結案）回傳 false
@@ -233,9 +239,10 @@ export async function withdrawReport(id, userId, reason = '') {
   item.logs.push({
     at: MOCK_NOW,
     actorId: userId,
-    label: '住戶撤回',
+    label: WITHDRAW_LABELS[item.source],
     text: reason ? `通報人撤回通報，原因：${reason}` : '通報人撤回通報',
-    residentText: '你已撤回這筆通報。',
+    // 代住戶登記的，住戶看到的是管委會或管理人員撤回的
+    residentText: item.source === 'resident' ? '你已撤回這筆通報。' : `${item.source === 'staff' ? '管理人員' : '管委會'}已撤回這筆通報。`,
   })
   return true
 }
@@ -262,7 +269,7 @@ export async function createReport(userId, input) {
     id: nextCaseId(),
     place: input.place,
     subject: input.subject,
-    title: `${areaName(input.areaId)} ${input.place}${input.subject}`,
+    title: input.subject, // 標題就是通報人自己打的「通報問題」，範圍和地點另外顯示
     areaId: input.areaId,
     category: 'other',
     source: 'resident',
@@ -300,7 +307,7 @@ export async function createRepair(userId, input, role = 'committee') {
     id: nextCaseId(),
     place: input.place,
     subject: input.subject,
-    title: `${areaName(input.areaId)} ${input.place}${input.subject}`,
+    title: input.subject, // 標題就是通報人自己打的「通報問題」，範圍和地點另外顯示
     areaId: input.areaId,
     category: 'other',
     source: role,
