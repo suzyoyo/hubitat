@@ -215,7 +215,7 @@ function toInput() {
 // 底部主要按鈕的文字
 const submitLabel = computed(() => {
   if (!isEdit) return '發布公告'
-  return original.value?.status === 'withdrawn' ? '重新發布' : '儲存修改'
+  return '儲存修改'
 })
 
 const pending = ref(false)
@@ -236,10 +236,15 @@ async function submit() {
     return
   }
   if (isEdit) {
-    toast.success(original.value.status === 'withdrawn' ? '公告已重新發布' : '公告已更新')
-  } else {
-    toast.success(result.status === 'pending' ? '已送出審核' : '公告已發布')
+    toast.success('公告已更新')
+    // 修改是從詳情頁點進來的：回到那一頁（不要再開一頁，瀏覽紀錄才不會有兩個一樣的詳情頁）
+    // 直接打網址進來的，就換成詳情頁
+    const detailPath = `/committee/announcements/${result.id}`
+    if (window.history.state?.back === detailPath) router.back()
+    else router.replace(detailPath)
+    return
   }
+  toast.success(result.status === 'pending' ? '已送出審核' : '公告已發布')
   // replace：換掉表單這一頁，按返回不會回到填好的表單
   router.replace(`/committee/announcements/${result.id}`)
 }
@@ -277,7 +282,7 @@ function cancel() {
       </EmptyMedia>
       <EmptyTitle class="type-greeting">{{ isEdit ? '這則公告不能修改' : '你沒有發布公告的權限' }}</EmptyTitle>
       <EmptyDescription class="type-body">
-        {{ isEdit ? '可能已經結束、還在審核中，或你不是發布者。' : '只有主委、副主委和管理人員可以發布公告。' }}
+        {{ isEdit ? '可能已經結束、已撤回、還在審核中，或你不是發布者。' : '只有主委、副主委和管理人員可以發布公告。' }}
       </EmptyDescription>
       <Button as-child class="mt-4">
         <RouterLink to="/committee/home">回到首頁</RouterLink>
