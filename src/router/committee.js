@@ -2,6 +2,7 @@
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 // 寫法可以參考住戶端的 resident.js
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
+import AnnouncementFormView from '@/views/committee/AnnouncementFormView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
@@ -15,6 +16,9 @@ export default {
   views: {
     home: HomeView,
     'announcements/:id': AnnouncementDetailView,
+    // 發布和修改是同一個表單
+    'announcements/new': AnnouncementFormView,
+    'announcements/:id/edit': AnnouncementFormView,
     todos: TodosView,
     tasks: TasksView,
     proposals: ProposalsView,
@@ -37,6 +41,7 @@ export default {
     { path: 'tasks/:id', title: '交辦詳情' },
     { path: 'proposals/:id', title: '提案詳情' },
     { path: 'announcements/:id', title: '公告詳情' },
+    { path: 'announcements/new', title: '發布公告' },
     { path: 'announcements/:id/edit', title: '修改公告' },
     { path: 'contracts/:id', title: '合約詳情' },
     { path: 'documents/:id', title: '文件詳情' },
