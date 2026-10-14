@@ -617,11 +617,11 @@ const latestReport = computed(() => reports.value[0])
 
 - 每一頁在**設計時**就決定用哪一種，不要因為資料多寡改變。所以選項要固定：不管有沒有資料都列出來，選到沒有資料的就顯示空狀態，不要「有資料才顯示這個選項」。
 - 篩選標籤**不帶件數**（不寫「待簽核 2」）。
-- 排序也用同一種下拉選單，例如「排序：到期日 ⌄」。
+- **排序用另一種樣子**（2026-10-14 改）：灰色小字「排序：到期日 ⌄」，沒有外框，放在列表上方**靠右**。和篩選的膠囊按鈕分開，一看就知道哪個是篩選、哪個是排序。
 
 **長相**
 
-在 Kit 裡兩種都是 `Button`（Small、膠囊形），不用另外找元件：
+篩選標籤和篩選的下拉選單在 Kit 裡都是 `Button`（Small、膠囊形），不用另外找元件。排序是設計稿手刻的，Kit 沒有：
 
 | | Kit | 程式 |
 |---|---|---|
@@ -629,11 +629,13 @@ const latestReport = computed(() => reports.value[0])
 | 篩選標籤・選中 | Button Small、藍底、膠囊形 | 同上 |
 | 下拉選單的按鈕 | Button Small、外框、膠囊形＋⌄ | `common/FilterSelect.vue`（用法見 `views/committee/TodosView.vue`） |
 | 下拉選單的選項 | Combobox 頁的選項：文字＋右邊打勾 | `ui/select`，選項放大到 44px、字 16px |
+| 排序 | 設計稿手刻：灰色小字＋深色 ⌄，靠右 | `common/SortSelect.vue`（用法見 `views/committee/VendorListView.vue`）。字 16px（`type-date`），可以點的範圍補到 44px |
 
 - 高度看起來 **32px**（Kit 的 Button Small 已改成 32px，對應程式 `Button` 的 `size="xs"`），可以點的範圍照上一節補到 44px。
 - 膠囊形在 `FilterChips`、`FilterSelect` 裡用 `rounded-full` 加，不要改 `ui/button`。
 - 字至少 **14px**，和一般按鈕一樣（`type-button`）。`xs` 預設的字是 12px（`text-xs`），太小，`FilterChips`、`FilterSelect` 要蓋掉。
-- 篩選、排序一律用這兩個元件，不要在頁面裡各自拼，所有列表頁的篩選才會長得一樣。
+- 篩選、排序一律用這三個元件，不要在頁面裡各自拼，所有列表頁的篩選才會長得一樣。
+- 篩選標籤要和設計稿一樣平分、佔滿整行時，加 `fill`：`<FilterChips … fill />`（廠商名冊這樣用）。
 - 篩選標籤是單選：點已經選中的那一個，不能變成「什麼都沒選」（`toggle-group` 預設會這樣，`FilterChips` 要擋掉）。
 
 > **為什麼看起來是 32px**：篩選只是輔助，太高的話視覺比重比內容還大。可以點的範圍維持 44px，長輩一樣按得到。
