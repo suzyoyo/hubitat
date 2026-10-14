@@ -1,5 +1,5 @@
 <script setup>
-// 新增通報・第 5 步：確認送出
+// 新增通報・第 5 步：確認送出（住戶端、管委會端的新增通報共用）
 // 把前面填的內容列出來讓住戶再看一次，每一項旁邊有「修改」可以回到那一步
 import { LockIcon, MegaphoneIcon } from '@lucide/vue'
 import { computed } from 'vue'

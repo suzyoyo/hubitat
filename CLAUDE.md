@@ -73,7 +73,7 @@
   - 問候語「早安／午安／晚安」的規則在 `src/lib/date.js` 的 `greetingWord()`，住戶端和管委會端首頁共用（2026-10-13）
   - 還沒處理的小事：公告卡片橫向排列時，內容少的卡片底部會多一塊空白；「查看全部待辦事項」按鈕在載入中和沒有待辦時也會顯示
 - ✅ 住戶端「新增通報」流程完成（2026-10-13，分支 `resident/new-report`）：`src/views/resident/NewReportView.vue`，網址 `/resident/reports/new`（右下角「通報」按鈕）
-  - 五步：1 選地點 → 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出，加上兩個完成頁（送出、我也遇到了）。每一步的畫面在 `src/views/resident/new-report/`，`NewReportView.vue` 負責記住填到一半的資料、決定顯示哪一步
+  - 五步：1 選地點 → 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出，加上兩個完成頁（送出、我也遇到了）。每一步的畫面在 `src/components/report/`（`ReportPlaceStep`、`ReportSimilarStep`、`ReportTypeStep`、`ReportDescribeStep`、`ReportConfirmStep`、`ReportSupportedDone`，2026-10-14 從 `views/resident/new-report/` 搬過來，管委會端的新增通報也用；選類型、確認送出有 `management` 開關換成管委會的說法），送出的完成頁 `SubmittedDone` 還在 `new-report/`。`NewReportView.vue` 負責記住填到一半的資料、決定顯示哪一步
   - 第幾步記在網址上（`?step=2`），按返回會回到上一步；重新整理、或資料已經清空卻回到中間的步驟，都會回第 1 步
   - 選地點：只列出地點清單裡 `common: true` 的（住戶常會通報的），最後一個是「其他」可以自己填（例如住戶家門口，通報住戶行為時會用到）。「梯廳」和「電梯」合併成「電梯／電梯口」（2026-10-13，改的是共用的地點清單）
   - 確認是否重複：比對「同一個範圍、地點名稱一樣、公開、還沒結案」的通報，沒有就跳過這一步。假資料只有「A 棟・1F 大廳」對得上。自己通報的、已經按過「我也遇到了」的不顯示按鈕

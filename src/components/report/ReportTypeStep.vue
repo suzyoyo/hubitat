@@ -1,5 +1,5 @@
 <script setup>
-// 新增通報・第 3 步：選類型
+// 新增通報・第 3 步：選類型（住戶端、管委會端的新增通報共用）
 // 兩種選一種：公共設施問題（公開）、涉及住戶行為（保密）。這個選擇決定其他住戶看不看得到這筆通報
 import { LockIcon, UsersIcon } from '@lucide/vue'
 import FeedbackHaobiTip from '@/components/feedback/FeedbackHaobiTip.vue'
