@@ -4,7 +4,9 @@
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
+import FilesView from '@/views/committee/FilesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
+import NotificationsView from '@/views/committee/NotificationsView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TasksView from '@/views/committee/TasksView.vue'
@@ -19,7 +21,9 @@ export default {
   // 沒列在這裡的頁面，會先顯示佔位頁
   views: {
     home: HomeView,
+    notifications: NotificationsView,
     cases: CasesView,
+    files: FilesView,
     vendors: VendorsView,
     'vendors/list': VendorListView,
     'vendors/:id': VendorDetailView,
@@ -60,5 +64,15 @@ export default {
     { path: 'cases/new', title: '新增通報' },
     { path: 'files/upload', title: '上傳文件' },
     { path: 'quick-saves/new', title: '快速留存' },
+    // 「社區」分頁點進去的頁面
+    { path: 'search', title: '搜尋' },
+    { path: 'meetings', title: '會議紀錄' },
+    { path: 'resolutions', title: '決議事項' },
+    { path: 'bylaws', title: '規約' },
+    { path: 'rules', title: '社區規則與慣例' },
+    { path: 'documents', title: '法定文件' },
+    { path: 'contracts', title: '廠商合約' },
+    { path: 'equipment', title: '設備清冊' },
+    { path: 'timeline', title: '社區時間軸' },
   ],
 }

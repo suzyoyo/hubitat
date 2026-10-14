@@ -2,7 +2,7 @@
 
 // 社區基本資料
 export const community = {
-  name: '好彼社區 翠峰閣',
+  name: '翠峰閣', // 社區名稱；「好彼社區」是 App 的名字，不放進來
   address: '臺北市○○區○○路 100 號',
   buildingCount: 3, // 棟數
   householdCount: 120, // 戶數
