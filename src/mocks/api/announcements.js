@@ -137,12 +137,19 @@ export async function withdrawAnnouncement(id, userId, reason = '') {
   return true
 }
 
-// 復原撤回（管理端用）：剛撤回後按 toast 上的「復原」→ 變回已發布
+// 復原撤回（管理端用）：剛撤回後按 toast 上的「復原」→ 變回已發布，撤回時發給住戶的通知也收回
 // 只有撤回的那個人能復原；回傳 true 代表成功
 export async function restoreAnnouncement(id, userId) {
   await delay()
   const item = announcements.find((entry) => entry.id === id)
   if (!item || item.status !== 'withdrawn' || item.withdrawnBy !== userId) return false
+  // 撤回時發給住戶的「公告已撤回」通知收回來，住戶就不會看到一則已經不成立的通知
+  // （從後面往前刪，刪掉一筆後前面的位置不會跑掉）
+  for (let index = notifications.length - 1; index >= 0; index--) {
+    const notice = notifications[index]
+    const isWithdrawNotice = notice.link.id === id && notice.title === '公告已撤回' && notice.at === item.withdrawnAt
+    if (isWithdrawNotice) notifications.splice(index, 1)
+  }
   item.status = 'published'
   delete item.withdrawnAt
   delete item.withdrawnBy
