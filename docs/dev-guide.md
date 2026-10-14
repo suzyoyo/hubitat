@@ -635,7 +635,7 @@ const latestReport = computed(() => reports.value[0])
 - 膠囊形在 `FilterChips`、`FilterSelect` 裡用 `rounded-full` 加，不要改 `ui/button`。
 - 字至少 **14px**，和一般按鈕一樣（`type-button`）。`xs` 預設的字是 12px（`text-xs`），太小，`FilterChips`、`FilterSelect` 要蓋掉。
 - 篩選、排序一律用這三個元件，不要在頁面裡各自拼，所有列表頁的篩選才會長得一樣。
-- 篩選標籤要和設計稿一樣平分、佔滿整行時，加 `fill`：`<FilterChips … fill />`（廠商名冊這樣用）。
+- **篩選標籤一律平分、佔滿整行**（2026-10-14，照設計稿）：`FilterChips` 已經寫好，不用另外設定。標籤左右留白比較小（`px-2`），4 個標籤時「等我簽核」這種 4 個字的也放得下。
 - 篩選標籤是單選：點已經選中的那一個，不能變成「什麼都沒選」（`toggle-group` 預設會這樣，`FilterChips` 要擋掉）。
 
 > **為什麼看起來是 32px**：篩選只是輔助，太高的話視覺比重比內容還大。可以點的範圍維持 44px，長輩一樣按得到。
