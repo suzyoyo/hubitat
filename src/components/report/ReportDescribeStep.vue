@@ -1,5 +1,5 @@
 <script setup>
-// 新增通報・第 4 步：描述問題
+// 新增通報・第 4 步：描述問題（住戶端、管委會端的新增通報共用）
 // 通報問題（標題，必填）、補充說明（選填）、現場照片或影片（選填，最多 3 個）
 import { MapPinIcon } from '@lucide/vue'
 import FeedbackHaobiTip from '@/components/feedback/FeedbackHaobiTip.vue'
