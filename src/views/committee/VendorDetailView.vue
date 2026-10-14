@@ -141,15 +141,14 @@ function telLink(phone) {
         </div>
       </section>
 
-      <!-- 聯絡窗口：可以直接撥號 -->
+      <!-- 聯絡窗口：每一張整張都是打電話的連結（和廠商分頁的聯絡清單一樣） -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
-        <div class="flex items-baseline justify-between gap-2">
-          <h2 class="type-card-title text-foreground">聯絡窗口</h2>
-          <p class="type-date text-muted-foreground">點電話直接通話</p>
-        </div>
-        <div
+        <h2 class="type-card-title text-foreground">聯絡窗口</h2>
+        <a
           v-for="contact in vendor.contacts"
           :key="contact.phone"
+          :href="telLink(contact.phone)"
+          :aria-label="`打電話給${contact.name}，${contact.phone}`"
           class="flex items-center gap-3 rounded-lg bg-muted p-3"
         >
           <div class="min-w-0 flex-1">
@@ -160,14 +159,11 @@ function telLink(phone) {
             </p>
             <p class="type-date text-muted-foreground">{{ contact.phone }}</p>
           </div>
-          <a
-            :href="telLink(contact.phone)"
-            :aria-label="`打電話給${contact.name}`"
-            class="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card"
-          >
+          <!-- 電話圖示：提示點了會打電話（整張已經是連結，這裡只是圖示） -->
+          <span class="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card">
             <PhoneCallIcon class="size-5" />
-          </a>
-        </div>
+          </span>
+        </a>
       </section>
 
       <!-- 合約資訊 -->
