@@ -2,6 +2,7 @@
 import { ANNOUNCEMENT_TYPES, announcements } from '../data/announcements'
 import { areaName } from './community'
 import { MOCK_NOW, delay, omit } from './helpers'
+import { COMMITTEE_TITLES } from '../data/users'
 import { findUser, userLabel } from './users'
 
 // 這則公告需不需要審核
@@ -92,11 +93,59 @@ export async function getManagedAnnouncements(status) {
     .map((item) => present(item, 'committee'))
 }
 
+// 這個人能不能修改、撤回這則公告：發布者本人，或是主委、副主委
+function canManage(item, userId) {
+  const user = findUser(userId)
+  if (!user) return false
+  if (item.authorId === userId) return true
+  return COMMITTEE_TITLES[user.committeeTitle]?.canReviewAnnouncement ?? false
+}
+
 // 取得單一公告的詳情
-export async function getAnnouncementById(id, role = 'resident') {
+//   userId 可以不傳；有傳的話（管理端用）會多兩個欄位，告訴畫面要放哪些按鈕：
+//     canWithdraw 能不能撤回：已發布、還沒結束
+//     canEdit     能不能修改：已發布或已撤回、還沒結束（已撤回的是「修改並重新發布」）
+//   兩個都要是發布者本人，或是主委、副主委
+export async function getAnnouncementById(id, role = 'resident', userId) {
   await delay()
   const item = announcements.find((entry) => entry.id === id)
-  return item ? present(item, role) : undefined
+  if (!item) return undefined
+  const result = present(item, role)
+  if (userId) {
+    const allowed = canManage(item, userId) && !result.hasEnded
+    result.canWithdraw = allowed && item.status === 'published'
+    result.canEdit = allowed && ['published', 'withdrawn'].includes(item.status)
+  }
+  return result
+}
+
+// 撤回公告（管理端用）：已發布、還沒結束的公告 → 已撤回，住戶就看不到了
+//   reason 撤回原因，選填
+// 回傳 true 代表撤回成功；不能撤回的話（沒有權限、不是已發布、已經結束）回傳 false
+// 撤回只存在記憶體，重新整理網頁會變回原本的假資料
+export async function withdrawAnnouncement(id, userId, reason = '') {
+  await delay()
+  const item = announcements.find((entry) => entry.id === id)
+  if (!item || item.status !== 'published' || item.endAt < MOCK_NOW) return false
+  if (!canManage(item, userId)) return false
+  item.status = 'withdrawn'
+  item.withdrawnAt = MOCK_NOW
+  item.withdrawnBy = userId
+  if (reason) item.withdrawReason = reason
+  return true
+}
+
+// 復原撤回（管理端用）：剛撤回後按 toast 上的「復原」→ 變回已發布
+// 只有撤回的那個人能復原；回傳 true 代表成功
+export async function restoreAnnouncement(id, userId) {
+  await delay()
+  const item = announcements.find((entry) => entry.id === id)
+  if (!item || item.status !== 'withdrawn' || item.withdrawnBy !== userId) return false
+  item.status = 'published'
+  delete item.withdrawnAt
+  delete item.withdrawnBy
+  delete item.withdrawReason
+  return true
 }
 
 // 取得緊急標示使用紀錄：誰在什麼時候把公告標成「緊急」
