@@ -213,6 +213,8 @@ async function submit() {
               清除
             </button>
           </div>
+          <!-- 那一戶的住戶看得到這筆通報；保密的通報填成被檢舉的那一戶，對方就會看到內容（PR #37 suzy 提醒） -->
+          <p class="type-date text-muted-foreground">請選請你登記的那一戶，那一戶的住戶可以追蹤進度。</p>
           <div class="grid grid-cols-3 gap-2">
             <!-- 三個下拉選單；看起來 40px 高，after 往上下各補 2px，可以點的範圍是 44px -->
             <Select v-model="form.building">
