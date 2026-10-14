@@ -9,6 +9,9 @@ import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TasksView from '@/views/committee/TasksView.vue'
 import TodosView from '@/views/committee/TodosView.vue'
+import VendorDetailView from '@/views/committee/VendorDetailView.vue'
+import VendorListView from '@/views/committee/VendorListView.vue'
+import VendorsView from '@/views/committee/VendorsView.vue'
 
 export default {
   // 已經做好的畫面：「網址」對應「畫面」
@@ -17,6 +20,9 @@ export default {
   views: {
     home: HomeView,
     cases: CasesView,
+    vendors: VendorsView,
+    'vendors/list': VendorListView,
+    'vendors/:id': VendorDetailView,
     'cases/:id': CaseDetailView,
     'announcements/:id': AnnouncementDetailView,
     todos: TodosView,
@@ -38,6 +44,10 @@ export default {
     { path: 'meetings/:id', title: '會議詳情' },
     // 待辦點進去的詳情頁
     { path: 'cases/:id', title: '案件詳情' },
+    { path: 'vendors/list', title: '廠商名冊' },
+    { path: 'vendors/new', title: '新增廠商' },
+    { path: 'vendors/:id', title: '廠商詳細' },
+    { path: 'equipment/:id', title: '設備詳情' },
     { path: 'tasks/:id', title: '交辦詳情' },
     { path: 'proposals/:id', title: '提案詳情' },
     { path: 'announcements/:id', title: '公告詳情' },
