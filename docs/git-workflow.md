@@ -7,13 +7,14 @@
 ## 目錄
 
 1. [分工](#1-分工)
-2. [四條規則](#2-四條規則)
+2. [五條規則](#2-五條規則)
 3. [先懂三個詞](#3-先懂三個詞)
 4. [只做一次的設定](#4-只做一次的設定)
-5. [每做一個頁面的流程](#5-每做一個頁面的流程)
-6. [幫對方看 PR](#6-幫對方看-pr)
-7. [commit 訊息怎麼寫](#7-commit-訊息怎麼寫)
-8. [遇到狀況怎麼辦](#8-遇到狀況怎麼辦)
+5. [改自己那一端的流程](#5-改自己那一端的流程)
+6. [改共用的東西的流程](#6-改共用的東西的流程)
+7. [幫對方看 PR](#7-幫對方看-pr)
+8. [commit 訊息怎麼寫](#8-commit-訊息怎麼寫)
+9. [遇到狀況怎麼辦](#9-遇到狀況怎麼辦)
 
 ---
 
@@ -21,41 +22,48 @@
 
 依三端切，一人負責一端：
 
-| 誰 | 負責 | 主要會改的地方 |
+| 誰 | 負責 | 自己那一端的檔案 |
 |---|---|---|
-| suzy | 住戶端 | `src/views/resident/`、`src/router/resident.js` |
-| 013 | 管委會端 | `src/views/committee/`、`src/router/committee.js` |
+| suzy | 住戶端 | `src/views/resident/`、`src/router/resident.js`，以及只有住戶端在用的元件 |
+| 013 | 管委會端 | `src/views/committee/`、`src/router/committee.js`，以及只有管委會端在用的元件 |
 | 先不分配 | 管理人員端 | 它和管委會端的分頁相同，等管委會端做出幾頁後，再看哪些畫面可以共用 |
 
 > **為什麼依三端切**：路由和資料夾已經依三端分開，這樣切兩人幾乎不會改到同一個檔案，合併時不容易衝突。
 
 ### 共用的東西
 
-| 東西 | 誰負責 | 另一個人要改時 |
-|---|---|---|
-| 設計 Token（`src/style.css`） | suzy | 直接改 `main`，改完在群組說一聲 |
-| 三端設定與外框（`src/config/roles.js`、`src/layouts/`、`src/components/app/` 的外框） | suzy | 直接改 `main`，改完在群組說一聲 |
-| 基礎元件（`src/components/ui/`） | suzy | 直接改 `main`，改完在群組說一聲 |
-| 假資料（`src/mocks/`）、共用小工具（`src/lib/`） | suzy | 直接改 `main`，改完在群組說一聲 |
-| 產品元件（`src/components/report/`、`notice/`、`meeting/` 等） | 誰先用到誰做 | 動手前在群組說一聲「我要做 XXX 元件」，避免兩人各做一個 |
-| 規格文件（`docs/`） | 兩人都可以改 | 改規則要對方同意；同意後直接改 `main` |
+兩端都會用到、改了可能讓對方的頁面壞掉的東西：
 
-共用的東西不用開 PR（2026-10-13 起），但不要和自己頁面的修改混在同一個分支裡：在 `main` 上改、commit、push，再回到自己的分支把 `main` 合進來。
+| 東西 | 誰負責 |
+|---|---|
+| 設計 Token（`src/style.css`） | suzy |
+| 三端設定與外框（`src/config/roles.js`、`src/layouts/`、`src/components/app/` 的外框） | suzy |
+| 路由的組合（`src/router/index.js`） | suzy |
+| 基礎元件（`src/components/ui/`） | suzy |
+| 假資料（`src/mocks/`）、共用小工具（`src/lib/`） | suzy |
+| 套件（`package.json`） | suzy |
+| 兩端都在用的產品元件（例如 `notice/NoticeDetailDialog`、`common/FilterChips`） | 誰先做誰負責 |
+| 規格文件（`docs/`）、`CLAUDE.md` 裡的規則 | 兩人一起 |
 
-> **為什麼要說一聲**：共用檔案會影響對方的頁面。對方知道你改了什麼，畫面出問題時才知道從哪裡找。
+- 不管誰負責，**另一個人要改時都開 PR 給負責的人 review**，流程見[第 6 節](#6-改共用的東西的流程)。負責的人改自己負責的東西，一樣要開 PR 給對方看，因為對方的頁面也在用。
+- 產品元件本來只有一端在用，另一端也要用時，就變成共用的東西。動手做新元件前先在群組說一聲「我要做 XXX 元件」，避免兩人各做一個。
+- 不確定算不算共用的時候，當作共用的。
+
+> **為什麼共用的東西要先 review**：自己那一端的檔案，改壞了只有自己的頁面壞掉。共用的東西改壞了，對方的頁面也會跟著壞，而且對方不知道從哪裡找起。
 
 ---
 
-## 2. 四條規則
+## 2. 五條規則
 
-2026-10-13 起改成這樣，目的是不用互相等，做得比較快：
+2026-10-14 起改成這樣。原則是：**只影響自己的就求快，會影響對方的才 review**。
 
-1. **頁面一頁一個分支，做完就合進 `main`。** 開 PR、自己合併，不用等對方 review。不要等全部做完才一起合，衝突會越積越多。
-2. **共用的東西直接改 `main`，改完在群組說一聲。** 見[第 1 節的「共用的東西」](#共用的東西)。
-3. **合併後對方有空再看。** 看到問題就留言，或開一個新的分支修。
-4. **每次開始工作前，先拿最新的 `main`。** 開新分支前、對方說改了共用的東西時，都要拿一次。
+1. **自己那一端的檔案，直接在 `main` 上 commit、push。** 不開分支、不開 PR，也不用對方 review。流程見[第 5 節](#5-改自己那一端的流程)。
+2. **共用的東西，開分支、開 PR 給對方 review，對方同意了才合併。** 一個 PR 只做一件事，說明寫清楚目的，對方才看得快。流程見[第 6 節](#6-改共用的東西的流程)。
+3. **一次 push 只放同一種東西。** 自己那一端的修改和共用的東西不要混在一起：共用的部分要先 review，混在一起就整包都得等。
+4. **每次開始工作前、push 之前，先拿最新的 `main`。** 兩個人都直接 push 到 `main`，不先拿的話 push 會被擋下來。
+5. **`main` 要一直是可以正常執行的版本。** push 到 `main` 或合併 PR 之前，先跑 `npm run build` 確認沒有錯誤。
 
-不管哪一條，`main` 都要是「可以正常執行」的版本：合併或 push 到 `main` 之前，先跑 `npm run build` 確認沒有錯誤。
+對方直接 push 到 `main` 的東西，有空時可以看一下 commit 紀錄（GitHub 的 **Commits**），看到問題就在群組說，或自己修。
 
 ---
 
@@ -105,9 +113,9 @@ git config --global user.email "你註冊 GitHub 的信箱"
 
 ---
 
-## 5. 每做一個頁面的流程
+## 5. 改自己那一端的流程
 
-以「suzy 要做住戶端的我的通報頁」為例。
+以「suzy 要做住戶端的我的通報頁」為例。全程都在 `main` 上。
 
 ### 步驟 1：拿最新的 main
 
@@ -124,33 +132,7 @@ git pull
 
 如果終端機提到 `package.json` 有變動，再跑一次 `npm install`。
 
-### 步驟 2：開一個新分支
-
-```bash
-git switch -c resident/reports
-```
-
-`-c` 是 create，意思是「建立一個新分支並切換過去」。
-
-**分支命名：`哪一端/頁面`**，全小寫英文，和網址一致。
-
-| 要做的事 | 分支名稱 |
-|---|---|
-| 住戶端・我的通報 | `resident/reports` |
-| 管委會端・首頁 | `committee/home` |
-| 改共用的東西 | 不用開分支，直接在 `main` 改（見[第 1 節](#共用的東西)） |
-| 改文件 | `docs/` 開頭，例如 `docs/update-dev-guide` |
-| 合併後照對方的意見修改 | `fix/` 開頭，例如 `fix/report-card-spacing` |
-
-想確認自己現在在哪個分支：
-
-```bash
-git status
-```
-
-第一行會寫 `On branch resident/reports`。VS Code 左下角也會顯示。
-
-### 步驟 3：寫程式，分段 commit
+### 步驟 2：寫程式，分段 commit
 
 照 [dev-guide.md 第 4 節](dev-guide.md#4-寫一個新頁面的步驟)做頁面。每完成一個小段落就 commit 一次，不用等全部做完。
 
@@ -160,10 +142,12 @@ git status
 git status
 ```
 
-把要存的檔案加進來（`.` 代表全部）：
+確認清單裡**只有自己那一端的檔案**。出現共用的東西（例如 `src/mocks/`）的話，那部分要另外走[第 6 節](#6-改共用的東西的流程)，先不要加進來。
+
+把要存的檔案一個一個加進來：
 
 ```bash
-git add .
+git add src/views/resident/ReportsView.vue src/router/resident.js
 ```
 
 存成一個版本：
@@ -172,61 +156,40 @@ git add .
 git commit -m "feat: add resident reports page"
 ```
 
-`git add .` 之前先看一眼 `git status` 的清單，確認沒有不該放進去的檔案（例如吉祥物原圖、自己的筆記）。
+不要用 `git add .`（全部加進來），容易把共用的東西、吉祥物原圖、自己的筆記一起放進去。
 
-### 步驟 4：push 到 GitHub
+### 步驟 3：push 到 GitHub
 
-這個分支第一次 push：
+做完一個段落、通過 [dev-guide.md 的檢查清單](dev-guide.md#步驟-6交出去之前自己檢查)後：
 
 ```bash
-git push -u origin resident/reports
+git pull
 ```
 
-之後同一個分支再 push，只要：
+```bash
+npm run build
+```
 
 ```bash
 git push
 ```
 
-還沒做完也可以 push，當作備份。
+- 先 `git pull`：對方可能剛 push 了新東西，不先拿的話 push 會被擋下來（見[第 9 節](#push-被擋下來)）。
+- 再 `npm run build`：確認合在一起之後還是可以正常執行。
 
-### 步驟 5：開 PR
+不用等整頁做完才 push，做完一個段落就可以 push。
 
-做完並通過 [dev-guide.md 的檢查清單](dev-guide.md#步驟-6交出去之前自己檢查)後：
+### 步驟 4：在群組說一聲
 
-1. 打開 GitHub 的 repo 頁面，上方會出現黃色提示「resident/reports had recent pushes」，按 **Compare & pull request**。
-2. 填寫標題和說明（格式見下方）。
-3. 按 **Create pull request**。不用選 Reviewers。
-4. 在群組跟對方說一聲，貼上 PR 的連結，對方有空再看。
+做完一頁時，在群組說「我做完 XXX 頁了」，附上網址和截圖。對方有空再看，看到問題就在群組說，或自己修。
 
-**PR 標題**：和 commit 訊息一樣的寫法，例如 `feat: add resident reports page`。
+---
 
-**PR 說明**照這個格式寫：
+## 6. 改共用的東西的流程
 
-```markdown
-## 做了什麼
-住戶端「我的通報」頁，列出進行中和已完成的通報。
+以「013 要在假資料加一個函式」為例。
 
-## 怎麼看
-打開 /resident/reports
-
-## 截圖
-（貼上手機寬度的截圖）
-
-## 要注意的地方
-- 新增了 ReportCard 的 Full 版
-- 「已完成」的徽章顏色還沒定案，先用 default
-```
-
-「要注意的地方」寫這些：有沒有改到共用的檔案、有沒有和設計稿不一樣的地方、有沒有碰到[尚未定案的事](dev-guide.md#8-尚未定案的事)。沒有就寫「無」。
-
-### 步驟 6：自己合併
-
-確認 PR 的 **Files changed** 只有這次要的檔案，按 **Merge pull request**，合併後按 **Delete branch** 把 GitHub 上的分支刪掉。
-
-### 步驟 7：對方看過後，照意見修改
-
-對方是在合併**之後**才看的，所以要修改時，從最新的 `main` 開一個新分支（例如 `fix/report-card-spacing`）改，再開 PR、自己合併：
+### 步驟 1：拿最新的 main，開一個分支
 
 ```bash
 git switch main
@@ -237,24 +200,76 @@ git pull
 ```
 
 ```bash
-git switch -c fix/report-card-spacing
+git switch -c shared/announcement-api
 ```
 
-改完之後：
+`-c` 是 create，意思是「建立一個新分支並切換過去」。
+
+**分支命名**，全小寫英文：
+
+| 要做的事 | 分支名稱 |
+|---|---|
+| 改共用的程式（`mocks/`、`lib/`、`ui/`、`style.css` 等） | `shared/` 開頭，例如 `shared/announcement-api` |
+| 改文件裡的規則 | `docs/` 開頭，例如 `docs/update-dev-guide` |
+
+想確認自己現在在哪個分支：
 
 ```bash
-git add .
+git status
 ```
+
+第一行會寫 `On branch shared/announcement-api`。VS Code 左下角也會顯示。
+
+### 步驟 2：改、commit、push
+
+**一個 PR 只做一件事。** 例如「新增發布公告的假 API」和「改公告的審核規則」是兩件事，就開兩個 PR。判斷方式：PR 的標題寫得出一句話、不用「和」連起來，就是一件事。
+
+> **為什麼要拆小**：看的人要搞懂你的目的，才判斷得了會不會影響自己。一個 PR 混了好幾件事，就得一件一件拆開來想，看得慢也容易漏看。拆小了，其中一件有問題，也不會卡住其他件。
+
+和第 5 節一樣分段 commit。第一次 push 這個分支：
 
 ```bash
-git commit -m "fix: adjust report card spacing"
+git push -u origin shared/announcement-api
 ```
 
-```bash
-git push -u origin fix/report-card-spacing
+之後再 push，只要 `git push`。
+
+### 步驟 3：開 PR，請對方 review
+
+1. 打開 GitHub 的 repo 頁面，上方會出現黃色提示「shared/announcement-api had recent pushes」，按 **Compare & pull request**。
+2. 填寫標題和說明（格式見下方）。
+3. 右邊的 **Reviewers** 選對方。
+4. 按 **Create pull request**，在群組跟對方說一聲，貼上 PR 的連結。
+
+**PR 標題**：和 commit 訊息一樣的寫法，例如 `feat: add announcement create and update`。
+
+**PR 說明**照這個格式寫：
+
+```markdown
+## 做了什麼
+假 API 新增 createAnnouncement、updateAnnouncement（發布、修改公告）。
+
+## 會影響到什麼
+- 原本的函式沒有改，現有頁面不受影響
+- 撤回公告時會多發通知給住戶
+
+## 怎麼確認
+打開 /playground 最下面的「假資料」區
+
+## 要注意的地方
+- 規則寫在 data-model 公告那一節
 ```
 
-### 步驟 8：回到 main，準備下一個頁面
+說明要讓對方**不用看程式就知道**你想做什麼、為什麼。「會影響到什麼」最重要：對方要靠它判斷自己的頁面會不會壞。
+
+### 步驟 4：等對方 review，再合併
+
+- 對方按 **Approve** → 自己按 **Merge pull request**，合併後按 **Delete branch**。
+- 對方按 **Request changes** → 在**同一個分支**上照意見修改、push，PR 會自動更新，再請對方看一次。
+
+等 review 的時候，可以先做別的。如果自己那一端的頁面要用到這個還沒合併的東西，可以先在自己電腦上從這個分支繼續做，等合併後再 push 頁面的部分。
+
+### 步驟 5：回到 main
 
 ```bash
 git switch main
@@ -267,46 +282,44 @@ git pull
 刪掉自己電腦上已經合併的分支：
 
 ```bash
-git branch -d resident/reports
+git branch -d shared/announcement-api
 ```
-
-然後回到步驟 2 開下一個分支。
 
 ---
 
-## 6. 幫對方看 PR
+## 7. 幫對方看 PR
 
-對方的 PR 是合併之後才看的，不會卡住對方，有空再看就好。但最好在對方開始下一頁之前看完，問題才不會一路帶下去。
+只有共用的東西會開 PR，而且要等你看過才能合併，所以**收到就盡快看**，當天看完最好，不然會卡住對方。
 
 ### 怎麼看
 
 1. 打開 PR，點 **Files changed** 分頁，看改了哪些地方（紅色是刪掉的，綠色是新增的）。
-2. 把對方的分支抓下來實際跑跑看：
+2. 把對方的分支抓下來實際跑跑看，**特別是自己的頁面有沒有壞掉**：
 
 ```bash
 git fetch
 ```
 
 ```bash
-git switch resident/reports
+git switch shared/announcement-api
 ```
 
 ```bash
 npm run dev
 ```
 
-3. 看完後切回自己原本的分支：
+3. 看完後切回 `main`：
 
 ```bash
-git switch committee/home
+git switch main
 ```
 
 ### 看什麼
 
 不用逐行檢查，看這幾件事就好：
 
-- [ ] 畫面在手機寬度看起來正常，可以點的東西都點得到
-- [ ] 有沒有改到共用的檔案？有的話，自己的頁面有沒有受影響
+- [ ] 自己那一端用到這個東西的頁面，打開來還正常嗎
+- [ ] PR 說明的「會影響到什麼」寫得對嗎？有沒有漏掉的
 - [ ] 有沒有照 [dev-guide.md](dev-guide.md) 的規則（命名、語意色、從假 API 拿資料）
 - [ ] 有沒有看不懂的地方？看不懂就問，這也是互相學習的機會
 
@@ -314,8 +327,8 @@ git switch committee/home
 
 在 **Files changed** 分頁右上角按 **Review changes**：
 
-- **Approve**：沒問題。
-- **Request changes**：有一定要改的地方，寫清楚哪裡、為什麼。對方會開新的分支修。
+- **Approve**：沒問題，對方就可以合併。
+- **Request changes**：有一定要改的地方，寫清楚哪裡、為什麼。對方會在同一個分支上修，修完再看一次。
 - **Comment**：只是提問或建議，不擋合併。
 
 想針對某一行留言，把滑鼠移到那一行左邊，按出現的 **＋**。
@@ -324,7 +337,7 @@ git switch committee/home
 
 ---
 
-## 7. commit 訊息怎麼寫
+## 8. commit 訊息怎麼寫
 
 用英文、簡短，格式是 `類型: 做了什麼`。
 
@@ -341,21 +354,35 @@ git switch committee/home
 
 ---
 
-## 8. 遇到狀況怎麼辦
+## 9. 遇到狀況怎麼辦
 
-### 我不小心在 main 上改了東西（還沒 commit）
+### 我在 main 上改到了共用的東西（還沒 commit）
 
-直接開一個新分支，修改會跟著過去：
+先把自己那一端的部分 commit（`git add` 只加自己那一端的檔案），剩下共用的部分開一個新分支，修改會跟著過去：
 
 ```bash
-git switch -c resident/reports
+git switch -c shared/announcement-api
 ```
 
-### 我不小心在 main 上 commit 了（還沒 push）
+### 我不小心把共用的東西 commit 在 main 上了（還沒 push）
 
 先不要 push，也不要自己嘗試復原，跟對方說，一起處理。
 
-### 我做到一半，對方合併了新的東西到 main
+### push 被擋下來
+
+終端機出現 `rejected` 或 `fetch first`，代表對方在你之後 push 了新東西到 `main`。先把它拿下來，再 push 一次：
+
+```bash
+git pull
+```
+
+```bash
+git push
+```
+
+`git pull` 時如果出現衝突，照下面「出現衝突」處理。
+
+### 我在分支上做到一半，對方 push 了新東西到 main
 
 想把最新的 `main` 拿進自己的分支：
 
@@ -368,7 +395,7 @@ git pull
 ```
 
 ```bash
-git switch resident/reports
+git switch shared/announcement-api
 ```
 
 ```bash
