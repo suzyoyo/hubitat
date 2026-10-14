@@ -1,7 +1,7 @@
 <script setup>
 // 管委會端・公告詳情：一則公告的時間、地點、內容說明與發布紀錄
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import BottomCta from '@/components/app/BottomCta.vue'
 import { Badge } from '@/components/ui/badge'
@@ -30,6 +30,8 @@ import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好�
 // useRoute()：取得目前路由的資訊
 // 網址是 /committee/announcements/:id，所以 route.params.id 就是這則公告的編號
 const route = useRoute()
+// useRouter()：用來換頁（撤回後回到上一頁）
+const router = useRouter()
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
 const loading = ref(true)
@@ -73,7 +75,8 @@ function openWithdraw() {
 
 async function submitWithdraw() {
   pending.value = true
-  const ok = await withdrawAnnouncement(announcement.value.id, userId.value, withdrawReason.value.trim())
+  const id = announcement.value.id
+  const ok = await withdrawAnnouncement(id, userId.value, withdrawReason.value.trim())
   pending.value = false
   withdrawOpen.value = false
   if (!ok) {
@@ -81,24 +84,35 @@ async function submitWithdraw() {
     return
   }
   // 設計稿：toast 右邊有「復原」。多停幾秒（預設 4 秒），長輩才來得及按
+  // toast 放在 App.vue，換頁後還會留著，所以回到上一頁也按得到「復原」
   toast.success('公告已撤回，已通知住戶', {
     duration: 8000,
-    action: { label: '復原', onClick: restore },
+    action: { label: '復原', onClick: () => restore(id) },
   })
-  await reload()
+  goBack()
 }
 
-// 按 toast 上的「復原」：變回已發布
-async function restore() {
-  pending.value = true
-  const ok = await restoreAnnouncement(announcement.value.id, userId.value)
-  pending.value = false
+// 撤回後回到上一頁（寫法和頂部列的返回鍵一樣）
+// 直接打網址進來的沒有上一頁，就回管委會首頁
+function goBack() {
+  // history.state.back 是 Vue Router 記下來的「上一頁的網址」，沒有的話是 null
+  if (window.history.state?.back) {
+    router.back()
+  } else {
+    router.replace('/committee/home')
+  }
+}
+
+// 按 toast 上的「復原」：變回已發布，並回到這則公告，讓使用者看到它回來了
+// 這時候已經離開詳情頁，所以公告編號由撤回時傳進來
+async function restore(id) {
+  const ok = await restoreAnnouncement(id, userId.value)
   if (!ok) {
     toast.error('復原失敗', { description: '這則公告的狀態已經變了，請重新整理。' })
     return
   }
   toast.success('已復原公告')
-  await reload()
+  router.push(`/committee/announcements/${id}`)
 }
 
 // 狀態徽章的顏色（dev-guide 第 5 節管理端的規則）
@@ -244,7 +258,8 @@ const publishRows = computed(() => {
       <!-- 撤回確認彈窗：平常看不到，withdrawOpen 變成 true 才會出現（長相和撤回通報的彈窗一樣） -->
       <Dialog v-model:open="withdrawOpen">
         <!-- 沒有右上角的叉叉，用「取消」關閉；點彈窗外面也可以關 -->
-        <DialogContent :show-close-button="false" class="gap-3.5 p-5">
+        <!-- @open-auto-focus.prevent：打開時不要自動把游標放進輸入框（不然手機的鍵盤會馬上跳出來），點了輸入框才開始打字 -->
+        <DialogContent :show-close-button="false" class="gap-3.5 p-5" @open-auto-focus.prevent>
           <!-- 結尾的 ! 是「一定要用這個」：DialogTitle 本身有預設的字級，要蓋過它 -->
           <DialogTitle class="type-card-title!">撤回這則公告？</DialogTitle>
           <DialogDescription class="type-body!">
