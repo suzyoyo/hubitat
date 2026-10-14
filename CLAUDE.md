@@ -18,7 +18,7 @@
 ## 工作方式（重要）
 1. **一次只做一步**，做完說明結果與如何驗證
 2. 等我確認沒問題，**才 commit**
-3. **照 `docs/git-workflow.md` 的流程**（2026-10-13 起）：頁面一頁開一個分支（例如 `resident/reports`），做完開 PR、**自己合併**，對方合併後有空再看；共用的東西（`style.css`、`ui/`、`mocks/`、`lib/` 等）和文件直接改 `main`，改完在群組說一聲。Claude 幫我做事時也照這個流程
+3. **照 `docs/git-workflow.md` 的流程**（2026-10-14 起）：**一頁一個分支**（例如 `resident/meetings`）。做完依情況合進 `main`：很小的修改（只改住戶端的一兩個檔案，例如改字、修小 bug）不開 PR，在本機 `git merge --no-edit` 合進 `main` 後 push；一般的頁面、功能比較大的開 PR、**自己合併**；動到共用的東西（`style.css`、`ui/`、`mocks/`、`lib/`、兩端都在用的元件、文件裡的規則等）或對方的元件，另外開 `shared/` 或 `docs/` 分支、開 PR，**等對方同意才合併**。頁面和共用的東西不要放在同一個分支。`component-map.md` 的狀態、本檔的「目前進度」跟著頁面的分支走。Claude 幫我做事時也照這個流程
 4. 寫程式照 `docs/dev-guide.md`；做完元件要更新 `docs/component-map.md` 的狀態，放在同一個分支
 5. Commit 訊息用英文、簡短（例如 `chore: add tailwindcss`）
 6. 回覆使用繁體中文
