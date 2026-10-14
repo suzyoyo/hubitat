@@ -1,5 +1,5 @@
 <script setup>
-// 管委會端・我的：個人資料、身分、交接與設定（主委才有）、顯示設定、系統與支援、登出、版本
+// 管委會端・我的：個人資料、身分、交接與設定（主委、副主委才有）、顯示設定、系統與支援、登出、版本
 // 設計稿「管委會端-我的（換屆版）」1241:16255。版面和住戶端的「我的」頁（views/resident/MeView.vue）一致
 import { computed, onMounted, ref, watch } from 'vue'
 import {
