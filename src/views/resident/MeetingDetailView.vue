@@ -4,11 +4,13 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { ArrowUpIcon, DownloadIcon, LockIcon, SearchIcon, XIcon } from '@lucide/vue'
+import AppMessage from '@/components/app/AppMessage.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import ArchiveSearchResultBar from '@/components/archive/ArchiveSearchResultBar.vue'
 import MeetingCase from '@/components/meeting/MeetingCase.vue'
 import MeetingHead from '@/components/meeting/MeetingHead.vue'
 import MeetingHighlight from '@/components/meeting/MeetingHighlight.vue'
+import MessageSheetContent from '@/components/message/MessageSheetContent.vue'
 import { Accordion } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -16,7 +18,7 @@ import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getCurrentUser, getMeetingById } from '@/mocks/api'
+import { MEETING_COMMENT_MAX, createMeetingComment, getCurrentUser, getMeetingById } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 // 網址是 /resident/meetings/:id，所以 route.params.id 就是這場會議的編號
@@ -26,6 +28,7 @@ const route = useRoute()
 const loading = ref(true)
 // 這場會議。找不到時（編號不存在，或是還沒發布給住戶）假 API 會回傳 undefined
 const meeting = ref(null)
+const userId = ref('') // 現在的住戶，留言時要用
 const currentTab = ref('summary') // 目前選到的分頁：'summary' 重點摘要 / 'full' 全文記錄
 
 // 兩個分頁
@@ -37,6 +40,7 @@ const tabs = [
 // onMounted：畫面一出現就去拿資料
 onMounted(async () => {
   const user = await getCurrentUser('resident')
+  userId.value = user.id
   meeting.value = await getMeetingById(route.params.id, 'resident', user.id)
   // 案由卡片一開始全部展開（長輩不一定知道要點開）
   if (meeting.value) openAllCases()
@@ -186,6 +190,30 @@ function backToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+// ── 留言給管委會 ──────────────────────────────────────
+
+const commentOpen = ref(false) // 留言抽屜是開還是關
+const commentPending = ref(false) // 留言送出中
+const commentSent = ref(false) // 留言送出成功了沒
+
+// 按右下角的「留言」：每次打開都從「輸入中」開始
+function openComment() {
+  commentSent.value = false
+  commentOpen.value = true
+}
+
+async function submitComment(text) {
+  commentPending.value = true
+  const comment = await createMeetingComment(meeting.value.id, userId.value, text)
+  commentPending.value = false
+  // 假 API 回傳 undefined 代表沒送成功（例如會議已經不公開了）
+  if (!comment) {
+    toast.error('留言沒有送出', { description: '請稍後再試一次' })
+    return
+  }
+  commentSent.value = true
+}
+
 // 議案的編號：第 1 個是 '01'，第 12 個是 '12'
 function agendaNumber(index) {
   return String(index + 1).padStart(2, '0')
@@ -199,7 +227,8 @@ function download() {
 </script>
 
 <template>
-  <div class="space-y-6 px-5 pt-4 pb-8">
+  <!-- pb-32：右下角的「留言」按鈕會蓋住最下面的內容，多留一點空間 -->
+  <div class="space-y-6 px-5 pt-4 pb-32">
     <!-- 載入中 -->
     <template v-if="loading">
       <Skeleton class="h-[110px] rounded-xl" />
@@ -384,15 +413,38 @@ function download() {
       </Tabs>
     </template>
 
-    <!-- 回到頂端：往下捲之後才出現，固定在右下角 -->
-    <button
-      v-if="showBackToTop"
-      type="button"
-      aria-label="回到頂端"
-      class="fixed right-5 bottom-6 z-10 flex size-11 items-center justify-center rounded-full border bg-card shadow-card"
-      @click="backToTop"
+    <!-- 右下角的按鈕：「回到頂端」在上、「留言」在下，固定在畫面上 -->
+    <!-- 外層和頁面內容一樣寬（max-w-md、置中）；pointer-events-none：外層的空白處不擋住後面的內容，按鈕自己再打開 -->
+    <!-- pr-[27px]、pb：和其他頁面右下角的「通報」按鈕同一個位置 -->
+    <div
+      v-if="meeting"
+      class="pointer-events-none fixed inset-x-0 bottom-0 z-10 mx-auto flex max-w-md flex-col items-end pr-[27px] pb-[max(20px,env(safe-area-inset-bottom))]"
     >
-      <ArrowUpIcon class="size-5" />
-    </button>
+      <div class="flex flex-col items-center gap-3 *:pointer-events-auto">
+        <!-- 回到頂端：往下捲之後才出現 -->
+        <button
+          v-if="showBackToTop"
+          type="button"
+          aria-label="回到頂端"
+          class="flex size-11 items-center justify-center rounded-full border bg-card shadow-card"
+          @click="backToTop"
+        >
+          <ArrowUpIcon class="size-5" />
+        </button>
+        <AppMessage @click="openComment" />
+      </div>
+    </div>
+
+    <!-- 留言給管委會（從底部滑上來） -->
+    <MessageSheetContent
+      v-if="meeting"
+      v-model:open="commentOpen"
+      :meeting-title="meeting.title"
+      :max-length="MEETING_COMMENT_MAX"
+      :pending="commentPending"
+      :sent="commentSent"
+      my-comments-path="/resident/me/comments"
+      @submit="submitComment"
+    />
   </div>
 </template>

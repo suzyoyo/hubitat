@@ -74,7 +74,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
 | `App/Drawer Content` | `app/DrawerContent.vue` | ⬜ | 從底部滑出的面板內容。外層用基礎元件 `ui/drawer` |
 | `App/Menu Item` | `app/MenuItem.vue` | ✅ | 選單的一列：圖示＋標題＋箭頭。圖示用 slot 放進去；`description` 是標題下面的灰色說明；有傳 `to` 才能點、才有箭頭。住戶端「我的」頁、管委會和管理人員的「全域新增選單」（`app/BottomNav.vue`）在用。設計稿「我的」頁的這幾列用的是基礎元件 Item，不是 `App/Menu Item`，兩個長得一樣不一樣還沒對過 |
-| `App/Message` | `app/AppMessage.vue` | ⬜ | 用途待確認，見[第 5 節](#5-需要跟設計確認的事) |
+| `App/Message` | `app/AppMessage.vue` | ✅ | 右下角圓形的「留言」按鈕（68px、半透明品牌藍），會議紀錄頁用來打開留言抽屜。只是按鈕，固定在哪裡由頁面決定，送出 `click`。圖示是設計稿的 hugeicons（`assets/icons/chat-edit.svg`），lucide 沒有一樣的 |
 | `_Drawer Slot` | ➖ | ➖ | 底線開頭是 Kit 內部用的零件，程式不用做 |
 
 ### B. 通報相關（Report/）
@@ -113,7 +113,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Calendar/Day` | ➖ | ➖ | 行事曆的單一日期。寫在 `CalendarCard.vue` 裡面即可 |
 | `Comment/Thread` | `comment/CommentThread.vue` | ⬜ | 一串留言。變體 Status：已回覆／待回覆 |
 | `Comment/Bubble` | `comment/CommentBubble.vue` | ⬜ | 一則留言。變體 From：我的留言／管委會回覆 |
-| `Message/Sheet Content` | `message/MessageSheetContent.vue` | ⬜ | 對會議留言的輸入面板。變體 State：輸入中／送出成功。外層用基礎元件 `ui/sheet` 或 `ui/drawer` |
+| `Message/Sheet Content` | `message/MessageSheetContent.vue` | ✅ | 「留言給管委會」的底部抽屜，外層的 `ui/drawer` 已經包在元件裡，用 `v-model:open` 控制開關。變體 State 用 `sent` 切換：`false` 輸入中、`true` 送出成功。傳 `meetingTitle`、`maxLength`、`pending`、`myCommentsPath`；按「確認送出」送出 `submit`（帶留言內容），真的送出是頁面的工作。拖曳把手照設計稿改成 40px 寬，`ui/drawer` 本身沒動 |
 
 ### D. 社區檔案
 
@@ -226,7 +226,7 @@ import { Button } from '@/components/ui/button'
 
 | 問題 | 說明 |
 |---|---|
-| `App/Message` 的說明是錯的 | 它的說明文字和 `App/FAB` 一模一樣（「右下角『通報』浮動按鈕」），應該是複製時沒改。要確認這個元件實際的用途 |
+| `App/Message` 的說明是錯的 | 它的說明文字和 `App/FAB` 一模一樣（「右下角『通報』浮動按鈕」），應該是複製時沒改。實際用途是會議紀錄頁右下角的「留言」按鈕（2026-10-14 確認），Kit 的說明要改 |
 | 圖示方塊有兩個 | `Archive/Icon Tile` 和 `Common/Icon Tile` 功能重複。而且 `Archive/Icon Tile` 放在「02 產品元件」區塊外面，說明寫 40×40 但實際高度是 20。建議只留 `Common/Icon Tile` |
 | 通知項目有兩個 | `Notification/Item`（住戶端）和 `Admin/Notification Item`（管委會端）。要確認是否真的需要兩種樣式 |
 | 名稱裡有中文 | `App/Bottom Nav 管委會`、`App/Bottom CTA 三按鈕`。其他元件都是英文，建議改成變體（例如 `App/Bottom Nav` 加一個 Role 變體） |
