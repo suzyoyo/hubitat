@@ -269,7 +269,8 @@ async function submit() {
 
       <SupportedDone v-else-if="step === 'supported'" :report="supportedReport" />
 
-      <TypeStep v-else-if="step === 3" v-model="form.visibility" />
+      <!-- management：說明改成「報修住戶」（要等 shared/report-steps-wording 合併才有作用） -->
+      <TypeStep v-else-if="step === 3" v-model="form.visibility" management />
 
       <DescribeStep
         v-else-if="step === 4"
@@ -279,7 +280,7 @@ async function submit() {
         :context="contextText"
       />
 
-      <ConfirmStep v-else-if="step === 5" :form="summary" @edit="goToStep" />
+      <ConfirmStep v-else-if="step === 5" :form="summary" management @edit="goToStep" />
 
       <!-- 送出後的完成頁（設計稿「管委會端-新增通報6-通報完成」） -->
       <div v-else-if="step === 'submitted'" class="space-y-4 pt-8 text-center">
