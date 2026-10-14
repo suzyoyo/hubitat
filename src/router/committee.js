@@ -43,7 +43,7 @@ export default {
     { path: 'documents/:id', title: '文件詳情' },
     { path: 'quick-saves/:id', title: '留存詳情' },
     // 全域新增選單（「＋」）的項目，新增交辦 tasks/new、發布公告 announcements/new 在上面
-    { path: 'cases/new', title: '登記報修' },
+    { path: 'cases/new', title: '新增報修' },
     { path: 'files/upload', title: '上傳文件' },
     { path: 'quick-saves/new', title: '快速留存' },
   ],
