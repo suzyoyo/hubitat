@@ -26,7 +26,7 @@ const managementTabs = [
 //   permission：誰才看得到這一項，見下面的 canUseMenuItem；沒寫就是大家都看得到
 const managementMenu = [
   { path: 'tasks/new', label: '新增交辦', icon: WrenchIcon, permission: 'assign' },
-  { path: 'cases/new', label: '新增報修', icon: PencilIcon },
+  { path: 'cases/new', label: '新增通報', icon: PencilIcon },
   { path: 'announcements/new', label: '發布公告', icon: MegaphoneIcon, permission: 'publish' },
   { path: 'files/upload', label: '上傳文件', icon: FileTextIcon },
   { path: 'quick-saves/new', label: '快速留存', icon: BookmarkIcon },

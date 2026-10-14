@@ -12,7 +12,7 @@ export default {
   // title 是還沒做好時，佔位頁上顯示的名稱
   innerPages: [
     // 全域新增選單（「＋」）的項目；管理人員不能交辦，所以沒有新增交辦
-    { path: 'cases/new', title: '新增報修' },
+    { path: 'cases/new', title: '新增通報' },
     { path: 'announcements/new', title: '發布公告' },
     { path: 'files/upload', title: '上傳文件' },
     { path: 'quick-saves/new', title: '快速留存' },
