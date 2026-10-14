@@ -82,16 +82,15 @@ const supportItems = [
 <template>
   <div class="space-y-8 px-5 pt-4">
     <!-- 個人資料：整張卡可以點，連到個人資料（還是佔位頁） -->
-    <Skeleton v-if="loading" class="h-[133px] rounded-xl" />
+    <Skeleton v-if="loading" class="h-[108px] rounded-xl" />
     <RouterLink v-else to="/committee/me/profile" class="flex items-center gap-3.5 rounded-xl bg-card p-4 shadow-card">
       <div class="flex size-14 shrink-0 items-center justify-center rounded-xl bg-muted">
         <UserRoundIcon class="size-6" />
       </div>
       <div class="min-w-0 flex-1">
         <p class="type-card-title text-heading">{{ user.displayName }}</p>
-        <!-- 社區名稱和戶號分成兩行，和住戶端一樣 -->
+        <!-- 管委會端不顯示戶號（2026-10-14 決定），只有社區名稱和任期 -->
         <p class="type-date text-muted-foreground">{{ community.name }}</p>
-        <p class="type-date text-muted-foreground">{{ user.building }} 棟 {{ user.unit }}</p>
         <p class="type-date text-muted-foreground">{{ termText }}</p>
       </div>
       <ChevronRightIcon class="size-5 shrink-0" />
