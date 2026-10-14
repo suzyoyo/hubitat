@@ -73,7 +73,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字；加上 `vertical` 按鈕改成上下排（完成頁用）。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
 | `App/Drawer Content` | `app/DrawerContent.vue` | ⬜ | 從底部滑出的面板內容。外層用基礎元件 `ui/drawer` |
-| `App/Menu Item` | `app/MenuItem.vue` | ✅ | 選單的一列：圖示＋標題＋箭頭。圖示用 slot 放進去；`description` 是標題下面的灰色說明；有傳 `to` 才能點、才有箭頭。住戶端「我的」頁在用，「全域新增選單」也會用到。設計稿「我的」頁的這幾列用的是基礎元件 Item，不是 `App/Menu Item`，兩個長得一樣不一樣還沒對過 |
+| `App/Menu Item` | `app/MenuItem.vue` | ✅ | 選單的一列：圖示＋標題＋箭頭。圖示用 slot 放進去；`description` 是標題下面的灰色說明；有傳 `to` 才能點、才有箭頭。住戶端「我的」頁、管委會和管理人員的「全域新增選單」（`app/BottomNav.vue`）在用。設計稿「我的」頁的這幾列用的是基礎元件 Item，不是 `App/Menu Item`，兩個長得一樣不一樣還沒對過 |
 | `App/Message` | `app/AppMessage.vue` | ⬜ | 用途待確認，見[第 5 節](#5-需要跟設計確認的事) |
 | `_Drawer Slot` | ➖ | ➖ | 底線開頭是 Kit 內部用的零件，程式不用做 |
 
@@ -107,8 +107,8 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | （Kit 沒有元件，設計稿是「查看詳情彈窗」） | `notice/NoticeDetailDialog.vue` | ✅ | 公告詳情彈窗，首頁和社區公告頁共用。傳 `notice`，用 `v-model:open` 控制開關。設計稿的「留言給管委會」按鈕還沒放，等留言功能做的時候再加 |
 | `Meeting/Card` | `meeting/MeetingCard.vue` | 🟡 | 變體 Type：**Summary**（首頁會議摘要）已做；**Latest**（最新會議：3 條決議重點）還沒做。重點決議的內容是灰色，和首頁公告卡一致 |
 | `Meeting/Point` | `meeting/MeetingPoint.vue` | ⬜ | 決議重點的一條：勾選圖示＋文字 |
-| `Meeting/Head` | `meeting/MeetingHead.vue` | ⬜ | 會議紀錄頁首：主辦機關、標題、日期、出席 |
-| `Meeting/Case` | `meeting/MeetingCase.vue` | ⬜ | 會議全文的案由，可展開收合。變體 State：Open／Closed。需要先加基礎元件 accordion |
+| `Meeting/Head` | `meeting/MeetingHead.vue` | ✅ | 會議紀錄頁首：「社區管理委員會」、會議名稱、日期（含星期）、出席人數。傳 `getMeetingById()` 回傳的 `meeting`。住戶端會議紀錄頁在用 |
+| `Meeting/Case` | `meeting/MeetingCase.vue` | ✅ | 會議全文的案由卡片：結果徽章（灰色）＋案由標題，點標題展開或收合內容。變體 State（Open／Closed）由外層的 `<Accordion>` 決定，不是 prop。要放在 `<Accordion type="multiple">` 裡面，傳 `section`（全文的一段）和 `value`。字級、標題列高度（78px）在元件裡調整過，`ui/accordion` 本身沒動。住戶端會議紀錄頁預設全部展開 |
 | `Calendar/Card` | `calendar/CalendarCard.vue` | ✅ | 社區行事曆卡：從這個星期日開始的兩週日期＋公告圓點（實心＝與我有關、空心＝其他）。傳 `notices`。只顯示、不能點 |
 | `Calendar/Day` | ➖ | ➖ | 行事曆的單一日期。寫在 `CalendarCard.vue` 裡面即可 |
 | `Comment/Thread` | `comment/CommentThread.vue` | ⬜ | 一串留言。變體 Status：已回覆／待回覆 |
@@ -122,7 +122,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Archive/Doc Card` | `archive/ArchiveDocCard.vue` | ⬜ | 公開文件卡：圖示方塊＋標題＋狀態徽章與日期 |
 | `Archive/Icon Tile` | ➖ | ➖ | 和 `Common/Icon Tile` 重複，見[第 5 節](#5-需要跟設計確認的事)。程式只做一個 `common/IconTile.vue` |
 | `Archive/History Record` | `archive/ArchiveHistoryRecord.vue` | ⬜ | 設備維修史的一筆：日期＋項目＋狀態徽章 |
-| `Archive/Search Result Bar` | `archive/ArchiveSearchResultBar.vue` | ⬜ | 內文搜尋結果列：「第 X／Y 處符合」＋上一處／下一處 |
+| `Archive/Search Result Bar` | `archive/ArchiveSearchResultBar.vue` | ✅ | 內文搜尋結果列：「第 X／Y 處符合「關鍵字」」＋上一處／下一處（44px 的圓形按鈕）。傳 `keyword`、`current`、`total`，按鈕送出 `prev`、`next`。住戶端會議紀錄的全文搜尋在用；搜到的字怎麼標出來在 `meeting/MeetingHighlight.vue` |
 | `Timeline/Month` | `timeline/TimelineMonth.vue` | ⬜ | 社區時間軸的月份分組列，可展開收合 |
 | `Timeline/Entry` | `timeline/TimelineEntry.vue` | ⬜ | 社區時間軸的一筆事件 |
 | `Rule/Article` | `rule/RuleArticle.vue` | ⬜ | 社區規約的一條條文 |
@@ -152,8 +152,8 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Admin/Notice Card` | `admin/AdminNoticeCard.vue` | ✅ | 變體 Type 沒有做成 prop：傳 `announcement`（`getManagedAnnouncements()` 的一筆）是公告，傳 `opinion`（`getResidentOpinions()` 的一筆）是住戶意見。住戶意見的標題用留言所在的會議名稱 |
 | `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`。變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」只是提示（2026-10-13 從滿版藍色按鈕改過來，卡片變短，也不會整頁都是主要按鈕）；「按鈕」「文字」還沒做，有頁面用到再加。期限徽章、緊急底色和 `AdminTodoCard` 一樣，規則在 `src/lib/todo.js` |
 | `Admin/Meeting Card` | `admin/AdminMeetingCard.vue` | ⬜ | 變體 State：待整理／待發布／已發布 |
-| `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ⬜ | 廠商卡 |
-| `Admin/Case Card` | `admin/AdminCaseCard.vue` | ⬜ | 案件卡 |
+| `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ✅ | 廠商卡：名稱＋合約徽章＋›、處理項目的小標籤。整張卡可以點。合約徽章：無合約紅；即將到期橘；尚未生效藍；合約內灰。管委會端「廠商名冊」在用 |
+| `Admin/Case Card` | `admin/AdminCaseCard.vue` | ✅ | 案件卡：標題＋狀態徽章＋›、地點徽章、負責人｜廠商（2026-10-14 照 Kit 改版）。整張卡可以點。狀態徽章：逾期、尚未受理紅；待驗收橘；已受理、施工中藍；已結案、已取消灰（規則在 `admin/caseStatusBadge.js`，案件詳情頁共用）。prop 叫 `item`（`case` 是 JavaScript 的保留字）。管委會端「案件」分頁在用 |
 | `Admin/Contract Card` | `admin/AdminContractCard.vue` | ⬜ | 合約卡。合約金額只有管委會看得到，管理人員端要能正常顯示沒有金額的樣子 |
 | `Admin/Doc Card` | `admin/AdminDocCard.vue` | ⬜ | 文件卡 |
 | `Admin/Notification Item` | `admin/AdminNotificationItem.vue` | ⬜ | 通知的一筆。做之前先看能不能和 `Notification/Item` 共用 |
@@ -185,7 +185,7 @@ import { Button } from '@/components/ui/button'
 | Seperator | `ui/separator` | ✅ | Kit 的頁面名稱拼錯了，程式用正確的拼法 separator |
 | Tabs | `ui/tabs` | ✅ | |
 | Textarea | `ui/textarea` | ✅ | |
-| Accordion | `accordion` | ⬜ | `Meeting/Case`、`Timeline/Month` 會用到 |
+| Accordion | `ui/accordion` | ✅ | 2026-10-14 加入，還是 shadcn-vue 原本的樣子（字是 14px），還沒照 Kit 調整。`Meeting/Case`、`Timeline/Month` 會用到，做這兩個元件時在元件裡調整字級和外框。示範在 `/playground` 的「清單」區 |
 | Alert | `alert` | ✅ | 2026-10-13 加入。已照 Kit 調整：說明的字是深色；字級照專案放大成 16px（Kit 是 14px）。圖示直接放在 `<Alert>` 裡的第一個位置。提案與簽核的「法定效力說明」、管委會首頁的「換屆交接提示」會用到 |
 | Calendar | `calendar` | ⬜ | |
 | Checkbox | `checkbox` | ⬜ | |
@@ -197,7 +197,7 @@ import { Button } from '@/components/ui/button'
 
 專案裡有、但 Kit 沒有獨立頁面的基礎元件：`empty`、`label`、`progress`、`select`、`sheet`、`skeleton`、`slider`、`sonner`、`spinner`、`stepper`。
 
-`select`（2026-10-12 加入）：點選的下拉選單，例如排序。Kit 的下拉選項在 Combobox 頁；選項預設高 28px，用的時候要放大到 44px、字 16px。篩選、排序的下拉一律用包好的 `common/FilterSelect.vue`（2026-10-13），已經放大好了，不用自己調。
+`select`（2026-10-12 加入）：點選的下拉選單，例如排序。Kit 的下拉選項在 Combobox 頁；選項預設高 28px，用的時候要放大到 44px、字 16px。篩選的下拉（選項 5 個以上）用包好的 `common/FilterSelect.vue`（2026-10-13，膠囊按鈕）；排序用 `common/SortSelect.vue`（2026-10-14，灰色小字、靠右）。兩個都已經放大好了，不用自己調。規則見 dev-guide 第 5 節「篩選」。
 
 **圖示**：Kit 有 Lucide、Tabler、HugeIcons 三套圖示的頁面，程式只裝了 Lucide（`@lucide/vue`）。設計稿上的圖示如果在 Lucide 找不到，先跟對方確認，不要另外安裝第二套。
 

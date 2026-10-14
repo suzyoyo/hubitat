@@ -617,11 +617,11 @@ const latestReport = computed(() => reports.value[0])
 
 - 每一頁在**設計時**就決定用哪一種，不要因為資料多寡改變。所以選項要固定：不管有沒有資料都列出來，選到沒有資料的就顯示空狀態，不要「有資料才顯示這個選項」。
 - 篩選標籤**不帶件數**（不寫「待簽核 2」）。
-- 排序也用同一種下拉選單，例如「排序：到期日 ⌄」。
+- **排序用另一種樣子**（2026-10-14 改）：灰色小字「排序：到期日 ⌄」，沒有外框，放在列表上方**靠右**。和篩選的膠囊按鈕分開，一看就知道哪個是篩選、哪個是排序。
 
 **長相**
 
-在 Kit 裡兩種都是 `Button`（Small、膠囊形），不用另外找元件：
+篩選標籤和篩選的下拉選單在 Kit 裡都是 `Button`（Small、膠囊形），不用另外找元件。排序是設計稿手刻的，Kit 沒有：
 
 | | Kit | 程式 |
 |---|---|---|
@@ -629,11 +629,13 @@ const latestReport = computed(() => reports.value[0])
 | 篩選標籤・選中 | Button Small、藍底、膠囊形 | 同上 |
 | 下拉選單的按鈕 | Button Small、外框、膠囊形＋⌄ | `common/FilterSelect.vue`（用法見 `views/committee/TodosView.vue`） |
 | 下拉選單的選項 | Combobox 頁的選項：文字＋右邊打勾 | `ui/select`，選項放大到 44px、字 16px |
+| 排序 | 設計稿手刻：灰色小字＋深色 ⌄，靠右 | `common/SortSelect.vue`（用法見 `views/committee/VendorListView.vue`）。字 16px（`type-date`），可以點的範圍補到 44px |
 
 - 高度看起來 **32px**（Kit 的 Button Small 已改成 32px，對應程式 `Button` 的 `size="xs"`），可以點的範圍照上一節補到 44px。
 - 膠囊形在 `FilterChips`、`FilterSelect` 裡用 `rounded-full` 加，不要改 `ui/button`。
 - 字至少 **14px**，和一般按鈕一樣（`type-button`）。`xs` 預設的字是 12px（`text-xs`），太小，`FilterChips`、`FilterSelect` 要蓋掉。
-- 篩選、排序一律用這兩個元件，不要在頁面裡各自拼，所有列表頁的篩選才會長得一樣。
+- 篩選、排序一律用這三個元件，不要在頁面裡各自拼，所有列表頁的篩選才會長得一樣。
+- **篩選標籤一律平分、佔滿整行**（2026-10-14，照設計稿）：`FilterChips` 已經寫好，不用另外設定。標籤左右留白比較小（`px-2`），4 個標籤時「等我簽核」這種 4 個字的也放得下。
 - 篩選標籤是單選：點已經選中的那一個，不能變成「什麼都沒選」（`toggle-group` 預設會這樣，`FilterChips` 要擋掉）。
 
 > **為什麼看起來是 32px**：篩選只是輔助，太高的話視覺比重比內容還大。可以點的範圍維持 44px，長輩一樣按得到。
@@ -770,17 +772,22 @@ const contracts = await getContracts('staff') // 拿到的資料不會有金額
 | commit `src/assets/IP/` 的吉祥物原圖 | 縮小後放 `src/assets/mascot/` 再用 | 原圖每張約 3MB，會讓 repo 和網頁都變得很慢 |
 | 在程式碼裡留 `console.log` | 交出去前刪掉 | 除錯用的訊息不該留在成品裡 |
 
-### 共用的檔案：改了要說
+### 共用的檔案：改之前先給對方看
 
-下面這些檔案兩個人都會用到。改的時候不用開 PR，可以直接改 `main`，但**改完要在群組說一聲**改了什麼（2026-10-13 起，見 [git-workflow.md](git-workflow.md#2-四條規則)）。不要和頁面的修改混在同一個分支裡：
+下面這些檔案兩個人都會用到。要改的時候**另外開 `shared/` 分支、開 PR 給對方 review**，對方同意了才合併（2026-10-14 起，見 [git-workflow.md](git-workflow.md#2-五條規則)）。不要和自己那一端的頁面修改混在一起：
 
 - `src/style.css`（設計 Token）
 - `src/config/roles.js`（三端的分頁設定）
 - `src/layouts/AppShell.vue` 和 `src/components/app/` 裡的外框元件
 - `src/router/index.js`
 - `src/components/ui/`
-- `src/mocks/`（新增沒關係；修改或刪除既有的要先說）
+- `src/mocks/`、`src/lib/`
 - `package.json`
+- 兩端都在用的產品元件
+- 對方那一端的檔案和元件
+- 文件裡的規則（`docs/`、`CLAUDE.md`）
+
+完整的清單和誰負責，見 [git-workflow.md 第 1 節](git-workflow.md#共用的東西)。
 
 ---
 
@@ -792,7 +799,6 @@ const contracts = await getContracts('staff') // 拿到的資料不會有金額
 |---|---|---|
 | 卡片圓角 | Kit 的卡片是 14px（`rounded-xl`）。但 `rounded-card`（20px）還留著，shadcn 的 `<Card>` 元件、角色選擇頁、playground 都在用 | 新做的產品元件用 `rounded-xl`，不要用 `rounded-card` |
 | 對比度偏低 | 白字在品牌藍上約 2 : 1、白字在「＋」按鈕的紅色上約 3 : 1，長輩可能看不清楚 | 完全照設計稿。之後要調整時只改 `style.css` 的 `:root` |
-| 管委會、管理人員的「＋」按鈕 | 設計是彈出「全域新增選單」，目前連到佔位頁 | 維持佔位頁 |
 | 管委會和管理人員共用的頁面放哪 | 兩端的分頁相同，有些頁面可能長得一樣 | 管理人員端先不做。等管委會端做出幾頁後再決定（見 [git-workflow.md](git-workflow.md#1-分工)） |
 | 用詞 | 住戶端叫「通報」，通知裡出現「報修」 | 畫面上一律用「通報」 |
 | mockup 裡手工畫的卡片 | 有些卡片不是 Kit 元件，不會跟著 Kit 變動，還沒清查 | 以 Kit 的元件為準 |
