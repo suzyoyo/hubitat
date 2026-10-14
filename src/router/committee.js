@@ -12,6 +12,7 @@ import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TasksView from '@/views/committee/TasksView.vue'
 import TodosView from '@/views/committee/TodosView.vue'
+import UrgentLogView from '@/views/committee/UrgentLogView.vue'
 import VendorDetailView from '@/views/committee/VendorDetailView.vue'
 import VendorListView from '@/views/committee/VendorListView.vue'
 import VendorsView from '@/views/committee/VendorsView.vue'
@@ -35,6 +36,7 @@ export default {
     tasks: TasksView,
     proposals: ProposalsView,
     'tasks/:id': TaskDetailView,
+    'me/urgent-log': UrgentLogView,
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
