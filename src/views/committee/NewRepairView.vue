@@ -1,6 +1,6 @@
 <script setup>
-// 管委會端・新增報修：和住戶端的新增通報同一個流程（設計稿「管委會端-新增通報」）
-//   1 選地點（上面多了「報修住戶」，可以代某一戶登記）→ 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出
+// 管委會端・新增通報：和住戶端的新增通報同一個流程（設計稿「管委會端-新增通報」）
+//   1 選地點（上面多了「通報住戶」，可以代某一戶登記）→ 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出
 // 中間每一步的畫面借用住戶端的（src/views/resident/new-report/），完成頁用管理端的說法，寫在這個檔案裡
 // 步驟記在網址上（/committee/cases/new?step=2），寫法和住戶端的 NewReportView.vue 一樣
 import { BellIcon } from '@lucide/vue'
@@ -26,7 +26,7 @@ import mascotUrl from '@/assets/mascot/happy.png' // 開心奔跑的好彼管家
 const route = useRoute()
 const router = useRouter()
 
-// ── 報修住戶的選項 ─────────────────────────────────
+// ── 通報住戶的選項 ─────────────────────────────────
 // 社區是 3 棟 120 戶：每棟 10 層、每層 4 戶。戶號的寫法和假資料一樣（'8樓之1'）
 const BUILDINGS = ['A', 'B', 'C']
 const FLOORS = Array.from({ length: 10 }, (_, index) => index + 1) // [1, 2, … 10]
@@ -39,7 +39,7 @@ const step = computed(() => {
 })
 const inFlow = computed(() => typeof step.value === 'number')
 
-// 填到一半的報修；前面幾個欄位和住戶端一樣，後面三個是報修住戶（選填）
+// 填到一半的通報；前面幾個欄位和住戶端一樣，後面三個是通報住戶（選填）
 const form = reactive({
   areaId: '',
   place: '',
@@ -80,7 +80,7 @@ onMounted(async () => {
   loading.value = false
 })
 
-// ── 報修住戶 ───────────────────────────────────
+// ── 通報住戶 ───────────────────────────────────
 // 選了幾格：0 是不代任何一戶登記；3 是選完了；1、2 是選到一半
 const unitPickedCount = computed(() => [form.building, form.floor, form.unitNumber].filter(Boolean).length)
 // 選完三格才算代這一戶登記，例如 { building: 'A', unit: '6樓之3' }
@@ -96,16 +96,16 @@ function clearUnit() {
 
 // 這一步填好了沒，決定「下一步」能不能按
 const canGoNext = computed(() => {
-  // 第 1 步：要選好地點；報修住戶不選、或三格都選完
+  // 第 1 步：要選好地點；通報住戶不選、或三格都選完
   if (step.value === 1) return form.place.trim() !== '' && unitPickedCount.value !== 1 && unitPickedCount.value !== 2
   if (step.value === 3) return form.visibility !== ''
   if (step.value === 4) return form.subject.trim() !== ''
   return true
 })
 
-// 第 1 步按鈕下面的提醒：報修住戶選到一半時
+// 第 1 步按鈕下面的提醒：通報住戶選到一半時
 const stepOneNote = computed(() =>
-  unitPickedCount.value === 1 || unitPickedCount.value === 2 ? '報修住戶要選完棟別、樓層、戶號，或都不選。' : '',
+  unitPickedCount.value === 1 || unitPickedCount.value === 2 ? '通報住戶要選完棟別、樓層、戶號，或都不選。' : '',
 )
 
 const areaName = computed(() => areas.value.find((item) => item.id === form.areaId)?.name ?? '')
@@ -152,7 +152,7 @@ async function support(report) {
   const updated = await supportReport(report.id, userId.value)
   supportingId.value = ''
   if (!updated) {
-    toast.error('送出失敗', { description: '這筆通報已經處理完了，請直接登記新的報修。' })
+    toast.error('送出失敗', { description: '這筆通報已經處理完了，請直接登記新的通報。' })
     return
   }
   supportedReport.value = updated
@@ -164,7 +164,7 @@ async function support(report) {
 const submitting = ref(false)
 // 送出後的案件，完成頁要用（查看案件、代哪一戶登記）
 const createdCase = ref(null)
-// 完成頁那一句：「已收到通報！代 A 棟 6樓之3 登記報修」；沒有代登記就是空的
+// 完成頁那一句：「已收到通報！代 A 棟 6樓之3 登記通報」；沒有代登記就是空的
 const onBehalfText = ref('')
 
 async function submit() {
@@ -178,7 +178,7 @@ async function submit() {
     photos: summary.value.photos,
     unit: unit.value ?? undefined,
   })
-  onBehalfText.value = unit.value ? `已收到通報！代 ${unit.value.building} 棟 ${unit.value.unit} 登記報修` : ''
+  onBehalfText.value = unit.value ? `已收到通報！代 ${unit.value.building} 棟 ${unit.value.unit} 登記通報` : ''
   submitting.value = false
   await router.replace({ query: { step: 'submitted' } })
   resetForm()
@@ -197,11 +197,11 @@ async function submit() {
       </div>
 
       <template v-else-if="step === 1">
-        <!-- 報修住戶（選填）：代某一戶登記。設計稿放在好彼管家提示框和地點之間，這裡放在最上面（地點那一區是住戶端的元件） -->
+        <!-- 通報住戶（選填）：代某一戶登記。設計稿放在好彼管家提示框和地點之間，這裡放在最上面（地點那一區是住戶端的元件） -->
         <fieldset class="mb-4 space-y-2">
           <div class="flex items-center justify-between">
             <legend class="flex items-center gap-2 text-base font-medium text-foreground">
-              報修住戶 <span class="type-label text-muted-foreground">選填</span>
+              通報住戶 <span class="type-label text-muted-foreground">選填</span>
             </legend>
             <!-- 有選的時候才出現，可以全部清掉 -->
             <button
@@ -269,7 +269,7 @@ async function submit() {
 
       <SupportedDone v-else-if="step === 'supported'" :report="supportedReport" />
 
-      <!-- management：說明改成「報修住戶」（要等 shared/report-steps-wording 合併才有作用） -->
+      <!-- management：說明改成「通報住戶」（要等 shared/report-steps-wording 合併才有作用） -->
       <TypeStep v-else-if="step === 3" v-model="form.visibility" management />
 
       <DescribeStep
@@ -311,7 +311,7 @@ async function submit() {
       <Button :disabled="!canGoNext" @click="goToStep(5)">下一步：確認資料</Button>
     </BottomCta>
     <BottomCta v-else-if="step === 5">
-      <Button :disabled="submitting" @click="submit">送出報修</Button>
+      <Button :disabled="submitting" @click="submit">送出通報</Button>
     </BottomCta>
     <!-- 兩個完成頁：replace，離開之後按返回不會再回到完成頁 -->
     <BottomCta v-else-if="step === 'submitted'" vertical>

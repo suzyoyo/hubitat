@@ -36,7 +36,7 @@ export default {
     { path: 'meetings/:id', title: '會議詳情' },
     // 待辦點進去的詳情頁
     { path: 'cases/:id', title: '案件詳情' },
-    { path: 'cases/new', title: '新增報修' },
+    { path: 'cases/new', title: '新增通報' },
     { path: 'tasks/:id', title: '交辦詳情' },
     { path: 'proposals/:id', title: '提案詳情' },
     { path: 'announcements/:id', title: '公告詳情' },
