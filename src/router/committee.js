@@ -37,6 +37,7 @@ export default {
     { path: 'tasks/:id', title: '交辦詳情' },
     { path: 'proposals/:id', title: '提案詳情' },
     { path: 'announcements/:id', title: '公告詳情' },
+    { path: 'announcements/:id/edit', title: '修改公告' },
     { path: 'contracts/:id', title: '合約詳情' },
     { path: 'documents/:id', title: '文件詳情' },
     { path: 'quick-saves/:id', title: '留存詳情' },
