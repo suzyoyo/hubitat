@@ -1,5 +1,6 @@
 <script setup>
 // 管委會端・廠商（底部分頁）：廠商緊急聯絡、社區內部聯絡、鑰匙清單（設計稿 1134:15888）
+// 緊急聯絡：點廠商連到廠商詳細，按電話直接撥號
 // 這一版只有「看」；「編輯」緊急聯絡和鑰匙清單之後再做
 import { ChevronRightIcon, PhoneCallIcon, SearchIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
@@ -68,11 +69,16 @@ function telLink(phone) {
         <div class="rounded-xl bg-card px-4 py-1 shadow-card">
           <template v-for="(item, index) in shownEmergency" :key="`${item.vendorId}-${item.phone}`">
             <Separator v-if="index > 0" />
-            <div class="flex items-center gap-3 py-3">
-              <div class="min-w-0 flex-1">
-                <p class="type-body-strong text-foreground">{{ item.vendorName }}</p>
-                <p class="type-date text-muted-foreground">{{ item.contactName }}・{{ item.phone }}</p>
-              </div>
+            <!-- 點廠商那一塊連到廠商詳細；右邊的電話按鈕另外撥號（連結裡面不能再放連結，所以兩個並排） -->
+            <div class="flex items-center gap-3">
+              <RouterLink :to="`/committee/vendors/${item.vendorId}`" class="flex min-w-0 flex-1 items-center gap-2 py-3">
+                <div class="min-w-0 flex-1">
+                  <p class="type-body-strong text-foreground">{{ item.vendorName }}</p>
+                  <p class="type-date text-muted-foreground">{{ item.contactName }}・{{ item.phone }}</p>
+                </div>
+                <!-- 提示這一列可以點 -->
+                <ChevronRightIcon class="size-4 shrink-0 text-muted-foreground" />
+              </RouterLink>
               <a
                 :href="telLink(item.phone)"
                 :aria-label="`打電話給${item.vendorName}`"
