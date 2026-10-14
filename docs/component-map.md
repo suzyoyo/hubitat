@@ -107,8 +107,8 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | （Kit 沒有元件，設計稿是「查看詳情彈窗」） | `notice/NoticeDetailDialog.vue` | ✅ | 公告詳情彈窗，首頁和社區公告頁共用。傳 `notice`，用 `v-model:open` 控制開關。設計稿的「留言給管委會」按鈕還沒放，等留言功能做的時候再加 |
 | `Meeting/Card` | `meeting/MeetingCard.vue` | 🟡 | 變體 Type：**Summary**（首頁會議摘要）已做；**Latest**（最新會議：3 條決議重點）還沒做。重點決議的內容是灰色，和首頁公告卡一致 |
 | `Meeting/Point` | `meeting/MeetingPoint.vue` | ⬜ | 決議重點的一條：勾選圖示＋文字 |
-| `Meeting/Head` | `meeting/MeetingHead.vue` | ⬜ | 會議紀錄頁首：主辦機關、標題、日期、出席 |
-| `Meeting/Case` | `meeting/MeetingCase.vue` | ⬜ | 會議全文的案由，可展開收合。變體 State：Open／Closed。需要先加基礎元件 accordion |
+| `Meeting/Head` | `meeting/MeetingHead.vue` | ✅ | 會議紀錄頁首：「社區管理委員會」、會議名稱、日期（含星期）、出席人數。傳 `getMeetingById()` 回傳的 `meeting`。住戶端會議紀錄頁在用 |
+| `Meeting/Case` | `meeting/MeetingCase.vue` | ✅ | 會議全文的案由卡片：結果徽章（灰色）＋案由標題，點標題展開或收合內容。變體 State（Open／Closed）由外層的 `<Accordion>` 決定，不是 prop。要放在 `<Accordion type="multiple">` 裡面，傳 `section`（全文的一段）和 `value`。字級、標題列高度（78px）在元件裡調整過，`ui/accordion` 本身沒動。住戶端會議紀錄頁預設全部展開 |
 | `Calendar/Card` | `calendar/CalendarCard.vue` | ✅ | 社區行事曆卡：從這個星期日開始的兩週日期＋公告圓點（實心＝與我有關、空心＝其他）。傳 `notices`。只顯示、不能點 |
 | `Calendar/Day` | ➖ | ➖ | 行事曆的單一日期。寫在 `CalendarCard.vue` 裡面即可 |
 | `Comment/Thread` | `comment/CommentThread.vue` | ⬜ | 一串留言。變體 Status：已回覆／待回覆 |
@@ -122,7 +122,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Archive/Doc Card` | `archive/ArchiveDocCard.vue` | ⬜ | 公開文件卡：圖示方塊＋標題＋狀態徽章與日期 |
 | `Archive/Icon Tile` | ➖ | ➖ | 和 `Common/Icon Tile` 重複，見[第 5 節](#5-需要跟設計確認的事)。程式只做一個 `common/IconTile.vue` |
 | `Archive/History Record` | `archive/ArchiveHistoryRecord.vue` | ⬜ | 設備維修史的一筆：日期＋項目＋狀態徽章 |
-| `Archive/Search Result Bar` | `archive/ArchiveSearchResultBar.vue` | ⬜ | 內文搜尋結果列：「第 X／Y 處符合」＋上一處／下一處 |
+| `Archive/Search Result Bar` | `archive/ArchiveSearchResultBar.vue` | ✅ | 內文搜尋結果列：「第 X／Y 處符合「關鍵字」」＋上一處／下一處（44px 的圓形按鈕）。傳 `keyword`、`current`、`total`，按鈕送出 `prev`、`next`。住戶端會議紀錄的全文搜尋在用；搜到的字怎麼標出來在 `meeting/MeetingHighlight.vue` |
 | `Timeline/Month` | `timeline/TimelineMonth.vue` | ⬜ | 社區時間軸的月份分組列，可展開收合 |
 | `Timeline/Entry` | `timeline/TimelineEntry.vue` | ⬜ | 社區時間軸的一筆事件 |
 | `Rule/Article` | `rule/RuleArticle.vue` | ⬜ | 社區規約的一條條文 |
@@ -150,7 +150,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 |---|---|---|---|
 | `Admin/Todo Card` | `admin/AdminTodoCard.vue` | ✅ | 待辦卡。傳 `getMyTodos()` 的一筆 `todo` 進去。變體 Type 沒有做成 prop，依 `todo.isUrgent` 自動切換；期限徽章和緊急的標示方式和 Kit 不同，見[第 4 節](#4-kit-和程式不一樣的地方)。左上角的建立日期要等 `getMyTodos()` 帶出 `createdAt` 才會顯示 |
 | `Admin/Notice Card` | `admin/AdminNoticeCard.vue` | ✅ | 變體 Type 沒有做成 prop：傳 `announcement`（`getManagedAnnouncements()` 的一筆）是公告，傳 `opinion`（`getResidentOpinions()` 的一筆）是住戶意見。住戶意見的標題用留言所在的會議名稱 |
-| `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`。變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」只是提示（2026-10-13 從滿版藍色按鈕改過來，卡片變短，也不會整頁都是主要按鈕）；「按鈕」「文字」還沒做，有頁面用到再加。期限徽章、緊急底色和 `AdminTodoCard` 一樣，規則在 `src/lib/todo.js` |
+| `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`；也可以傳 `getMyDoneTodos()` 的一筆（有 `doneAt`），會變成灰色「已完成」、寫完成時間、右下角「查看詳情」。變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」只是提示（2026-10-13 從滿版藍色按鈕改過來，卡片變短，也不會整頁都是主要按鈕）；「按鈕」「文字」還沒做，有頁面用到再加。期限徽章、緊急底色和 `AdminTodoCard` 一樣，規則在 `src/lib/todo.js` |
 | `Admin/Meeting Card` | `admin/AdminMeetingCard.vue` | ⬜ | 變體 State：待整理／待發布／已發布 |
 | `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ✅ | 廠商卡：名稱＋合約徽章＋›、處理項目的小標籤。整張卡可以點。合約徽章：無合約紅；即將到期橘；尚未生效藍；合約內灰。管委會端「廠商名冊」在用 |
 | `Admin/Case Card` | `admin/AdminCaseCard.vue` | ✅ | 案件卡：標題＋狀態徽章＋›、地點徽章、負責人｜廠商（2026-10-14 照 Kit 改版）。整張卡可以點。狀態徽章：逾期、尚未受理紅；待驗收橘；已受理、施工中藍；已結案、已取消灰（規則在 `admin/caseStatusBadge.js`，案件詳情頁共用）。prop 叫 `item`（`case` 是 JavaScript 的保留字）。管委會端「案件」分頁在用 |
@@ -197,7 +197,7 @@ import { Button } from '@/components/ui/button'
 
 專案裡有、但 Kit 沒有獨立頁面的基礎元件：`empty`、`label`、`progress`、`select`、`sheet`、`skeleton`、`slider`、`sonner`、`spinner`、`stepper`。
 
-`select`（2026-10-12 加入）：點選的下拉選單，例如排序。Kit 的下拉選項在 Combobox 頁；選項預設高 28px，用的時候要放大到 44px、字 16px。篩選、排序的下拉一律用包好的 `common/FilterSelect.vue`（2026-10-13），已經放大好了，不用自己調。
+`select`（2026-10-12 加入）：點選的下拉選單，例如排序。Kit 的下拉選項在 Combobox 頁；選項預設高 28px，用的時候要放大到 44px、字 16px。篩選的下拉（選項 5 個以上）用包好的 `common/FilterSelect.vue`（2026-10-13，膠囊按鈕）；排序用 `common/SortSelect.vue`（2026-10-14，灰色小字、靠右）。兩個都已經放大好了，不用自己調。規則見 dev-guide 第 5 節「篩選」。
 
 **圖示**：Kit 有 Lucide、Tabler、HugeIcons 三套圖示的頁面，程式只裝了 Lucide（`@lucide/vue`）。設計稿上的圖示如果在 Lucide 找不到，先跟對方確認，不要另外安裝第二套。
 

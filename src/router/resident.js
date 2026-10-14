@@ -3,6 +3,7 @@
 import AnnouncementsView from '@/views/resident/AnnouncementsView.vue'
 import HomeView from '@/views/resident/HomeView.vue'
 import JoinCommitteeView from '@/views/resident/JoinCommitteeView.vue'
+import MeetingDetailView from '@/views/resident/MeetingDetailView.vue'
 import MeView from '@/views/resident/MeView.vue'
 import NewReportView from '@/views/resident/NewReportView.vue'
 import ReportDetailView from '@/views/resident/ReportDetailView.vue'
@@ -16,6 +17,7 @@ export default {
     home: HomeView,
     me: MeView,
     'me/join': JoinCommitteeView, // 「我的」頁的「加入管委會」
+    'meetings/:id': MeetingDetailView,
     reports: ReportsView,
     'reports/:id': ReportDetailView,
     announcements: AnnouncementsView,

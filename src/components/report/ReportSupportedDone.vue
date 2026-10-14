@@ -1,5 +1,5 @@
 <script setup>
-// 新增通報・「我也遇到了」的完成頁：告訴住戶已經記錄了，不用再通報一次
+// 新增通報・「我也遇到了」的完成頁：告訴住戶已經記錄了，不用再通報一次（住戶端、管委會端的新增通報共用）
 import { BellIcon } from '@lucide/vue'
 import ReportSimilarCard from '@/components/report/ReportSimilarCard.vue'
 import mascotUrl from '@/assets/mascot/waving.png' // 坐著揮手的好彼管家
