@@ -1,21 +1,35 @@
 <script setup>
-// 管委會端・我的待辦：列出所有還沒完成的待辦，可以依類型篩選、換排序
+// 管委會端・我的待辦：「未完成」「已完成」兩個分頁，可以依類型篩選；未完成可以換排序
+// 已完成是最近 30 天我完成的事（getMyDoneTodos），2026-10-14 照設計稿補上
 import { computed, onMounted, ref } from 'vue'
 import AdminActionCard from '@/components/admin/AdminActionCard.vue'
 import FilterSelect from '@/components/common/FilterSelect.vue'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { todoLink } from '@/lib/todo'
-import { getCurrentUser, getMyTodos } from '@/mocks/api'
+import { DONE_TODO_DAYS, getCurrentUser, getMyDoneTodos, getMyTodos } from '@/mocks/api'
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
 const loading = ref(true)
 // 我的待辦：getMyTodos() 回傳 items（每一筆待辦）和 total（共幾件）
 const todos = ref({ items: [], total: 0 })
+// 最近完成的事
+const doneTodos = ref([])
+
+// 現在看哪個分頁：'open' 未完成 / 'done' 已完成
+const tab = ref('open')
+const TABS = [
+  { value: 'open', label: '未完成' },
+  { value: 'done', label: '已完成' },
+]
 
 // onMounted：畫面一出現就去拿資料
 onMounted(async () => {
   const user = await getCurrentUser('committee')
-  todos.value = await getMyTodos(user.id, 'committee')
+  // Promise.all：兩種資料同時拿
+  const [openList, doneList] = await Promise.all([getMyTodos(user.id, 'committee'), getMyDoneTodos(user.id, 'committee')])
+  todos.value = openList
+  doneTodos.value = doneList
   loading.value = false
 })
 
@@ -42,7 +56,10 @@ const sort = ref('due')
 // 篩選＋排序後要顯示的待辦
 const shownTodos = computed(() => {
   const filter = TYPE_FILTERS.find((item) => item.value === type.value)
-  const items = type.value === 'all' ? todos.value.items : todos.value.items.filter((todo) => filter.kinds.includes(todo.kind))
+  const source = tab.value === 'done' ? doneTodos.value : todos.value.items
+  const items = type.value === 'all' ? source : source.filter((todo) => filter.kinds.includes(todo.kind))
+  // 已完成的固定新的在前（getMyDoneTodos() 已經排好），不用排序選單
+  if (tab.value === 'done') return items
   // getMyTodos() 本來就照到期日排好了
   if (sort.value === 'urgent') {
     // 緊急的排前面，其他維持到期日的順序
@@ -58,9 +75,25 @@ const shownTodos = computed(() => {
 
 <template>
   <div class="space-y-3 px-5 pt-4 pb-5">
+    <!-- 未完成／已完成（樣式和住戶端「社區公告」的分頁一樣） -->
+    <Tabs v-model="tab">
+      <TabsList class="h-11! w-full rounded-xl border border-border bg-background p-1">
+        <!-- before:…：按鈕看起來大約 35px 高，用看不見的 before 往上下各補 8px，可以點的範圍超過 44px -->
+        <TabsTrigger
+          v-for="item in TABS"
+          :key="item.value"
+          :value="item.value"
+          class="text-base text-muted-foreground before:absolute before:inset-x-0 before:-inset-y-2 data-active:bg-secondary data-active:text-secondary-foreground"
+        >
+          {{ item.label }}
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
+
     <div class="grid grid-cols-2 gap-3">
       <FilterSelect v-model="type" label="類型" :options="TYPE_FILTERS" />
-      <FilterSelect v-model="sort" label="排序" :options="SORT_OPTIONS" />
+      <!-- 已完成固定新的在前，不用排序 -->
+      <FilterSelect v-if="tab === 'open'" v-model="sort" label="排序" :options="SORT_OPTIONS" />
     </div>
 
     <template v-if="loading">
@@ -68,10 +101,13 @@ const shownTodos = computed(() => {
     </template>
     <!-- 沒有任何待辦，或是選的類型剛好沒有 -->
     <div v-else-if="!shownTodos.length" class="rounded-xl bg-card p-4 shadow-card">
-      <p class="type-body text-muted-foreground">{{ type === 'all' ? '目前沒有待辦事項' : '沒有這類待辦' }}</p>
+      <p v-if="tab === 'done'" class="type-body text-muted-foreground">最近 {{ DONE_TODO_DAYS }} 天沒有完成的事</p>
+      <p v-else class="type-body text-muted-foreground">{{ type === 'all' ? '目前沒有待辦事項' : '沒有這類待辦' }}</p>
     </div>
     <template v-else>
-      <p class="type-date text-muted-foreground">共 {{ shownTodos.length }} 件待辦</p>
+      <p class="type-date text-muted-foreground">
+        {{ tab === 'done' ? `最近 ${DONE_TODO_DAYS} 天完成 ${shownTodos.length} 件` : `共 ${shownTodos.length} 件待辦` }}
+      </p>
       <AdminActionCard v-for="todo in shownTodos" :key="todo.id" :todo="todo" :to="todoLink(todo)" />
     </template>
   </div>

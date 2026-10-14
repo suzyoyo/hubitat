@@ -150,7 +150,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 |---|---|---|---|
 | `Admin/Todo Card` | `admin/AdminTodoCard.vue` | ✅ | 待辦卡。傳 `getMyTodos()` 的一筆 `todo` 進去。變體 Type 沒有做成 prop，依 `todo.isUrgent` 自動切換；期限徽章和緊急的標示方式和 Kit 不同，見[第 4 節](#4-kit-和程式不一樣的地方)。左上角的建立日期要等 `getMyTodos()` 帶出 `createdAt` 才會顯示 |
 | `Admin/Notice Card` | `admin/AdminNoticeCard.vue` | ✅ | 變體 Type 沒有做成 prop：傳 `announcement`（`getManagedAnnouncements()` 的一筆）是公告，傳 `opinion`（`getResidentOpinions()` 的一筆）是住戶意見。住戶意見的標題用留言所在的會議名稱 |
-| `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`。變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」只是提示（2026-10-13 從滿版藍色按鈕改過來，卡片變短，也不會整頁都是主要按鈕）；「按鈕」「文字」還沒做，有頁面用到再加。期限徽章、緊急底色和 `AdminTodoCard` 一樣，規則在 `src/lib/todo.js` |
+| `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`；也可以傳 `getMyDoneTodos()` 的一筆（有 `doneAt`），會變成灰色「已完成」、寫完成時間、右下角「查看詳情」。變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」只是提示（2026-10-13 從滿版藍色按鈕改過來，卡片變短，也不會整頁都是主要按鈕）；「按鈕」「文字」還沒做，有頁面用到再加。期限徽章、緊急底色和 `AdminTodoCard` 一樣，規則在 `src/lib/todo.js` |
 | `Admin/Meeting Card` | `admin/AdminMeetingCard.vue` | ⬜ | 變體 State：待整理／待發布／已發布 |
 | `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ⬜ | 廠商卡 |
 | `Admin/Case Card` | `admin/AdminCaseCard.vue` | ✅ | 案件卡：標題＋狀態徽章＋›、地點徽章、負責人｜廠商（2026-10-14 照 Kit 改版）。整張卡可以點。狀態徽章：逾期、尚未受理紅；待驗收橘；已受理、施工中藍；已結案、已取消灰（規則在 `admin/caseStatusBadge.js`，案件詳情頁共用）。prop 叫 `item`（`case` 是 JavaScript 的保留字）。管委會端「案件」分頁在用 |
