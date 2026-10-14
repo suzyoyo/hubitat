@@ -2,7 +2,10 @@
 // 底部導覽：左邊是半透明白色膠囊分頁列，右邊是圓形「＋」按鈕
 // 顏色都來自 src/style.css 的變數（--nav、--nav-active、--fab …）
 import { PlusIcon } from '@lucide/vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import MenuItem from '@/components/app/MenuItem.vue'
+import IconTile from '@/components/common/IconTile.vue'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 const props = defineProps({
   // 這一端的網址開頭，例如 /resident
@@ -11,10 +14,21 @@ const props = defineProps({
   tabs: { type: Array, required: true },
   // 「＋」按鈕的設定
   fab: { type: Object, required: true },
+  // fab 有 menu 時：這個人看得到的選單項目（外框依權限篩過）
+  menuItems: { type: Array, default: () => [] },
 })
 
 // 分頁超過 3 個（管委會、管理人員）時用緊湊版：字和按鈕都小一點
 const compact = computed(() => props.tabs.length > 3)
+
+// 全域新增選單是開還是關
+const menuOpen = ref(false)
+
+// 「＋」按鈕的樣子：連結和開選單的按鈕共用
+const fabClass = computed(() => [
+  'flex shrink-0 flex-col items-center justify-center rounded-full border border-nav-border bg-fab type-nav text-fab-foreground shadow-fab',
+  compact.value ? 'size-14' : 'size-[68px]',
+])
 </script>
 
 <template>
@@ -44,12 +58,33 @@ const compact = computed(() => props.tabs.length > 3)
       </RouterLink>
     </nav>
 
-    <RouterLink
-      :to="`${basePath}/${fab.path}`"
-      :aria-label="fab.title"
-      class="flex shrink-0 flex-col items-center justify-center rounded-full border border-nav-border bg-fab type-nav text-fab-foreground shadow-fab"
-      :class="compact ? 'size-14' : 'size-[68px]'"
-    >
+    <!-- 管委會、管理人員：按下去在按鈕上方跳出全域新增選單 -->
+    <Popover v-if="fab.menu" v-model:open="menuOpen">
+      <PopoverTrigger as-child>
+        <button type="button" :aria-label="fab.title" :class="fabClass">
+          <PlusIcon :class="compact ? 'size-6' : 'size-[26px]'" />
+        </button>
+      </PopoverTrigger>
+      <!-- side="top" align="end"：出現在按鈕上方、靠右對齊 -->
+      <PopoverContent side="top" align="end" :side-offset="12" class="w-[270px] gap-0 rounded-xl p-2 shadow-card ring-0">
+        <!-- 點了任何一項就關掉選單，再換頁 -->
+        <MenuItem
+          v-for="item in menuItems"
+          :key="item.path"
+          :title="item.label"
+          :to="`${basePath}/${item.path}`"
+          class="rounded-lg px-2 hover:bg-muted"
+          @click="menuOpen = false"
+        >
+          <IconTile variant="square">
+            <component :is="item.icon" />
+          </IconTile>
+        </MenuItem>
+      </PopoverContent>
+    </Popover>
+
+    <!-- 住戶：按下去換到新增通報 -->
+    <RouterLink v-else :to="`${basePath}/${fab.path}`" :aria-label="fab.title" :class="fabClass">
       <PlusIcon :class="compact ? 'size-6' : 'size-[26px]'" />
       <!-- 只有住戶端的按鈕上有文字「通報」 -->
       <span v-if="fab.text">{{ fab.text }}</span>
