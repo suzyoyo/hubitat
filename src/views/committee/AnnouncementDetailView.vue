@@ -2,13 +2,28 @@
 // 管委會端・公告詳情：一則公告的時間、地點、內容說明與發布紀錄
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { toast } from 'vue-sonner'
+import BottomCta from '@/components/app/BottomCta.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate, formatTime } from '@/lib/date'
-import { getAnnouncementById } from '@/mocks/api'
+import {
+  getAnnouncementById,
+  getCurrentUser,
+  restoreAnnouncement,
+  withdrawAnnouncement,
+} from '@/mocks/api'
 import { ANNOUNCEMENT_STATUSES } from '@/mocks/data/announcements'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
@@ -20,12 +35,71 @@ const route = useRoute()
 const loading = ref(true)
 // 這一則公告。編號不存在時，假 API 會回傳 undefined
 const announcement = ref(null)
+// 我是誰：假 API 要用來判斷我能不能修改、撤回
+const userId = ref('')
+
+// 拿這則公告；有傳 userId，回來的資料會多 canEdit、canWithdraw
+async function reload() {
+  announcement.value = await getAnnouncementById(route.params.id, 'committee', userId.value)
+}
 
 // onMounted：畫面一出現就去拿資料
 onMounted(async () => {
-  announcement.value = await getAnnouncementById(route.params.id, 'committee')
+  const user = await getCurrentUser('committee')
+  userId.value = user.id
+  await reload()
   loading.value = false
 })
+
+// ── 修改、撤回 ─────────────────────────────────────
+// 底部的按鈕（誰、什麼狀態能按，由假 API 決定，見 docs/data-model.md 的公告）
+//   已發布 → 修改公告、撤回公告；已撤回 → 修改並重新發布；其他 → 沒有按鈕
+const hasActions = computed(() => announcement.value?.canEdit || announcement.value?.canWithdraw)
+// 修改的畫面還沒做（和發布公告的表單一起做），先連到佔位頁
+const editLink = computed(() => `/committee/announcements/${route.params.id}/edit`)
+
+// pending：動作還在路上時是 true，按鈕先不能按，避免連按兩次
+const pending = ref(false)
+// 撤回確認彈窗是開還是關
+const withdrawOpen = ref(false)
+// 撤回原因（選填）
+const withdrawReason = ref('')
+
+function openWithdraw() {
+  // 每次打開都清掉上次填的
+  withdrawReason.value = ''
+  withdrawOpen.value = true
+}
+
+async function submitWithdraw() {
+  pending.value = true
+  const ok = await withdrawAnnouncement(announcement.value.id, userId.value, withdrawReason.value.trim())
+  pending.value = false
+  withdrawOpen.value = false
+  if (!ok) {
+    toast.error('撤回失敗', { description: '這則公告的狀態已經變了，請重新整理。' })
+    return
+  }
+  // 設計稿：toast 右邊有「復原」。多停幾秒（預設 4 秒），長輩才來得及按
+  toast.success('公告已撤回，已通知住戶', {
+    duration: 8000,
+    action: { label: '復原', onClick: restore },
+  })
+  await reload()
+}
+
+// 按 toast 上的「復原」：變回已發布
+async function restore() {
+  pending.value = true
+  const ok = await restoreAnnouncement(announcement.value.id, userId.value)
+  pending.value = false
+  if (!ok) {
+    toast.error('復原失敗', { description: '這則公告的狀態已經變了，請重新整理。' })
+    return
+  }
+  toast.success('已復原公告')
+  await reload()
+}
 
 // 狀態徽章的顏色（dev-guide 第 5 節管理端的規則）
 //   待補、已退回 → 橘：要發布的人動手
@@ -97,7 +171,11 @@ const publishRows = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-4 px-5 pt-4">
+  <!-- 有按鈕時底部有固定的按鈕區，留空間給它，內容才不會被蓋住；兩顆上下排要留多一點 -->
+  <div
+    class="space-y-4 px-5 pt-4"
+    :class="announcement?.canWithdraw ? 'pb-40' : hasActions ? 'pb-24' : 'pb-5'"
+  >
     <!-- 載入中：三個和卡片差不多高的灰色方塊 -->
     <template v-if="loading">
       <Skeleton class="h-[200px] rounded-xl" />
@@ -148,6 +226,43 @@ const publishRows = computed(() => {
           <p class="min-w-0 flex-1 text-right whitespace-pre-line type-body-strong text-foreground">{{ row.value }}</p>
         </div>
       </section>
+
+      <!-- 已發布：兩顆上下排（照設計稿） -->
+      <BottomCta v-if="announcement.canWithdraw" vertical>
+        <Button as-child>
+          <RouterLink :to="editLink">修改公告</RouterLink>
+        </Button>
+        <Button variant="outline" :disabled="pending" @click="openWithdraw">撤回公告</Button>
+      </BottomCta>
+      <!-- 已撤回：只能修改後重新發布 -->
+      <BottomCta v-else-if="announcement.canEdit">
+        <Button as-child>
+          <RouterLink :to="editLink">修改並重新發布</RouterLink>
+        </Button>
+      </BottomCta>
+
+      <!-- 撤回確認彈窗：平常看不到，withdrawOpen 變成 true 才會出現（長相和撤回通報的彈窗一樣） -->
+      <Dialog v-model:open="withdrawOpen">
+        <!-- 沒有右上角的叉叉，用「取消」關閉；點彈窗外面也可以關 -->
+        <DialogContent :show-close-button="false" class="gap-3.5 p-5">
+          <!-- 結尾的 ! 是「一定要用這個」：DialogTitle 本身有預設的字級，要蓋過它 -->
+          <DialogTitle class="type-card-title!">撤回這則公告？</DialogTitle>
+          <DialogDescription class="type-body!">
+            撤回後住戶將看不到這則公告，已收到通知的住戶會收到更正通知。
+          </DialogDescription>
+          <!-- aria-label：輸入框沒有另外的標題文字，這是給螢幕閱讀器念的名稱 -->
+          <Input v-model="withdrawReason" aria-label="撤回原因" placeholder="撤回原因（選填）" maxlength="50" />
+          <div class="flex gap-3">
+            <!-- DialogClose：包住的按鈕按下去就會關閉彈窗 -->
+            <DialogClose as-child>
+              <Button variant="outline" class="flex-1">取消</Button>
+            </DialogClose>
+            <Button variant="destructive" class="flex-1" :disabled="pending" @click="submitWithdraw">
+              確認撤回
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </template>
   </div>
 </template>
