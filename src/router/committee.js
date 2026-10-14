@@ -3,6 +3,7 @@
 // 寫法可以參考住戶端的 resident.js
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
+import NewRepairView from '@/views/committee/NewRepairView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TasksView from '@/views/committee/TasksView.vue'
@@ -19,6 +20,7 @@ export default {
     tasks: TasksView,
     proposals: ProposalsView,
     'tasks/:id': TaskDetailView,
+    'cases/new': NewRepairView,
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
@@ -34,6 +36,7 @@ export default {
     { path: 'meetings/:id', title: '會議詳情' },
     // 待辦點進去的詳情頁
     { path: 'cases/:id', title: '案件詳情' },
+    { path: 'cases/new', title: '新增報修' },
     { path: 'tasks/:id', title: '交辦詳情' },
     { path: 'proposals/:id', title: '提案詳情' },
     { path: 'announcements/:id', title: '公告詳情' },
