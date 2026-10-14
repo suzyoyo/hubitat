@@ -107,7 +107,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | （Kit 沒有元件，設計稿是「查看詳情彈窗」） | `notice/NoticeDetailDialog.vue` | ✅ | 公告詳情彈窗，首頁和社區公告頁共用。傳 `notice`，用 `v-model:open` 控制開關。設計稿的「留言給管委會」按鈕還沒放，等留言功能做的時候再加 |
 | `Meeting/Card` | `meeting/MeetingCard.vue` | 🟡 | 變體 Type：**Summary**（首頁會議摘要）已做；**Latest**（最新會議：3 條決議重點）還沒做。重點決議的內容是灰色，和首頁公告卡一致 |
 | `Meeting/Point` | `meeting/MeetingPoint.vue` | ⬜ | 決議重點的一條：勾選圖示＋文字 |
-| `Meeting/Head` | `meeting/MeetingHead.vue` | ⬜ | 會議紀錄頁首：主辦機關、標題、日期、出席 |
+| `Meeting/Head` | `meeting/MeetingHead.vue` | ✅ | 會議紀錄頁首：「社區管理委員會」、會議名稱、日期（含星期）、出席人數。傳 `getMeetingById()` 回傳的 `meeting`。住戶端會議紀錄頁在用 |
 | `Meeting/Case` | `meeting/MeetingCase.vue` | ⬜ | 會議全文的案由，可展開收合。變體 State：Open／Closed。需要先加基礎元件 accordion |
 | `Calendar/Card` | `calendar/CalendarCard.vue` | ✅ | 社區行事曆卡：從這個星期日開始的兩週日期＋公告圓點（實心＝與我有關、空心＝其他）。傳 `notices`。只顯示、不能點 |
 | `Calendar/Day` | ➖ | ➖ | 行事曆的單一日期。寫在 `CalendarCard.vue` 裡面即可 |

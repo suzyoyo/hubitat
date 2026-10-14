@@ -4,7 +4,9 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { DownloadIcon } from '@lucide/vue'
+import SectionHeader from '@/components/app/SectionHeader.vue'
 import MeetingHead from '@/components/meeting/MeetingHead.vue'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -33,6 +35,11 @@ onMounted(async () => {
   meeting.value = await getMeetingById(route.params.id, 'resident', user.id)
   loading.value = false
 })
+
+// 議案的編號：第 1 個是 '01'，第 12 個是 '12'
+function agendaNumber(index) {
+  return String(index + 1).padStart(2, '0')
+}
 
 // 下載會議紀錄：下載的是管委會遮蔽過個資的版本
 // 假資料沒有真的檔案，先跳提示
@@ -88,8 +95,34 @@ function download() {
         </TabsList>
 
         <!-- 兩個分頁的內容：下一步再做 -->
-        <TabsContent value="summary">
-          <p class="type-body text-muted-foreground">重點摘要（下一步做）</p>
+        <!-- 重點摘要：核心決議＋議案列表 -->
+        <TabsContent value="summary" class="space-y-6">
+          <div class="space-y-2 rounded-xl bg-secondary p-4">
+            <p class="type-date text-muted-foreground">本次會議核心決議</p>
+            <p class="type-card-title text-secondary-foreground">{{ meeting.summary }}</p>
+          </div>
+
+          <section class="space-y-1">
+            <SectionHeader title="議案" />
+            <ol>
+              <!-- 每一項：左邊編號，右邊標題、結果徽章和一行說明；項目之間有分隔線 -->
+              <li
+                v-for="(item, index) in meeting.agenda"
+                :key="item.id"
+                class="flex gap-3 border-b py-3.5 last:border-b-0"
+              >
+                <span class="type-body-strong text-muted-foreground">{{ agendaNumber(index) }}</span>
+                <div class="min-w-0 flex-1 space-y-1.5">
+                  <p class="type-body-strong">{{ item.title }}</p>
+                  <!-- 結果只是分類（已經決定好的事），用灰色徽章 -->
+                  <div class="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline">{{ item.resultText }}</Badge>
+                    <span class="type-date text-muted-foreground">{{ item.note }}</span>
+                  </div>
+                </div>
+              </li>
+            </ol>
+          </section>
         </TabsContent>
         <TabsContent value="full">
           <p class="type-body text-muted-foreground">全文記錄（之後做）</p>
