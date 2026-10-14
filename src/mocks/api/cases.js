@@ -285,7 +285,7 @@ export async function createReport(userId, input) {
   return presentForResident(item, userId)
 }
 
-// 登記報修（管委會、管理人員用），回傳新增好的案件（管理端的樣子）
+// 登記通報（管委會、管理人員代為登記用），回傳新增好的案件（管理端的樣子）
 //   input 和 createReport 一樣，另外可以傳：
 //     unit  代哪一戶登記，例如 { building: 'A', unit: '6樓之3' }；不是代住戶登記就不傳
 //           有傳的話，同一戶的住戶在「我的通報」看得到這一筆（只能看，不能修改或撤回）
@@ -315,7 +315,7 @@ export async function createRepair(userId, input, role = 'committee') {
         at: MOCK_NOW,
         actorId: userId,
         label: CASE_SOURCES[role].label,
-        text: input.unit ? `${who} 代 ${unitLabel(input.unit)} 登記報修` : `${who} 登記報修`,
+        text: input.unit ? `${who} 代 ${unitLabel(input.unit)} 登記通報` : `${who} 登記通報`,
         residentText: '管委會已代你登記，好彼管家已通知管理人員。',
       },
     ],
