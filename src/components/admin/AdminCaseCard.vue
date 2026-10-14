@@ -4,6 +4,7 @@
 import { computed } from 'vue'
 import { ChevronRightIcon } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
+import { caseStatusBadge } from './caseStatusBadge'
 
 const props = defineProps({
   // getCases() 回傳的其中一筆
@@ -12,19 +13,8 @@ const props = defineProps({
   to: { type: String, default: '' },
 })
 
-// 狀態徽章（dev-guide 第 5 節管理端的顏色）
-//   逾期、還沒受理 → 紅：已經出問題
-//   待驗收        → 橘：輪到管委會確認
-//   已受理、施工中 → 藍：進行中，在等別人
-//   已結案、已取消 → 灰：已結束
-const statusBadge = computed(() => {
-  const { item } = props
-  if (item.isOverdue) return { variant: 'destructive', text: `逾期 ${item.overdueDays} 天` }
-  if (item.status === 'pending') return { variant: 'destructive', text: '尚未受理' }
-  if (item.status === 'to_verify') return { variant: 'secondary', text: item.statusLabel }
-  if (item.isOpen) return { variant: 'default', text: item.statusLabel }
-  return { variant: 'outline', text: item.statusLabel }
-})
+// 狀態徽章的規則放在 caseStatusBadge.js，案件詳情頁也用同一份
+const statusBadge = computed(() => caseStatusBadge(props.item))
 
 // 最下面那一行：還沒受理的只寫「尚未受理」，其他寫負責人和廠商
 const footerText = computed(() => {
