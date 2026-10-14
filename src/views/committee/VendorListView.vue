@@ -67,7 +67,7 @@ const shownVendors = computed(() => {
       </RouterLink>
     </Button>
 
-    <FilterChips v-model="status" :options="STATUS_FILTERS" />
+    <FilterChips v-model="status" :options="STATUS_FILTERS" fill />
     <div class="w-1/2">
       <FilterSelect v-model="sort" label="排序" :options="SORT_OPTIONS" />
     </div>
