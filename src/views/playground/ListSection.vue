@@ -1,6 +1,7 @@
 <script setup>
-// 清單元件：item（適合廠商名冊、施工日誌列表）
+// 清單元件：item（適合廠商名冊、施工日誌列表）、accordion（可以展開收合的清單）
 import { ChevronRightIcon, WrenchIcon } from '@lucide/vue'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -67,6 +68,22 @@ const vendors = [
           </Item>
         </template>
       </ItemGroup>
+    </div>
+
+    <!-- Accordion：點標題展開或收合內容。會議紀錄的案由會用到 -->
+    <div class="space-y-2">
+      <h3 class="text-sm font-medium text-muted-foreground">Accordion（會議案由，預設全部展開）</h3>
+      <!-- type="multiple"：可以同時展開好幾個；default-value 寫一開始要展開哪幾個 -->
+      <Accordion type="multiple" :default-value="['case-1', 'case-2']" class="rounded-lg border px-3">
+        <AccordionItem value="case-1">
+          <AccordionTrigger>案由一：電梯年度保養合約續簽案</AccordionTrigger>
+          <AccordionContent>原合作廠商本年度服務表現良好，維持原保養約定續簽 1 年。</AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="case-2">
+          <AccordionTrigger>案由二：地下室防水工程招標</AccordionTrigger>
+          <AccordionContent>暫緩表決，由修繕委員於兩週內補齊第三方勘驗報告。</AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   </section>
 </template>

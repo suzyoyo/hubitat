@@ -770,17 +770,22 @@ const contracts = await getContracts('staff') // 拿到的資料不會有金額
 | commit `src/assets/IP/` 的吉祥物原圖 | 縮小後放 `src/assets/mascot/` 再用 | 原圖每張約 3MB，會讓 repo 和網頁都變得很慢 |
 | 在程式碼裡留 `console.log` | 交出去前刪掉 | 除錯用的訊息不該留在成品裡 |
 
-### 共用的檔案：改了要說
+### 共用的檔案：改之前先給對方看
 
-下面這些檔案兩個人都會用到。改的時候不用開 PR，可以直接改 `main`，但**改完要在群組說一聲**改了什麼（2026-10-13 起，見 [git-workflow.md](git-workflow.md#2-四條規則)）。不要和頁面的修改混在同一個分支裡：
+下面這些檔案兩個人都會用到。要改的時候**另外開 `shared/` 分支、開 PR 給對方 review**，對方同意了才合併（2026-10-14 起，見 [git-workflow.md](git-workflow.md#2-五條規則)）。不要和自己那一端的頁面修改混在一起：
 
 - `src/style.css`（設計 Token）
 - `src/config/roles.js`（三端的分頁設定）
 - `src/layouts/AppShell.vue` 和 `src/components/app/` 裡的外框元件
 - `src/router/index.js`
 - `src/components/ui/`
-- `src/mocks/`（新增沒關係；修改或刪除既有的要先說）
+- `src/mocks/`、`src/lib/`
 - `package.json`
+- 兩端都在用的產品元件
+- 對方那一端的檔案和元件
+- 文件裡的規則（`docs/`、`CLAUDE.md`）
+
+完整的清單和誰負責，見 [git-workflow.md 第 1 節](git-workflow.md#共用的東西)。
 
 ---
 
@@ -792,7 +797,6 @@ const contracts = await getContracts('staff') // 拿到的資料不會有金額
 |---|---|---|
 | 卡片圓角 | Kit 的卡片是 14px（`rounded-xl`）。但 `rounded-card`（20px）還留著，shadcn 的 `<Card>` 元件、角色選擇頁、playground 都在用 | 新做的產品元件用 `rounded-xl`，不要用 `rounded-card` |
 | 對比度偏低 | 白字在品牌藍上約 2 : 1、白字在「＋」按鈕的紅色上約 3 : 1，長輩可能看不清楚 | 完全照設計稿。之後要調整時只改 `style.css` 的 `:root` |
-| 管委會、管理人員的「＋」按鈕 | 設計是彈出「全域新增選單」，目前連到佔位頁 | 維持佔位頁 |
 | 管委會和管理人員共用的頁面放哪 | 兩端的分頁相同，有些頁面可能長得一樣 | 管理人員端先不做。等管委會端做出幾頁後再決定（見 [git-workflow.md](git-workflow.md#1-分工)） |
 | 用詞 | 住戶端叫「通報」，通知裡出現「報修」 | 畫面上一律用「通報」 |
 | mockup 裡手工畫的卡片 | 有些卡片不是 Kit 元件，不會跟著 Kit 變動，還沒清查 | 以 Kit 的元件為準 |

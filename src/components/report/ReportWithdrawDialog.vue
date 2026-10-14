@@ -36,7 +36,8 @@ watch(open, (isOpen) => {
 <template>
   <Dialog v-model:open="open">
     <!-- 設計稿沒有右上角的叉叉，用「取消」關閉；點彈窗外面也可以關 -->
-    <DialogContent :show-close-button="false" class="gap-3.5 p-5">
+    <!-- @open-auto-focus.prevent：打開時不要自動把游標放進輸入框（不然手機的鍵盤會馬上跳出來），點了輸入框才開始打字 -->
+    <DialogContent :show-close-button="false" class="gap-3.5 p-5" @open-auto-focus.prevent>
       <!-- 結尾的 ! 是「一定要用這個」：DialogTitle 本身有預設的字級，要蓋過它 -->
       <DialogTitle class="type-card-title!">撤回這則通報？</DialogTitle>
       <DialogDescription class="type-body!">撤回後管委會將停止處理本單，無法復原</DialogDescription>

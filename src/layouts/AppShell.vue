@@ -2,11 +2,12 @@
 // App 外框：三端共用。上面是頂部列，下面是底部導覽，中間放各頁內容
 // 底部分頁的那幾頁：logo 頂部列＋底部導覽
 // 其他頁面（內頁、通知 …）：「返回＋標題」頂部列，沒有底部導覽
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import AppHeader from '@/components/app/AppHeader.vue'
 import BottomNav from '@/components/app/BottomNav.vue'
-import { getRole } from '@/config/roles'
+import { canUseMenuItem, getRole } from '@/config/roles'
+import { getCurrentUser } from '@/mocks/api'
 
 const props = defineProps({
   // 由路由傳進來：resident / committee / staff
@@ -20,6 +21,20 @@ const basePath = computed(() => `/${props.roleId}`)
 const route = useRoute()
 // 目前這一頁是不是底部分頁的其中一頁
 const isTab = computed(() => route.meta.isTab)
+
+// 「＋」跳出的選單裡，這個人看得到的項目（例如一般委員看不到「新增交辦」）
+// 要先知道是誰，所以一開始是空的；換到另一端時重新拿
+const menuItems = ref([])
+watch(
+  () => props.roleId,
+  async () => {
+    menuItems.value = []
+    if (!role.value.fab.menu) return
+    const user = await getCurrentUser(props.roleId)
+    menuItems.value = role.value.fab.menu.filter((item) => canUseMenuItem(item, user))
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -39,6 +54,6 @@ const isTab = computed(() => route.meta.isTab)
       <!-- RouterView：目前網址對應的頁面會顯示在這裡 -->
       <RouterView />
     </main>
-    <BottomNav v-if="isTab" :base-path="basePath" :tabs="role.tabs" :fab="role.fab" />
+    <BottomNav v-if="isTab" :base-path="basePath" :tabs="role.tabs" :fab="role.fab" :menu-items="menuItems" />
   </div>
 </template>
