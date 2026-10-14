@@ -1,7 +1,7 @@
 <script setup>
 // 管委會端・新增通報：和住戶端的新增通報同一個流程（設計稿「管委會端-新增通報」）
 //   1 選地點（上面多了「通報住戶」，可以代某一戶登記）→ 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出
-// 中間每一步的畫面借用住戶端的（src/views/resident/new-report/），完成頁用管理端的說法，寫在這個檔案裡
+// 中間每一步的畫面和住戶端共用（src/components/report/Report…Step），完成頁用管理端的說法，寫在這個檔案裡
 // 步驟記在網址上（/committee/cases/new?step=2），寫法和住戶端的 NewReportView.vue 一樣
 import { BellIcon } from '@lucide/vue'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
@@ -15,12 +15,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton'
 import { REPORT_TYPES } from '@/lib/report'
 import { createRepair, getAreas, getCurrentUser, getSimilarReports, supportReport } from '@/mocks/api'
-import ConfirmStep from '@/views/resident/new-report/ConfirmStep.vue'
-import DescribeStep from '@/views/resident/new-report/DescribeStep.vue'
-import PlaceStep from '@/views/resident/new-report/PlaceStep.vue'
-import SimilarStep from '@/views/resident/new-report/SimilarStep.vue'
-import SupportedDone from '@/views/resident/new-report/SupportedDone.vue'
-import TypeStep from '@/views/resident/new-report/TypeStep.vue'
+import ReportConfirmStep from '@/components/report/ReportConfirmStep.vue'
+import ReportDescribeStep from '@/components/report/ReportDescribeStep.vue'
+import ReportPlaceStep from '@/components/report/ReportPlaceStep.vue'
+import ReportSimilarStep from '@/components/report/ReportSimilarStep.vue'
+import ReportSupportedDone from '@/components/report/ReportSupportedDone.vue'
+import ReportTypeStep from '@/components/report/ReportTypeStep.vue'
 import mascotUrl from '@/assets/mascot/happy.png' // 開心奔跑的好彼管家
 
 const route = useRoute()
@@ -259,7 +259,7 @@ async function submit() {
           </div>
         </fieldset>
 
-        <PlaceStep
+        <ReportPlaceStep
           v-model:area-id="form.areaId"
           v-model:place="form.place"
           v-model:is-other="form.isOtherPlace"
@@ -267,14 +267,14 @@ async function submit() {
         />
       </template>
 
-      <SimilarStep v-else-if="step === 2" :reports="similarReports" :supporting-id="supportingId" @support="support" />
+      <ReportSimilarStep v-else-if="step === 2" :reports="similarReports" :supporting-id="supportingId" @support="support" />
 
-      <SupportedDone v-else-if="step === 'supported'" :report="supportedReport" />
+      <ReportSupportedDone v-else-if="step === 'supported'" :report="supportedReport" />
 
-      <!-- management：說明改成「通報住戶」（要等 shared/report-steps-wording 合併才有作用） -->
-      <TypeStep v-else-if="step === 3" v-model="form.visibility" management />
+      <!-- management：有選通報住戶時，說明改成「通報住戶」；沒選（例如巡查自己發現的）就用原本的說法（PR #38 suzy 的建議） -->
+      <ReportTypeStep v-else-if="step === 3" v-model="form.visibility" :management="Boolean(unit)" />
 
-      <DescribeStep
+      <ReportDescribeStep
         v-else-if="step === 4"
         v-model:subject="form.subject"
         v-model:description="form.description"
@@ -282,7 +282,7 @@ async function submit() {
         :context="contextText"
       />
 
-      <ConfirmStep v-else-if="step === 5" :form="summary" management @edit="goToStep" />
+      <ReportConfirmStep v-else-if="step === 5" :form="summary" :management="Boolean(unit)" @edit="goToStep" />
 
       <!-- 送出後的完成頁（設計稿「管委會端-新增通報6-通報完成」） -->
       <div v-else-if="step === 'submitted'" class="space-y-4 pt-8 text-center">
