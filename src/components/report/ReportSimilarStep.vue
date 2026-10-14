@@ -1,5 +1,5 @@
 <script setup>
-// 新增通報・第 2 步：確認是否重複
+// 新增通報・第 2 步：確認是否重複（住戶端、管委會端的新增通報共用）
 // 列出同一個地點、還沒處理完的通報。是同一個問題就按「我也遇到了」，不用再通報一次
 import FeedbackHaobiTip from '@/components/feedback/FeedbackHaobiTip.vue'
 import ReportSimilarCard from '@/components/report/ReportSimilarCard.vue'

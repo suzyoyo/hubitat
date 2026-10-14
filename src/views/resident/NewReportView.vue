@@ -3,7 +3,8 @@
 //   1 選地點 → 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出
 //   第 2 步如果按了「我也遇到了」，就不用再通報，直接到完成頁（step=supported）
 //   第 5 步送出後到另一個完成頁（step=submitted）
-// 每一步的畫面放在 new-report/ 資料夾，這個檔案負責記住填到一半的資料、決定現在顯示哪一步
+// 每一步的畫面放在 src/components/report/（Report…Step，管委會端的新增通報也用），送出的完成頁在 new-report/ 資料夾
+// 這個檔案負責記住填到一半的資料、決定現在顯示哪一步
 // 現在是第幾步記在網址上（/resident/reports/new?step=2），所以按返回會回到上一步，不會直接離開
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -14,13 +15,13 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { REPORT_TYPES } from '@/lib/report'
 import { createReport, getAreas, getCurrentUser, getSimilarReports, supportReport } from '@/mocks/api'
-import ConfirmStep from './new-report/ConfirmStep.vue'
-import DescribeStep from './new-report/DescribeStep.vue'
-import PlaceStep from './new-report/PlaceStep.vue'
-import SimilarStep from './new-report/SimilarStep.vue'
+import ReportConfirmStep from '@/components/report/ReportConfirmStep.vue'
+import ReportDescribeStep from '@/components/report/ReportDescribeStep.vue'
+import ReportPlaceStep from '@/components/report/ReportPlaceStep.vue'
+import ReportSimilarStep from '@/components/report/ReportSimilarStep.vue'
 import SubmittedDone from './new-report/SubmittedDone.vue'
-import SupportedDone from './new-report/SupportedDone.vue'
-import TypeStep from './new-report/TypeStep.vue'
+import ReportSupportedDone from '@/components/report/ReportSupportedDone.vue'
+import ReportTypeStep from '@/components/report/ReportTypeStep.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -187,7 +188,7 @@ async function submit() {
         <Skeleton v-for="n in 6" :key="n" class="h-[70px] rounded-xl" />
       </div>
 
-      <PlaceStep
+      <ReportPlaceStep
         v-else-if="step === 1"
         v-model:area-id="form.areaId"
         v-model:place="form.place"
@@ -195,13 +196,13 @@ async function submit() {
         :areas="areas"
       />
 
-      <SimilarStep v-else-if="step === 2" :reports="similarReports" :supporting-id="supportingId" @support="support" />
+      <ReportSimilarStep v-else-if="step === 2" :reports="similarReports" :supporting-id="supportingId" @support="support" />
 
-      <SupportedDone v-else-if="step === 'supported'" :report="supportedReport" />
+      <ReportSupportedDone v-else-if="step === 'supported'" :report="supportedReport" />
 
-      <TypeStep v-else-if="step === 3" v-model="form.visibility" />
+      <ReportTypeStep v-else-if="step === 3" v-model="form.visibility" />
 
-      <DescribeStep
+      <ReportDescribeStep
         v-else-if="step === 4"
         v-model:subject="form.subject"
         v-model:description="form.description"
@@ -210,7 +211,7 @@ async function submit() {
       />
 
       <!-- 按某一項的「修改」會回到那一步，改完再一步一步按回來 -->
-      <ConfirmStep v-else-if="step === 5" :form="summary" @edit="goToStep" />
+      <ReportConfirmStep v-else-if="step === 5" :form="summary" @edit="goToStep" />
 
       <SubmittedDone v-else-if="step === 'submitted'" />
     </div>
