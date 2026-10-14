@@ -9,7 +9,9 @@
 //   source      來源，見下方 CASE_SOURCES
 //   isPrivate   是否保密。true：涉及住戶行為，只有管委會與管理人員看得到
 //   isUrgent    是否標示為緊急
-//   reporterId  通報人（對應 users.js）
+//   reporterId  通報人（對應 users.js）。管委會、管理人員代住戶登記時，是登記的人
+//   reporterUnit 代哪一戶登記：{ building: 'A', unit: '6樓之3' }（代登記時才有）
+//               同一戶的住戶在「我的通報」都看得到這一筆
 //   reportedAt  通報時間
 //   description 通報人寫的問題描述
 //   photos      照片或影片的檔名（欄位名稱沿用 photos，影片也放這裡，例如 '異音.mp4'）
@@ -45,6 +47,7 @@ export const CASE_STATUSES = {
 export const CASE_SOURCES = {
   resident: { label: '住戶通報' },
   staff: { label: '管理人員登記' },
+  committee: { label: '委員登記' },
   patrol: { label: '巡查發現' },
 }
 
