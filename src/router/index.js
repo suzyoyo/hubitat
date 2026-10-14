@@ -41,7 +41,8 @@ const roleRoutes = roles.map((role) => {
     children: [
       ...role.tabs.map((tab) => page(tab.path, tab.label, true)), // 底部分頁
       page('notifications', '通知'), // 右上角的鈴鐺
-      page(role.fab.path, role.fab.title), // 右下角的「＋」按鈕
+      // 右下角的「＋」按鈕：有自己一頁的才要路由（跳出選單的不用）
+      ...(role.fab.path ? [page(role.fab.path, role.fab.title)] : []),
       ...innerPages.map((item) => page(item.path, item.title)), // 內頁
     ],
   }
