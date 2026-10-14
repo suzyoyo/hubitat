@@ -11,7 +11,7 @@ import {
   meetings,
   nextMeeting,
 } from '../data/meetings'
-import { delay } from './helpers'
+import { MOCK_NOW, delay } from './helpers'
 import { findUser, userLabel } from './users'
 
 // 決議結果的顯示文字
@@ -152,6 +152,32 @@ export async function getResidentOpinions(pendingOnly = false) {
     .flatMap((meeting) => meeting.comments.map((item) => presentComment(item, meeting)))
     .filter((item) => !pendingOnly || !item.isReplied)
     .toSorted((a, b) => b.at.localeCompare(a.at))
+}
+
+// 留言最多幾個字
+export const MEETING_COMMENT_MAX = 300
+
+// 住戶對一場會議留言，回傳新增好的留言；不能留言的話回傳 undefined
+//   只有已發布的會議可以留言；內容去掉頭尾空白後不能是空的，也不能超過 MEETING_COMMENT_MAX 字
+// 留言會出現在管委會首頁的「住戶意見」（getResidentOpinions），等主委或副主委回覆
+// 新留言只存在記憶體，重新整理網頁就不見了
+export async function createMeetingComment(meetingId, userId, text) {
+  await delay()
+  const meeting = meetings.find((item) => item.id === meetingId)
+  const content = text.trim()
+  if (!meeting || meeting.status !== 'published') return undefined
+  if (!content || content.length > MEETING_COMMENT_MAX) return undefined
+  // 新編號：所有會議裡最大的編號 + 1，例如 cm-003 → cm-004
+  const allComments = meetings.flatMap((item) => item.comments)
+  const maxNumber = Math.max(0, ...allComments.map((item) => Number(item.id.slice(3))))
+  const comment = {
+    id: `cm-${String(maxNumber + 1).padStart(3, '0')}`,
+    userId,
+    at: MOCK_NOW,
+    text: content,
+  }
+  meeting.comments.push(comment)
+  return presentComment(comment, meeting)
 }
 
 // 取得「我的留言」（住戶用）：我在各場會議留過的言，新的在前
