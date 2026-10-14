@@ -3,7 +3,7 @@
 //   presentForManagement：管委會、管理人員看的（完整）
 //   presentForResident：  住戶看的（簡化的狀態、只給住戶看的進度說明）
 import { diffDays } from '@/lib/date'
-import { CASE_STATUSES, CASE_VISIBILITY, cases } from '../data/cases'
+import { CASE_SOURCES, CASE_STATUSES, CASE_VISIBILITY, cases } from '../data/cases'
 import { ISSUE_CATEGORIES } from '../data/community'
 import { equipment } from '../data/equipment'
 import { vendors } from '../data/vendors'
@@ -16,6 +16,18 @@ function isOpen(item) {
   return CASE_STATUSES[item.status].isOpen
 }
 
+// 戶的顯示文字：{ building: 'A', unit: '6樓之3' } → 'A 棟 6樓之3'
+export function unitLabel(unit) {
+  return `${unit.building} 棟 ${unit.unit}`
+}
+
+// 這筆案件是不是代這位住戶的那一戶登記的（比對棟別＋戶號，同一戶的人都算）
+function isMyHousehold(item, userId) {
+  if (!item.reporterUnit) return false
+  const user = findUser(userId)
+  return user?.building === item.reporterUnit.building && user?.unit === item.reporterUnit.unit
+}
+
 // 逾期幾天；沒逾期回傳 0
 // 有設定期限、還沒結案、而且期限已經過了，才算逾期
 export function caseOverdueDays(item) {
@@ -25,10 +37,12 @@ export function caseOverdueDays(item) {
 }
 
 // 通報人的顯示文字，例如「陳先生（B 棟 8 樓）」；管理人員登記的顯示職稱
-function reporterLabel(userId) {
-  const user = findUser(userId)
+// 委員或管理人員代住戶登記的，例如「主委 李委員（代 A 棟 6樓之3）」
+function reporterLabel(item) {
+  const user = findUser(item.reporterId)
   if (!user) return ''
-  if (user.roles.includes('staff')) return userLabel(userId)
+  if (item.reporterUnit) return `${userLabel(item.reporterId)}（代 ${unitLabel(item.reporterUnit)}）`
+  if (item.source === 'committee' || user.roles.includes('staff')) return userLabel(item.reporterId)
   const floor = user.unit.split('樓')[0] // '8樓之2' → '8'
   return `${user.name}（${user.building} 棟 ${floor} 樓）`
 }
@@ -44,7 +58,7 @@ function presentForManagement(item) {
     categoryLabel: ISSUE_CATEGORIES[item.category].label,
     statusLabel: CASE_STATUSES[item.status].label,
     isOpen: isOpen(item),
-    reporterLabel: reporterLabel(item.reporterId),
+    reporterLabel: reporterLabel(item),
     assigneeLabel: item.assigneeId ? userLabel(item.assigneeId) : '',
     vendorName: vendor ? vendor.name : '',
     equipmentName: device ? device.name : '',
@@ -92,7 +106,10 @@ function presentForResident(item, userId) {
       doneAt: item.closedAt ?? null,
     },
     supporterCount: item.supporters.length,
-    isMine: item.reporterId === userId, // 是我通報的，還是我按了「我也遇到了」
+    // 是我（或我這一戶被代登記）通報的，還是我按了「我也遇到了」
+    isMine: item.reporterId === userId || isMyHousehold(item, userId),
+    // 是不是管委會、管理人員代我這一戶登記的（只能看，不能修改或撤回）
+    isOnBehalf: isMyHousehold(item, userId),
     hasSupported: item.supporters.includes(userId), // 我按過「我也遇到了」
     // 能不能修改或撤回：要是我自己通報的，而且還沒結案
     canEdit: item.reporterId === userId && isOpen(item),
@@ -154,12 +171,12 @@ export function caseStatsOfVendor(vendorId) {
 
 // ── 住戶端 ────────────────────────────────────────────────
 
-// 取得「我的通報」：我通報的，加上我按過「我也遇到了」的
+// 取得「我的通報」：我通報的、管委會或管理人員代我這一戶登記的，加上我按過「我也遇到了」的
 // status 可以不傳（全部），或傳 'active'（進行中）、'done'（已完成）
 export async function getMyReports(userId, status) {
   await delay()
   return cases
-    .filter((item) => item.reporterId === userId || item.supporters.includes(userId))
+    .filter((item) => item.reporterId === userId || isMyHousehold(item, userId) || item.supporters.includes(userId))
     .filter((item) => item.status !== 'cancelled')
     .filter((item) => {
       if (status === 'active') return isOpen(item)
@@ -176,7 +193,7 @@ export async function getReportById(id, userId) {
   await delay()
   const item = cases.find((entry) => entry.id === id)
   if (!item) return undefined
-  if (item.isPrivate && item.reporterId !== userId) return undefined
+  if (item.isPrivate && item.reporterId !== userId && !isMyHousehold(item, userId)) return undefined
   return presentForResident(item, userId)
 }
 
@@ -221,6 +238,13 @@ export async function withdrawReport(id, userId, reason = '') {
   return true
 }
 
+// 新案件的編號：CASE-今天的日期-流水號。流水號是今天已經有幾件再加 1，補成三位數
+function nextCaseId() {
+  const datePart = MOCK_TODAY.replaceAll('-', '') // '2026-10-01' → '20261001'
+  const todayCount = cases.filter((item) => item.id.startsWith(`CASE-${datePart}`)).length
+  return `CASE-${datePart}-${String(todayCount + 1).padStart(3, '0')}`
+}
+
 // 新增通報（住戶用），回傳新增好的通報
 //   input 要傳：
 //     areaId      範圍，例如 'area-a'
@@ -232,13 +256,8 @@ export async function withdrawReport(id, userId, reason = '') {
 // 分類先一律歸「其他」，之後由管理人員調整；新通報只存在記憶體，重新整理網頁就不見了
 export async function createReport(userId, input) {
   await delay()
-  // 編號：CASE-今天的日期-流水號。流水號是今天已經有幾件再加 1，補成三位數
-  const datePart = MOCK_TODAY.replaceAll('-', '') // '2026-10-01' → '20261001'
-  const todayCount = cases.filter((item) => item.id.startsWith(`CASE-${datePart}`)).length
-  const id = `CASE-${datePart}-${String(todayCount + 1).padStart(3, '0')}`
-
   const item = {
-    id,
+    id: nextCaseId(),
     place: input.place,
     subject: input.subject,
     title: `${areaName(input.areaId)} ${input.place}${input.subject}`,
@@ -257,13 +276,53 @@ export async function createReport(userId, input) {
       {
         at: MOCK_NOW,
         label: '住戶通報',
-        text: `${reporterLabel(userId)}通報${input.photos.length ? `，附 ${input.photos.length} 個照片或影片` : ''}`,
+        text: `${reporterLabel({ reporterId: userId, source: 'resident' })}通報${input.photos.length ? `，附 ${input.photos.length} 個照片或影片` : ''}`,
         residentText: '已收到，好彼管家已通知管理人員。',
       },
     ],
   }
   cases.push(item)
   return presentForResident(item, userId)
+}
+
+// 登記報修（管委會、管理人員用），回傳新增好的案件（管理端的樣子）
+//   input 和 createReport 一樣，另外可以傳：
+//     unit  代哪一戶登記，例如 { building: 'A', unit: '6樓之3' }；不是代住戶登記就不傳
+//           有傳的話，同一戶的住戶在「我的通報」看得到這一筆（只能看，不能修改或撤回）
+//   role  'committee' 委員登記 / 'staff' 管理人員登記
+// 新案件只存在記憶體，重新整理網頁就不見了
+export async function createRepair(userId, input, role = 'committee') {
+  await delay()
+  const who = userLabel(userId)
+  const item = {
+    id: nextCaseId(),
+    place: input.place,
+    subject: input.subject,
+    title: `${areaName(input.areaId)} ${input.place}${input.subject}`,
+    areaId: input.areaId,
+    category: 'other',
+    source: role,
+    isPrivate: input.isPrivate,
+    isUrgent: false,
+    reporterId: userId,
+    reportedAt: MOCK_NOW,
+    description: input.description,
+    photos: [...input.photos],
+    status: 'pending',
+    supporters: [],
+    logs: [
+      {
+        at: MOCK_NOW,
+        actorId: userId,
+        label: CASE_SOURCES[role].label,
+        text: input.unit ? `${who} 代 ${unitLabel(input.unit)} 登記報修` : `${who} 登記報修`,
+        residentText: '管委會已代你登記，好彼管家已通知管理人員。',
+      },
+    ],
+  }
+  if (input.unit) item.reporterUnit = { ...input.unit }
+  cases.push(item)
+  return presentForManagement(item)
 }
 
 // 對別人的通報按「我也遇到了」（附議），回傳更新後的通報
