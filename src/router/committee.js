@@ -2,6 +2,7 @@
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 // 寫法可以參考住戶端的 resident.js
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
+import CasesView from '@/views/committee/CasesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
@@ -14,6 +15,7 @@ export default {
   // 沒列在這裡的頁面，會先顯示佔位頁
   views: {
     home: HomeView,
+    cases: CasesView,
     'announcements/:id': AnnouncementDetailView,
     todos: TodosView,
     tasks: TasksView,
