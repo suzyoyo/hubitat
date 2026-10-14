@@ -5,6 +5,7 @@ import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
+import NotificationsView from '@/views/committee/NotificationsView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TasksView from '@/views/committee/TasksView.vue'
@@ -19,6 +20,7 @@ export default {
   // 沒列在這裡的頁面，會先顯示佔位頁
   views: {
     home: HomeView,
+    notifications: NotificationsView,
     cases: CasesView,
     vendors: VendorsView,
     'vendors/list': VendorListView,
