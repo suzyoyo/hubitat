@@ -43,8 +43,9 @@ const termText = computed(() => {
   return `第 ${term.value.number} 屆・任期至 ${year}/${month}`
 })
 
-// 「交接與設定」只有主委看得到（設計稿寫「主委專用權限」）
-const isChair = computed(() => user.value?.committeeTitle === 'chair')
+// 「交接與設定」只有主委、副主委看得到（docs/permissions.md：換屆交接、社區設定、緊急標示使用紀錄）
+// 設計稿寫「主委專用權限」，權限表是主委、副主委都可以，照權限表
+const isChairOrVice = computed(() => ['chair', 'viceChair'].includes(user.value?.committeeTitle))
 
 // 「交接與設定」的三列；to 是點了要去的頁面（都還是佔位頁）
 // 換屆交接的進度（第幾屆交接中、第幾步）假資料還沒有，先寫一般的說明
@@ -113,11 +114,11 @@ const supportItems = [
       </div>
     </section>
 
-    <!-- 交接與設定：主委才看得到 -->
-    <section v-if="isChair" class="space-y-3">
+    <!-- 交接與設定：主委、副主委才看得到 -->
+    <section v-if="isChairOrVice" class="space-y-3">
       <div class="flex items-center justify-between gap-3">
         <h2 class="type-title text-heading">交接與設定</h2>
-        <Badge variant="outline">主委專用權限</Badge>
+        <Badge variant="outline">主委、副主委權限</Badge>
       </div>
       <div class="rounded-xl bg-card px-4 py-1 shadow-card">
         <template v-for="(item, index) in handoverItems" :key="item.label">
