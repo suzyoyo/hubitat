@@ -122,7 +122,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Archive/Doc Card` | `archive/ArchiveDocCard.vue` | ⬜ | 公開文件卡：圖示方塊＋標題＋狀態徽章與日期 |
 | `Archive/Icon Tile` | ➖ | ➖ | 和 `Common/Icon Tile` 重複，見[第 5 節](#5-需要跟設計確認的事)。程式只做一個 `common/IconTile.vue` |
 | `Archive/History Record` | `archive/ArchiveHistoryRecord.vue` | ⬜ | 設備維修史的一筆：日期＋項目＋狀態徽章 |
-| `Archive/Search Result Bar` | `archive/ArchiveSearchResultBar.vue` | ⬜ | 內文搜尋結果列：「第 X／Y 處符合」＋上一處／下一處 |
+| `Archive/Search Result Bar` | `archive/ArchiveSearchResultBar.vue` | ✅ | 內文搜尋結果列：「第 X／Y 處符合「關鍵字」」＋上一處／下一處（44px 的圓形按鈕）。傳 `keyword`、`current`、`total`，按鈕送出 `prev`、`next`。住戶端會議紀錄的全文搜尋在用；搜到的字怎麼標出來在 `meeting/MeetingHighlight.vue` |
 | `Timeline/Month` | `timeline/TimelineMonth.vue` | ⬜ | 社區時間軸的月份分組列，可展開收合 |
 | `Timeline/Entry` | `timeline/TimelineEntry.vue` | ⬜ | 社區時間軸的一筆事件 |
 | `Rule/Article` | `rule/RuleArticle.vue` | ⬜ | 社區規約的一條條文 |

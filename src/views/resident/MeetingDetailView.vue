@@ -1,16 +1,19 @@
 <script setup>
 // 住戶端・會議紀錄：看一場會議的重點摘要和全文記錄（全文已經遮蔽個資）
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
-import { ArrowUpIcon, DownloadIcon, LockIcon } from '@lucide/vue'
+import { ArrowUpIcon, DownloadIcon, LockIcon, SearchIcon, XIcon } from '@lucide/vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
+import ArchiveSearchResultBar from '@/components/archive/ArchiveSearchResultBar.vue'
 import MeetingCase from '@/components/meeting/MeetingCase.vue'
 import MeetingHead from '@/components/meeting/MeetingHead.vue'
+import MeetingHighlight from '@/components/meeting/MeetingHighlight.vue'
 import { Accordion } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getCurrentUser, getMeetingById } from '@/mocks/api'
@@ -93,6 +96,81 @@ async function jumpTo(item) {
   await nextTick()
   // scrollIntoView：把那一段捲到畫面上；上面留的空間由那一段的 scroll-mt 決定
   document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
+}
+
+// ── 全文搜尋 ──────────────────────────────────────────
+
+const keyword = ref('') // 搜尋框裡的字
+const searchWord = computed(() => keyword.value.trim()) // 去掉頭尾空白；空字串就是沒有在搜尋
+const currentMatch = ref(1) // 現在跳到第幾處（從 1 開始）
+
+// 把一段文字依搜尋的字切開，例如搜「廠商」：
+//   '原合作廠商本年度' → [{ text: '原合作' }, { text: '廠商', match: 1 }, { text: '本年度' }]
+// counter 記錄全文到目前為止找到幾處，讓編號可以一段一段接下去
+function splitByWord(text, word, counter) {
+  if (!word) return [{ text }]
+  const parts = []
+  // toLowerCase()：英文不分大小寫，搜 pdf 也找得到 PDF
+  const lowerText = text.toLowerCase()
+  const lowerWord = word.toLowerCase()
+  let start = 0
+  let found = lowerText.indexOf(lowerWord, start)
+  // indexOf 找不到時是 -1；找得到就一直往後找
+  while (found !== -1) {
+    if (found > start) parts.push({ text: text.slice(start, found) })
+    counter.count += 1
+    parts.push({ text: text.slice(found, found + word.length), match: counter.count })
+    start = found + word.length
+    found = lowerText.indexOf(lowerWord, start)
+  }
+  if (start < text.length) parts.push({ text: text.slice(start) })
+  return parts
+}
+
+// 全文每一段的標題和內容都切好，順便算出一共有幾處
+// 例如 { parts: { 'section-1': { heading: [...], body: [...] } }, total: 2 }
+const searchResult = computed(() => {
+  const counter = { count: 0 }
+  const parts = {}
+  // 照畫面上的順序（標題、內容、下一段…）編號，「下一處」才會往下走
+  for (const item of outline.value) {
+    parts[item.id] = {
+      heading: splitByWord(item.heading, searchWord.value, counter),
+      body: splitByWord(item.body, searchWord.value, counter),
+    }
+  }
+  return { parts, total: counter.count }
+})
+
+// 換了搜尋的字：回到第 1 處，並打開所有案由卡片（符合的字可能在收起來的卡片裡）
+watch(searchWord, () => {
+  currentMatch.value = 1
+  if (searchWord.value) openAllCases()
+})
+
+// 跳到第幾處：標成目前這一處，再捲過去（捲到畫面中間，才不會被上面固定的列擋住）
+async function goToMatch(number) {
+  currentMatch.value = number
+  await nextTick()
+  document.getElementById(`match-${number}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
+// 上一處、下一處：到頭了就從另一頭繼續
+function prevMatch() {
+  goToMatch(currentMatch.value === 1 ? searchResult.value.total : currentMatch.value - 1)
+}
+function nextMatch() {
+  goToMatch(currentMatch.value === searchResult.value.total ? 1 : currentMatch.value + 1)
+}
+
+// 在搜尋框按 Enter（手機鍵盤的「搜尋」）：跳到目前這一處，並收起鍵盤
+function onSearchEnter(event) {
+  if (searchResult.value.total) goToMatch(currentMatch.value)
+  event.target.blur()
+}
+
+function clearSearch() {
+  keyword.value = ''
 }
 
 // 「回到頂端」按鈕：往下捲超過 300px（大約過了頁首和分頁）才出現
@@ -208,9 +286,54 @@ function download() {
             </div>
           </div>
 
+          <!-- 搜尋框：左邊放大鏡，有字的時候右邊出現清除按鈕 -->
+          <div class="relative">
+            <SearchIcon class="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground" />
+            <!-- enterkeyhint="search"：手機鍵盤的 Enter 鍵顯示成「搜尋」 -->
+            <Input
+              v-model="keyword"
+              aria-label="搜尋全文"
+              placeholder="搜尋全文關鍵字，例如：電梯、防水"
+              enterkeyhint="search"
+              class="pr-11 pl-10"
+              @keydown.enter="onSearchEnter"
+            />
+            <button
+              v-if="keyword"
+              type="button"
+              aria-label="清除搜尋"
+              class="absolute top-0 right-0 flex size-11 items-center justify-center"
+              @click="clearSearch"
+            >
+              <XIcon class="size-5" />
+            </button>
+          </div>
+
+          <!-- 搜尋中、有找到：結果列取代目錄標籤，一樣固定在頂部列下面 -->
+          <div v-if="searchWord && searchResult.total" class="sticky top-15 z-[5] -mx-5 bg-background px-5 py-2">
+            <ArchiveSearchResultBar
+              :keyword="searchWord"
+              :current="currentMatch"
+              :total="searchResult.total"
+              @prev="prevMatch"
+              @next="nextMatch"
+            />
+          </div>
+
+          <!-- 搜尋中、沒找到 -->
+          <Empty v-else-if="searchWord" class="gap-1 pt-6">
+            <EmptyMedia>
+              <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+            </EmptyMedia>
+            <EmptyTitle class="type-greeting">找不到「{{ searchWord }}」相關內容</EmptyTitle>
+            <EmptyDescription class="type-body">請換個關鍵字，例如：電梯、防水</EmptyDescription>
+            <Button variant="outline" class="mt-4" @click="clearSearch">清除搜尋</Button>
+          </Empty>
+
           <!-- 目錄標籤：捲動時固定在頂部列下面（top-15 是頂部列的高度 60px）。太多時可以左右滑 -->
           <!-- [scrollbar-width:none]、[&::-webkit-scrollbar]:hidden：藏起左右滑的捲軸 -->
           <nav
+            v-if="!searchWord"
             class="sticky top-15 z-[5] -mx-5 flex gap-2 overflow-x-auto bg-background px-5 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             <button
@@ -224,11 +347,19 @@ function download() {
             </button>
           </nav>
 
-          <template v-for="block in fullTextBlocks" :key="block.type === 'text' ? block.section.id : block.sections[0].id">
+          <!-- 全文：搜尋沒找到時不顯示。標題和內容都用 MeetingHighlight，搜尋到的字會被標出來 -->
+          <template
+            v-for="block in searchWord && !searchResult.total ? [] : fullTextBlocks"
+            :key="block.type === 'text' ? block.section.id : block.sections[0].id"
+          >
             <!-- 一般段落。scroll-mt-32：跳過來時，上面留空間給頂部列和目錄標籤 -->
             <section v-if="block.type === 'text'" :id="block.section.id" class="scroll-mt-32 space-y-2">
-              <h3 class="type-card-title text-heading">{{ block.section.heading }}</h3>
-              <p class="type-body whitespace-pre-line">{{ block.section.body }}</p>
+              <h3 class="type-card-title text-heading">
+                <MeetingHighlight :parts="searchResult.parts[block.section.id].heading" :current="currentMatch" />
+              </h3>
+              <p class="type-body whitespace-pre-line">
+                <MeetingHighlight :parts="searchResult.parts[block.section.id].body" :current="currentMatch" />
+              </p>
             </section>
             <!-- 一組案由卡片：type="multiple" 可以同時展開好幾張 -->
             <Accordion v-else v-model="openCases[block.sections[0].id]" type="multiple" class="gap-3">
@@ -239,7 +370,14 @@ function download() {
                 :value="item.id"
                 :section="item"
                 class="scroll-mt-32"
-              />
+              >
+                <template #heading>
+                  <MeetingHighlight :parts="searchResult.parts[item.id].heading" :current="currentMatch" />
+                </template>
+                <template #body>
+                  <MeetingHighlight :parts="searchResult.parts[item.id].body" :current="currentMatch" />
+                </template>
+              </MeetingCase>
             </Accordion>
           </template>
         </TabsContent>

@@ -2,6 +2,7 @@
 // 會議全文的案由卡片（對應 Figma 的 Meeting/Case）：結果徽章、案由標題，點標題可以展開或收合內容
 // 要放在 <Accordion> 裡面用，例如：
 //   <Accordion type="multiple" :default-value="['案由一']"><MeetingCase value="案由一" :section="section" /></Accordion>
+// 標題和內容想換成別的（例如把搜尋到的字標出來），可以用 #heading、#body 兩個 slot
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 
@@ -21,12 +22,12 @@ defineProps({
       <span class="flex min-w-0 flex-col items-start gap-1.5">
         <!-- 結果只是分類，用灰色徽章 -->
         <Badge v-if="section.tag" variant="outline">{{ section.tag }}</Badge>
-        <span class="type-body-strong">{{ section.heading }}</span>
+        <span class="type-body-strong"><slot name="heading">{{ section.heading }}</slot></span>
       </span>
     </AccordionTrigger>
     <!-- whitespace-pre-line：內容裡的換行（\n）照樣換行 -->
     <AccordionContent class="border-t pt-3 pb-4 type-body whitespace-pre-line">
-      {{ section.body }}
+      <slot name="body">{{ section.body }}</slot>
     </AccordionContent>
   </AccordionItem>
 </template>
