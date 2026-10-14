@@ -68,8 +68,9 @@ const shownVendors = computed(() => {
     </Button>
 
     <FilterChips v-model="status" :options="STATUS_FILTERS" />
-    <!-- 排序：灰色小字靠右 -->
-    <div class="flex justify-end">
+    <!-- 同一行：左邊件數、右邊排序（灰色小字） -->
+    <div class="flex items-center justify-between gap-3">
+      <p class="type-date text-muted-foreground">{{ loading ? '' : `共 ${shownVendors.length} 家廠商` }}</p>
       <SortSelect v-model="sort" :options="SORT_OPTIONS" />
     </div>
 
