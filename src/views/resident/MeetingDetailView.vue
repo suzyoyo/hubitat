@@ -1,11 +1,13 @@
 <script setup>
 // 住戶端・會議紀錄：看一場會議的重點摘要和全文記錄（全文已經遮蔽個資）
-import { onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
-import { DownloadIcon } from '@lucide/vue'
+import { ArrowUpIcon, DownloadIcon, LockIcon } from '@lucide/vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
+import MeetingCase from '@/components/meeting/MeetingCase.vue'
 import MeetingHead from '@/components/meeting/MeetingHead.vue'
+import { Accordion } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
@@ -33,8 +35,78 @@ const tabs = [
 onMounted(async () => {
   const user = await getCurrentUser('resident')
   meeting.value = await getMeetingById(route.params.id, 'resident', user.id)
+  // 案由卡片一開始全部展開（長輩不一定知道要點開）
+  if (meeting.value) openAllCases()
   loading.value = false
 })
+
+// ── 全文記錄 ──────────────────────────────────────────
+
+// 全文的每一段：有 tag（例如「通過」）的是案由，畫成可以展開收合的卡片；其他是一般段落
+// 連在一起的案由放進同一組卡片，所以把段落分成一塊一塊：
+//   { type: 'text', section }      一般段落
+//   { type: 'cases', sections: [] } 一組案由卡片
+const fullTextBlocks = computed(() => {
+  const blocks = []
+  meeting.value.fullText.forEach((section, index) => {
+    // 每一段都給一個 id，目錄標籤點了要跳到這裡
+    const item = { ...section, id: `section-${index}`, shortLabel: shortLabel(section.heading) }
+    const last = blocks.at(-1)
+    if (!section.tag) blocks.push({ type: 'text', section: item })
+    else if (last?.type === 'cases') last.sections.push(item)
+    else blocks.push({ type: 'cases', sections: [item] })
+  })
+  return blocks
+})
+
+// 目錄標籤用的短名稱
+//   '案由一：電梯年度保養合約續簽案' → '案由一'（冒號前面）
+//   '參、散會' → '散會'（頓號後面）
+function shortLabel(heading) {
+  if (heading.includes('：')) return heading.split('：')[0]
+  if (heading.includes('、')) return heading.split('、')[1]
+  return heading
+}
+
+// 目錄標籤：每一段一個
+const outline = computed(() =>
+  fullTextBlocks.value.flatMap((block) => (block.type === 'text' ? [block.section] : block.sections)),
+)
+
+// 每一組案由卡片展開了哪幾張，例如 { 'section-1': ['section-1', 'section-2'] }
+// key 是那一組第一張卡片的 id；資料拿到之後（onMounted 裡）先設成全部展開
+const openCases = ref({})
+function openAllCases() {
+  for (const block of fullTextBlocks.value) {
+    if (block.type === 'cases') openCases.value[block.sections[0].id] = block.sections.map((item) => item.id)
+  }
+}
+
+// 點目錄標籤：捲到那一段。如果是收起來的案由，先打開
+async function jumpTo(item) {
+  for (const block of fullTextBlocks.value) {
+    if (block.type !== 'cases' || !block.sections.includes(item)) continue
+    const opened = openCases.value[block.sections[0].id]
+    if (!opened.includes(item.id)) opened.push(item.id)
+  }
+  // nextTick：等卡片打開、畫面更新完再捲，不然捲到一半畫面變長，會停在錯的地方
+  await nextTick()
+  // scrollIntoView：把那一段捲到畫面上；上面留的空間由那一段的 scroll-mt 決定
+  document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })
+}
+
+// 「回到頂端」按鈕：往下捲超過 300px（大約過了頁首和分頁）才出現
+const showBackToTop = ref(false)
+function onScroll() {
+  showBackToTop.value = window.scrollY > 300
+}
+onMounted(() => window.addEventListener('scroll', onScroll))
+// 離開這一頁時把監聽拿掉，不然換到別頁還會一直執行
+onUnmounted(() => window.removeEventListener('scroll', onScroll))
+
+function backToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 
 // 議案的編號：第 1 個是 '01'，第 12 個是 '12'
 function agendaNumber(index) {
@@ -99,7 +171,7 @@ function download() {
         <TabsContent value="summary" class="space-y-6">
           <div class="space-y-2 rounded-xl bg-secondary p-4">
             <p class="type-date text-muted-foreground">本次會議核心決議</p>
-            <p class="type-card-title text-secondary-foreground">{{ meeting.summary }}</p>
+            <p class="type-body text-secondary-foreground">{{ meeting.summary }}</p>
           </div>
 
           <section class="space-y-1">
@@ -124,10 +196,65 @@ function download() {
             </ol>
           </section>
         </TabsContent>
-        <TabsContent value="full">
-          <p class="type-body text-muted-foreground">全文記錄（之後做）</p>
+        <!-- 全文記錄：遮蔽聲明、目錄標籤、全文 -->
+        <TabsContent value="full" class="space-y-4">
+          <div class="flex gap-3 rounded-xl border bg-card p-4">
+            <LockIcon class="mt-0.5 size-5 shrink-0" />
+            <div class="space-y-1">
+              <p class="type-body-strong">個人隱私資訊遮蔽聲明</p>
+              <p class="type-date text-muted-foreground">
+                為保護住戶個資權益，簽到名冊、戶號電話及未公開的廠商報價細節，已由系統遮蔽處理。
+              </p>
+            </div>
+          </div>
+
+          <!-- 目錄標籤：捲動時固定在頂部列下面（top-15 是頂部列的高度 60px）。太多時可以左右滑 -->
+          <!-- [scrollbar-width:none]、[&::-webkit-scrollbar]:hidden：藏起左右滑的捲軸 -->
+          <nav
+            class="sticky top-15 z-[5] -mx-5 flex gap-2 overflow-x-auto bg-background px-5 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            <button
+              v-for="item in outline"
+              :key="item.id"
+              type="button"
+              class="h-11 max-w-36 shrink-0 truncate rounded-full border bg-card px-4 type-body"
+              @click="jumpTo(item)"
+            >
+              {{ item.shortLabel }}
+            </button>
+          </nav>
+
+          <template v-for="block in fullTextBlocks" :key="block.type === 'text' ? block.section.id : block.sections[0].id">
+            <!-- 一般段落。scroll-mt-32：跳過來時，上面留空間給頂部列和目錄標籤 -->
+            <section v-if="block.type === 'text'" :id="block.section.id" class="scroll-mt-32 space-y-2">
+              <h3 class="type-card-title text-heading">{{ block.section.heading }}</h3>
+              <p class="type-body whitespace-pre-line">{{ block.section.body }}</p>
+            </section>
+            <!-- 一組案由卡片：type="multiple" 可以同時展開好幾張 -->
+            <Accordion v-else v-model="openCases[block.sections[0].id]" type="multiple" class="gap-3">
+              <MeetingCase
+                v-for="item in block.sections"
+                :id="item.id"
+                :key="item.id"
+                :value="item.id"
+                :section="item"
+                class="scroll-mt-32"
+              />
+            </Accordion>
+          </template>
         </TabsContent>
       </Tabs>
     </template>
+
+    <!-- 回到頂端：往下捲之後才出現，固定在右下角 -->
+    <button
+      v-if="showBackToTop"
+      type="button"
+      aria-label="回到頂端"
+      class="fixed right-5 bottom-6 z-10 flex size-11 items-center justify-center rounded-full border bg-card shadow-card"
+      @click="backToTop"
+    >
+      <ArrowUpIcon class="size-5" />
+    </button>
   </div>
 </template>

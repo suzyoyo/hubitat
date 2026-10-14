@@ -108,7 +108,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Meeting/Card` | `meeting/MeetingCard.vue` | 🟡 | 變體 Type：**Summary**（首頁會議摘要）已做；**Latest**（最新會議：3 條決議重點）還沒做。重點決議的內容是灰色，和首頁公告卡一致 |
 | `Meeting/Point` | `meeting/MeetingPoint.vue` | ⬜ | 決議重點的一條：勾選圖示＋文字 |
 | `Meeting/Head` | `meeting/MeetingHead.vue` | ✅ | 會議紀錄頁首：「社區管理委員會」、會議名稱、日期（含星期）、出席人數。傳 `getMeetingById()` 回傳的 `meeting`。住戶端會議紀錄頁在用 |
-| `Meeting/Case` | `meeting/MeetingCase.vue` | ⬜ | 會議全文的案由，可展開收合。變體 State：Open／Closed。需要先加基礎元件 accordion |
+| `Meeting/Case` | `meeting/MeetingCase.vue` | ✅ | 會議全文的案由卡片：結果徽章（灰色）＋案由標題，點標題展開或收合內容。變體 State（Open／Closed）由外層的 `<Accordion>` 決定，不是 prop。要放在 `<Accordion type="multiple">` 裡面，傳 `section`（全文的一段）和 `value`。字級、標題列高度（78px）在元件裡調整過，`ui/accordion` 本身沒動。住戶端會議紀錄頁預設全部展開 |
 | `Calendar/Card` | `calendar/CalendarCard.vue` | ✅ | 社區行事曆卡：從這個星期日開始的兩週日期＋公告圓點（實心＝與我有關、空心＝其他）。傳 `notices`。只顯示、不能點 |
 | `Calendar/Day` | ➖ | ➖ | 行事曆的單一日期。寫在 `CalendarCard.vue` 裡面即可 |
 | `Comment/Thread` | `comment/CommentThread.vue` | ⬜ | 一串留言。變體 Status：已回覆／待回覆 |
