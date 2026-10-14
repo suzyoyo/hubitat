@@ -1,6 +1,6 @@
 <script setup>
 // 管委會端・廠商（底部分頁）：廠商緊急聯絡、社區內部聯絡、鑰匙清單（設計稿 1134:15888）
-// 緊急聯絡：點廠商連到廠商詳細，按電話直接撥號
+// 緊急聯絡：整列點了就撥號
 // 這一版只有「看」；「編輯」緊急聯絡和鑰匙清單之後再做
 import { ChevronRightIcon, PhoneCallIcon, SearchIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
@@ -69,24 +69,21 @@ function telLink(phone) {
         <div class="rounded-xl bg-card px-4 py-1 shadow-card">
           <template v-for="(item, index) in shownEmergency" :key="`${item.vendorId}-${item.phone}`">
             <Separator v-if="index > 0" />
-            <!-- 點廠商那一塊連到廠商詳細；右邊的電話按鈕另外撥號（連結裡面不能再放連結，所以兩個並排） -->
-            <div class="flex items-center gap-3">
-              <RouterLink :to="`/committee/vendors/${item.vendorId}`" class="flex min-w-0 flex-1 items-center gap-2 py-3">
-                <div class="min-w-0 flex-1">
-                  <p class="type-body-strong text-foreground">{{ item.vendorName }}</p>
-                  <p class="type-date text-muted-foreground">{{ item.contactName }}・{{ item.phone }}</p>
-                </div>
-                <!-- 提示這一列可以點 -->
-                <ChevronRightIcon class="size-4 shrink-0 text-muted-foreground" />
-              </RouterLink>
-              <a
-                :href="telLink(item.phone)"
-                :aria-label="`打電話給${item.vendorName}`"
-                class="flex size-11 shrink-0 items-center justify-center rounded-full border border-border"
-              >
+            <!-- 整列都是打電話的連結：點哪裡都會撥號 -->
+            <a
+              :href="telLink(item.phone)"
+              :aria-label="`打電話給${item.vendorName}，${item.phone}`"
+              class="flex items-center gap-3 py-3"
+            >
+              <div class="min-w-0 flex-1">
+                <p class="type-body-strong text-foreground">{{ item.vendorName }}</p>
+                <p class="type-date text-muted-foreground">{{ item.contactName }}・{{ item.phone }}</p>
+              </div>
+              <!-- 電話圖示：提示點了會打電話（整列已經是連結，這裡只是圖示） -->
+              <span class="flex size-11 shrink-0 items-center justify-center rounded-full border border-border">
                 <PhoneCallIcon class="size-5" />
-              </a>
-            </div>
+              </span>
+            </a>
           </template>
           <p v-if="!shownEmergency.length" class="py-3 type-body text-muted-foreground">沒有符合的廠商</p>
           <Separator />
@@ -103,7 +100,8 @@ function telLink(phone) {
         <div class="rounded-xl bg-card px-4 py-1 shadow-card">
           <template v-for="(item, index) in shownInternal" :key="item.id">
             <Separator v-if="index > 0" />
-            <div class="flex items-center gap-3 py-3">
+            <!-- 整列都是打電話的連結，和廠商緊急聯絡一樣 -->
+            <a :href="telLink(item.phone)" :aria-label="`打電話給${item.name}，${item.phone}`" class="flex items-center gap-3 py-3">
               <div class="min-w-0 flex-1">
                 <p class="type-body-strong text-foreground">
                   {{ item.name }}
@@ -112,14 +110,10 @@ function telLink(phone) {
                 </p>
                 <p class="type-date text-muted-foreground">{{ item.phone }}</p>
               </div>
-              <a
-                :href="telLink(item.phone)"
-                :aria-label="`打電話給${item.name}`"
-                class="flex size-11 shrink-0 items-center justify-center rounded-full border border-border"
-              >
+              <span class="flex size-11 shrink-0 items-center justify-center rounded-full border border-border">
                 <PhoneCallIcon class="size-5" />
-              </a>
-            </div>
+              </span>
+            </a>
           </template>
           <p v-if="!shownInternal.length" class="py-3 type-body text-muted-foreground">沒有符合的聯絡人</p>
         </div>
