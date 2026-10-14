@@ -10,7 +10,7 @@
 2. [五條規則](#2-五條規則)
 3. [先懂三個詞](#3-先懂三個詞)
 4. [只做一次的設定](#4-只做一次的設定)
-5. [改自己那一端的流程](#5-改自己那一端的流程)
+5. [做自己那一端的流程](#5-做自己那一端的流程)
 6. [改共用的東西的流程](#6-改共用的東西的流程)
 7. [幫對方看 PR](#7-幫對方看-pr)
 8. [commit 訊息怎麼寫](#8-commit-訊息怎麼寫)
@@ -45,7 +45,9 @@
 | 兩端都在用的產品元件（例如 `notice/NoticeDetailDialog`、`common/FilterChips`） | 誰先做誰負責 |
 | 規格文件（`docs/`）、`CLAUDE.md` 裡的規則 | 兩人一起 |
 
-- 不管誰負責，**另一個人要改時都開 PR 給負責的人 review**，流程見[第 6 節](#6-改共用的東西的流程)。負責的人改自己負責的東西，一樣要開 PR 給對方看，因為對方的頁面也在用。
+- 不管誰負責，**要改的時候都另外開 `shared/` 分支、開 PR，等對方同意才合併**，流程見[第 6 節](#6-改共用的東西的流程)。負責的人改自己負責的東西，一樣要開 PR 給對方看，因為對方的頁面也在用。
+- **對方那一端的檔案和元件**（例如住戶端要改 `admin/` 的元件）也一樣，開 PR 等對方同意。
+- 文件裡只有「規則」算共用的。`component-map.md` 的完成狀態、`CLAUDE.md` 的「目前進度」跟著頁面的分支一起改就好。
 - 產品元件本來只有一端在用，另一端也要用時，就變成共用的東西。動手做新元件前先在群組說一聲「我要做 XXX 元件」，避免兩人各做一個。
 - 不確定算不算共用的時候，當作共用的。
 
@@ -55,15 +57,21 @@
 
 ## 2. 五條規則
 
-2026-10-14 起改成這樣。原則是：**只影響自己的就求快，會影響對方的才 review**。
+2026-10-14 起改成這樣。原則是：**每一頁都在自己的分支上做；只影響自己的求快，會影響對方的才等對方看**。
 
-1. **自己那一端的檔案，直接在 `main` 上 commit、push。** 不開分支、不開 PR，也不用對方 review。流程見[第 5 節](#5-改自己那一端的流程)。
-2. **共用的東西，開分支、開 PR 給對方 review，對方同意了才合併。** 一個 PR 只做一件事，說明寫清楚目的，對方才看得快。流程見[第 6 節](#6-改共用的東西的流程)。
-3. **一次 push 只放同一種東西。** 自己那一端的修改和共用的東西不要混在一起：共用的部分要先 review，混在一起就整包都得等。
-4. **每次開始工作前、push 之前，先拿最新的 `main`。** 兩個人都直接 push 到 `main`，不先拿的話 push 會被擋下來。
-5. **`main` 要一直是可以正常執行的版本。** push 到 `main` 或合併 PR 之前，先跑 `npm run build` 確認沒有錯誤。
+1. **一頁一個分支。** 例如做住戶端的會議紀錄頁，就開 `resident/meetings`。不要直接在 `main` 上寫程式。
+2. **做完後，依情況決定怎麼合進 `main`：**
 
-對方直接 push 到 `main` 的東西，有空時可以看一下 commit 紀錄（GitHub 的 **Commits**），看到問題就在群組說，或自己修。
+   | 情況 | 例子 | 怎麼合進 `main` | 要不要等對方 |
+   |---|---|---|---|
+   | 很小的修改 | 改幾個字、調間距、修一個小 bug，只動到自己那一端的一兩個檔案 | 不開 PR，在自己電腦上合進 `main`、push（[第 5 節步驟 5A](#步驟-5a很小的修改不開-pr直接合進-main)） | 不用 |
+   | 一般的頁面、功能比較大或改了很多 | 做一個新頁面、加一個流程 | 開 PR、自己合併（[第 5 節步驟 5B](#步驟-5b開-pr自己合併)） | 不用，對方有空再看 |
+   | 動到共用的東西或對方的元件 | 加假 API、加基礎元件、改 `style.css` | 那部分另外開 `shared/` 分支、開 PR（[第 6 節](#6-改共用的東西的流程)） | **要等對方同意才合併** |
+
+   只要碰到共用的東西或對方的元件，就不算「很小的修改」。不確定算哪一種時，開 PR。
+3. **頁面和共用的東西不要放在同一個分支。** 共用的部分要等對方看，混在一起整包都得等。
+4. **每次開始工作前、合進 `main` 之前，先拿最新的 `main`。**
+5. **`main` 要一直是可以正常執行的版本。** 合進 `main` 或合併 PR 之前，先跑 `npm run build` 確認沒有錯誤。
 
 ---
 
@@ -113,9 +121,9 @@ git config --global user.email "你註冊 GitHub 的信箱"
 
 ---
 
-## 5. 改自己那一端的流程
+## 5. 做自己那一端的流程
 
-以「suzy 要做住戶端的我的通報頁」為例。全程都在 `main` 上。
+以「suzy 要做住戶端的我的通報頁」為例。
 
 ### 步驟 1：拿最新的 main
 
@@ -132,7 +140,33 @@ git pull
 
 如果終端機提到 `package.json` 有變動，再跑一次 `npm install`。
 
-### 步驟 2：寫程式，分段 commit
+### 步驟 2：開一個新分支
+
+```bash
+git switch -c resident/reports
+```
+
+`-c` 是 create，意思是「建立一個新分支並切換過去」。
+
+**分支命名**，全小寫英文：
+
+| 要做的事 | 分支名稱 |
+|---|---|
+| 住戶端・我的通報 | `resident/reports`（`哪一端/頁面`，和網址一致） |
+| 管委會端・首頁 | `committee/home` |
+| 修正、小修改 | `fix/` 開頭，例如 `fix/report-card-spacing` |
+| 改共用的東西 | `shared/` 開頭，走[第 6 節](#6-改共用的東西的流程) |
+| 改文件裡的規則 | `docs/` 開頭，走[第 6 節](#6-改共用的東西的流程) |
+
+想確認自己現在在哪個分支：
+
+```bash
+git status
+```
+
+第一行會寫 `On branch resident/reports`。VS Code 左下角也會顯示。
+
+### 步驟 3：寫程式，分段 commit
 
 照 [dev-guide.md 第 4 節](dev-guide.md#4-寫一個新頁面的步驟)做頁面。每完成一個小段落就 commit 一次，不用等全部做完。
 
@@ -158,12 +192,32 @@ git commit -m "feat: add resident reports page"
 
 不要用 `git add .`（全部加進來），容易把共用的東西、吉祥物原圖、自己的筆記一起放進去。
 
-### 步驟 3：push 到 GitHub
+### 步驟 4：push 分支到 GitHub
 
-做完一個段落、通過 [dev-guide.md 的檢查清單](dev-guide.md#步驟-6交出去之前自己檢查)後：
+這個分支第一次 push：
+
+```bash
+git push -u origin resident/reports
+```
+
+之後同一個分支再 push，只要 `git push`。還沒做完也可以 push，當作備份。
+
+### 步驟 5：合進 main
+
+做完並通過 [dev-guide.md 的檢查清單](dev-guide.md#步驟-6交出去之前自己檢查)後，依[第 2 節](#2-五條規則)的表格選 5A 或 5B。
+
+#### 步驟 5A：很小的修改，不開 PR，直接合進 main
+
+```bash
+git switch main
+```
 
 ```bash
 git pull
+```
+
+```bash
+git merge --no-edit resident/reports
 ```
 
 ```bash
@@ -174,14 +228,67 @@ npm run build
 git push
 ```
 
-- 先 `git pull`：對方可能剛 push 了新東西，不先拿的話 push 會被擋下來（見[第 9 節](#push-被擋下來)）。
-- 再 `npm run build`：確認合在一起之後還是可以正常執行。
+- `git merge --no-edit resident/reports`：把分支合進 `main`。`--no-edit` 是「合併訊息用預設的就好」，不加的話 Git 可能會打開一個要你寫訊息的編輯畫面（見[第 9 節](#跳出一個看不懂的編輯畫面)）。
+- `npm run build` 沒有錯誤才 `git push`。有錯誤的話先不要 push，修好再說。
 
-不用等整頁做完才 push，做完一個段落就可以 push。
+合併完刪掉這個分支：
 
-### 步驟 4：在群組說一聲
+```bash
+git branch -d resident/reports
+```
 
-做完一頁時，在群組說「我做完 XXX 頁了」，附上網址和截圖。對方有空再看，看到問題就在群組說，或自己修。
+GitHub 上如果也有這個分支（步驟 4 有 push 過），再刪掉 GitHub 上的：
+
+```bash
+git push origin --delete resident/reports
+```
+
+#### 步驟 5B：開 PR，自己合併
+
+1. 打開 GitHub 的 repo 頁面，上方會出現黃色提示「resident/reports had recent pushes」，按 **Compare & pull request**。
+2. 填寫標題和說明（格式見下方）。
+3. 按 **Create pull request**。不用選 Reviewers。
+4. 確認 **Files changed** 只有這次要的檔案，按 **Merge pull request**，合併後按 **Delete branch**。
+5. 在群組跟對方說一聲，貼上 PR 的連結，對方有空再看。
+
+**PR 標題**：和 commit 訊息一樣的寫法，例如 `feat: add resident reports page`。
+
+**PR 說明**照這個格式寫：
+
+```markdown
+## 做了什麼
+住戶端「我的通報」頁，列出進行中和已完成的通報。
+
+## 怎麼看
+打開 /resident/reports
+
+## 截圖
+（貼上手機寬度的截圖）
+
+## 要注意的地方
+- 新增了 ReportCard 的 Full 版
+- 「已完成」的徽章顏色還沒定案，先用 default
+```
+
+「要注意的地方」寫這些：有沒有和設計稿不一樣的地方、有沒有碰到[尚未定案的事](dev-guide.md#8-尚未定案的事)。沒有就寫「無」。
+
+### 步驟 6：回到 main，準備下一頁
+
+```bash
+git switch main
+```
+
+```bash
+git pull
+```
+
+刪掉自己電腦上已經合併的分支：
+
+```bash
+git branch -d resident/reports
+```
+
+對方看過後有要修改的地方，從最新的 `main` 開一個 `fix/` 分支修，一樣依大小選 5A 或 5B。
 
 ---
 
@@ -289,7 +396,10 @@ git branch -d shared/announcement-api
 
 ## 7. 幫對方看 PR
 
-只有共用的東西會開 PR，而且要等你看過才能合併，所以**收到就盡快看**，當天看完最好，不然會卡住對方。
+對方的 PR 有兩種：
+
+- **共用的東西、你的元件**：要等你同意才能合併，**收到就盡快看**，當天看完最好，不然會卡住對方。
+- **對方自己那一端的頁面**：對方已經自己合併了，有空再看就好。看到問題就在 PR 留言或在群組說。
 
 ### 怎麼看
 
@@ -356,24 +466,26 @@ git switch main
 
 ## 9. 遇到狀況怎麼辦
 
-### 我在 main 上改到了共用的東西（還沒 commit）
+### 我不小心在 main 上改了東西（還沒 commit）
 
-先把自己那一端的部分 commit（`git add` 只加自己那一端的檔案），剩下共用的部分開一個新分支，修改會跟著過去：
+直接開一個新分支，修改會跟著過去：
 
 ```bash
-git switch -c shared/announcement-api
+git switch -c resident/reports
 ```
 
-### 我不小心把共用的東西 commit 在 main 上了（還沒 push）
+裡面有共用的東西的話，先只 `git add` 自己那一端的檔案、commit，剩下共用的部分再開一個 `shared/` 分支。
+
+### 我不小心在 main 上 commit 了（還沒 push）
 
 先不要 push，也不要自己嘗試復原，跟對方說，一起處理。
 
 ### push 被擋下來
 
-終端機出現 `rejected` 或 `fetch first`，代表對方在你之後 push 了新東西到 `main`。先把它拿下來，再 push 一次：
+終端機出現 `rejected` 或 `fetch first`，代表對方在你之後 push 了新東西到 `main`（通常是步驟 5A 合進 `main` 時遇到）。先把它拿下來，再 push 一次：
 
 ```bash
-git pull
+git pull --no-edit
 ```
 
 ```bash
@@ -382,7 +494,16 @@ git push
 
 `git pull` 時如果出現衝突，照下面「出現衝突」處理。
 
-### 我在分支上做到一半，對方 push 了新東西到 main
+### 跳出一個看不懂的編輯畫面
+
+`git merge`、`git pull` 有時會打開一個編輯畫面，要你寫合併訊息，第一行通常是 `Merge branch ...`。預設的訊息就可以了，直接存檔離開：
+
+- 畫面最下面有 `^X Exit` 字樣（nano）：按 `Ctrl` + `X`。
+- 其他（vim）：按一下 `Esc`，輸入 `:wq`，再按 `Enter`。
+
+以後在指令後面加 `--no-edit`（例如 `git merge --no-edit main`），就不會跳出來。
+
+### 我在分支上做到一半，對方合併了新的東西到 main
 
 想把最新的 `main` 拿進自己的分支：
 
@@ -395,11 +516,11 @@ git pull
 ```
 
 ```bash
-git switch shared/announcement-api
+git switch resident/reports
 ```
 
 ```bash
-git merge main
+git merge --no-edit main
 ```
 
 沒有衝突的話會自動完成。

@@ -772,7 +772,7 @@ const contracts = await getContracts('staff') // 拿到的資料不會有金額
 
 ### 共用的檔案：改之前先給對方看
 
-下面這些檔案兩個人都會用到。要改的時候**開分支、開 PR 給對方 review**，對方同意了才合併（2026-10-14 起，見 [git-workflow.md](git-workflow.md#2-五條規則)）。不要和自己那一端的頁面修改混在一起：
+下面這些檔案兩個人都會用到。要改的時候**另外開 `shared/` 分支、開 PR 給對方 review**，對方同意了才合併（2026-10-14 起，見 [git-workflow.md](git-workflow.md#2-五條規則)）。不要和自己那一端的頁面修改混在一起：
 
 - `src/style.css`（設計 Token）
 - `src/config/roles.js`（三端的分頁設定）
@@ -782,6 +782,7 @@ const contracts = await getContracts('staff') // 拿到的資料不會有金額
 - `src/mocks/`、`src/lib/`
 - `package.json`
 - 兩端都在用的產品元件
+- 對方那一端的檔案和元件
 - 文件裡的規則（`docs/`、`CLAUDE.md`）
 
 完整的清單和誰負責，見 [git-workflow.md 第 1 節](git-workflow.md#共用的東西)。
