@@ -1,21 +1,23 @@
 <script setup>
 // 管委會端・通知：頂部鈴鐺點進來（設計稿 1134:17656、空狀態 1134:18244）
 // 依今天、昨天、更早分組；點一則就到那筆資料的頁面；第一組右邊有「全部已讀」
-// 「全部已讀」目前只改這一頁畫面上的資料（離開再回來會變回未讀），要記住得等假 API 加上「設為已讀」
+// 已讀（2026-10-15）：點進某一則，那一則的紅點消失；按「全部已讀」全部消失，頂部鈴鐺的紅點也跟著消失
 import { CalendarIcon, CircleCheckIcon, FileTextIcon, MegaphoneIcon, MessageSquareIcon, TriangleAlertIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
 import IconTile from '@/components/common/IconTile.vue'
 import { Empty, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getCurrentUser, getNotifications } from '@/mocks/api'
+import { getCurrentUser, getNotifications, markAllNotificationsRead, markNotificationRead } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 const loading = ref(true)
 const notifications = ref([]) // 全部的通知（新的在前，已經分好組）
+const userId = ref('')
 
 onMounted(async () => {
   const user = await getCurrentUser('committee')
+  userId.value = user.id
   notifications.value = await getNotifications(user.id, 'committee')
   loading.value = false
 })
@@ -35,9 +37,15 @@ const groups = computed(() =>
 // 還有沒有沒讀的；都讀過了就不顯示「全部已讀」
 const hasUnread = computed(() => notifications.value.some((item) => !item.read))
 
-// 全部已讀：先只改畫面上的資料
-function markAllRead() {
+// 全部已讀：畫面上先變成已讀，再告訴假 API 記下來
+async function markAllRead() {
   notifications.value = notifications.value.map((item) => ({ ...item, read: true }))
+  await markAllNotificationsRead(userId.value, 'committee')
+}
+
+// 點進某一則：這一則設為已讀（同時連到那筆資料的頁面）
+function openItem(item) {
+  if (!item.read) markNotificationRead(item.id)
 }
 
 // ── 每一則的圖示和連結 ────────────────────────
@@ -99,7 +107,7 @@ function linkOf(item) {
         <template v-for="(item, index) in group.items" :key="item.id">
           <Separator v-if="index > 0" />
           <!-- 整列都可以點，到那筆資料的頁面 -->
-          <RouterLink :to="linkOf(item)" class="flex items-start gap-3 py-3">
+          <RouterLink :to="linkOf(item)" class="flex items-start gap-3 py-3" @click="openItem(item)">
             <IconTile variant="square">
               <component :is="ICONS[item.link.type]" />
             </IconTile>
