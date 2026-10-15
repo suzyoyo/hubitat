@@ -287,7 +287,8 @@ function dueText(item) {
           </div>
           <p class="type-date text-text-secondary">{{ task.assignerLabel }} → {{ task.assigneeLabel }}</p>
           <p class="type-date text-muted-foreground">
-            #{{ task.id }}・期限 {{ formatDateTime(task.deadline) }}
+            <!-- 期限是選填（#88），沒有期限時寫「未設定」，和交辦詳情一樣 -->
+            #{{ task.id }}・期限 {{ task.deadline ? formatDateTime(task.deadline) : '未設定' }}
             <span v-if="task.caseTitle">・關聯：{{ task.caseTitle }}</span>
           </p>
         </div>
