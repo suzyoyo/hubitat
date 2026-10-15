@@ -5,6 +5,7 @@
 export {
   ComboboxRoot as Combobox,
   ComboboxAnchor,
+  ComboboxCancel,
   ComboboxGroup,
   ComboboxItemIndicator,
   ComboboxTrigger,
