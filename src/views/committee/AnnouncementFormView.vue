@@ -146,6 +146,16 @@ const labels = computed(() => ({
   organizer: isActivity.value ? '主辦單位' : '主辦／負責單位',
 }))
 
+// 標題的提示文字：依類型舉一個例子（設計稿的標題是填好的範例，沒有提示文字）
+const titlePlaceholder = computed(
+  () =>
+    ({
+      construction: '例如：B 棟頂樓防水施工',
+      maintenance: '例如：A 棟電梯定期保養',
+      activity: '例如：中秋社區烤肉聯誼',
+    })[form.type] ?? '例如：社區年度消毒與除蟲',
+)
+
 // 影響範圍的按鈕：全社區＋各範圍
 const areaOptions = computed(() => [
   { value: 'all', label: '全社區' },
@@ -313,7 +323,7 @@ function cancel() {
         <Label for="an-title" class="text-base">
           {{ labels.title }} <span class="text-warning-strong">*</span>
         </Label>
-        <Input id="an-title" v-model="form.title" maxlength="40" :aria-invalid="Boolean(shownErrors.title)" />
+        <Input id="an-title" v-model="form.title" :placeholder="titlePlaceholder" maxlength="40" :aria-invalid="Boolean(shownErrors.title)" />
         <p v-if="shownErrors.title" class="type-date text-warning-strong">{{ shownErrors.title }}</p>
       </div>
 
