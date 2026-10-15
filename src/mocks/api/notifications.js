@@ -48,3 +48,4 @@ export async function markAllNotificationsRead(userId, role) {
     if (item.userId === userId && item.role === role) item.read = true
   }
 }
+
