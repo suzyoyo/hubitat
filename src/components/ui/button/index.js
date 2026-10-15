@@ -7,7 +7,7 @@ export { default as Button } from "./Button.vue";
 //   2. 顏色對照好彼 Kit 的 Button。有底色的四種（default、outline、secondary、destructive）
 //      底部有一條深色的線，看起來像微微浮起來；ghost 和 link 沒有
 //        default     品牌藍底、白字：主要動作，例如「確認修改」
-//        outline     接近白色的灰底、深藍字：次要動作，例如「撤回通報」「登出帳號」
+//        outline     接近白色的灰底、深藍字：次要動作，例如「登出帳號」
 //                    （名稱沿用 shadcn 的 outline，但 Kit 已改成沒有外框）
 //        secondary   淺藍底、深藍字
 //        destructive 淺紅底、紅字：刪除這類危險的動作

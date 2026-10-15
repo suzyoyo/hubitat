@@ -48,13 +48,13 @@
   - review 後還沒定案的事（分頁按鈕高度、件數徽章、分頁外框）記在 `docs/dev-guide.md` 第 8 節
 - ✅ 住戶端「通報詳情」頁（`src/views/resident/ReportDetailView.vue`）分兩個 PR 做完：
   - ✅ 第一部分「看」（分支 `resident/report-detail`）：通報摘要卡 `ReportSummary`、處理進度卡 `ReportProgressCard`（裡面是 `ReportStepper`、`ReportRecord`），載入中與找不到通報的畫面
-  - ✅ 第二部分「改」（2026-10-13，分支 `resident/report-edit`）：補充說明（200 字）、照片（最多 3 張）、確認修改、撤回通報
-    - 只有自己通報、還沒結案的才能改和撤回，假 API 用 `canEdit` 告訴畫面；已完成的、只是按「我也遇到了」的都只能看
+  - ✅ 第二部分「改」（2026-10-13，分支 `resident/report-edit`）：補充說明（200 字）、照片（最多 3 張）、確認修改
+    - **撤回通報拿掉了**（2026-10-15 和 013 決定，分支 `shared/remove-withdraw`）：`withdrawReport`、`canWithdraw`、`report/ReportWithdrawDialog`、`cancelled` 狀態都刪了。住戶修改時處理紀錄多一筆「住戶補充」留存，住戶的處理進度看到「你修改了補充說明。」，下面用灰色的備註小字（`type-note`，14px）記下改完的內容（`report/ReportRecord` 多了 `note`），管理端看到是誰改了什麼；這筆不算管委會的回覆。這次只改住戶端和假 API，管委會端的頁面沒動（013 正在改案件詳情）。Figma 的通報詳情要跟著拿掉「撤回通報」按鈕和撤回確認彈窗
+    - 只有自己通報、還沒結案的才能改，假 API 用 `canEdit` 告訴畫面；已完成的、只是按「我也遇到了」的都只能看
     - 「補充說明」就是原本的問題描述（`description`），地點和主旨不能改
-    - 假 API 新增 `updateReport`、`withdrawReport(id, userId, reason)`，都只改記憶體，重新整理網頁會變回原本的假資料
-    - 新元件：`app/BottomCta`（固定在底部的按鈕區）、`report/ReportWithdrawDialog`（撤回確認彈窗，撤回原因選填）
+    - 假 API 新增 `updateReport`，只改記憶體，重新整理網頁會變回原本的假資料
+    - 新元件：`app/BottomCta`（固定在底部的按鈕區）
     - 照片區後來和新增通報統一了，見下面「新增通報」的說明
-    - 底部按鈕下面的「撤回後…無法復原」拿掉了（和彈窗裡的說明重複），Figma 的通報詳情兩個畫面還有，要跟著拿掉
   - 設計稿的詳情頁同時是編輯頁，「我的通報」的「編輯通報 / 補充」按鈕也是連到這裡
   - 徽章顏色的規則放在 `src/lib/report.js`（`reportBadgeVariant`），`ReportCard` 和 `ReportSummary` 共用
   - 保密通報的公開狀態文字定為「僅你本人與管委會可見」（`CASE_VISIBILITY.private.note`）；進度條還沒到的步驟下面不顯示文字
@@ -149,6 +149,7 @@
 - 三層：基礎色階（`@theme`，覆蓋 Tailwind 的 blue / red / gray；orange 用 Tailwind 內建的，不覆蓋）→ 語意色（`:root`）→ 接到 Tailwind（`@theme inline`）。換色改 `:root`
 - 文字樣式用 `type-` 開頭的 class：`type-title`、`type-card-title`、`type-body`、`type-label` 等（不要用 `text-` 開頭，會和顏色 class 撞名）
 - 內文是 16px（設計稿 14px，團隊決定放大）
+- 備註用 `type-note`（14px，2026-10-15 和 013 決定）：附在一筆內容下面、比補充資訊再低一層的小字，例如通報紀錄下面「改完的內容」，搭配灰色
 - 日期和補充資訊用 `type-date`，也是 16px（2026-10-12 從 14px 放大，原本 14px 和自己拼的 16px 混用）。靠 `text-muted-foreground` 的灰色和內文區分，不要自己拼 `text-base leading-5`
 - 卡片：好彼 Kit 的卡片圓角是 14px，新做的元件用 `rounded-xl` + `shadow-card`。`rounded-card`（20px）是舊值，shadcn 的 `<Card>`（`src/components/ui/card/Card.vue`）、角色選擇頁和 playground 還在用，還沒決定要不要改
 - 徽章（`src/components/ui/badge/index.js`，對照 Kit 的 Badge，高 22px）：顏色代表「需不需要注意」，住戶端和管理端的意思不同，完整規則與例子在 `docs/dev-guide.md` 第 5 節（2026-10-11 定案，來源是 013 整理的《管委會端規格：角色權限與狀態顏色》）
@@ -157,7 +158,7 @@
   - 住戶端不顯示逾期天數、附議人數、處理人姓名
   - 紅色徽章的色值用我們色階裡的（`bg-warning-subtle text-red-800`），和 Kit 的 `#ffdbdc` / `#e7000b` 不完全相同
 - 表單：必填只用紅色星號，不寫「必填」；選填用灰色小字「選填」，不要底色
-- 按鈕（`src/components/ui/button/index.js`，對照 Kit 的 Button，2026-10-12）：`default` 品牌藍底＝主要動作；`outline` 灰底深藍字、**沒有外框**＝次要動作（撤回通報、登出帳號）；`secondary` 淺藍底（管委會端有用到，住戶端目前沒有）；`destructive` 淺紅底；`ghost`、`link` 沒有底色。有底色的四種底部有一條 1px 深色的線，用 `inset-shadow` 做（不用 `border-b`，圓角會斷開），已寫在元件裡，不用自己加。完整說明在 `docs/dev-guide.md` 第 5 節
+- 按鈕（`src/components/ui/button/index.js`，對照 Kit 的 Button，2026-10-12）：`default` 品牌藍底＝主要動作；`outline` 灰底深藍字、**沒有外框**＝次要動作（登出帳號）；`secondary` 淺藍底（管委會端有用到，住戶端目前沒有）；`destructive` 淺紅底；`ghost`、`link` 沒有底色。有底色的四種底部有一條 1px 深色的線，用 `inset-shadow` 做（不用 `border-b`，圓角會斷開），已寫在元件裡，不用自己加。完整說明在 `docs/dev-guide.md` 第 5 節
 - 外框顏色變數：`--nav`、`--nav-active`、`--fab` 等
 
 ## 假資料（`src/mocks/`）

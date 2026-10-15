@@ -140,7 +140,7 @@ function committeeTodos(userId) {
 
   // 我負責、還沒結案的案件
   for (const item of cases) {
-    const open = !['closed', 'cancelled'].includes(item.status)
+    const open = item.status !== 'closed'
     if (item.assigneeId === userId && open) {
       // 管理人員已完工驗收、等我結案的：換成「待我結案」，說明寫是誰完工驗收的
       if (item.status === 'to_verify') {
