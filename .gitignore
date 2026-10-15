@@ -22,3 +22,6 @@ logs/
 .idea/
 *.suo
 *.sw?
+
+# 吉祥物原圖（每張約 3MB），用在網頁前要先縮小放到 src/assets/mascot/，原圖不要 commit
+src/assets/IP/
