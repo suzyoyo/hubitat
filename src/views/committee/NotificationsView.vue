@@ -2,9 +2,8 @@
 // 管委會端・通知：頂部鈴鐺點進來（設計稿 1134:17656、空狀態 1134:18244）
 // 依今天、昨天、更早分組；點一則就到那筆資料的頁面；第一組右邊有「全部已讀」
 // 已讀（2026-10-15）：點進某一則，那一則的紅點消失；按「全部已讀」全部消失，頂部鈴鐺的紅點也跟著消失
-import { CalendarIcon, CircleCheckIcon, FileTextIcon, MegaphoneIcon, MessageSquareIcon, TriangleAlertIcon } from '@lucide/vue'
+// 每一則前面沒有圖示（2026-10-15 suzy 決定拿掉；設計稿有，Figma 要跟著改）
 import { computed, onMounted, ref } from 'vue'
-import IconTile from '@/components/common/IconTile.vue'
 import { Empty, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -48,17 +47,7 @@ function openItem(item) {
   if (!item.read) markNotificationRead(item.id)
 }
 
-// ── 每一則的圖示和連結 ────────────────────────
-// 依通知連到的資料種類決定圖示（設計稿：公告大聲公、提案文件、交辦打勾、合約日曆、案件警告）
-const ICONS = {
-  announcement: MegaphoneIcon,
-  meeting: MessageSquareIcon,
-  proposal: FileTextIcon,
-  task: CircleCheckIcon,
-  contract: CalendarIcon,
-  case: TriangleAlertIcon,
-}
-
+// ── 每一則的連結 ────────────────────────
 // 資料種類對應到哪一種頁面，例如 { type: 'case', id: 'CASE-1' } → '/committee/cases/CASE-1'
 const LINK_PATHS = {
   announcement: 'announcements',
@@ -108,14 +97,12 @@ function linkOf(item) {
           <Separator v-if="index > 0" />
           <!-- 整列都可以點，到那筆資料的頁面 -->
           <RouterLink :to="linkOf(item)" class="flex items-start gap-3 py-3" @click="openItem(item)">
-            <IconTile variant="square">
-              <component :is="ICONS[item.link.type]" />
-            </IconTile>
             <div class="min-w-0 flex-1 space-y-0.5">
               <p class="type-body-strong text-foreground">{{ item.title }}</p>
               <!-- line-clamp-1：內容太長只顯示一行，後面變成… -->
               <p class="line-clamp-1 type-date text-muted-foreground">{{ item.body }}</p>
-              <p class="type-date text-muted-foreground">{{ item.timeText }}</p>
+              <!-- 時間用備註的小字（type-note，14px，2026-10-15 suzy 決定），和內文分出層級 -->
+              <p class="type-note text-muted-foreground">{{ item.timeText }}</p>
             </div>
             <!-- 沒讀過的有紅點；aria-label 讓螢幕閱讀器念出「未讀」 -->
             <span v-if="!item.read" class="mt-2 size-2 shrink-0 rounded-full bg-destructive" aria-label="未讀" />
