@@ -28,6 +28,7 @@ const roleRoutes = roles.map((role) => {
         title: `${role.label}端・${title}`, // 佔位頁上顯示的名稱
         pageTitle: title, // 頂部列顯示的標題
         isTab,
+        roleId: role.id, // 是哪一端：'resident' / 'committee' / 'staff'。兩端共用的頁面用它決定連結開頭和「我是誰」
       },
     }
   }
