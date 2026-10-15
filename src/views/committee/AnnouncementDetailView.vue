@@ -55,9 +55,9 @@ onMounted(async () => {
 
 // ── 修改、撤回 ─────────────────────────────────────
 // 底部的按鈕（誰、什麼狀態能按，由假 API 決定，見 docs/data-model.md 的公告）
-//   已發布 → 修改公告、撤回公告；已撤回 → 修改並重新發布；其他 → 沒有按鈕
+//   已發布 → 修改公告、撤回公告；其他（包含已撤回）→ 沒有按鈕。已撤回的不能再改、不能重新發布
 const hasActions = computed(() => announcement.value?.canEdit || announcement.value?.canWithdraw)
-// 修改的畫面還沒做（和發布公告的表單一起做），先連到佔位頁
+// 修改公告：和發布公告同一個表單
 const editLink = computed(() => `/committee/announcements/${route.params.id}/edit`)
 
 // pending：動作還在路上時是 true，按鈕先不能按，避免連按兩次
@@ -93,10 +93,11 @@ async function submitWithdraw() {
 }
 
 // 撤回後回到上一頁（寫法和頂部列的返回鍵一樣）
-// 直接打網址進來的沒有上一頁，就回管委會首頁
+// 直接打網址進來的沒有上一頁、或上一頁也是這則公告（例如剛修改完），就回管委會首頁
 function goBack() {
   // history.state.back 是 Vue Router 記下來的「上一頁的網址」，沒有的話是 null
-  if (window.history.state?.back) {
+  const back = window.history.state?.back
+  if (back && !back.startsWith(`/committee/announcements/${route.params.id}`)) {
     router.back()
   } else {
     router.replace('/committee/home')
@@ -247,12 +248,6 @@ const publishRows = computed(() => {
           <RouterLink :to="editLink">修改公告</RouterLink>
         </Button>
         <Button variant="outline" :disabled="pending" @click="openWithdraw">撤回公告</Button>
-      </BottomCta>
-      <!-- 已撤回：只能修改後重新發布 -->
-      <BottomCta v-else-if="announcement.canEdit">
-        <Button as-child>
-          <RouterLink :to="editLink">修改並重新發布</RouterLink>
-        </Button>
       </BottomCta>
 
       <!-- 撤回確認彈窗：平常看不到，withdrawOpen 變成 true 才會出現（長相和撤回通報的彈窗一樣） -->
