@@ -5,6 +5,7 @@ import HomeView from '@/views/resident/HomeView.vue'
 import JoinCommitteeView from '@/views/resident/JoinCommitteeView.vue'
 import MeetingDetailView from '@/views/resident/MeetingDetailView.vue'
 import MeView from '@/views/resident/MeView.vue'
+import MyCommentsView from '@/views/resident/MyCommentsView.vue'
 import NewReportView from '@/views/resident/NewReportView.vue'
 import ReportDetailView from '@/views/resident/ReportDetailView.vue'
 import ReportsView from '@/views/resident/ReportsView.vue'
@@ -17,6 +18,7 @@ export default {
     home: HomeView,
     me: MeView,
     'me/join': JoinCommitteeView, // 「我的」頁的「加入管委會」
+    'me/comments': MyCommentsView, // 會議紀錄留言送出後的「查看我的留言」
     'meetings/:id': MeetingDetailView,
     reports: ReportsView,
     'reports/:id': ReportDetailView,

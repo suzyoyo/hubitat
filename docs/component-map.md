@@ -111,8 +111,8 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Meeting/Case` | `meeting/MeetingCase.vue` | ✅ | 會議全文的案由卡片：結果徽章（灰色）＋案由標題，點標題展開或收合內容。變體 State（Open／Closed）由外層的 `<Accordion>` 決定，不是 prop。要放在 `<Accordion type="multiple">` 裡面，傳 `section`（全文的一段）和 `value`。字級、標題列高度（78px）在元件裡調整過，`ui/accordion` 本身沒動。住戶端會議紀錄頁預設全部展開 |
 | `Calendar/Card` | `calendar/CalendarCard.vue` | ✅ | 社區行事曆卡：從這個星期日開始的兩週日期＋公告圓點（實心＝與我有關、空心＝其他）。傳 `notices`。只顯示、不能點 |
 | `Calendar/Day` | ➖ | ➖ | 行事曆的單一日期。寫在 `CalendarCard.vue` 裡面即可 |
-| `Comment/Thread` | `comment/CommentThread.vue` | ⬜ | 一串留言。變體 Status：已回覆／待回覆 |
-| `Comment/Bubble` | `comment/CommentBubble.vue` | ⬜ | 一則留言。變體 From：我的留言／管委會回覆 |
+| `Comment/Thread` | `comment/CommentThread.vue` | ✅ | 一串留言：會議名稱＋狀態徽章、我的留言，已回覆的下面接管委會回覆，待回覆的是一行灰字。變體 Status 不是 prop，看傳進來的留言有沒有回覆。傳 `comment`（`getMyComments()` 的一筆）。徽章照住戶端規則：待回覆藍、已回覆灰（設計稿是待回覆橘、已回覆藍） |
+| `Comment/Bubble` | `comment/CommentBubble.vue` | ✅ | 一則留言：「我的留言・9/30 14:20」＋內容。變體 From 用 `from` 切換：`mine` 淺灰底、`reply` 淺藍底（寫「管委會回覆」，不顯示委員姓名）。傳 `at`、`text` |
 | `Message/Sheet Content` | `message/MessageSheetContent.vue` | ✅ | 「留言給管委會」的底部抽屜，外層的 `ui/drawer` 已經包在元件裡，用 `v-model:open` 控制開關。變體 State 用 `sent` 切換：`false` 輸入中、`true` 送出成功。傳 `meetingTitle`、`maxLength`、`pending`、`myCommentsPath`；按「確認送出」送出 `submit`（帶留言內容），真的送出是頁面的工作。拖曳把手照設計稿改成 40px 寬，`ui/drawer` 本身沒動 |
 
 ### D. 社區檔案
