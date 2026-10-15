@@ -20,9 +20,10 @@ defineProps({
       <Separator />
       <div class="space-y-2">
         <!-- index 是第幾筆（從 0 開始）；最後一筆就是最新的 -->
+        <!-- key 加上 index：同一個時間可能有兩筆（例如連續修改兩次） -->
         <ReportRecord
           v-for="(record, index) in report.timeline"
-          :key="record.at"
+          :key="`${record.at}-${index}`"
           :record="record"
           :latest="index === report.timeline.length - 1"
         />

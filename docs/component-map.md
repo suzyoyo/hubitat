@@ -94,7 +94,6 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Report/Review Row` | `report/ReportReviewRow.vue` | ✅ | 確認送出頁的一列：欄位名稱（`label`）＋內容（`value`）＋「修改」按鈕，按了送出 `edit` 事件。分隔線由外面的容器用 `divide-y` 畫，沒有做成 prop |
 | `Report/Photo Tile` | `report/ReportPhotoTile.vue` | ✅ | 照片格，新增通報和通報詳情共用。`type` 有兩種：`thumbnail`（預設，傳 `name` 檔名，下面一顆「刪除」文字按鈕，按了送出 `remove`）／`add`（虛線框的「新增」，選好檔案送出 `pick`，帶檔名）。照片和影片都可以選，影片（看副檔名）用攝影機圖示，超過 50MB 不收並跳提示。假資料只有檔名，所以只顯示圖示＋檔名。**和 Kit 不一樣**：沒有大張的 Preview 和「更換」（2026-10-13 決定兩頁統一用小張＋「刪除」，長輩比較看得懂文字；要換就先刪除再新增） |
 | （Kit 沒有元件） | `report/ReportPhotoGrid.vue` | ✅ | 照片／影片那一區：一排三格的 `ReportPhotoTile`＋下面一行說明（最多 3 個、影片 50MB 以內）。用 `v-model` 綁檔名的陣列。新增通報和通報詳情共用，兩頁才會長得一樣 |
-| （Kit 沒有元件，設計稿是「住戶端-通報詳情-撤回確認」） | `report/ReportWithdrawDialog.vue` | ✅ | 撤回通報的確認彈窗：標題＋說明＋撤回原因（選填）＋「取消／確認撤回」。用 `v-model:open` 控制開關，按「確認撤回」送出 `confirm` 事件（帶原因），真的去撤回是頁面的工作；撤回中傳 `pending` 讓按鈕不能按 |
 
 ### C. 公告與會議
 
@@ -190,7 +189,7 @@ import { Button } from '@/components/ui/button'
 | Calendar | `common/DatePicker.vue` | 🟡 | 2026-10-15：Kit 還沒有 Date Picker，照設計稿「新增交辦」的完成期限（1134:14034）自己做，沒有用 shadcn 的 `calendar`。按鈕（日曆圖示＋文字）點了跳出月曆，值是 `'2026-10-12'` 字串，可以傳 `min`、`max`。管委會的發布公告在用。時間用 `common/TimePicker.vue`（Kit、shadcn 都沒有時間選擇器，照 DatePicker 的樣子做）：按鈕點了跳出「時」「分」兩欄，分鐘每 5 分一格，值是 `'14:30'` 字串。不用瀏覽器內建的 `type="time"`，因為跳出來的滾輪是手機畫的，樣式改不了 |
 | Checkbox | `checkbox` | ⬜ | |
 | Combobox | `ui/combobox` | ✅ | 要打字搜尋的選單才用。只是點選的下拉選單用 `select`（見下方），選項的樣子照 Kit 這一頁的「Combobox Item」：文字＋右邊打勾。2026-10-15 加：用 `npx shadcn-vue add combobox` 會失敗（它要的 `input-group` 轉成 JavaScript 時出錯），所以照 shadcn-vue 的寫法手動建，底層是 reka-ui 的 Combobox。案件詳情的「關聯設備」（`case/CaseEquipmentPicker`）在用，照 shadcn Figma（Combobox 頁）的「Basic」＋「Clear Button」：框本身就是輸入框，點了往下展開、打字就篩選，右邊 ✕ 清掉打的字、箭頭展開收起 |
-| Dialog | `dialog` | ✅ | 2026-10-12 加入。公告詳情彈窗在用；通報詳情的撤回確認之後也會用到 |
+| Dialog | `dialog` | ✅ | 2026-10-12 加入。公告詳情彈窗、各種確認彈窗在用 |
 | Native Select | `native-select` | ⬜ | |
 | Toggle & Toggle Group | `toggle`、`toggle-group` | ✅ | 2026-10-12 加入。篩選標籤用 `toggle-group` 當底，包成 `common/FilterChips.vue`（2026-10-13，樣式在那裡調，`ui/` 沒改），規則見 [dev-guide.md 第 5 節](dev-guide.md#篩選篩選標籤下拉選單) |
 | Kbd | ➖ | ➖ | 顯示鍵盤按鍵用的，手機版用不到 |

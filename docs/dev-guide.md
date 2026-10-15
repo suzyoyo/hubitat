@@ -478,6 +478,7 @@ const latestReport = computed(() => reports.value[0])
 | `type-body-strong` | 內文裡要強調的字 | 16px 中粗 |
 | `type-link` | 「看全部」這類文字連結 | 16px 中粗 |
 | `type-date` | 日期、更新時間、負責單位這類補充資訊。通常搭配 `text-muted-foreground` | 16px |
+| `type-note` | 備註：附在一筆內容下面、比補充資訊再低一層的小字，例如通報紀錄下面「改完的內容」。搭配 `text-muted-foreground`（2026-10-15 和 013 決定） | 14px |
 | `type-button` | 按鈕文字（Button 已內建，不用自己加） | 14px 粗體 |
 | `type-nav` | 底部導覽列 | 13px |
 | `type-label` | 徽章 | 12px |
@@ -570,7 +571,7 @@ const latestReport = computed(() => reports.value[0])
 | `variant` | 外觀 | 什麼時候用 | 例子 |
 |---|---|---|---|
 | `default`（不用寫） | 品牌藍底、白字 | 這個畫面最主要的動作 | 「新增通報」「確認修改」「我知道了」 |
-| `outline` | 接近白色的灰底、深藍字 | 次要的動作，通常和主要按鈕放在一起 | 「撤回通報」「留言給管委會」「登出帳號」 |
+| `outline` | 接近白色的灰底、深藍字 | 次要的動作，通常和主要按鈕放在一起 | 「留言給管委會」「登出帳號」 |
 | `secondary` | 淺藍底、深藍字 | 比 `outline` 明顯一點的次要動作。管委會端的設計稿有用到，住戶端目前沒有 | 照設計稿 |
 | `destructive` | 淺紅底、紅字 | 刪除這類做了就回不去的動作 | 設計稿目前沒有用到 |
 | `ghost` | 沒有底色、黑字 | 不需要強調的小動作，例如關閉 | Sheet 右上角的關閉 |
@@ -578,10 +579,10 @@ const latestReport = computed(() => reports.value[0])
 
 ```vue
 <Button>確認修改</Button>
-<Button variant="outline">撤回通報</Button>
+<Button variant="outline">登出帳號</Button>
 ```
 
-- 兩顆按鈕並排時，通常主要的用 `default`，另一顆用 `outline`（例如「確認修改」和「撤回通報」）。
+- 兩顆按鈕並排時，通常主要的用 `default`，另一顆用 `outline`（例如管委會端的「取消」和「確認回報」）。
 - `outline` 這個名字是沿用 shadcn 的，Kit 已經改成**沒有外框**。
 - 有底色的四種，底部都有一條深色的線，看起來像微微浮起來。這條線已經寫在元件裡，不用自己加，也不要另外加陰影（`shadow-*`）。
 - 不要用 class 改按鈕的底色（例如加 `bg-card`）。需要的樣式 Kit 沒有時，先跟對方確認。

@@ -84,10 +84,17 @@ function presentForManagement(item) {
 // 只挑住戶需要的欄位，不會把負責人、廠商、內部紀錄給住戶
 function presentForResident(item, userId) {
   // 只留有 residentText 的紀錄，並改用給住戶看的說明
+  //   isEdit：是住戶自己修改的紀錄（「你修改了補充說明。」），不算管委會的回覆
   const timeline = item.logs
     .filter((log) => log.residentText)
-    .map((log) => ({ at: log.at, text: log.residentText }))
-  const latest = timeline.at(-1) // 最後一筆，也就是最新的回覆
+    .map((log) => ({
+      at: log.at,
+      text: log.residentText,
+      note: log.note ?? '', // 小字的補充，例如住戶改成了什麼內容；沒有就是空字串
+      isEdit: log.label === RESIDENT_EDIT_LABEL,
+    }))
+  const replies = timeline.filter((record) => !record.isEdit) // 管委會、管理人員的回覆
+  const latest = replies.at(-1) // 最新的回覆
 
   return {
     id: item.id,
@@ -103,24 +110,26 @@ function presentForResident(item, userId) {
     description: item.description,
     photos: item.photos,
     submittedAt: item.reportedAt,
-    updatedAt: latest ? latest.at : item.reportedAt,
+    // 更新時間：最後一筆紀錄（包含自己修改的）
+    updatedAt: timeline.at(-1)?.at ?? item.reportedAt,
     latestReply: latest,
     timeline,
     // 處理進度的三個階段各自的時間；還沒到的階段是 null
     steps: {
       receivedAt: item.reportedAt,
-      processingAt: item.status === 'pending' ? null : (timeline[1]?.at ?? null),
+      // 第一筆是「已收到」，第二筆回覆是受理；自己修改的不算
+      processingAt: item.status === 'pending' ? null : (replies[1]?.at ?? null),
       doneAt: item.closedAt ?? null,
     },
     supporterCount: item.supporters.length,
     // 是我（或我這一戶被代登記）通報的，還是我按了「我也遇到了」
     isMine: item.reporterId === userId || isMyHousehold(item, userId),
-    // 是不是管委會、管理人員代我這一戶登記的（只能看，不能修改或撤回）
+    // 是不是管委會、管理人員代我這一戶登記的（只能看，不能修改）
     isOnBehalf: isMyHousehold(item, userId),
     // 卡片、詳情頁顯示的文字：'管委會代為登記' / '管理人員代為登記'；不是代我這一戶登記的就是空字串
     onBehalfLabel: isMyHousehold(item, userId) ? `${item.source === 'staff' ? '管理人員' : '管委會'}代為登記` : '',
     hasSupported: item.supporters.includes(userId), // 我按過「我也遇到了」
-    // 能不能修改或撤回：要是我自己通報的，而且還沒結案
+    // 能不能修改：要是我自己通報的，而且還沒結案
     canEdit: item.reporterId === userId && isOpen(item),
   }
 }
@@ -152,12 +161,11 @@ export async function getCases(filters = {}) {
 }
 
 // 取得單一案件的詳情（管委會、管理人員用）
-// 有傳 userId 時，會多一個 canWithdraw：是這個人登記的、而且還沒結案，才能撤回
-export async function getCaseById(id, userId) {
+export async function getCaseById(id) {
   await delay()
   const item = cases.find((entry) => entry.id === id)
   if (!item) return undefined
-  return { ...presentForManagement(item), canWithdraw: item.reporterId === userId && isOpen(item) }
+  return presentForManagement(item)
 }
 
 // ── 管理端的動作：受理 → 派廠商 → 處理紀錄 → 完工驗收 → 結案 ──────────
@@ -445,7 +453,6 @@ export async function getMyReports(userId, status) {
   await delay()
   return cases
     .filter((item) => item.reporterId === userId || isMyHousehold(item, userId) || item.supporters.includes(userId))
-    .filter((item) => item.status !== 'cancelled')
     .filter((item) => {
       if (status === 'active') return isOpen(item)
       if (status === 'done') return !isOpen(item)
@@ -473,50 +480,40 @@ function findEditableCase(id, userId) {
   return item
 }
 
-// 撤回紀錄的標籤：看是誰通報的（巡查發現的是管理人員登記的，也算管理人員）
-const WITHDRAW_LABELS = { resident: '住戶撤回', committee: '委員撤回', staff: '管理人員撤回', patrol: '管理人員撤回' }
-
-// 住戶看到的撤回說明：住戶自己撤回的寫「你」，其他寫是誰撤回的
-const WITHDRAW_RESIDENT_TEXTS = {
-  resident: '你已撤回這筆通報。',
-  committee: '管委會已撤回這筆通報。',
-  staff: '管理人員已撤回這筆通報。',
-  patrol: '管理人員已撤回這筆通報。',
-}
+// 住戶修改通報的紀錄名稱；住戶端看到這個名稱的紀錄，就知道是自己改的
+const RESIDENT_EDIT_LABEL = '住戶補充'
 
 // 修改通報（住戶用）：只能改補充說明和照片，地點和主旨送出後就不能改
 //   changes 可以傳 description（補充說明）、photos（照片或影片檔名的清單），沒傳的不會動
+// 有改到東西的話，處理紀錄多一筆「住戶補充」，留下修改的紀錄：
+//   管理端看到「陳先生（B 棟 8 樓）修改了補充說明」，住戶自己的處理進度看到「你修改了補充說明。」
+//   紀錄的 note 存改完之後的內容（補充說明的全文、照片的檔名），住戶的處理進度用小字顯示在下面
 // 回傳修改後的通報；不能改的話（不是自己的、已經結案）回傳 undefined
 // 修改只存在記憶體，重新整理網頁會變回原本的假資料
 export async function updateReport(id, userId, changes) {
   await delay()
   const item = findEditableCase(id, userId)
   if (!item) return undefined
-  if (changes.description !== undefined) item.description = changes.description
-  if (changes.photos !== undefined) item.photos = [...changes.photos]
+  const changed = [] // 改了哪些，例如 ['補充說明', '照片／影片']
+  const notes = [] // 改完之後的內容，和 changed 一一對應
+  if (changes.description !== undefined && changes.description !== item.description) {
+    item.description = changes.description
+    changed.push('補充說明')
+    notes.push(item.description ? `「${item.description}」` : '已清空')
+  }
+  if (changes.photos !== undefined && changes.photos.join('|') !== item.photos.join('|')) {
+    item.photos = [...changes.photos]
+    changed.push('照片／影片')
+    notes.push(item.photos.length ? item.photos.join('、') : '已全部刪除')
+  }
+  if (changed.length) {
+    const what = changed.join('、')
+    addLog(item, userId, RESIDENT_EDIT_LABEL, `${reporterLabel(item)}修改了${what}`, `你修改了${what}。`)
+    // 剛加的那一筆，多記改完的內容。只改一項時，上一行已經說了改哪一項，不用再寫一次；兩項都改才在前面標名稱
+    item.logs.at(-1).note =
+      changed.length === 1 ? notes[0] : changed.map((name, i) => `${name}：${notes[i]}`).join('\n')
+  }
   return presentForResident(item, userId)
-}
-
-// 撤回通報：狀態改成「已取消」，並留下一筆紀錄
-// 住戶撤回自己的通報；管委會、管理人員撤回自己登記的（包括代住戶登記的）
-//   reason 撤回原因，選填；有寫的話管理端的紀錄會看到
-// 撤回後不會再出現在「我的通報」，管理端的未結案列表也看不到
-// 回傳 true 代表撤回成功；不能撤回的話（不是自己的、已經結案）回傳 false
-export async function withdrawReport(id, userId, reason = '') {
-  await delay()
-  const item = findEditableCase(id, userId)
-  if (!item) return false
-  item.status = 'cancelled'
-  if (reason) item.withdrawReason = reason
-  item.logs.push({
-    at: MOCK_NOW,
-    actorId: userId,
-    label: WITHDRAW_LABELS[item.source],
-    text: reason ? `通報人撤回通報，原因：${reason}` : '通報人撤回通報',
-    // 代住戶登記的，住戶看到的是管委會或管理人員撤回的
-    residentText: WITHDRAW_RESIDENT_TEXTS[item.source],
-  })
-  return true
 }
 
 // 新案件的編號：CASE-今天的日期-流水號。流水號是今天已經有幾件再加 1，補成三位數

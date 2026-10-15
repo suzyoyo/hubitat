@@ -1,27 +1,25 @@
 <script setup>
-// 住戶端・通報詳情：看一筆通報的處理進度，也可以補充說明、換照片或撤回
+// 住戶端・通報詳情：看一筆通報的處理進度，也可以補充說明、換照片
+// 沒有「撤回通報」：2026-10-15 和 013 決定拿掉撤回，不需要處理的通報由處理的人寫明原因結案
 import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import BottomCta from '@/components/app/BottomCta.vue'
 import ReportPhotoGrid from '@/components/report/ReportPhotoGrid.vue'
 import ReportProgressCard from '@/components/report/ReportProgressCard.vue'
 import ReportSummary from '@/components/report/ReportSummary.vue'
-import ReportWithdrawDialog from '@/components/report/ReportWithdrawDialog.vue'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { REPORT_DESCRIPTION_MAX } from '@/lib/report'
-import { getCurrentUser, getReportById, updateReport, withdrawReport } from '@/mocks/api'
+import { getCurrentUser, getReportById, updateReport } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 // useRoute()：取得目前路由的資訊
 // 網址是 /resident/reports/:id，所以 route.params.id 就是這筆通報的編號
 const route = useRoute()
-// useRouter()：用程式換頁（撤回之後要回到「我的通報」）
-const router = useRouter()
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
 const loading = ref(true)
@@ -83,26 +81,6 @@ async function save() {
   fillForm()
   toast.success('已更新通報')
 }
-
-// 撤回確認彈窗是開還是關
-const withdrawOpen = ref(false)
-// withdrawing：撤回還在路上時是 true
-const withdrawing = ref(false)
-
-// 在彈窗按了「確認撤回」；reason 是彈窗傳來的撤回原因（沒寫就是空字串）
-async function withdraw(reason) {
-  withdrawing.value = true
-  const ok = await withdrawReport(report.value.id, userId.value, reason)
-  withdrawing.value = false
-  withdrawOpen.value = false
-  if (!ok) {
-    toast.error('撤回失敗', { description: '這筆通報已經不能撤回了。' })
-    return
-  }
-  toast.success('已撤回通報')
-  // replace：用「我的通報」取代現在這一頁，按返回才不會又回到已經撤回的通報
-  router.replace('/resident/reports')
-}
 </script>
 
 <template>
@@ -121,7 +99,7 @@ async function withdraw(reason) {
         <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">找不到這筆通報</EmptyTitle>
-      <EmptyDescription class="type-body">可能已經撤回，或是網址不正確。</EmptyDescription>
+      <EmptyDescription class="type-body">可能是網址不正確。</EmptyDescription>
       <Button as-child class="mt-4">
         <RouterLink to="/resident/reports">回到我的通報</RouterLink>
       </Button>
@@ -156,14 +134,10 @@ async function withdraw(reason) {
           <ReportPhotoGrid v-model="photos" />
         </div>
 
-        <!-- 設計稿在按鈕下面還有一行「撤回後…無法復原」，和撤回彈窗裡的說明重複，所以拿掉 -->
+        <!-- 設計稿左邊還有一顆「撤回通報」，2026-10-15 拿掉了 -->
         <BottomCta>
-          <Button variant="outline" @click="withdrawOpen = true">撤回通報</Button>
           <Button :disabled="!canSave" @click="save">確認修改</Button>
         </BottomCta>
-
-        <!-- 撤回確認彈窗：平常看不到，withdrawOpen 變成 true 才會出現 -->
-        <ReportWithdrawDialog v-model:open="withdrawOpen" :pending="withdrawing" @confirm="withdraw" />
       </template>
     </template>
   </div>

@@ -31,7 +31,6 @@
 //   completion  完工紀錄：at 時間 / note 備註 / photos 照片（還沒完工就不寫）
 //   rating      廠商評分：score 1～5 分 / comment 評語（還沒評就不寫）
 //   closedAt    結案時間（還沒結案就不寫）
-//   withdrawReason 撤回原因（住戶撤回時選填，沒寫就沒有這一項）
 
 // 案件狀態：同一個狀態，管理端和住戶端顯示的文字不同
 //   label         管委會、管理人員看到的
@@ -45,7 +44,6 @@ export const CASE_STATUSES = {
   in_progress: { label: '處理中', residentLabel: '處理中', isOpen: true },
   to_verify: { label: '待結案', residentLabel: '處理中', isOpen: true }, // 管理人員已完工驗收，等負責人結案
   closed: { label: '已結案', residentLabel: '已完成', isOpen: false },
-  cancelled: { label: '已取消', residentLabel: '已撤回', isOpen: false },
 }
 
 // 案件來源
