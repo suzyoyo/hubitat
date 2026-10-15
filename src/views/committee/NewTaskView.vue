@@ -3,7 +3,7 @@
 // 主要從案件詳情的「交辦」進來，網址帶案件編號（/committee/tasks/new?caseId=CASE-…），這時關聯案件鎖定不能改
 // 從「＋」選單進來的沒有關聯案件（設計稿可以搜尋例行會議決議或案件，還沒做）
 // 只有主委、副主委可以交辦；同一件案件還有沒完成的交辦時不能再交辦（假 API createTask 會擋）
-// 交辦對象只有管理人員（2026-10-15 013 決定）；完成期限選填
+// 交辦對象只有管理人員（2026-10-15 013 決定）；交辦內容、完成期限選填
 // 寫法參考案件詳情頁（CaseDetailView）：送出中按鈕先不能按、成功失敗用 toast 提示
 import { LockIcon, SearchIcon, XIcon } from '@lucide/vue'
 import { computed, onMounted, reactive, ref } from 'vue'
@@ -90,7 +90,6 @@ const submitted = ref(false)
 const errors = computed(() => {
   const result = {}
   if (!form.title.trim()) result.title = '請填寫交辦標題'
-  if (!form.content.trim()) result.content = '請填寫交辦內容'
   if (!form.assigneeId) result.assignee = '請選擇交辦對象'
   return result
 })
@@ -172,19 +171,18 @@ function cancel() {
       </div>
 
       <div class="space-y-2">
-        <Label for="task-content" class="text-base">交辦內容 <span class="text-warning-strong">*</span></Label>
+        <Label for="task-content" class="text-base">
+          交辦內容<span class="type-date text-muted-foreground">選填</span>
+        </Label>
         <Textarea
           id="task-content"
           v-model="form.content"
           placeholder="例如：請聯繫兩家廠商，報價維修工程"
           :maxlength="CONTENT_MAX"
           class="min-h-[100px]"
-          :aria-invalid="Boolean(shownErrors.content)"
         />
         <div class="flex gap-3">
-          <p class="min-w-0 flex-1 type-date" :class="shownErrors.content ? 'text-warning-strong' : 'text-muted-foreground'">
-            {{ shownErrors.content || '請具體說明廠商評選條件或驗收標準' }}
-          </p>
+          <p class="min-w-0 flex-1 type-date text-muted-foreground">請具體說明廠商評選條件或驗收標準</p>
           <p class="shrink-0 type-date text-muted-foreground">{{ form.content.length }} / {{ CONTENT_MAX }} 字</p>
         </div>
       </div>
