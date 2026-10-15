@@ -286,6 +286,9 @@ function isVideo(name) {
             <div class="min-w-0 flex-1 space-y-0.5">
               <p class="type-body-strong text-foreground">{{ log.label }}</p>
               <p class="type-body text-muted-foreground">{{ log.text }}</p>
+              <!-- 備註小字（例如住戶修改通報時，改完的內容）：和住戶端的處理進度一樣（ReportRecord），
+                   type-note 14px 灰色；whitespace-pre-line 讓兩項都改時一項一行 -->
+              <p v-if="log.note" class="type-note whitespace-pre-line text-muted-foreground">{{ log.note }}</p>
             </div>
           </div>
         </template>
