@@ -10,6 +10,7 @@ import FilesView from '@/views/staff/FilesView.vue'
 import HomeView from '@/views/staff/HomeView.vue'
 import MeView from '@/views/staff/MeView.vue'
 import NotificationsView from '@/views/staff/NotificationsView.vue'
+import TodosView from '@/views/staff/TodosView.vue'
 import VendorsView from '@/views/staff/VendorsView.vue'
 
 export default {
@@ -23,6 +24,7 @@ export default {
     files: FilesView,
     me: MeView,
     notifications: NotificationsView, // 右上角的鈴鐺
+    todos: TodosView, // 首頁的「查看全部待辦事項」
     // 和管委會端共用的頁面
     cases: CasesView,
     'cases/:id': CaseDetailView,
