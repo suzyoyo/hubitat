@@ -39,7 +39,7 @@ onMounted(async () => {
 //   選項固定，不管有沒有這類待辦都列出來（dev-guide 第 5 節「篩選」）
 const TYPE_FILTERS = [
   { value: 'all', label: '全部', kinds: [] },
-  { value: 'case', label: '案件', kinds: ['my_case'] },
+  { value: 'case', label: '案件', kinds: ['new_case', 'my_case'] }, // 新通報（待受理）也算案件
   { value: 'task', label: '交辦', kinds: ['assigned', 'confirm'] },
   { value: 'incomplete', label: '需補資料', kinds: ['incomplete'] },
   { value: 'expiring', label: '快到期文件', kinds: ['expiring'] },
