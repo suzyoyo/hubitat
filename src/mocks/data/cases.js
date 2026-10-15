@@ -31,7 +31,6 @@
 //   completion  完工紀錄：at 時間 / note 備註 / photos 照片（還沒完工就不寫）
 //   rating      廠商評分：score 1～5 分 / comment 評語（還沒評就不寫）
 //   closedAt    結案時間（還沒結案就不寫）
-//   withdrawReason 撤回原因（住戶撤回時選填，沒寫就沒有這一項）
 
 // 案件狀態：同一個狀態，管理端和住戶端顯示的文字不同
 //   label         管委會、管理人員看到的
@@ -45,7 +44,6 @@ export const CASE_STATUSES = {
   in_progress: { label: '處理中', residentLabel: '處理中', isOpen: true },
   to_verify: { label: '待結案', residentLabel: '處理中', isOpen: true }, // 管理人員已完工驗收，等負責人結案
   closed: { label: '已結案', residentLabel: '已完成', isOpen: false },
-  cancelled: { label: '已取消', residentLabel: '已撤回', isOpen: false },
 }
 
 // 案件來源
@@ -119,7 +117,7 @@ export const cases = [
         at: '2026-09-26T09:30',
         actorId: 'u-c04',
         label: '已受理',
-        text: '主委 李委員受理並設定處理期限',
+        text: '李主委受理並設定處理期限',
         residentText: '管委會已受理。',
       },
       {
@@ -163,7 +161,7 @@ export const cases = [
         at: '2026-09-23T09:10',
         actorId: 'u-c02',
         label: '已受理',
-        text: '副主委 張委員受理，指派大同電梯檢修',
+        text: '張副主委受理，指派大同電梯檢修',
         residentText: '管委會已受理，已請電梯廠商檢修。',
       },
       {
@@ -201,8 +199,8 @@ export const cases = [
     vendorId: 'v-008',
     supporters: [],
     logs: [
-      { at: '2026-09-18T10:00', actorId: 'u-s01', label: '巡查登記', text: '總幹事 王小姐巡查登記，附 2 張照片' },
-      { at: '2026-09-19T11:20', actorId: 'u-c04', label: '已受理', text: '主委 李委員受理，指派昇益工程行' },
+      { at: '2026-09-18T10:00', actorId: 'u-s01', label: '巡查登記', text: '王總幹事巡查登記，附 2 張照片' },
+      { at: '2026-09-19T11:20', actorId: 'u-c04', label: '已受理', text: '李主委受理，指派昇益工程行' },
       { at: '2026-09-24T08:30', actorId: 'u-s02', label: '施工', text: '昇益工程行進場，預計 10/01 完工' },
     ],
   },
@@ -261,7 +259,7 @@ export const cases = [
         at: '2026-09-28T10:00',
         actorId: 'u-c02',
         label: '已受理',
-        text: '副主委 張委員受理，將先行勸導',
+        text: '張副主委受理，將先行勸導',
         residentText: '管委會已受理。',
       },
     ],
@@ -298,7 +296,7 @@ export const cases = [
         at: '2026-09-22T09:00',
         actorId: 'u-s01',
         label: '已受理',
-        text: '總幹事 王小姐受理',
+        text: '王總幹事受理',
         residentText: '管理人員已受理。',
       },
       {
@@ -391,7 +389,7 @@ export const cases = [
         at: '2026-09-24T15:20',
         actorId: 'u-s01',
         label: '已受理',
-        text: '總幹事 王小姐受理，立信水電行已初步查勘，待料更換止水閥',
+        text: '王總幹事受理，立信水電行已初步查勘，待料更換止水閥',
         residentText: '水電廠商已初步查勘，待料更換止水閥。',
       },
     ],
@@ -423,7 +421,7 @@ export const cases = [
         text: '李伯伯（A 棟 8 樓）通報',
         residentText: '已收到通報，好彼管家已轉交管委會。',
       },
-      { at: '2026-09-09T10:00', actorId: 'u-c02', label: '已受理', text: '副主委 張委員受理', residentText: '管委會已受理。' },
+      { at: '2026-09-09T10:00', actorId: 'u-c02', label: '已受理', text: '張副主委受理', residentText: '管委會已受理。' },
       {
         at: '2026-09-10T14:00',
         actorId: 'u-c02',
@@ -495,7 +493,7 @@ export const cases = [
     vendorId: 'v-013',
     supporters: [],
     logs: [
-      { at: '2026-09-15T09:00', actorId: 'u-s03', label: '管理人員登記', text: '警衛 黃組長代住戶登記，附 1 張照片' },
+      { at: '2026-09-15T09:00', actorId: 'u-s03', label: '管理人員登記', text: '黃警衛代住戶登記，附 1 張照片' },
       { at: '2026-09-16T10:00', actorId: 'u-s02', label: '已受理', text: '張管理員受理，聯絡金城五金' },
       { at: '2026-09-20T15:30', actorId: 'u-s02', label: '已結案', text: '金城五金更換門片與鎖頭，測試正常' },
     ],

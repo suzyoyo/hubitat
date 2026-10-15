@@ -146,7 +146,7 @@ export async function createTask(userId, input) {
   if (!input.deadline || input.deadline <= MOCK_NOW) return undefined
   const relatedCase = input.caseId ? cases.find((item) => item.id === input.caseId) : undefined
   if (input.caseId) {
-    if (!relatedCase || ['closed', 'cancelled'].includes(relatedCase.status)) return undefined
+    if (!relatedCase || relatedCase.status === 'closed') return undefined
     const hasOpenTask = tasks.some(
       (task) => task.caseId === input.caseId && ['in_progress', 'reported'].includes(task.status),
     )
@@ -170,7 +170,7 @@ export async function createTask(userId, input) {
       at: MOCK_NOW,
       actorId: userId,
       label: '交辦',
-      text: `${userLabel(userId)}交辦給 ${userLabel(input.assigneeId)}（${task.id}）`,
+      text: `${userLabel(userId)}交辦給${userLabel(input.assigneeId)}（${task.id}）`,
     })
   }
   tasks.push(task)

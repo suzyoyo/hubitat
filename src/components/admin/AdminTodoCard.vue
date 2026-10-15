@@ -34,6 +34,6 @@ const deadlineBadge = computed(() => todoDeadlineBadge(props.todo))
       <ChevronRightIcon class="size-4 shrink-0" :class="{ 'ml-auto': !deadlineBadge }" />
     </div>
     <h3 class="type-card-title text-foreground">{{ todo.title }}</h3>
-    <p class="type-body text-muted-foreground">{{ todo.hint }}</p>
+    <p class="truncate type-body text-muted-foreground">{{ todo.hint }}</p>
   </RouterLink>
 </template>

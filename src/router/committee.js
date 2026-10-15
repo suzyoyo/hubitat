@@ -3,6 +3,7 @@
 // 寫法可以參考住戶端的 resident.js
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
 import AnnouncementFormView from '@/views/committee/AnnouncementFormView.vue'
+import CaseCompleteView from '@/views/committee/CaseCompleteView.vue'
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
 import FilesView from '@/views/committee/FilesView.vue'
@@ -34,6 +35,7 @@ export default {
     'vendors/list': VendorListView,
     'vendors/:id': VendorDetailView,
     'cases/:id': CaseDetailView,
+    'cases/:id/complete': CaseCompleteView,
     'announcements/:id': AnnouncementDetailView,
     // 發布和修改是同一個表單
     'announcements/new': AnnouncementFormView,

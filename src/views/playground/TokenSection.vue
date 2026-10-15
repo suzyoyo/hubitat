@@ -100,6 +100,7 @@ const textStyles = [
   { class: 'type-body-strong', spec: '16 / 24 中粗', sample: '影響範圍：A 棟前門電梯暫停使用' },
   { class: 'type-link', spec: '16 / 20 中粗', sample: '看全部' },
   { class: 'type-date', spec: '16 / 20', sample: '更新於 9/25 14:30' },
+  { class: 'type-note', spec: '14 / 20', sample: '「進入大廳時，感應門偶爾不會自動開啟」' },
   { class: 'type-button', spec: '14 / 20 粗體', sample: '閱讀完整會議紀錄' },
   { class: 'type-nav', spec: '13 / 21 中粗', sample: '社區檔案' },
   { class: 'type-label', spec: '12 / 16 中粗', sample: '處理中' },
