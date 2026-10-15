@@ -146,10 +146,12 @@ export async function getCases(filters = {}) {
 }
 
 // 取得單一案件的詳情（管委會、管理人員用）
-export async function getCaseById(id) {
+// 有傳 userId 時，會多一個 canWithdraw：是這個人登記的、而且還沒結案，才能撤回
+export async function getCaseById(id, userId) {
   await delay()
   const item = cases.find((entry) => entry.id === id)
-  return item ? presentForManagement(item) : undefined
+  if (!item) return undefined
+  return { ...presentForManagement(item), canWithdraw: item.reporterId === userId && isOpen(item) }
 }
 
 // ── 管理端的動作：受理 → 派廠商 → 處理紀錄 → 完工驗收 → 結案 ──────────
@@ -374,6 +376,17 @@ function findEditableCase(id, userId) {
   return item
 }
 
+// 撤回紀錄的標籤：看是誰通報的（巡查發現的是管理人員登記的，也算管理人員）
+const WITHDRAW_LABELS = { resident: '住戶撤回', committee: '委員撤回', staff: '管理人員撤回', patrol: '管理人員撤回' }
+
+// 住戶看到的撤回說明：住戶自己撤回的寫「你」，其他寫是誰撤回的
+const WITHDRAW_RESIDENT_TEXTS = {
+  resident: '你已撤回這筆通報。',
+  committee: '管委會已撤回這筆通報。',
+  staff: '管理人員已撤回這筆通報。',
+  patrol: '管理人員已撤回這筆通報。',
+}
+
 // 修改通報（住戶用）：只能改補充說明和照片，地點和主旨送出後就不能改
 //   changes 可以傳 description（補充說明）、photos（照片或影片檔名的清單），沒傳的不會動
 // 回傳修改後的通報；不能改的話（不是自己的、已經結案）回傳 undefined
@@ -387,7 +400,8 @@ export async function updateReport(id, userId, changes) {
   return presentForResident(item, userId)
 }
 
-// 撤回通報（住戶用）：狀態改成「已取消」，並留下一筆紀錄
+// 撤回通報：狀態改成「已取消」，並留下一筆紀錄
+// 住戶撤回自己的通報；管委會、管理人員撤回自己登記的（包括代住戶登記的）
 //   reason 撤回原因，選填；有寫的話管理端的紀錄會看到
 // 撤回後不會再出現在「我的通報」，管理端的未結案列表也看不到
 // 回傳 true 代表撤回成功；不能撤回的話（不是自己的、已經結案）回傳 false
@@ -400,9 +414,10 @@ export async function withdrawReport(id, userId, reason = '') {
   item.logs.push({
     at: MOCK_NOW,
     actorId: userId,
-    label: '住戶撤回',
+    label: WITHDRAW_LABELS[item.source],
     text: reason ? `通報人撤回通報，原因：${reason}` : '通報人撤回通報',
-    residentText: '你已撤回這筆通報。',
+    // 代住戶登記的，住戶看到的是管委會或管理人員撤回的
+    residentText: WITHDRAW_RESIDENT_TEXTS[item.source],
   })
   return true
 }
@@ -429,7 +444,8 @@ export async function createReport(userId, input) {
     id: nextCaseId(),
     place: input.place,
     subject: input.subject,
-    title: `${areaName(input.areaId)} ${input.place}${input.subject}`,
+    // 標題是地點＋通報問題，例如「1F 大廳門鎖壞了」；範圍（A 棟）在卡片的標籤上，不放進標題
+    title: `${input.place}${input.subject}`,
     areaId: input.areaId,
     category: 'other',
     source: 'resident',
@@ -467,7 +483,8 @@ export async function createRepair(userId, input, role = 'committee') {
     id: nextCaseId(),
     place: input.place,
     subject: input.subject,
-    title: `${areaName(input.areaId)} ${input.place}${input.subject}`,
+    // 標題是地點＋通報問題，例如「1F 大廳門鎖壞了」；範圍（A 棟）在卡片的標籤上，不放進標題
+    title: `${input.place}${input.subject}`,
     areaId: input.areaId,
     category: 'other',
     source: role,
