@@ -96,7 +96,7 @@ const actions = computed(() => {
 // 「更新進度」：能選廠商或寫紀錄的時候才出現；有記下來的內容才能按
 const canUpdate = computed(() => canPickVendor.value || canAddLog.value)
 const hasDraft = computed(() => Boolean(equipmentDraft.value || vendorDraft.value || logDraft.value))
-// 廠商卡片灰底區塊顯示的：已經存好的廠商（還沒存的只在下面的欄位裡）
+// 已經存好的廠商：帶入選廠商的欄位；不能改的人直接看文字
 const shownVendor = computed(() => ({ name: item.value?.vendorName ?? '', scheduledAt: item.value?.scheduledAt ?? '' }))
 const hasBottom = computed(() => !loading.value && item.value && (actions.value.length > 0 || canUpdate.value))
 
@@ -265,17 +265,15 @@ function isVideo(name) {
       <!-- 廠商 -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">廠商履歷</h2>
-        <!-- 已經存好的廠商；要換的話在下面的欄位改 -->
-        <div class="space-y-1 rounded-lg bg-muted p-3.5">
+        <!-- 可以派廠商的時候直接顯示欄位（欄位裡已經帶入存好的廠商和預約時間，2026-10-15 拿掉灰底區塊）；
+             不能改的只看文字 -->
+        <CaseVendorPicker v-if="canPickVendor" v-model:draft="vendorDraft" :vendors="vendors" :current="shownVendor" />
+        <div v-else class="space-y-0.5">
           <p class="type-body-strong text-foreground">{{ shownVendor.name || '尚未派廠商' }}</p>
-          <p v-if="!shownVendor.name" class="type-date text-muted-foreground">
-            指派後可在這裡查看該廠商的履歷與過往施工紀錄
-          </p>
-          <p v-else-if="shownVendor.scheduledAt" class="type-date text-muted-foreground">
+          <p v-if="shownVendor.scheduledAt" class="type-date text-muted-foreground">
             預約 {{ dateTimeText(shownVendor.scheduledAt) }} 到場
           </p>
         </div>
-        <CaseVendorPicker v-if="canPickVendor" v-model:draft="vendorDraft" :vendors="vendors" :current="shownVendor" />
       </section>
 
       <!-- 處理進度與留痕：由舊到新 -->
