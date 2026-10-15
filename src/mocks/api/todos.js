@@ -102,11 +102,10 @@ function assignedTasks(userId) {
   return tasks
     .filter((task) => task.assigneeId === userId && task.status === 'in_progress')
     .map((task) => {
-      // 例如「李主委交辦・今天 18:00 前完成」
-      const hint = task.returnNote
-        ? `已退回：${task.returnNote.note}`
-        : `${userLabel(task.assignerId)}交辦・${deadlineText(task.deadline)} 前完成`
-      return todo('assigned', task.title, hint, task.createdAt, task.deadline, {
+      // 例如「李主委交辦・今天 18:00 前完成」；沒有期限的只寫「李主委交辦」
+      const due = task.deadline ? `・${deadlineText(task.deadline)} 前完成` : ''
+      const hint = task.returnNote ? `已退回：${task.returnNote.note}` : `${userLabel(task.assignerId)}交辦${due}`
+      return todo('assigned', task.title, hint, task.createdAt, task.deadline || null, {
         type: 'task',
         id: task.id,
       })
@@ -123,7 +122,7 @@ function committeeTodos(userId) {
     const waitingClose = cases.some((item) => item.id === task.caseId && item.status === 'to_verify')
     if (task.assignerId === userId && task.status === 'reported' && !waitingClose) {
       items.push(
-        todo('confirm', task.title, `${userLabel(task.assigneeId)}已回報完成`, task.createdAt, task.deadline, {
+        todo('confirm', task.title, `${userLabel(task.assigneeId)}已回報完成`, task.createdAt, task.deadline || null, {
           type: 'task',
           id: task.id,
         }),
