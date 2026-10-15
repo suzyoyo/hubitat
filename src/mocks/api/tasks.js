@@ -123,3 +123,72 @@ export async function withdrawTask(id, userId, reason) {
   notifyAssignee(task, '交辦已撤回', reason)
   return true
 }
+
+// ── 新增交辦、回報完成 ─────────────────────────────────────
+
+// 這個人能不能交辦給別人：只有主委、副主委（權限表）
+export function canAssignTasks(userId) {
+  return ['chair', 'viceChair'].includes(findUser(userId)?.committeeTitle)
+}
+
+// 新增交辦（主委、副主委用），回傳新增好的交辦；不能新增的話回傳 undefined
+//   input 要傳：
+//     title      標題
+//     content    內容（最多 200 字）
+//     assigneeId 交辦給誰（對應 users.js）
+//     deadline   完成期限，例如 '2026-10-08T18:00'，要比現在晚
+//     caseId     關聯的案件（選填）。案件要還沒結案，而且同一件案件同時只能有一筆還沒完成的交辦
+//                有傳的話，案件的處理紀錄會多一筆「交辦」（不給住戶看）
+// 交辦後會通知被交辦人；新交辦只存在記憶體，重新整理網頁就不見了
+export async function createTask(userId, input) {
+  await delay()
+  if (!canAssignTasks(userId) || !input.title?.trim() || !findUser(input.assigneeId)) return undefined
+  if (!input.deadline || input.deadline <= MOCK_NOW) return undefined
+  const relatedCase = input.caseId ? cases.find((item) => item.id === input.caseId) : undefined
+  if (input.caseId) {
+    if (!relatedCase || ['closed', 'cancelled'].includes(relatedCase.status)) return undefined
+    const hasOpenTask = tasks.some(
+      (task) => task.caseId === input.caseId && ['in_progress', 'reported'].includes(task.status),
+    )
+    if (hasOpenTask) return undefined
+  }
+  // 新編號：現有最大的編號 + 1，例如 TASK-104 → TASK-105
+  const maxNumber = Math.max(...tasks.map((task) => Number(task.id.slice(5))))
+  const task = {
+    id: `TASK-${maxNumber + 1}`,
+    title: input.title.trim(),
+    content: input.content ?? '',
+    assignerId: userId,
+    assigneeId: input.assigneeId,
+    createdAt: MOCK_NOW,
+    deadline: input.deadline,
+    status: 'in_progress',
+  }
+  if (relatedCase) {
+    task.caseId = relatedCase.id
+    relatedCase.logs.push({
+      at: MOCK_NOW,
+      actorId: userId,
+      label: '交辦',
+      text: `${userLabel(userId)}交辦給 ${userLabel(input.assigneeId)}（${task.id}）`,
+    })
+  }
+  tasks.push(task)
+  notifyAssignee(task, '新的交辦', `${userLabel(userId)}交辦，期限 ${formatFullDate(task.deadline)} ${formatTime(task.deadline)}`)
+  return present(task)
+}
+
+// 回報完成（被交辦的人用）：進行中（包含已逾期）→ 待確認，等交辦人確認
+//   note 備註、files 附件檔名的清單，都是選填
+//   被退回過的，回報後清掉退回原因
+// 連到案件的交辦，在案件上按「完工驗收」時會自動回報，不用再按這個
+// 成功回傳 true，不能回報（不是交辦給自己的、狀態不對）回傳 false
+export async function reportTask(id, userId, { note = '', files = [] } = {}) {
+  await delay()
+  const task = tasks.find((item) => item.id === id && item.assigneeId === userId && item.status === 'in_progress')
+  if (!task) return false
+  task.status = 'reported'
+  task.report = { at: MOCK_NOW, note, files: [...files] }
+  delete task.returnNote
+  return true
+}
