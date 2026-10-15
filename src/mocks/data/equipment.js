@@ -135,7 +135,7 @@ export const equipment = [
     place: 'C 棟 1 樓機房',
     spec: '曳引式 10 人無障礙',
     vendorId: 'v-001',
-    status: 'normal',
+    status: 'repairing', // CASE-20260922-002 還沒結案（設備狀態跟著案件變，docs/case-flow.md）
     installedAt: '2019-06-01',
     warrantyUntil: '2027-06-30',
     cycle: 'monthly',
