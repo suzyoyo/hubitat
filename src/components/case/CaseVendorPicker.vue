@@ -2,7 +2,7 @@
 // 案件詳情「廠商履歷」卡片裡的選擇廠商：欄位一直顯示（2026-10-15 改，原本要先按「選擇廠商 ›」展開、再按「確定」）
 //   輸入框打字會篩選名冊裡合作中的廠商，點一家就把名字填進輸入框；名冊裡沒有的，直接用打的名字
 //   預約到場時間選填，用 DatePicker、TimePicker（和其他日期一樣點框框就能選）
-// 和已經存好的不一樣時就記下來（v-model:draft）；真的存是按頁面底部的「更新現況」
+// 和已經存好的不一樣時就記下來（v-model:draft）；真的存是按頁面底部的「更新進度」
 import { computed, ref, watch } from 'vue'
 import DatePicker from '@/components/common/DatePicker.vue'
 import TimePicker from '@/components/common/TimePicker.vue'
@@ -25,7 +25,7 @@ const name = ref('') // 輸入框裡的廠商名稱
 const scheduledDate = ref('') // 預約到場的日期，例如 '2026-10-03'
 const scheduledTime = ref('') // 預約到場的時間，例如 '14:00'
 
-// 欄位換回已經存好的內容（一打開、或按「更新現況」存好、存好的廠商變了之後）
+// 欄位換回已經存好的內容（一打開、或按「更新進度」存好、存好的廠商變了之後）
 function reset() {
   const [date = '', time = ''] = props.current.scheduledAt.split('T')
   name.value = props.current.name
@@ -73,7 +73,7 @@ watch([name, scheduledAt], () => {
       <Input
         id="case-vendor"
         v-model="name"
-        placeholder="輸入廠商名稱，或從選單選"
+        placeholder="從名冊選，或輸入其他廠商名稱"
         autocomplete="off"
         @focus="listOpen = true"
         @input="listOpen = true"

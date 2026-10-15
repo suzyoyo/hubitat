@@ -2,7 +2,7 @@
 // 案件詳情「處理進度與留痕」卡片最下面的新增處理紀錄：欄位一直顯示（2026-10-15 改，原本要先按「＋ 新增處理紀錄」、再按「確定」）
 //   內容（管理端看的）、給住戶看的一句（選填，沒寫就不給住戶看）
 //   沒有「改期」（2026-10-15 013 拿掉）：要改預約時間，在「廠商履歷」卡片的預約到場時間改
-// 有寫內容就記下來（v-model:draft）；真的存是按頁面底部的「更新現況」，和設備、廠商合成一筆紀錄
+// 有寫內容就記下來（v-model:draft）；真的存是按頁面底部的「更新進度」，和設備、廠商合成一筆紀錄
 // 規則見 docs/case-flow.md 4-4
 import { ref, watch } from 'vue'
 import { Input } from '@/components/ui/input'
@@ -20,7 +20,7 @@ watch([text, residentText], () => {
   draft.value = text.value.trim() ? { text: text.value.trim(), residentText: residentText.value.trim() } : null
 })
 
-// 按「更新現況」存好之後（頁面把 draft 清掉），欄位也清空
+// 按「更新進度」存好之後（頁面把 draft 清掉），欄位也清空
 // 自己把內容刪光時 draft 也會變 null，這時內容已經是空的，就不要連其他欄位一起清
 watch(draft, (value) => {
   if (value || !text.value.trim()) return

@@ -189,7 +189,7 @@ import { Button } from '@/components/ui/button'
 | Alert | `alert` | ✅ | 2026-10-13 加入。已照 Kit 調整：說明的字是深色；字級照專案放大成 16px（Kit 是 14px）。圖示直接放在 `<Alert>` 裡的第一個位置。提案與簽核的「法定效力說明」、管委會首頁的「換屆交接提示」會用到 |
 | Calendar | `common/DatePicker.vue` | 🟡 | 2026-10-15：Kit 還沒有 Date Picker，照設計稿「新增交辦」的完成期限（1134:14034）自己做，沒有用 shadcn 的 `calendar`。按鈕（日曆圖示＋文字）點了跳出月曆，值是 `'2026-10-12'` 字串，可以傳 `min`、`max`。管委會的發布公告在用。時間用 `common/TimePicker.vue`（Kit、shadcn 都沒有時間選擇器，照 DatePicker 的樣子做）：按鈕點了跳出「時」「分」兩欄，分鐘每 5 分一格，值是 `'14:30'` 字串。不用瀏覽器內建的 `type="time"`，因為跳出來的滾輪是手機畫的，樣式改不了 |
 | Checkbox | `checkbox` | ⬜ | |
-| Combobox | `combobox` | ⬜ | 要打字搜尋的選單才用。只是點選的下拉選單用 `select`（見下方），選項的樣子照 Kit 這一頁的「Combobox Item」：文字＋右邊打勾 |
+| Combobox | `ui/combobox` | ✅ | 要打字搜尋的選單才用。只是點選的下拉選單用 `select`（見下方），選項的樣子照 Kit 這一頁的「Combobox Item」：文字＋右邊打勾。2026-10-15 加：用 `npx shadcn-vue add combobox` 會失敗（它要的 `input-group` 轉成 JavaScript 時出錯），所以照 shadcn-vue 的寫法手動建，底層是 reka-ui 的 Combobox。案件詳情的「關聯設備」（`case/CaseEquipmentPicker`）在用：選單框點了展開，最上面是搜尋框 |
 | Dialog | `dialog` | ✅ | 2026-10-12 加入。公告詳情彈窗在用；通報詳情的撤回確認之後也會用到 |
 | Native Select | `native-select` | ⬜ | |
 | Toggle & Toggle Group | `toggle`、`toggle-group` | ✅ | 2026-10-12 加入。篩選標籤用 `toggle-group` 當底，包成 `common/FilterChips.vue`（2026-10-13，樣式在那裡調，`ui/` 沒改），規則見 [dev-guide.md 第 5 節](dev-guide.md#篩選篩選標籤下拉選單) |

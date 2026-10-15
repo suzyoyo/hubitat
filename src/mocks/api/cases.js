@@ -233,7 +233,7 @@ function setFirstVisit(item, scheduledAt) {
 // ── 關聯設備、派廠商、處理紀錄 ─────────────────────────────
 // 下面三個 apply… 只改案件、不寫紀錄，回傳這次做了什麼的文字（寫紀錄用）；不能做回傳 undefined
 // 單獨用的 setCaseEquipment、assignVendor、addCaseLog 各寫一筆紀錄；
-// 案件詳情的「更新現況」用 updateCase，一次做完只寫一筆（2026-10-15）
+// 案件詳情的「更新進度」用 updateCase，一次做完只寫一筆（2026-10-15）
 
 // 關聯設備：設備一律先設成待維修；「維修中」不存在資料裡，從廠商第一次到場那天起由設備的假 API 用日期算
 //   換掉的那台變回正常使用中。結案時，這台設備的維修紀錄會多一筆（見 closeItem）
@@ -315,12 +315,12 @@ export async function addCaseLog(id, userId, log) {
   return presentForManagement(item)
 }
 
-// 更新現況（案件詳情底部的按鈕）：關聯設備、派廠商、處理紀錄有填的一次做完，**只寫一筆紀錄**
+// 更新進度（案件詳情底部的按鈕）：關聯設備、派廠商、處理紀錄有填的一次做完，**只寫一筆紀錄**
 //   changes 三個都選填，至少要有一個：
 //     equipmentId 關聯設備（和 setCaseEquipment 一樣）
 //     vendor      { vendorId, vendorName, scheduledAt }（和 assignVendor 一樣）
 //     log         { text, residentText, scheduledAt }（和 addCaseLog 一樣）
-//   紀錄：「更新現況」／「主委 李委員：關聯設備「揚水馬達」；指派 欣欣機電，預約 10/21 09:10 到場；改了時間」
+//   紀錄：「更新進度」／「主委 李委員：關聯設備「揚水馬達」；指派 欣欣機電，預約 10/21 09:10 到場；改了時間」
 //   住戶看到：派廠商、處理紀錄給住戶看的那幾句接在一起（都沒有就不給住戶看）
 // 待結案的案件只能寫處理紀錄（設備、廠商不能改了）；有一樣做不了就全部不做，回傳 undefined
 export async function updateCase(id, userId, { equipmentId = '', vendor = null, log = null } = {}) {
@@ -339,7 +339,7 @@ export async function updateCase(id, userId, { equipmentId = '', vendor = null, 
   ].filter(Boolean)
   const text = `${userLabel(userId)}：${steps.map((step) => step.text).join('；')}`
   const residentText = steps.map((step) => step.residentText).filter(Boolean).join(' ')
-  addLog(item, userId, '更新現況', text, residentText)
+  addLog(item, userId, '更新進度', text, residentText)
   return presentForManagement(item)
 }
 
