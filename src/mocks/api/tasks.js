@@ -67,13 +67,13 @@ function findMyTask(id, userId, statuses) {
   return tasks.find((task) => task.id === id && task.assignerId === userId && statuses.includes(task.status))
 }
 
-// 發一則通知給被交辦人
-// 被交辦人是管理人員就發到管理人員端，是委員就發到管委會端
 // 「新的交辦」通知的標題
 //   todos.js 用它判斷哪件交辦還沒看過、要排在待辦最前面，所以發通知和找通知都用這個常數，
 //   要改字只改這裡，不要在別的地方另外寫「新的交辦」
 export const NEW_TASK_TITLE = '新的交辦'
 
+// 發一則通知給被交辦人
+// 被交辦人是管理人員就發到管理人員端，是委員就發到管委會端
 function notifyAssignee(task, title, reason) {
   const assignee = findUser(task.assigneeId)
   notifications.push({
