@@ -30,8 +30,10 @@ function dateText(value) {
 }
 
 // 到期資訊：有期限顯示到期日；沒有期限（例如需補資料的留存）改顯示建立日期
+// 新通報（待受理的案件）沒有期限，dueAt 是通報時間（只用來排序），所以寫「通報」
 const dateLine = computed(() => {
   if (isDone.value) return `完成：${dateText(props.todo.doneAt)}`
+  if (props.todo.kind === 'new_case') return `通報：${dateText(props.todo.createdAt)}`
   if (props.todo.dueAt) return `到期：${dateText(props.todo.dueAt)}`
   if (props.todo.createdAt) return `建立：${dateText(props.todo.createdAt)}`
   return ''
