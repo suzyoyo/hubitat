@@ -9,6 +9,7 @@ import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import FilesView from '@/views/staff/FilesView.vue'
 import HomeView from '@/views/staff/HomeView.vue'
 import MeView from '@/views/staff/MeView.vue'
+import NotificationsView from '@/views/staff/NotificationsView.vue'
 import VendorsView from '@/views/staff/VendorsView.vue'
 
 export default {
@@ -21,6 +22,7 @@ export default {
     vendors: VendorsView,
     files: FilesView,
     me: MeView,
+    notifications: NotificationsView, // 右上角的鈴鐺
     // 和管委會端共用的頁面
     cases: CasesView,
     'cases/:id': CaseDetailView,
@@ -36,6 +38,9 @@ export default {
     { path: 'announcements', title: '公告與動態' },
     { path: 'announcements/:id', title: '公告詳情' },
     { path: 'quick-saves/:id', title: '留存詳情' }, // 待辦裡「需補資料」的留存
+    // 通知點進去的頁面（案件、交辦、公告詳情在別處已經列了）
+    { path: 'contracts/:id', title: '合約詳情' },
+    { path: 'meetings/:id', title: '會議紀錄' },
     { path: 'cases/:id', title: '案件詳情' },
     { path: 'cases/:id/complete', title: '回報完成' }, // 案件詳情的「完工驗收」
     { path: 'tasks/:id', title: '交辦詳情' },
