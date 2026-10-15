@@ -103,7 +103,7 @@ function committeeTodos(userId) {
   if (['chair', 'viceChair'].includes(user.committeeTitle)) {
     for (const item of cases) {
       if (item.status === 'pending') {
-        items.push(todo('new_case', item.title, `${areaName(item.areaId)}・尚未受理`, item.reportedAt, item.reportedAt, { type: 'case', id: item.id }, item.isUrgent))
+        items.push(todo('new_case', item.title, areaName(item.areaId), item.reportedAt, item.reportedAt, { type: 'case', id: item.id }, item.isUrgent))
       }
     }
   }
