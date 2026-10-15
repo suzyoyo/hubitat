@@ -8,6 +8,7 @@ import MeetingDetailView from '@/views/resident/MeetingDetailView.vue'
 import MeView from '@/views/resident/MeView.vue'
 import MyCommentsView from '@/views/resident/MyCommentsView.vue'
 import NewReportView from '@/views/resident/NewReportView.vue'
+import NotificationsView from '@/views/resident/NotificationsView.vue'
 import ReportDetailView from '@/views/resident/ReportDetailView.vue'
 import ReportsView from '@/views/resident/ReportsView.vue'
 
@@ -25,6 +26,7 @@ export default {
     reports: ReportsView,
     'reports/:id': ReportDetailView,
     announcements: AnnouncementsView,
+    notifications: NotificationsView, // 右上角的鈴鐺
     'reports/new': NewReportView, // 右下角「通報」按鈕（網址定在 src/config/roles.js 的 fab）
   },
 
