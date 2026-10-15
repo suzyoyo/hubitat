@@ -1,13 +1,12 @@
 <script setup>
 // 管理人員端・首頁：問候列、我的待辦（前 2 筆）、公告與動態（設計稿 1483:15339）
 // 版面和管委會首頁一樣，只是沒有捷徑方塊和住戶意見；卡片元件也沿用管委會的
+import { ChevronRightIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
 import AdminNoticeCard from '@/components/admin/AdminNoticeCard.vue'
 import AdminTodoCard from '@/components/admin/AdminTodoCard.vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { greetingWord } from '@/lib/date'
 import { todoLink } from '@/lib/todo'
@@ -61,10 +60,19 @@ function staffTodoLink(todo) {
 
     <div class="space-y-8 px-5 pt-5">
       <section class="space-y-3">
-        <!-- 標題右邊是件數徽章，不是「看全部」，所以不用 SectionHeader -->
+        <!-- 標題右邊是「查看 N 件待辦 ›」（2026-10-15 suzy 改：拿掉件數徽章和下面的「查看全部待辦事項」按鈕）
+             樣式和下面「公告與動態」的「看全部 ›」一樣（SectionHeader），只是文字不同，所以這裡照著寫一份 -->
         <div class="flex items-center justify-between">
           <h2 class="type-title text-heading">我的待辦</h2>
-          <Badge v-if="!loading && todos.total" variant="secondary">待處理 {{ todos.total }} 件</Badge>
+          <!-- h-11 是 44px 的可點擊範圍；-my-1 讓這一列的高度維持 36px（和 SectionHeader 一樣） -->
+          <RouterLink
+            v-if="!loading && todos.total"
+            to="/staff/todos"
+            class="-my-1 flex h-11 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
+          >
+            查看 {{ todos.total }} 件待辦
+            <ChevronRightIcon class="size-4" />
+          </RouterLink>
         </div>
         <template v-if="loading">
           <Skeleton v-for="n in 2" :key="n" class="h-[124px] rounded-xl" />
@@ -76,9 +84,6 @@ function staffTodoLink(todo) {
         <template v-else>
           <AdminTodoCard v-for="todo in homeTodos" :key="todo.id" :todo="todo" :to="staffTodoLink(todo)" />
         </template>
-        <Button as-child class="w-full">
-          <RouterLink to="/staff/todos">查看全部待辦事項</RouterLink>
-        </Button>
       </section>
 
       <section class="space-y-3 pb-5">
