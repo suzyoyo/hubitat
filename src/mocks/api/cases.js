@@ -54,7 +54,8 @@ export function reporterLabel(item) {
 // 畫面上的「負責人」：實際處理這件事的人（docs/case-flow.md 第 3 節，2026-10-15）
 //   資料上的負責人（assigneeId）是受理的人，不會換；這裡另外算出來給畫面顯示
 //   結案了 → 按「完工驗收」的那個人
-//   有交辦出去、還沒完成的（進行中或待確認）→ 交辦對象；交辦被撤回或退回 → 換回受理的人
+//   有交辦出去、還沒完成的（進行中或待確認）→ 交辦對象
+//     被退回的還是進行中（請對方再做一次），所以還是交辦對象；交辦被撤回 → 換回受理的人
 //   其他 → 受理的人
 function handlerIdOf(item) {
   if (item.status === 'closed') {
@@ -63,7 +64,7 @@ function handlerIdOf(item) {
   const task = tasks.find(
     (entry) =>
       entry.caseId === item.id &&
-      (entry.status === 'reported' || (entry.status === 'in_progress' && !entry.returnNote)),
+      ['in_progress', 'reported'].includes(entry.status),
   )
   return task ? task.assigneeId : item.assigneeId
 }
@@ -73,6 +74,7 @@ function presentForManagement(item) {
   const vendor = vendors.find((entry) => entry.id === item.vendorId)
   const device = equipment.find((entry) => entry.id === item.equipmentId)
   const overdueDays = caseOverdueDays(item)
+  const handlerId = handlerIdOf(item)
   return {
     ...item,
     areaName: areaName(item.areaId),
@@ -82,8 +84,8 @@ function presentForManagement(item) {
     reporterLabel: reporterLabel(item),
     assigneeLabel: item.assigneeId ? userLabel(item.assigneeId) : '', // 資料上的負責人（受理的人）
     // 畫面上的「負責人」：實際處理的人（見 handlerIdOf）；案件詳情、案件卡片都顯示這個
-    handlerId: handlerIdOf(item) ?? '',
-    handlerLabel: handlerIdOf(item) ? userLabel(handlerIdOf(item)) : '',
+    handlerId: handlerId ?? '',
+    handlerLabel: handlerId ? userLabel(handlerId) : '',
     // 名冊裡的廠商用名冊的名字；自己打的（名冊裡沒有）存在案件的 vendorName
     vendorName: vendor ? vendor.name : (item.vendorName ?? ''),
     equipmentName: device ? device.name : '',
@@ -194,12 +196,12 @@ export async function getCaseById(id) {
 // 下面都只改記憶體裡的資料，重新整理網頁會變回原本的假資料
 // 不能做的時候（沒有權限、狀態不對）回傳 undefined，成功回傳更新後的案件（管理端的樣子）
 
-// 這個人能不能處理案件（受理、派廠商、寫處理紀錄、完工驗收）：主委、副主委、管理人員
 // 這個人能不能結案：只有主委、副主委（2026-10-15 改，原本是案件負責人；管理人員完工驗收後一律交給他們結案）
 export function canCloseCases(userId) {
   return ['chair', 'viceChair'].includes(findUser(userId)?.committeeTitle)
 }
 
+// 這個人能不能處理案件（受理、派廠商、寫處理紀錄、完工驗收）：主委、副主委、管理人員
 export function canHandleCases(userId) {
   const user = findUser(userId)
   if (!user) return false

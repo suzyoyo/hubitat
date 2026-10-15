@@ -10,7 +10,7 @@ import { quickSaves } from '../data/quickSaves'
 import { tasks } from '../data/tasks'
 import { COMMITTEE_TITLES } from '../data/users'
 import { vendors } from '../data/vendors'
-import { reporterLabel } from './cases'
+import { canCloseCases, reporterLabel } from './cases'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
 import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
@@ -169,7 +169,7 @@ function committeeTodos(userId) {
 
   // 管理人員已完工驗收、等結案的：主委、副主委兩個人都有「待我結案」，誰先結案都可以（2026-10-15 改，原本只有負責人）
   //   說明寫是誰完工驗收的
-  const canClose = ['chair', 'viceChair'].includes(user.committeeTitle)
+  const canClose = canCloseCases(userId)
   for (const item of cases) {
     if (!canClose || item.status !== 'to_verify') continue
     const completedBy = item.logs.findLast((log) => log.label === '完工驗收')?.actorId
