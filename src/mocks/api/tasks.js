@@ -7,15 +7,15 @@ import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
 import { findUser, userLabel } from './users'
 
 // 算出畫面上要顯示的狀態
-// 還在進行中、而且已經超過期限的，顯示為「已逾期」
+// 還在進行中、而且已經超過期限的，顯示為「已逾期」；沒有期限的不會逾期（期限選填，2026-10-15）
 export function taskDisplayStatus(task) {
-  if (task.status === 'in_progress' && task.deadline < MOCK_NOW) return 'overdue'
+  if (task.status === 'in_progress' && task.deadline && task.deadline < MOCK_NOW) return 'overdue'
   return task.status
 }
 
 function present(task) {
   const relatedCase = cases.find((item) => item.id === task.caseId)
-  const deadlineDate = task.deadline.split('T')[0]
+  const deadlineDate = task.deadline ? task.deadline.split('T')[0] : ''
   return {
     ...task,
     displayStatus: taskDisplayStatus(task),
@@ -23,8 +23,8 @@ function present(task) {
     assignerLabel: userLabel(task.assignerId),
     assigneeLabel: userLabel(task.assigneeId),
     caseTitle: relatedCase ? relatedCase.title : '',
-    // 距離期限還有幾天：0 是今天到期，負數是已經過了幾天
-    daysLeft: diffDays(MOCK_TODAY, deadlineDate),
+    // 距離期限還有幾天：0 是今天到期，負數是已經過了幾天；沒有期限是 null
+    daysLeft: deadlineDate ? diffDays(MOCK_TODAY, deadlineDate) : null,
   }
 }
 
@@ -46,7 +46,8 @@ export async function getTasks(filters = {}) {
       if (assignerId && task.assignerId !== assignerId) return false
       return true
     })
-    .toSorted((a, b) => a.deadline.localeCompare(b.deadline))
+    // 期限近的在前；沒有期限的排最後
+    .toSorted((a, b) => (a.deadline || '9999').localeCompare(b.deadline || '9999'))
 }
 
 // 取得單一交辦的詳情
@@ -136,14 +137,14 @@ export function canAssignTasks(userId) {
 //     title      標題
 //     content    內容（最多 200 字）
 //     assigneeId 交辦給誰（對應 users.js）
-//     deadline   完成期限，例如 '2026-10-08T18:00'，要比現在晚
+//     deadline   完成期限，例如 '2026-10-08T18:00'，選填（2026-10-15 改）；有填的話要比現在晚
 //     caseId     關聯的案件（選填）。案件要還沒結案，而且同一件案件同時只能有一筆還沒完成的交辦
 //                有傳的話，案件的處理紀錄會多一筆「交辦」（不給住戶看）
 // 交辦後會通知被交辦人；新交辦只存在記憶體，重新整理網頁就不見了
 export async function createTask(userId, input) {
   await delay()
   if (!canAssignTasks(userId) || !input.title?.trim() || !findUser(input.assigneeId)) return undefined
-  if (!input.deadline || input.deadline <= MOCK_NOW) return undefined
+  if (input.deadline && input.deadline <= MOCK_NOW) return undefined
   const relatedCase = input.caseId ? cases.find((item) => item.id === input.caseId) : undefined
   if (input.caseId) {
     if (!relatedCase || relatedCase.status === 'closed') return undefined
@@ -161,7 +162,7 @@ export async function createTask(userId, input) {
     assignerId: userId,
     assigneeId: input.assigneeId,
     createdAt: MOCK_NOW,
-    deadline: input.deadline,
+    deadline: input.deadline || '', // 沒有期限是空字串
     status: 'in_progress',
   }
   if (relatedCase) {
@@ -174,7 +175,8 @@ export async function createTask(userId, input) {
     })
   }
   tasks.push(task)
-  notifyAssignee(task, '新的交辦', `${userLabel(userId)}交辦，期限 ${formatFullDate(task.deadline)} ${formatTime(task.deadline)}`)
+  const deadlineNote = task.deadline ? `，期限 ${formatFullDate(task.deadline)} ${formatTime(task.deadline)}` : ''
+  notifyAssignee(task, '新的交辦', `${userLabel(userId)}交辦${deadlineNote}`)
   return present(task)
 }
 

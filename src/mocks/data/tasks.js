@@ -6,7 +6,7 @@
 //   assignerId 交辦人（對應 users.js）
 //   assigneeId 交辦對象
 //   createdAt  建立時間
-//   deadline   完成期限。「已逾期」是用今天的時間算出來的
+//   deadline   完成期限，選填（沒有是空字串，2026-10-15 改）。「已逾期」是用今天的時間算出來的，沒有期限的不會逾期
 //   status     狀態，見下方 TASK_STATUSES
 //   caseId     關聯的案件（沒有就不寫）
 //   report     對方的完成回報：at 時間 / note 備註 / files 附件（還沒回報就不寫）
