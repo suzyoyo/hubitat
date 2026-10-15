@@ -1,13 +1,15 @@
 <script setup>
 // 案件詳情「廠商履歷」卡片裡的選擇廠商（設計稿的「選擇廠商 ›」按鈕，按了在卡片裡展開）
 //   輸入框打字會篩選名冊裡合作中的廠商，點一家就把名字填進輸入框；名冊裡沒有的，直接用打的名字
-//   預約到場時間選填
+//   預約到場時間選填，用 DatePicker、TimePicker（2026-10-15 改，和其他日期一樣點框框就能選）
 // 按「確定」只是先記下來（v-model:draft），頁面會把它顯示在卡片上；真的存是按頁面底部的「更新現況」
 import { computed, ref } from 'vue'
+import DatePicker from '@/components/common/DatePicker.vue'
+import TimePicker from '@/components/common/TimePicker.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { MOCK_NOW } from '@/mocks/api'
+import { MOCK_TODAY } from '@/mocks/api'
 
 const props = defineProps({
   // 名冊裡可以選的廠商：getVendors('active') 回傳的清單
@@ -22,7 +24,12 @@ const draft = defineModel('draft', { type: Object, default: null })
 
 const open = ref(false) // 選擇的區塊有沒有展開
 const name = ref('') // 輸入框裡的廠商名稱
-const scheduledAt = ref('') // datetime-local 的值，例如 '2026-10-03T14:00'
+const scheduledDate = ref('') // 預約到場的日期，例如 '2026-10-03'
+const scheduledTime = ref('') // 預約到場的時間，例如 '14:00'
+// 日期、時間都選了才算有預約；組成 '2026-10-03T14:00'
+const scheduledAt = computed(() =>
+  scheduledDate.value && scheduledTime.value ? `${scheduledDate.value}T${scheduledTime.value}` : '',
+)
 
 // 名冊裡名字有包含輸入的字的廠商；沒打字就全部列出來
 const matches = computed(() => props.vendors.filter((vendor) => vendor.name.includes(name.value.trim())))
@@ -35,7 +42,9 @@ const showList = computed(() => matches.value.length > 0 && !listed.value)
 // 展開時，帶入之前記下來的選擇
 function start() {
   name.value = draft.value?.vendorName ?? ''
-  scheduledAt.value = draft.value?.scheduledAt ?? ''
+  const [date = '', time = ''] = (draft.value?.scheduledAt ?? '').split('T')
+  scheduledDate.value = date
+  scheduledTime.value = time
   open.value = true
 }
 
@@ -66,8 +75,12 @@ function confirm() {
       <Label for="case-scheduled" class="text-base">
         預約到場時間<span class="type-date text-muted-foreground">選填</span>
       </Label>
-      <!-- datetime-local：手機會跳出選日期和時間的轉盤；min 讓使用者選不到比現在早的時間 -->
-      <Input id="case-scheduled" v-model="scheduledAt" type="datetime-local" :min="MOCK_NOW" />
+      <!-- 日期、時間上下排（放在卡片裡，並排的話日期擠不下）；日期選不到今天以前 -->
+      <div class="space-y-2">
+        <DatePicker id="case-scheduled" v-model="scheduledDate" :min="MOCK_TODAY" />
+        <TimePicker v-model="scheduledTime" aria-label="預約到場的時間" />
+      </div>
+      <p v-if="scheduledDate && !scheduledTime" class="type-date text-muted-foreground">再選時間，才會記下預約</p>
     </div>
     <div class="flex gap-3 *:flex-1">
       <Button variant="outline" @click="open = false">取消</Button>

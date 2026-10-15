@@ -1,7 +1,7 @@
 <script setup>
 // 管委會端、管理人員端共用・案件詳情：一件案件的基本資料、通報內容、廠商、處理紀錄（設計稿 1134:17558）
 // 按鈕依「這個人能做什麼＋案件狀態」顯示，不分哪一端（規則見 docs/case-flow.md）：
-//   關聯設備、廠商、處理紀錄三張卡片：卡片裡按「確定」先記下來（顯示在卡片上、標「尚未更新」），
+//   關聯設備、廠商、處理紀錄三張卡片：設備從選單點一台、廠商和紀錄按「確定」先記下來（標「尚未更新」），
 //   按底部「更新現況」才一起存
 //   底部：更新現況＋完工驗收（到回報完成頁）並排；受理（按了就受理）、交辦（到新增交辦頁）、
 //   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
@@ -98,12 +98,6 @@ const actions = computed(() => {
 // 「更新現況」：能選廠商或寫紀錄的時候才出現；有記下來的內容才能按
 const canUpdate = computed(() => canPickVendor.value || canAddLog.value)
 const hasDraft = computed(() => Boolean(equipmentDraft.value || vendorDraft.value || logDraft.value))
-// 設備卡片上顯示的：有記下來的就顯示記下來的，沒有就顯示已經存的
-const shownEquipment = computed(() =>
-  equipmentDraft.value
-    ? { name: equipmentDraft.value.name, place: equipmentDraft.value.place }
-    : { name: item.value?.equipmentName ?? '', place: item.value?.equipmentPlace ?? '' },
-)
 // 廠商卡片上顯示的：有記下來的就顯示記下來的，沒有就顯示已經存的
 const shownVendor = computed(() =>
   vendorDraft.value
@@ -265,22 +259,20 @@ function isVideo(name) {
         <p v-else class="type-body text-muted-foreground">沒有照片或影片</p>
       </section>
 
-      <!-- 關聯設備：選了，結案時才會記進這台設備的維修紀錄 -->
+      <!-- 關聯設備：選了，結案時才會記進這台設備的維修紀錄
+           可以選的時候直接顯示選設備的欄位（2026-10-15 改，拿掉灰色區塊和「選擇設備 ›」按鈕）；不能選的只看文字 -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">關聯設備</h2>
-        <div class="space-y-1 rounded-lg bg-muted p-3.5">
-          <p class="type-body-strong text-foreground">{{ shownEquipment.name || '尚未關聯設備' }}</p>
-          <p class="type-date text-muted-foreground">
-            {{ shownEquipment.name ? shownEquipment.place : '選了之後，結案時會記進這台設備的維修紀錄' }}
-          </p>
-          <p v-if="equipmentDraft" class="type-date text-muted-foreground">尚未更新</p>
-        </div>
         <CaseEquipmentPicker
           v-if="canPickVendor"
           v-model:draft="equipmentDraft"
           :devices="devices"
-          :button-text="shownEquipment.name ? '更換設備' : '選擇設備'"
+          :current="{ name: item.equipmentName, place: item.equipmentPlace }"
         />
+        <div v-else class="space-y-0.5">
+          <p class="type-body-strong text-foreground">{{ item.equipmentName || '尚未關聯設備' }}</p>
+          <p v-if="item.equipmentName" class="type-date text-muted-foreground">{{ item.equipmentPlace }}</p>
+        </div>
       </section>
 
       <!-- 廠商 -->
@@ -347,14 +339,6 @@ function isVideo(name) {
         </p>
       </section>
 
-      <!-- 施工日誌：假資料還沒有，先顯示空的 -->
-      <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
-        <h2 class="type-card-title text-foreground">施工日誌</h2>
-        <div class="space-y-1 rounded-lg bg-muted p-3.5">
-          <p class="type-body-strong text-foreground">尚無施工日誌</p>
-          <p class="type-date text-muted-foreground">施工中拍下收據或單據，系統自動帶入日期與記錄者。</p>
-        </div>
-      </section>
 
     </template>
 
