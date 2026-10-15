@@ -18,7 +18,7 @@ import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好�
 const route = useRoute()
 
 const loading = ref(true)
-const cases = ref([]) // 全部的案件（包含已結案、已取消），篩選在畫面上做
+const cases = ref([]) // 全部的案件（包含已結案），篩選在畫面上做
 const areas = ref([])
 
 onMounted(async () => {

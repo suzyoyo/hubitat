@@ -85,10 +85,17 @@ function presentForManagement(item) {
 // 只挑住戶需要的欄位，不會把負責人、廠商、內部紀錄給住戶
 function presentForResident(item, userId) {
   // 只留有 residentText 的紀錄，並改用給住戶看的說明
+  //   isEdit：是住戶自己修改的紀錄（「你修改了補充說明。」），不算管委會的回覆
   const timeline = item.logs
     .filter((log) => log.residentText)
-    .map((log) => ({ at: log.at, text: log.residentText }))
-  const latest = timeline.at(-1) // 最後一筆，也就是最新的回覆
+    .map((log) => ({
+      at: log.at,
+      text: log.residentText,
+      note: log.note ?? '', // 小字的補充，例如住戶改成了什麼內容；沒有就是空字串
+      isEdit: log.label === RESIDENT_EDIT_LABEL,
+    }))
+  const replies = timeline.filter((record) => !record.isEdit) // 管委會、管理人員的回覆
+  const latest = replies.at(-1) // 最新的回覆
 
   return {
     id: item.id,
@@ -104,24 +111,26 @@ function presentForResident(item, userId) {
     description: item.description,
     photos: item.photos,
     submittedAt: item.reportedAt,
-    updatedAt: latest ? latest.at : item.reportedAt,
+    // 更新時間：最後一筆紀錄（包含自己修改的）
+    updatedAt: timeline.at(-1)?.at ?? item.reportedAt,
     latestReply: latest,
     timeline,
     // 處理進度的三個階段各自的時間；還沒到的階段是 null
     steps: {
       receivedAt: item.reportedAt,
-      processingAt: item.status === 'pending' ? null : (timeline[1]?.at ?? null),
+      // 第一筆是「已收到」，第二筆回覆是受理；自己修改的不算
+      processingAt: item.status === 'pending' ? null : (replies[1]?.at ?? null),
       doneAt: item.closedAt ?? null,
     },
     supporterCount: item.supporters.length,
     // 是我（或我這一戶被代登記）通報的，還是我按了「我也遇到了」
     isMine: item.reporterId === userId || isMyHousehold(item, userId),
-    // 是不是管委會、管理人員代我這一戶登記的（只能看，不能修改或撤回）
+    // 是不是管委會、管理人員代我這一戶登記的（只能看，不能修改）
     isOnBehalf: isMyHousehold(item, userId),
     // 卡片、詳情頁顯示的文字：'管委會代為登記' / '管理人員代為登記'；不是代我這一戶登記的就是空字串
     onBehalfLabel: isMyHousehold(item, userId) ? `${item.source === 'staff' ? '管理人員' : '管委會'}代為登記` : '',
     hasSupported: item.supporters.includes(userId), // 我按過「我也遇到了」
-    // 能不能修改或撤回：要是我自己通報的，而且還沒結案
+    // 能不能修改：要是我自己通報的，而且還沒結案
     canEdit: item.reporterId === userId && isOpen(item),
   }
 }
@@ -153,12 +162,11 @@ export async function getCases(filters = {}) {
 }
 
 // 取得單一案件的詳情（管委會、管理人員用）
-// 有傳 userId 時，會多一個 canWithdraw：是這個人登記的、而且還沒結案，才能撤回
-export async function getCaseById(id, userId) {
+export async function getCaseById(id) {
   await delay()
   const item = cases.find((entry) => entry.id === id)
   if (!item) return undefined
-  return { ...presentForManagement(item), canWithdraw: item.reporterId === userId && isOpen(item) }
+  return presentForManagement(item)
 }
 
 // ── 管理端的動作：受理 → 派廠商 → 處理紀錄 → 完工驗收 → 結案 ──────────
@@ -231,32 +239,27 @@ function setFirstVisit(item, scheduledAt) {
   else delete item.firstVisitAt
 }
 
-// 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
-//   設備一律先設成待維修；「維修中」不存在資料裡，從廠商第一次到場那天起由設備的假 API 用日期算
+// ── 關聯設備、派廠商、處理紀錄 ─────────────────────────────
+// 下面三個 apply… 只改案件、不寫紀錄，回傳這次做了什麼的文字（寫紀錄用）；不能做回傳 undefined
+// 單獨用的 setCaseEquipment、assignVendor、addCaseLog 各寫一筆紀錄；
+// 案件詳情的「更新進度」用 updateCase，一次做完只寫一筆（2026-10-15）
+
+// 關聯設備：設備一律先設成待維修；「維修中」不存在資料裡，從廠商第一次到場那天起由設備的假 API 用日期算
 //   換掉的那台變回正常使用中。結案時，這台設備的維修紀錄會多一筆（見 closeItem）
-export async function setCaseEquipment(id, userId, equipmentId) {
-  await delay()
-  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+function applyEquipment(item, equipmentId) {
   const device = equipment.find((entry) => entry.id === equipmentId)
-  if (!item || !device) return undefined
+  if (!device) return undefined
   if (item.equipmentId && item.equipmentId !== equipmentId) setEquipmentStatus(item, 'normal')
   item.equipmentId = equipmentId
   setEquipmentStatus(item, 'needs_repair')
-  addLog(item, userId, '關聯設備', `${userLabel(userId)}關聯設備「${device.name}」`)
-  return presentForManagement(item)
+  return { text: `關聯設備「${device.name}」` }
 }
 
-// 派廠商：已受理、處理中 → 處理中（處理中也可以換廠商）
-//   vendorId    名冊裡的廠商，例如 'v-001'
-//   vendorName  名冊裡沒有的廠商，自己打的名字，例如 '順達環保'（vendorId 和 vendorName 傳一個就好）
-//               先只記在案件上；之後要自動加進廠商名冊、出現「需補資料」待辦（CLAUDE.md 待辦提醒）
-//   scheduledAt 預約到場時間，例如 '2026-10-03T14:00'（選填）
-export async function assignVendor(id, userId, { vendorId = '', vendorName = '', scheduledAt = '' }) {
-  await delay()
-  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+// 派廠商：狀態 → 處理中；住戶看到的不寫廠商名稱
+function applyVendor(item, { vendorId = '', vendorName = '', scheduledAt = '' }) {
   const listed = vendors.find((entry) => entry.id === vendorId)
   const name = listed ? listed.name : vendorName.trim()
-  if (!item || !name) return undefined
+  if (!name) return undefined
   item.status = 'in_progress'
   if (listed) {
     item.vendorId = listed.id
@@ -268,12 +271,43 @@ export async function assignVendor(id, userId, { vendorId = '', vendorName = '',
   if (scheduledAt) item.scheduledAt = scheduledAt
   else delete item.scheduledAt // 換廠商又沒填時間，就不要留著上一家的預約
   setFirstVisit(item, scheduledAt)
-  // 住戶看到的不寫廠商名稱
-  const text = scheduledAt
-    ? `${userLabel(userId)}指派 ${name}，預約 ${formatDateTime(scheduledAt)} 到場`
-    : `${userLabel(userId)}指派 ${name}`
-  const residentText = scheduledAt ? `已安排廠商，預計 ${formatDate(scheduledAt)} 到場。` : '已安排廠商處理。'
-  addLog(item, userId, '派廠商', text, residentText)
+  return {
+    text: scheduledAt ? `指派 ${name}，預約 ${formatDateTime(scheduledAt)} 到場` : `指派 ${name}`,
+    residentText: scheduledAt ? `已安排廠商，預計 ${formatDate(scheduledAt)} 到場。` : '已安排廠商處理。',
+  }
+}
+
+// 處理紀錄：改期時同時更新預約到場時間
+function applyLog(item, { text, residentText = '', scheduledAt = '' }) {
+  if (!text?.trim()) return undefined
+  if (scheduledAt) {
+    item.scheduledAt = scheduledAt
+    setFirstVisit(item, scheduledAt)
+  }
+  return { text: text.trim(), residentText: residentText.trim() }
+}
+
+// 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
+export async function setCaseEquipment(id, userId, equipmentId) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+  const done = item && applyEquipment(item, equipmentId)
+  if (!done) return undefined
+  addLog(item, userId, '關聯設備', `${userLabel(userId)}${done.text}`)
+  return presentForManagement(item)
+}
+
+// 派廠商：已受理、處理中 → 處理中（處理中也可以換廠商）
+//   vendorId    名冊裡的廠商，例如 'v-001'
+//   vendorName  名冊裡沒有的廠商，自己打的名字，例如 '順達環保'（vendorId 和 vendorName 傳一個就好）
+//               先只記在案件上；之後要自動加進廠商名冊、出現「需補資料」待辦（CLAUDE.md 待辦提醒）
+//   scheduledAt 預約到場時間，例如 '2026-10-03T14:00'（選填）
+export async function assignVendor(id, userId, vendor) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+  const done = item && applyVendor(item, vendor)
+  if (!done) return undefined
+  addLog(item, userId, '派廠商', `${userLabel(userId)}${done.text}`, done.residentText)
   return presentForManagement(item)
 }
 
@@ -281,15 +315,40 @@ export async function assignVendor(id, userId, { vendorId = '', vendorName = '',
 //   text         管理端看的內容（可以寫廠商、報價這些細節），必填
 //   residentText 給住戶看的一句，選填；沒寫就不給住戶看
 //   scheduledAt  改期時填新的預約到場時間，選填
-export async function addCaseLog(id, userId, { text, residentText = '', scheduledAt = '' }) {
+export async function addCaseLog(id, userId, log) {
   await delay()
   const item = findHandleableCase(id, userId, ['accepted', 'in_progress', 'to_verify'])
-  if (!item || !text?.trim()) return undefined
-  if (scheduledAt) {
-    item.scheduledAt = scheduledAt
-    setFirstVisit(item, scheduledAt)
-  }
-  addLog(item, userId, '處理紀錄', text.trim(), residentText.trim())
+  const done = item && applyLog(item, log)
+  if (!done) return undefined
+  addLog(item, userId, '處理紀錄', done.text, done.residentText)
+  return presentForManagement(item)
+}
+
+// 更新進度（案件詳情底部的按鈕）：關聯設備、派廠商、處理紀錄有填的一次做完，**只寫一筆紀錄**
+//   changes 三個都選填，至少要有一個：
+//     equipmentId 關聯設備（和 setCaseEquipment 一樣）
+//     vendor      { vendorId, vendorName, scheduledAt }（和 assignVendor 一樣）
+//     log         { text, residentText, scheduledAt }（和 addCaseLog 一樣）
+//   紀錄：「更新進度」／「李主委：關聯設備「揚水馬達」；指派 欣欣機電，預約 10/21 09:10 到場；改了時間」
+//   住戶看到：派廠商、處理紀錄給住戶看的那幾句接在一起（都沒有就不給住戶看）
+// 待結案的案件只能寫處理紀錄（設備、廠商不能改了）；有一樣做不了就全部不做，回傳 undefined
+export async function updateCase(id, userId, { equipmentId = '', vendor = null, log = null } = {}) {
+  await delay()
+  const statuses = equipmentId || vendor ? ['accepted', 'in_progress'] : ['accepted', 'in_progress', 'to_verify']
+  const item = findHandleableCase(id, userId, statuses)
+  if (!item || !(equipmentId || vendor || log)) return undefined
+  // 先檢查做得到，再改資料，才不會改到一半
+  if (equipmentId && !equipment.some((entry) => entry.id === equipmentId)) return undefined
+  if (vendor && !vendors.some((entry) => entry.id === vendor.vendorId) && !vendor.vendorName?.trim()) return undefined
+  if (log && !log.text?.trim()) return undefined
+  const steps = [
+    equipmentId && applyEquipment(item, equipmentId),
+    vendor && applyVendor(item, vendor),
+    log && applyLog(item, log),
+  ].filter(Boolean)
+  const text = `${userLabel(userId)}：${steps.map((step) => step.text).join('；')}`
+  const residentText = steps.map((step) => step.residentText).filter(Boolean).join(' ')
+  addLog(item, userId, '更新進度', text, residentText)
   return presentForManagement(item)
 }
 
@@ -395,7 +454,6 @@ export async function getMyReports(userId, status) {
   await delay()
   return cases
     .filter((item) => item.reporterId === userId || isMyHousehold(item, userId) || item.supporters.includes(userId))
-    .filter((item) => item.status !== 'cancelled')
     .filter((item) => {
       if (status === 'active') return isOpen(item)
       if (status === 'done') return !isOpen(item)
@@ -423,50 +481,40 @@ function findEditableCase(id, userId) {
   return item
 }
 
-// 撤回紀錄的標籤：看是誰通報的（巡查發現的是管理人員登記的，也算管理人員）
-const WITHDRAW_LABELS = { resident: '住戶撤回', committee: '委員撤回', staff: '管理人員撤回', patrol: '管理人員撤回' }
-
-// 住戶看到的撤回說明：住戶自己撤回的寫「你」，其他寫是誰撤回的
-const WITHDRAW_RESIDENT_TEXTS = {
-  resident: '你已撤回這筆通報。',
-  committee: '管委會已撤回這筆通報。',
-  staff: '管理人員已撤回這筆通報。',
-  patrol: '管理人員已撤回這筆通報。',
-}
+// 住戶修改通報的紀錄名稱；住戶端看到這個名稱的紀錄，就知道是自己改的
+const RESIDENT_EDIT_LABEL = '住戶補充'
 
 // 修改通報（住戶用）：只能改補充說明和照片，地點和主旨送出後就不能改
 //   changes 可以傳 description（補充說明）、photos（照片或影片檔名的清單），沒傳的不會動
+// 有改到東西的話，處理紀錄多一筆「住戶補充」，留下修改的紀錄：
+//   管理端看到「陳先生（B 棟 8 樓）修改了補充說明」，住戶自己的處理進度看到「你修改了補充說明。」
+//   紀錄的 note 存改完之後的內容（補充說明的全文、照片的檔名），住戶的處理進度用小字顯示在下面
 // 回傳修改後的通報；不能改的話（不是自己的、已經結案）回傳 undefined
 // 修改只存在記憶體，重新整理網頁會變回原本的假資料
 export async function updateReport(id, userId, changes) {
   await delay()
   const item = findEditableCase(id, userId)
   if (!item) return undefined
-  if (changes.description !== undefined) item.description = changes.description
-  if (changes.photos !== undefined) item.photos = [...changes.photos]
+  const changed = [] // 改了哪些，例如 ['補充說明', '照片／影片']
+  const notes = [] // 改完之後的內容，和 changed 一一對應
+  if (changes.description !== undefined && changes.description !== item.description) {
+    item.description = changes.description
+    changed.push('補充說明')
+    notes.push(item.description ? `「${item.description}」` : '已清空')
+  }
+  if (changes.photos !== undefined && changes.photos.join('|') !== item.photos.join('|')) {
+    item.photos = [...changes.photos]
+    changed.push('照片／影片')
+    notes.push(item.photos.length ? item.photos.join('、') : '已全部刪除')
+  }
+  if (changed.length) {
+    const what = changed.join('、')
+    addLog(item, userId, RESIDENT_EDIT_LABEL, `${reporterLabel(item)}修改了${what}`, `你修改了${what}。`)
+    // 剛加的那一筆，多記改完的內容。只改一項時，上一行已經說了改哪一項，不用再寫一次；兩項都改才在前面標名稱
+    item.logs.at(-1).note =
+      changed.length === 1 ? notes[0] : changed.map((name, i) => `${name}：${notes[i]}`).join('\n')
+  }
   return presentForResident(item, userId)
-}
-
-// 撤回通報：狀態改成「已取消」，並留下一筆紀錄
-// 住戶撤回自己的通報；管委會、管理人員撤回自己登記的（包括代住戶登記的）
-//   reason 撤回原因，選填；有寫的話管理端的紀錄會看到
-// 撤回後不會再出現在「我的通報」，管理端的未結案列表也看不到
-// 回傳 true 代表撤回成功；不能撤回的話（不是自己的、已經結案）回傳 false
-export async function withdrawReport(id, userId, reason = '') {
-  await delay()
-  const item = findEditableCase(id, userId)
-  if (!item) return false
-  item.status = 'cancelled'
-  if (reason) item.withdrawReason = reason
-  item.logs.push({
-    at: MOCK_NOW,
-    actorId: userId,
-    label: WITHDRAW_LABELS[item.source],
-    text: reason ? `通報人撤回通報，原因：${reason}` : '通報人撤回通報',
-    // 代住戶登記的，住戶看到的是管委會或管理人員撤回的
-    residentText: WITHDRAW_RESIDENT_TEXTS[item.source],
-  })
-  return true
 }
 
 // 新案件的編號：CASE-今天的日期-流水號。流水號是今天已經有幾件再加 1，補成三位數
