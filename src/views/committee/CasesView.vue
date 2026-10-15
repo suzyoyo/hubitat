@@ -28,11 +28,20 @@ onMounted(async () => {
 // ── 篩選 ─────────────────────────────────────
 // 四個都是 5 個選項以上，所以都用下拉選單（dev-guide 第 5 節「篩選」）
 // 狀態的文字用假資料的對照表；設計稿寫的「待處理、處理中、已處理」和資料的狀態對不起來
+// 已受理（accepted）在管理端也顯示「處理中」，所以選單只放一個「處理中」，選了兩種都列出來（2026-10-15）
 const STATUS_OPTIONS = [
   { value: 'all', label: '全部' },
   { value: 'open', label: '未結案' },
-  ...Object.entries(CASE_STATUSES).map(([value, info]) => ({ value, label: info.label })),
+  ...Object.entries(CASE_STATUSES)
+    .filter(([value]) => value !== 'accepted')
+    .map(([value, info]) => ({ value, label: info.label })),
 ]
+
+// 選單選的狀態，對到資料裡的哪幾種
+function matchesStatus(item, value) {
+  if (value === 'in_progress') return ['accepted', 'in_progress'].includes(item.status)
+  return item.status === value
+}
 const CATEGORY_OPTIONS = [
   { value: 'all', label: '全部' },
   ...Object.entries(ISSUE_CATEGORIES).map(([value, info]) => ({ value, label: info.label })),
@@ -64,7 +73,7 @@ function clearFilters() {
 const shownCases = computed(() =>
   cases.value.filter((item) => {
     if (status.value === 'open' && !item.isOpen) return false
-    if (!['all', 'open'].includes(status.value) && item.status !== status.value) return false
+    if (!['all', 'open'].includes(status.value) && !matchesStatus(item, status.value)) return false
     if (areaId.value !== 'all' && item.areaId !== areaId.value) return false
     if (vendorId.value !== 'all' && item.vendorId !== vendorId.value) return false
     if (category.value !== 'all' && item.category !== category.value) return false
