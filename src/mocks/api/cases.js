@@ -6,7 +6,9 @@ import { diffDays, formatDate, formatDateTime } from '@/lib/date'
 import { CASE_SOURCES, CASE_STATUSES, CASE_VISIBILITY, cases } from '../data/cases'
 import { ISSUE_CATEGORIES } from '../data/community'
 import { equipment } from '../data/equipment'
+import { notifications } from '../data/notifications'
 import { tasks } from '../data/tasks'
+import { users } from '../data/users'
 import { vendors } from '../data/vendors'
 import { areaName } from './community'
 import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
@@ -467,7 +469,30 @@ export async function createReport(userId, input) {
     ],
   }
   cases.push(item)
+  notifyNewReport(item)
   return presentForResident(item, userId)
+}
+
+// 有新的住戶通報：通知能受理的人（主委、副主委用管委會身分收、管理人員用管理人員身分收）
+// 通報的人自己不用收（例如李伯伯同時是主委）
+function notifyNewReport(item) {
+  for (const user of users) {
+    if (user.id === item.reporterId) continue
+    let role = ''
+    if (['chair', 'viceChair'].includes(user.committeeTitle)) role = 'committee'
+    if (user.roles.includes('staff')) role = 'staff'
+    if (!role) continue
+    notifications.push({
+      id: `n-${item.id}-${user.id}`,
+      userId: user.id,
+      role,
+      title: '新的住戶通報',
+      body: `${areaName(item.areaId)}・${item.place}：${item.subject}`,
+      at: MOCK_NOW,
+      read: false,
+      link: { type: 'case', id: item.id },
+    })
+  }
 }
 
 // 登記通報（管委會、管理人員代為登記用），回傳新增好的案件（管理端的樣子）
