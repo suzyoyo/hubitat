@@ -1,5 +1,6 @@
 <script setup>
-// 管委會端・交辦詳情：一件我交辦出去的事的內容、期限和處理紀錄
+// 管委會端、管理人員端共用・交辦詳情：一件交辦的內容、期限和處理紀錄
+//   交辦人看到「確認完成、退回、撤回」；被交辦的人（例如管理人員）看到「回報完成」（之後加）
 //   設計稿沒有這一頁，版型借用管委會端的公告詳情（node 1134:17718）
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -19,7 +20,8 @@ import { taskStatusBadge } from '@/lib/task'
 import { MOCK_NOW, confirmTask, getCurrentUser, getTaskById, returnTask, withdrawTask } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
-// 網址是 /committee/tasks/:id，所以 route.params.id 就是這件交辦的編號
+// 網址是 /committee/tasks/:id 或 /staff/tasks/:id，所以 route.params.id 就是這件交辦的編號
+// route.meta.roleId 是目前在哪一端，用來決定「我是誰」
 const route = useRoute()
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
@@ -30,7 +32,7 @@ const userId = ref('') // 我是誰，按按鈕時要用
 
 // onMounted：畫面一出現就去拿資料
 onMounted(async () => {
-  const [user, item] = await Promise.all([getCurrentUser('committee'), getTaskById(route.params.id)])
+  const [user, item] = await Promise.all([getCurrentUser(route.meta.roleId), getTaskById(route.params.id)])
   userId.value = user.id
   task.value = item
   loading.value = false
@@ -173,7 +175,10 @@ const recordRows = computed(() => {
       <EmptyTitle class="type-greeting">找不到這件交辦</EmptyTitle>
       <EmptyDescription class="type-body">可能已經刪除，或是網址不正確。</EmptyDescription>
       <Button as-child class="mt-4">
-        <RouterLink to="/committee/tasks">回到交辦進度</RouterLink>
+        <!-- 管理人員端沒有交辦列表，回首頁 -->
+        <RouterLink :to="route.meta.roleId === 'staff' ? '/staff/home' : '/committee/tasks'">
+          {{ route.meta.roleId === 'staff' ? '回到首頁' : '回到交辦進度' }}
+        </RouterLink>
       </Button>
     </Empty>
 

@@ -1,7 +1,9 @@
 <script setup>
-// 管委會端・案件（底部分頁）：列出社區所有案件，可以依狀態、地點、廠商、分類篩選
+// 管委會端、管理人員端共用・案件（底部分頁）：列出社區所有案件，可以依狀態、地點、廠商、分類篩選
+//   管理人員端沒有另外畫，沿用管委會的（Figma 管理人員區塊 1483:15338）；連結開頭看目前在哪一端
 // 設計稿：列表 1134:16221、狀態下拉 1134:18205、空狀態 1134:18106
 import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import AdminCaseCard from '@/components/admin/AdminCaseCard.vue'
 import FilterSelect from '@/components/common/FilterSelect.vue'
 import { Button } from '@/components/ui/button'
@@ -11,6 +13,9 @@ import { getAreas, getCases, getVendors } from '@/mocks/api'
 import { CASE_STATUSES } from '@/mocks/data/cases'
 import { ISSUE_CATEGORIES } from '@/mocks/data/community'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
+
+// route.meta.roleId 是目前在哪一端（'committee' 或 'staff'），卡片的連結要接在它後面
+const route = useRoute()
 
 const loading = ref(true)
 const cases = ref([]) // 全部的案件（包含已結案、已取消），篩選在畫面上做
@@ -100,7 +105,7 @@ const shownCases = computed(() =>
 
     <template v-else>
       <p class="type-date text-muted-foreground">共 {{ shownCases.length }} 件</p>
-      <AdminCaseCard v-for="item in shownCases" :key="item.id" :item="item" :to="`/committee/cases/${item.id}`" />
+      <AdminCaseCard v-for="item in shownCases" :key="item.id" :item="item" :to="`/${route.meta.roleId}/cases/${item.id}`" />
     </template>
   </div>
 </template>

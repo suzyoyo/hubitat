@@ -1,5 +1,5 @@
 <script setup>
-// 管委會端・案件詳情：一件案件的基本資料、通報內容、廠商、處理紀錄（設計稿 1134:17558）
+// 管委會端、管理人員端共用・案件詳情：一件案件的基本資料、通報內容、廠商、處理紀錄（設計稿 1134:17558）
 // 這一版只有「看」；底部的發布社區公告、交辦、完工標記與結案要新的假 API，之後再做
 import { ImageIcon, VideoIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
@@ -14,7 +14,8 @@ import { formatFullDate, formatTime } from '@/lib/date'
 import { getCaseById } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
-// 網址是 /committee/cases/:id，所以 route.params.id 就是案件編號
+// 網址是 /committee/cases/:id 或 /staff/cases/:id，所以 route.params.id 就是案件編號
+// 管理人員端的設計稿內容和管委會一樣，只有底部按鈕不同（Figma 1484:15491）；route.meta.roleId 是目前在哪一端
 const route = useRoute()
 
 const loading = ref(true)
@@ -71,7 +72,7 @@ function isVideo(name) {
       <EmptyTitle class="type-greeting">找不到這件案件</EmptyTitle>
       <EmptyDescription class="type-body">可能已經刪除，或是網址不正確。</EmptyDescription>
       <Button as-child class="mt-4">
-        <RouterLink to="/committee/cases">回到案件列表</RouterLink>
+        <RouterLink :to="`/${route.meta.roleId}/cases`">回到案件列表</RouterLink>
       </Button>
     </Empty>
 

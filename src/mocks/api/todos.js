@@ -10,6 +10,7 @@ import { quickSaves } from '../data/quickSaves'
 import { tasks } from '../data/tasks'
 import { COMMITTEE_TITLES } from '../data/users'
 import { vendors } from '../data/vendors'
+import { areaName } from './community'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
 import { MOCK_TODAY, delay } from './helpers'
@@ -27,7 +28,7 @@ export const TODO_KINDS = {
   expiring: { label: '快到期文件' },
   incomplete: { label: '需補資料' },
   // 管理人員
-  new_case: { label: '新報修' },
+  new_case: { label: '新通報' }, // 待受理的案件（2026-10-15 從「新報修」改，用詞統一叫「通報」）；管委會只有主委、副主委有
   in_progress: { label: '處理中' }, // 2026-10-15 從「施工中」改名（docs/case-flow.md）
   to_verify: { label: '待標記完成' }, // 2026-10-15 起不會出現在待辦（待結案是負責人的事），只有「已完成」還用這個種類
 }
@@ -94,6 +95,16 @@ function committeeTodos(userId) {
           id: task.id,
         }),
       )
+    }
+  }
+
+  // 待受理的案件：只有能受理的主委、副主委有（管理人員在 staffTodos）
+  // 沒有期限，用通報時間排序（越早通報的越前面）；畫面上的徽章是「尚未受理」，不是「逾期」
+  if (['chair', 'viceChair'].includes(user.committeeTitle)) {
+    for (const item of cases) {
+      if (item.status === 'pending') {
+        items.push(todo('new_case', item.title, `${areaName(item.areaId)}・尚未受理`, item.reportedAt, item.reportedAt, { type: 'case', id: item.id }, item.isUrgent))
+      }
     }
   }
 
