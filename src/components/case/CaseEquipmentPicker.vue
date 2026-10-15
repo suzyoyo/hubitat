@@ -1,7 +1,7 @@
 <script setup>
 // 案件詳情「關聯設備」卡片裡的選擇設備：輸入框一直顯示（2026-10-15 改，原本要先按「選擇設備 ›」展開）
 //   輸入框打字篩選設備清冊（名稱或位置），點一台就記下來（v-model:draft）；只能選清冊裡有的
-//   記下來的會在輸入框下面標「尚未更新」；真的存是按頁面底部的「更新現況」
+//   真的存是按頁面底部的「更新現況」（輸入框下面不放灰字，2026-10-15 013 決定）
 // 選了設備，結案時才會記進這台設備的維修紀錄（docs/case-flow.md）
 import { computed, ref, watch } from 'vue'
 import { Input } from '@/components/ui/input'
@@ -18,12 +18,10 @@ const draft = defineModel('draft', { type: Object, default: null })
 
 const name = ref(props.current.name) // 輸入框裡的字
 
-// 存好之後（頁面把 draft 清掉、current 換成新的），輸入框跟著換成存好的設備
+// 存好之後（存好的設備換了），輸入框跟著換成存好的設備
 watch(
-  () => [draft.value, props.current.name],
-  () => {
-    if (!draft.value) name.value = props.current.name
-  },
+  () => props.current.name,
+  (value) => (name.value = value),
 )
 
 // 名稱或位置有包含輸入的字的設備；沒打字就全部列出來
@@ -70,11 +68,5 @@ function pick(device) {
         </button>
       </li>
     </ul>
-    <p v-else-if="!picked && name.trim() && !matches.length" class="type-date text-muted-foreground">清冊裡沒有符合的設備</p>
-    <!-- 選好的設備在哪裡；記下來還沒存的標「尚未更新」 -->
-    <p v-if="picked" class="type-date text-muted-foreground">
-      {{ picked.place }}<template v-if="draft">・尚未更新</template>
-    </p>
-    <p v-else-if="!name.trim()" class="type-date text-muted-foreground">選了之後，結案時會記進這台設備的維修紀錄</p>
   </div>
 </template>

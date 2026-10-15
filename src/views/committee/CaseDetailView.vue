@@ -1,8 +1,8 @@
 <script setup>
 // 管委會端、管理人員端共用・案件詳情：一件案件的基本資料、通報內容、廠商、處理紀錄（設計稿 1134:17558）
 // 按鈕依「這個人能做什麼＋案件狀態」顯示，不分哪一端（規則見 docs/case-flow.md）：
-//   關聯設備、廠商、處理紀錄三張卡片：設備從選單點一台、廠商和紀錄按「確定」先記下來（標「尚未更新」），
-//   按底部「更新現況」才一起存
+//   關聯設備、廠商、處理紀錄三張卡片：欄位直接顯示，邊填邊記下來（2026-10-15 拿掉「取消」「確定」），
+//   按底部「更新現況」才一起存，而且只寫一筆紀錄（updateCase）
 //   底部：更新現況＋完工驗收（到回報完成頁）並排；受理（按了就受理）、交辦（到新增交辦頁）、
 //   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
 //   沒有「撤回通報」：2026-10-15 和 013 決定拿掉撤回，不需要處理的通報由處理的人完工驗收時寫明原因結案
@@ -23,15 +23,13 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate, formatTime } from '@/lib/date'
 import {
   acceptCase,
-  addCaseLog,
-  assignVendor,
   canAssignTasks,
   canHandleCases,
   getCaseById,
   getCurrentUser,
   getEquipmentList,
   getVendors,
-  setCaseEquipment,
+  updateCase,
 } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
@@ -98,12 +96,8 @@ const actions = computed(() => {
 // 「更新現況」：能選廠商或寫紀錄的時候才出現；有記下來的內容才能按
 const canUpdate = computed(() => canPickVendor.value || canAddLog.value)
 const hasDraft = computed(() => Boolean(equipmentDraft.value || vendorDraft.value || logDraft.value))
-// 廠商卡片上顯示的：有記下來的就顯示記下來的，沒有就顯示已經存的
-const shownVendor = computed(() =>
-  vendorDraft.value
-    ? { name: vendorDraft.value.vendorName, scheduledAt: vendorDraft.value.scheduledAt }
-    : { name: item.value?.vendorName ?? '', scheduledAt: item.value?.scheduledAt ?? '' },
-)
+// 廠商卡片灰底區塊顯示的：已經存好的廠商（還沒存的只在下面的欄位裡）
+const shownVendor = computed(() => ({ name: item.value?.vendorName ?? '', scheduledAt: item.value?.scheduledAt ?? '' }))
 const hasBottom = computed(() => !loading.value && item.value && (actions.value.length > 0 || canUpdate.value))
 
 // 交辦放上面一排；其他（受理、完工驗收、結案）和「更新現況」並排在下面
@@ -138,23 +132,16 @@ async function goComplete() {
   router.push(`/${route.meta.roleId}/cases/${item.value.id}/complete`)
 }
 
-// ── 更新現況：把卡片裡記下來的廠商、處理紀錄一起存 ─────────────
+// ── 更新現況：把卡片裡記下來的設備、廠商、處理紀錄一起存，只寫一筆紀錄 ─────────────
 // 成功回傳 true，失敗回傳 false（完工驗收要先存好才換頁）
 async function updateStatus() {
   pending.value = true
-  let result = item.value
-  if (equipmentDraft.value) {
-    result = await setCaseEquipment(item.value.id, userId.value, equipmentDraft.value.equipmentId)
-    if (!result) return failUpdate()
-  }
-  if (vendorDraft.value) {
-    result = await assignVendor(item.value.id, userId.value, vendorDraft.value)
-    if (!result) return failUpdate()
-  }
-  if (logDraft.value) {
-    result = await addCaseLog(item.value.id, userId.value, logDraft.value)
-    if (!result) return failUpdate()
-  }
+  const result = await updateCase(item.value.id, userId.value, {
+    equipmentId: equipmentDraft.value?.equipmentId,
+    vendor: vendorDraft.value,
+    log: logDraft.value,
+  })
+  if (!result) return failUpdate()
   pending.value = false
   item.value = result
   equipmentDraft.value = null
@@ -278,7 +265,7 @@ function isVideo(name) {
       <!-- 廠商 -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">廠商履歷</h2>
-        <!-- 有記下來、還沒存的廠商，先顯示它，並標「尚未更新」 -->
+        <!-- 已經存好的廠商；要換的話在下面的欄位改 -->
         <div class="space-y-1 rounded-lg bg-muted p-3.5">
           <p class="type-body-strong text-foreground">{{ shownVendor.name || '尚未派廠商' }}</p>
           <p v-if="!shownVendor.name" class="type-date text-muted-foreground">
@@ -287,14 +274,8 @@ function isVideo(name) {
           <p v-else-if="shownVendor.scheduledAt" class="type-date text-muted-foreground">
             預約 {{ dateTimeText(shownVendor.scheduledAt) }} 到場
           </p>
-          <p v-if="vendorDraft" class="type-date text-muted-foreground">尚未更新</p>
         </div>
-        <CaseVendorPicker
-          v-if="canPickVendor"
-          v-model:draft="vendorDraft"
-          :vendors="vendors"
-          :button-text="shownVendor.name ? '更換廠商' : '選擇廠商'"
-        />
+        <CaseVendorPicker v-if="canPickVendor" v-model:draft="vendorDraft" :vendors="vendors" :current="shownVendor" />
       </section>
 
       <!-- 處理進度與留痕：由舊到新 -->
@@ -310,22 +291,10 @@ function isVideo(name) {
             </div>
           </div>
         </template>
-        <!-- 記下來、還沒存的紀錄：接在最下面，時間的位置寫「尚未更新」 -->
-        <template v-if="logDraft">
-          <Separator />
-          <div class="flex gap-3">
-            <p class="w-[88px] shrink-0 type-date text-muted-foreground">尚未更新</p>
-            <div class="min-w-0 flex-1 space-y-0.5">
-              <p class="type-body-strong text-foreground">處理紀錄</p>
-              <p class="type-body text-muted-foreground">{{ logDraft.text }}</p>
-              <p v-if="logDraft.residentText" class="type-date text-muted-foreground">住戶看到：{{ logDraft.residentText }}</p>
-            </div>
-          </div>
-        </template>
         <CaseLogForm
           v-if="canAddLog"
           v-model:draft="logDraft"
-          :can-reschedule="Boolean(item.vendorName || vendorDraft)"
+          :can-reschedule="Boolean(item.vendorName)"
         />
       </section>
 

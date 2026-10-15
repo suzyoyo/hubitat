@@ -1,14 +1,15 @@
 <script setup>
-// 案件詳情「處理進度與留痕」卡片最下面的「新增處理紀錄」，按了在卡片裡展開
-//   內容（必填，管理端看的）、給住戶看的一句（選填，沒寫就不給住戶看）、改期的新預約時間（選填）
-// 按「確定」只是先記下來（v-model:draft），頁面會把它接在紀錄最下面；真的存是按頁面底部的「更新現況」
+// 案件詳情「處理進度與留痕」卡片最下面的新增處理紀錄：欄位一直顯示（2026-10-15 改，原本要先按「＋ 新增處理紀錄」、再按「確定」）
+//   內容（管理端看的）、給住戶看的一句（選填，沒寫就不給住戶看）、改期的新預約時間（選填）
+// 有寫內容就記下來（v-model:draft）；真的存是按頁面底部的「更新現況」，和設備、廠商合成一筆紀錄
 // 規則見 docs/case-flow.md 4-4
-import { ref } from 'vue'
-import { Button } from '@/components/ui/button'
+import { computed, ref, watch } from 'vue'
+import DatePicker from '@/components/common/DatePicker.vue'
+import TimePicker from '@/components/common/TimePicker.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { MOCK_NOW } from '@/mocks/api'
+import { MOCK_TODAY } from '@/mocks/api'
 
 defineProps({
   // 有派廠商才顯示「改期」（沒有廠商就沒有預約時間可以改）
@@ -18,31 +19,37 @@ defineProps({
 // 記下來、還沒存的紀錄：{ text, residentText, scheduledAt }，沒有就是 null
 const draft = defineModel('draft', { type: Object, default: null })
 
-const open = ref(false) // 表單有沒有展開
 const text = ref('')
 const residentText = ref('')
-const scheduledAt = ref('')
+const scheduledDate = ref('')
+const scheduledTime = ref('')
+// 改期：日期、時間都選了才算
+const scheduledAt = computed(() =>
+  scheduledDate.value && scheduledTime.value ? `${scheduledDate.value}T${scheduledTime.value}` : '',
+)
 
-// 展開時，帶入之前記下來的內容（已經記下一筆時，按鈕是「修改處理紀錄」）
-function start() {
-  text.value = draft.value?.text ?? ''
-  residentText.value = draft.value?.residentText ?? ''
-  scheduledAt.value = draft.value?.scheduledAt ?? ''
-  open.value = true
-}
+// 邊填邊記下來：有寫內容才算一筆
+watch([text, residentText, scheduledAt], () => {
+  draft.value = text.value.trim()
+    ? { text: text.value.trim(), residentText: residentText.value.trim(), scheduledAt: scheduledAt.value }
+    : null
+})
 
-// 確定：先記下來，表單收起來
-function confirm() {
-  if (!text.value.trim()) return
-  draft.value = { text: text.value.trim(), residentText: residentText.value.trim(), scheduledAt: scheduledAt.value }
-  open.value = false
-}
+// 按「更新現況」存好之後（頁面把 draft 清掉），欄位也清空
+// 自己把內容刪光時 draft 也會變 null，這時內容已經是空的，就不要連其他欄位一起清
+watch(draft, (value) => {
+  if (value || !text.value.trim()) return
+  text.value = ''
+  residentText.value = ''
+  scheduledDate.value = ''
+  scheduledTime.value = ''
+})
 </script>
 
 <template>
-  <div v-if="open" class="space-y-3">
+  <div class="space-y-3">
     <div class="space-y-2">
-      <Label for="log-text" class="text-base">處理內容<span class="text-destructive">*</span></Label>
+      <Label for="log-text" class="text-base">處理內容</Label>
       <Textarea
         id="log-text"
         v-model="text"
@@ -63,15 +70,10 @@ function confirm() {
       <Label for="log-scheduled" class="text-base">
         改期：新的預約到場時間<span class="type-date text-muted-foreground">選填</span>
       </Label>
-      <Input id="log-scheduled" v-model="scheduledAt" type="datetime-local" :min="MOCK_NOW" />
-    </div>
-    <div class="flex gap-3 *:flex-1">
-      <Button variant="outline" @click="open = false">取消</Button>
-      <Button :disabled="!text.trim()" @click="confirm">確定</Button>
+      <div class="space-y-2">
+        <DatePicker id="log-scheduled" v-model="scheduledDate" :min="MOCK_TODAY" />
+        <TimePicker v-model="scheduledTime" aria-label="新的預約到場時間" />
+      </div>
     </div>
   </div>
-
-  <Button v-else variant="outline" class="w-full" @click="start">
-    {{ draft ? '修改處理紀錄' : '＋ 新增處理紀錄' }}
-  </Button>
 </template>
