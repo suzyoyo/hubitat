@@ -291,11 +291,7 @@ function isVideo(name) {
             </div>
           </div>
         </template>
-        <CaseLogForm
-          v-if="canAddLog"
-          v-model:draft="logDraft"
-          :can-reschedule="Boolean(item.vendorName)"
-        />
+        <CaseLogForm v-if="canAddLog" v-model:draft="logDraft" />
       </section>
 
       <!-- 完工紀錄：完工了才有 -->
@@ -318,20 +314,19 @@ function isVideo(name) {
       <Button v-for="action in topActions" :key="action.key" variant="outline" @click="runAction(action)">
         {{ action.label }}
       </Button>
-      <!-- 下面一排：更新現況（次要）和主要動作並排 -->
+      <!-- 下面一排：動作（完工驗收、結案…）在左、更新現況在右（2026-10-15 013 改）
+           顏色不跟著換：右邊那顆是主要的藍色；有更新現況時，左邊的動作用次要的淺藍 -->
       <div v-if="canUpdate || mainActions.length" class="flex gap-3 *:flex-1">
-        <Button v-if="canUpdate" variant="secondary" :disabled="!hasDraft || pending" @click="updateStatus">
-          更新現況
-        </Button>
         <Button
           v-for="action in mainActions"
           :key="action.key"
-          :variant="action.main ? 'default' : 'outline'"
+          :variant="canUpdate ? 'secondary' : action.main ? 'default' : 'outline'"
           :disabled="pending"
           @click="runAction(action)"
         >
           {{ action.label }}
         </Button>
+        <Button v-if="canUpdate" :disabled="!hasDraft || pending" @click="updateStatus">更新現況</Button>
       </div>
     </BottomCta>
   </div>
