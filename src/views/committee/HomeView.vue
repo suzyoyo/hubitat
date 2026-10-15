@@ -7,8 +7,6 @@ import AdminTodoCard from '@/components/admin/AdminTodoCard.vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import IconTile from '@/components/common/IconTile.vue'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { greetingWord } from '@/lib/date'
 import { todoLink } from '@/lib/todo'
@@ -55,7 +53,7 @@ const greeting = computed(() => {
   return { title: `${hello}！今天有`, subtitle: `${todos.value.total} 件待辦事項喔！` }
 })
 
-// 首頁只放最前面的 2 筆待辦，其餘的按「查看全部待辦事項」
+// 首頁只放最前面的 2 筆待辦，其餘的按標題右邊的「查看 N 件待辦」
 const homeTodos = computed(() => todos.value.items.slice(0, 2))
 
 // 捷徑方塊：不是 Kit 元件，直接寫在頁面裡
@@ -72,10 +70,19 @@ const shortcuts = [
 
     <div class="space-y-8 px-5 pt-5">
       <section class="space-y-3">
-        <!-- 標題右邊是件數徽章，不是「看全部」，所以不用 SectionHeader -->
         <div class="flex items-center justify-between">
           <h2 class="type-title text-heading">我的待辦</h2>
-          <Badge v-if="!loading && todos.total" variant="secondary">待處理 {{ todos.total }} 件</Badge>
+          <!-- 「查看 N 件待辦 ›」（2026-10-15 suzy 改：拿掉件數徽章和下面的「查看全部待辦事項」按鈕，管理人員首頁也一樣）
+               樣式和「看全部 ›」一樣（SectionHeader），只是文字不同，所以這裡照著寫一份。
+               h-11 是 44px 的可點擊範圍；-my-1 讓這一列的高度維持 36px -->
+          <RouterLink
+            v-if="!loading && todos.total"
+            to="/committee/todos"
+            class="-my-1 flex h-11 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
+          >
+            查看 {{ todos.total }} 件待辦
+            <ChevronRightIcon class="size-4" />
+          </RouterLink>
         </div>
         <template v-if="loading">
           <Skeleton v-for="n in 2" :key="n" class="h-[124px] rounded-xl" />
@@ -87,9 +94,6 @@ const shortcuts = [
         <template v-else>
           <AdminTodoCard v-for="todo in homeTodos" :key="todo.id" :todo="todo" :to="todoLink(todo)" />
         </template>
-        <Button as-child class="w-full">
-          <RouterLink to="/committee/todos">查看全部待辦事項</RouterLink>
-        </Button>
       </section>
 
       <div class="grid grid-cols-2 gap-3">
