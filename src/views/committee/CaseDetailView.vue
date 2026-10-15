@@ -285,7 +285,8 @@ function isVideo(name) {
             <p class="w-[88px] shrink-0 type-date text-muted-foreground">{{ dateTimeText(log.at) }}</p>
             <div class="min-w-0 flex-1 space-y-0.5">
               <p class="type-body-strong text-foreground">{{ log.label }}</p>
-              <p class="type-body text-muted-foreground">{{ log.text }}</p>
+              <!-- whitespace-pre-line：「更新進度」一項一行（內容裡的換行照樣換行） -->
+              <p class="type-body whitespace-pre-line text-muted-foreground">{{ log.text }}</p>
               <!-- 備註小字（例如住戶修改通報時，改完的內容）：和住戶端的處理進度一樣（ReportRecord），
                    type-note 14px 灰色；whitespace-pre-line 讓兩項都改時一項一行 -->
               <p v-if="log.note" class="type-note whitespace-pre-line text-muted-foreground">{{ log.note }}</p>

@@ -240,7 +240,9 @@ function setFirstVisit(item, scheduledAt) {
 }
 
 // ── 關聯設備、派廠商、處理紀錄 ─────────────────────────────
-// 下面三個 apply… 只改案件、不寫紀錄，回傳這次做了什麼的文字（寫紀錄用）；不能做回傳 undefined
+// 下面三個 apply… 只改案件、不寫紀錄，回傳這次做了什麼（寫紀錄用）；不能做回傳 undefined
+//   text  單獨寫一筆紀錄時用的一句話，例如「指派 大同電梯，預約 10/3 14:00 到場」
+//   lines 「更新進度」合成一筆時用的精簡寫法，一項一行，例如 ['廠商：大同電梯', '到場：10/3 14:00']
 // 單獨用的 setCaseEquipment、assignVendor、addCaseLog 各寫一筆紀錄；
 // 案件詳情的「更新進度」用 updateCase，一次做完只寫一筆（2026-10-15）
 
@@ -252,7 +254,7 @@ function applyEquipment(item, equipmentId) {
   if (item.equipmentId && item.equipmentId !== equipmentId) setEquipmentStatus(item, 'normal')
   item.equipmentId = equipmentId
   setEquipmentStatus(item, 'needs_repair')
-  return { text: `關聯設備「${device.name}」` }
+  return { text: `關聯設備「${device.name}」`, lines: [`關聯設備：${device.name}`] }
 }
 
 // 派廠商：狀態 → 處理中；住戶看到的不寫廠商名稱
@@ -273,6 +275,7 @@ function applyVendor(item, { vendorId = '', vendorName = '', scheduledAt = '' })
   setFirstVisit(item, scheduledAt)
   return {
     text: scheduledAt ? `指派 ${name}，預約 ${formatDateTime(scheduledAt)} 到場` : `指派 ${name}`,
+    lines: scheduledAt ? [`廠商：${name}`, `到場：${formatDateTime(scheduledAt)}`] : [`廠商：${name}`],
     residentText: scheduledAt ? `已安排廠商，預計 ${formatDate(scheduledAt)} 到場。` : '已安排廠商處理。',
   }
 }
@@ -284,7 +287,9 @@ function applyLog(item, { text, residentText = '', scheduledAt = '' }) {
     item.scheduledAt = scheduledAt
     setFirstVisit(item, scheduledAt)
   }
-  return { text: text.trim(), residentText: residentText.trim() }
+  // 「更新進度」的紀錄多一行「給住戶：…」，管理端才看得到這次給住戶看了什麼（有寫才有）
+  const lines = residentText.trim() ? [text.trim(), `給住戶：${residentText.trim()}`] : [text.trim()]
+  return { text: text.trim(), lines, residentText: residentText.trim() }
 }
 
 // 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
@@ -329,7 +334,12 @@ export async function addCaseLog(id, userId, log) {
 //     equipmentId 關聯設備（和 setCaseEquipment 一樣）
 //     vendor      { vendorId, vendorName, scheduledAt }（和 assignVendor 一樣）
 //     log         { text, residentText, scheduledAt }（和 addCaseLog 一樣）
-//   紀錄：「更新進度」／「李主委：關聯設備「揚水馬達」；指派 欣欣機電，預約 10/21 09:10 到場；改了時間」
+//   紀錄：「更新進度」，內容一項一行、不寫是誰按的（受理、交辦之後就知道是誰在處理；紀錄的 actorId 還是有記），例如
+//     關聯設備：揚水馬達
+//     廠商：欣欣機電
+//     到場：10/21 09:10
+//     我改了時間和地點
+//     給住戶：廠商將於 10/21 到場處理。（處理紀錄有寫給住戶看的說明才有這行）
 //   住戶看到：派廠商、處理紀錄給住戶看的那幾句接在一起（都沒有就不給住戶看）
 // 待結案的案件只能寫處理紀錄（設備、廠商不能改了）；有一樣做不了就全部不做，回傳 undefined
 export async function updateCase(id, userId, { equipmentId = '', vendor = null, log = null } = {}) {
@@ -346,7 +356,7 @@ export async function updateCase(id, userId, { equipmentId = '', vendor = null, 
     vendor && applyVendor(item, vendor),
     log && applyLog(item, log),
   ].filter(Boolean)
-  const text = `${userLabel(userId)}：${steps.map((step) => step.text).join('；')}`
+  const text = steps.flatMap((step) => step.lines).join('\n')
   const residentText = steps.map((step) => step.residentText).filter(Boolean).join(' ')
   addLog(item, userId, '更新進度', text, residentText)
   return presentForManagement(item)
