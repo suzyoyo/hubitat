@@ -22,7 +22,7 @@ import {
   confirmTask,
   getCurrentUser,
   getTaskById,
-  markNotificationsReadByLink,
+  markNewTaskNotificationRead,
   returnTask,
   withdrawTask,
 } from '@/mocks/api'
@@ -44,8 +44,8 @@ onMounted(async () => {
   userId.value = user.id
   task.value = item
   loading.value = false
-  // 被交辦的人打開了，連到這件交辦的通知就算看過（待辦不再把它當成新交辦排最前面）
-  if (item?.assigneeId === user.id) markNotificationsReadByLink(user.id, route.meta.roleId, { type: 'task', id: item.id })
+  // 被交辦的人打開了，「新的交辦」通知就算看過（待辦不再把它排最前面）；其他通知不動
+  if (item?.assigneeId === user.id) markNewTaskNotificationRead(user.id, route.meta.roleId, item.id)
 })
 
 const statusBadge = computed(() => taskStatusBadge(task.value))

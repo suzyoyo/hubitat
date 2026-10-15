@@ -16,6 +16,7 @@ import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
 import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
 import { proposalStatus } from './proposals'
+import { NEW_TASK_TITLE } from './tasks'
 import { findUser, userLabel } from './users'
 
 // 待辦的種類。管委會和管理人員各自會用到其中幾種
@@ -103,7 +104,7 @@ function incompleteQuickSaves(userId) {
 //   點那則通知、或打開交辦詳情，通知就會變成已讀，這件交辦就不算新的了
 function isUnseenTask(userId, taskId) {
   return notifications.some(
-    (item) => item.userId === userId && item.title === '新的交辦' && item.link?.id === taskId && !item.read,
+    (item) => item.userId === userId && item.title === NEW_TASK_TITLE && item.link?.id === taskId && !item.read,
   )
 }
 

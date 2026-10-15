@@ -69,6 +69,11 @@ function findMyTask(id, userId, statuses) {
 
 // 發一則通知給被交辦人
 // 被交辦人是管理人員就發到管理人員端，是委員就發到管委會端
+// 「新的交辦」通知的標題
+//   todos.js 用它判斷哪件交辦還沒看過、要排在待辦最前面，所以發通知和找通知都用這個常數，
+//   要改字只改這裡，不要在別的地方另外寫「新的交辦」
+export const NEW_TASK_TITLE = '新的交辦'
+
 function notifyAssignee(task, title, reason) {
   const assignee = findUser(task.assigneeId)
   notifications.push({
@@ -81,6 +86,18 @@ function notifyAssignee(task, title, reason) {
     read: false,
     link: { type: 'task', id: task.id },
   })
+}
+
+// 被交辦的人打開交辦詳情時用：只把這件交辦的「新的交辦」通知設為已讀
+//   這件交辦就不算新的，待辦不再把它排到最前面
+//   「交辦今天到期」「交辦被退回」等其他通知不動，要等他自己在通知頁點
+export async function markNewTaskNotificationRead(userId, role, taskId) {
+  await delay()
+  for (const item of notifications) {
+    if (item.userId === userId && item.role === role && item.title === NEW_TASK_TITLE && item.link?.id === taskId) {
+      item.read = true
+    }
+  }
 }
 
 // 確認完成：對方回報完成後（待確認），交辦人確認 → 已完成
@@ -176,7 +193,7 @@ export async function createTask(userId, input) {
   }
   tasks.push(task)
   const deadlineNote = task.deadline ? `，期限 ${formatFullDate(task.deadline)} ${formatTime(task.deadline)}` : ''
-  notifyAssignee(task, '新的交辦', `${userLabel(userId)}交辦${deadlineNote}`)
+  notifyAssignee(task, NEW_TASK_TITLE, `${userLabel(userId)}交辦${deadlineNote}`)
   return present(task)
 }
 
