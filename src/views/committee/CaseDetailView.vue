@@ -343,7 +343,7 @@ function isVideo(name) {
         <p class="type-date text-muted-foreground">{{ dateTimeText(item.completion.at) }}</p>
         <p class="type-body text-foreground">{{ item.completion.note }}</p>
         <p v-if="item.completion.photos.length" class="type-date text-muted-foreground">
-          附 {{ item.completion.photos.length }} 張照片
+          附 {{ item.completion.photos.length }} 個檔案
         </p>
       </section>
 
