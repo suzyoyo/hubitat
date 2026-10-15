@@ -113,7 +113,7 @@ function canManage(item, userId) {
 // 取得單一公告的詳情
 //   userId 可以不傳；有傳的話（管理端用）會多兩個欄位，告訴畫面要放哪些按鈕：
 //     canWithdraw 能不能撤回：已發布、還沒結束
-//     canEdit     能不能修改：已發布或已撤回、還沒結束（已撤回的是「修改並重新發布」）
+//     canEdit     能不能修改：已發布、還沒結束（已撤回的不能再改、不能重新發布，要再發就發一則新的）
 //   兩個都要是發布者本人，或是主委、副主委
 export async function getAnnouncementById(id, role = 'resident', userId) {
   await delay()
@@ -123,7 +123,7 @@ export async function getAnnouncementById(id, role = 'resident', userId) {
   if (userId) {
     const allowed = canManage(item, userId) && !result.hasEnded
     result.canWithdraw = allowed && item.status === 'published'
-    result.canEdit = allowed && ['published', 'withdrawn'].includes(item.status)
+    result.canEdit = allowed && item.status === 'published'
   }
   return result
 }
@@ -254,38 +254,19 @@ function notifyChairs(item, title) {
 
 // 修改公告（管理端用），回傳修改後的公告；不能改的話回傳 undefined
 //   changes 和 createAnnouncement 的 input 一樣，要傳完整的表單內容（沒傳的欄位會被清掉）
-// 已發布的 → 改完立刻生效，不用重新審核，並通知住戶「公告已更新」
-//            管理人員改的，另外通知主委和副主委「XX 修改了公告」（2026-10-14，PR #35 suzy 的建議）
-// 已撤回的 → 「修改並重新發布」：清掉撤回紀錄
-//            管理人員的公告（不緊急）→ 變回待審核，等主委或副主委審核（住戶已經收到撤回通知，等於一則新公告）
-//            其他 → 變回已發布、發布時間改成現在
+// 只有已發布、還沒結束的能改：改完立刻生效，不用重新審核，並通知住戶「公告已更新」
+//   管理人員改的，另外通知主委和副主委「XX 修改了公告」（2026-10-14，PR #35 suzy 的建議）
+// 已撤回的不能改、不能重新發布（2026-10-14 決定：撤回就結束了，要再發就發一則新的）
 export async function updateAnnouncement(id, userId, changes) {
   await delay()
   const item = announcements.find((entry) => entry.id === id)
-  if (!item || !['published', 'withdrawn'].includes(item.status) || item.endAt < MOCK_NOW) return undefined
+  if (!item || item.status !== 'published' || item.endAt < MOCK_NOW) return undefined
   if (!canManage(item, userId)) return undefined
-  const editorIsStaff = findUser(userId).roles.includes('staff')
   // 先清掉表單的欄位，再放進新的（例如從多日改成單日，timeText 就要拿掉）
   for (const key of FORM_FIELDS) delete item[key]
   Object.assign(item, pickFormFields(changes))
-  if (item.status === 'withdrawn') {
-    delete item.withdrawnAt
-    delete item.withdrawnBy
-    delete item.withdrawReason
-    if (editorIsStaff && announcementNeedsReview(item)) {
-      // 重新送審：之前的審核和發布時間都不算了
-      item.status = 'pending'
-      delete item.reviewerId
-      delete item.publishedAt
-    } else {
-      item.status = 'published'
-      item.publishedAt = MOCK_NOW
-      notifyResidents(item, `新公告：${item.title}`)
-    }
-  } else {
-    notifyResidents(item, `公告已更新：${item.title}`)
-    if (editorIsStaff) notifyChairs(item, `${userLabel(userId)} 修改了公告`)
-  }
+  notifyResidents(item, `公告已更新：${item.title}`)
+  if (findUser(userId).roles.includes('staff')) notifyChairs(item, `${userLabel(userId)} 修改了公告`)
   return present(item, 'committee')
 }
 
