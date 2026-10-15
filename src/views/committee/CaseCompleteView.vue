@@ -15,7 +15,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
-import { formatDate } from '@/lib/date'
+import { formatFullDate } from '@/lib/date'
 import { canHandleCases, completeCase, getCaseById, getCurrentUser } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
@@ -54,9 +54,9 @@ const canComplete = computed(
 // 我是負責人 → 回報後直接結案
 const isAssignee = computed(() => item.value?.assigneeId === userId.value)
 
-// 摘要卡的第二行：負責人｜期限
+// 摘要卡的第二行：負責人｜期限（管委會、管理人員端的日期有年份，例如 2026/10/08）
 const summaryText = computed(() => {
-  const deadline = item.value.deadline ? formatDate(item.value.deadline) : '尚未設定'
+  const deadline = item.value.deadline ? formatFullDate(item.value.deadline) : '尚未設定'
   return `負責人：${item.value.assigneeLabel || '尚未指派'}｜期限：${deadline}`
 })
 
