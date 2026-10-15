@@ -200,6 +200,9 @@
 
 ### 13. 通知 `notifications.js`
 - 收件角色、標題、內容、時間、是否已讀、點了要去哪裡
+- 住戶送出通報時（`createReport`），通知能受理的人：主委、副主委（管委會身分）、所有管理人員，通報的人自己也收（2026-10-15，見 `case-flow.md` 第 5 節）
+- 頂部列的鈴鐺有未讀時加紅點（`AppShell` 每次換頁用 `getUnreadCount` 問一次）
+- **設為已讀**（2026-10-15，只改記憶體）：`markNotificationRead(id)` 點進某一則時用，那一則的紅點消失；`markAllNotificationsRead(userId, role)` 按「全部已讀」時用，只改這個人、這個身分的通知。全部讀完，鈴鐺的紅點就消失。住戶端的通知頁也用這兩個
 
 ### 14. 留存 `quickSaves.js`
 - 管委會和管理人員都可以使用

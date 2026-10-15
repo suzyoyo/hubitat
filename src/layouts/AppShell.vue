@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router'
 import AppHeader from '@/components/app/AppHeader.vue'
 import BottomNav from '@/components/app/BottomNav.vue'
 import { canUseMenuItem, getRole } from '@/config/roles'
-import { getCurrentUser } from '@/mocks/api'
+import { getCurrentUser, getUnreadCount } from '@/mocks/api'
 
 const props = defineProps({
   // 由路由傳進來：resident / committee / staff
@@ -35,6 +35,18 @@ watch(
   },
   { immediate: true },
 )
+
+// 有沒有沒讀過的通知：有的話鈴鐺加紅點
+// 每次換頁都重新問一次，例如住戶送出通報後切到管委會首頁，紅點就會出現
+const hasUnread = ref(false)
+watch(
+  () => [props.roleId, route.fullPath],
+  async () => {
+    const user = await getCurrentUser(props.roleId)
+    hasUnread.value = (await getUnreadCount(user.id, props.roleId)) > 0
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -46,6 +58,7 @@ watch(
     <AppHeader
       :title="isTab ? '' : route.meta.pageTitle"
       :notifications-to="`${basePath}/notifications`"
+      :has-unread="hasUnread"
       :home-to="`${basePath}/home`"
     />
     <!-- pb-32：留空間給固定在底部的導覽列，內容才不會被蓋住；沒有導覽列時只留 pb-10 -->
