@@ -96,8 +96,8 @@ const buttonText = computed(() => {
       </Button>
     </PopoverTrigger>
 
-    <!-- align="start"：月曆的左邊對齊按鈕的左邊；超出畫面時會自動往內移 -->
-    <PopoverContent align="start" class="w-[335px] gap-2 rounded-xl p-3 shadow-card ring-border">
+    <!-- 月曆和按鈕一樣寬、對齊按鈕的正下方（--reka-popover-trigger-width 是按鈕的寬度） -->
+    <PopoverContent class="w-(--reka-popover-trigger-width) gap-2 rounded-xl p-3 shadow-card ring-border">
       <!-- 月份列：上個月、年月、下個月 -->
       <div class="flex items-center justify-between">
         <!-- before 把可以點的範圍補到 44px -->
