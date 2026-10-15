@@ -20,7 +20,7 @@ export async function getHandoverPackage() {
 
   // 1. 未結案案件
   const openCases = cases
-    .filter((item) => !['closed', 'cancelled'].includes(item.status))
+    .filter((item) => item.status !== 'closed')
     .map((item) => ({
       id: item.id,
       title: item.title,

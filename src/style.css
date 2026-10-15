@@ -249,6 +249,13 @@
   line-height: 20px;
   font-weight: 400;
 }
+/* 備註：附在一筆內容下面、比補充資訊再低一層的小字，例如通報紀錄下面「改完的內容」
+   2026-10-15 和 013 決定：備註要和內文、日期分出層級，所以比 type-date 小。搭配 text-muted-foreground 的灰色 */
+@utility type-note {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
 /* 按鈕文字 */
 @utility type-button {
   font-size: 14px;
