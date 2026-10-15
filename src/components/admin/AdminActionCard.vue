@@ -49,7 +49,7 @@ const dateLine = computed(() => {
     </div>
     <h3 class="type-card-title text-foreground">{{ todo.title }}</h3>
     <div class="space-y-1">
-      <p class="type-body text-muted-foreground">{{ todo.hint }}</p>
+      <p class="truncate type-body text-muted-foreground">{{ todo.hint }}</p>
       <p v-if="dateLine" class="type-body text-muted-foreground">{{ dateLine }}</p>
     </div>
     <!-- 只是提示「可以點」，整張卡本身就是連結 -->

@@ -35,18 +35,20 @@ export function findUser(id) {
   return users.find((user) => user.id === id)
 }
 
-// 把成員 id 轉成「主委 李委員」「總幹事 王小姐」這種顯示文字
+// 把成員 id 轉成「李主委」「王總幹事」這種顯示文字：姓＋職稱
+// 2026-10-15 從「主委 李委員」「總幹事 王小姐」改短：職稱和名字都有「委員」，太重複
+//   主委、副主委 → 李主委、張副主委
+//   其他委員     → 王委員（財務、修繕、監察委員都一樣）
+//   管理人員     → 王總幹事、張管理員、黃警衛
+//   住戶         → 名字，例如陳先生
 export function userLabel(id) {
   const user = findUser(id)
   if (!user) return ''
-  if (user.committeeTitle) {
-    const info = describeUser(user, 'committee')
-    return `${info.titleLabel} ${info.displayName}`
+  if (['chair', 'viceChair'].includes(user.committeeTitle)) {
+    return `${user.surname}${COMMITTEE_TITLES[user.committeeTitle].label}`
   }
-  if (user.staffTitle) {
-    const info = describeUser(user, 'staff')
-    return `${info.titleLabel} ${info.displayName}`
-  }
+  if (user.committeeTitle) return `${user.surname}委員`
+  if (user.staffTitle) return `${user.surname}${STAFF_TITLES[user.staffTitle].label}`
   return user.name
 }
 

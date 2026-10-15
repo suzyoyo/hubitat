@@ -170,7 +170,7 @@ export async function createTask(userId, input) {
       at: MOCK_NOW,
       actorId: userId,
       label: '交辦',
-      text: `${userLabel(userId)}交辦給 ${userLabel(input.assigneeId)}（${task.id}）`,
+      text: `${userLabel(userId)}交辦給${userLabel(input.assigneeId)}（${task.id}）`,
     })
   }
   tasks.push(task)

@@ -40,8 +40,9 @@ export function caseOverdueDays(item) {
 }
 
 // 通報人的顯示文字，例如「陳先生（B 棟 8 樓）」；管理人員登記的顯示職稱
-// 委員或管理人員代住戶登記的，例如「主委 李委員（代 A 棟 6樓之3）」
-function reporterLabel(item) {
+// 委員或管理人員代住戶登記的，例如「李主委（代 A 棟 6樓之3）」
+// 我的待辦（todos.js）的說明也會用到，所以 export
+export function reporterLabel(item) {
   const user = findUser(item.reporterId)
   if (!user) return ''
   if (item.reporterUnit) return `${userLabel(item.reporterId)}（代 ${unitLabel(item.reporterUnit)}）`
