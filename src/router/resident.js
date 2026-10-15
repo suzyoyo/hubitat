@@ -37,5 +37,6 @@ export default {
     { path: 'me/help', title: '使用說明' },
     { path: 'me/account', title: '帳號與安全' },
     { path: 'me/join', title: '加入管委會' },
+    { path: 'me/comments', title: '我的留言' }, // 會議紀錄留言送出後的「查看我的留言」
   ],
 }
