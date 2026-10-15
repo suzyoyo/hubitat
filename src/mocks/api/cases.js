@@ -238,32 +238,27 @@ function setFirstVisit(item, scheduledAt) {
   else delete item.firstVisitAt
 }
 
-// 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
-//   設備一律先設成待維修；「維修中」不存在資料裡，從廠商第一次到場那天起由設備的假 API 用日期算
+// ── 關聯設備、派廠商、處理紀錄 ─────────────────────────────
+// 下面三個 apply… 只改案件、不寫紀錄，回傳這次做了什麼的文字（寫紀錄用）；不能做回傳 undefined
+// 單獨用的 setCaseEquipment、assignVendor、addCaseLog 各寫一筆紀錄；
+// 案件詳情的「更新進度」用 updateCase，一次做完只寫一筆（2026-10-15）
+
+// 關聯設備：設備一律先設成待維修；「維修中」不存在資料裡，從廠商第一次到場那天起由設備的假 API 用日期算
 //   換掉的那台變回正常使用中。結案時，這台設備的維修紀錄會多一筆（見 closeItem）
-export async function setCaseEquipment(id, userId, equipmentId) {
-  await delay()
-  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+function applyEquipment(item, equipmentId) {
   const device = equipment.find((entry) => entry.id === equipmentId)
-  if (!item || !device) return undefined
+  if (!device) return undefined
   if (item.equipmentId && item.equipmentId !== equipmentId) setEquipmentStatus(item, 'normal')
   item.equipmentId = equipmentId
   setEquipmentStatus(item, 'needs_repair')
-  addLog(item, userId, '關聯設備', `${userLabel(userId)}關聯設備「${device.name}」`)
-  return presentForManagement(item)
+  return { text: `關聯設備「${device.name}」` }
 }
 
-// 派廠商：已受理、處理中 → 處理中（處理中也可以換廠商）
-//   vendorId    名冊裡的廠商，例如 'v-001'
-//   vendorName  名冊裡沒有的廠商，自己打的名字，例如 '順達環保'（vendorId 和 vendorName 傳一個就好）
-//               先只記在案件上；之後要自動加進廠商名冊、出現「需補資料」待辦（CLAUDE.md 待辦提醒）
-//   scheduledAt 預約到場時間，例如 '2026-10-03T14:00'（選填）
-export async function assignVendor(id, userId, { vendorId = '', vendorName = '', scheduledAt = '' }) {
-  await delay()
-  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+// 派廠商：狀態 → 處理中；住戶看到的不寫廠商名稱
+function applyVendor(item, { vendorId = '', vendorName = '', scheduledAt = '' }) {
   const listed = vendors.find((entry) => entry.id === vendorId)
   const name = listed ? listed.name : vendorName.trim()
-  if (!item || !name) return undefined
+  if (!name) return undefined
   item.status = 'in_progress'
   if (listed) {
     item.vendorId = listed.id
@@ -275,12 +270,43 @@ export async function assignVendor(id, userId, { vendorId = '', vendorName = '',
   if (scheduledAt) item.scheduledAt = scheduledAt
   else delete item.scheduledAt // 換廠商又沒填時間，就不要留著上一家的預約
   setFirstVisit(item, scheduledAt)
-  // 住戶看到的不寫廠商名稱
-  const text = scheduledAt
-    ? `${userLabel(userId)}指派 ${name}，預約 ${formatDateTime(scheduledAt)} 到場`
-    : `${userLabel(userId)}指派 ${name}`
-  const residentText = scheduledAt ? `已安排廠商，預計 ${formatDate(scheduledAt)} 到場。` : '已安排廠商處理。'
-  addLog(item, userId, '派廠商', text, residentText)
+  return {
+    text: scheduledAt ? `指派 ${name}，預約 ${formatDateTime(scheduledAt)} 到場` : `指派 ${name}`,
+    residentText: scheduledAt ? `已安排廠商，預計 ${formatDate(scheduledAt)} 到場。` : '已安排廠商處理。',
+  }
+}
+
+// 處理紀錄：改期時同時更新預約到場時間
+function applyLog(item, { text, residentText = '', scheduledAt = '' }) {
+  if (!text?.trim()) return undefined
+  if (scheduledAt) {
+    item.scheduledAt = scheduledAt
+    setFirstVisit(item, scheduledAt)
+  }
+  return { text: text.trim(), residentText: residentText.trim() }
+}
+
+// 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
+export async function setCaseEquipment(id, userId, equipmentId) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+  const done = item && applyEquipment(item, equipmentId)
+  if (!done) return undefined
+  addLog(item, userId, '關聯設備', `${userLabel(userId)}${done.text}`)
+  return presentForManagement(item)
+}
+
+// 派廠商：已受理、處理中 → 處理中（處理中也可以換廠商）
+//   vendorId    名冊裡的廠商，例如 'v-001'
+//   vendorName  名冊裡沒有的廠商，自己打的名字，例如 '順達環保'（vendorId 和 vendorName 傳一個就好）
+//               先只記在案件上；之後要自動加進廠商名冊、出現「需補資料」待辦（CLAUDE.md 待辦提醒）
+//   scheduledAt 預約到場時間，例如 '2026-10-03T14:00'（選填）
+export async function assignVendor(id, userId, vendor) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+  const done = item && applyVendor(item, vendor)
+  if (!done) return undefined
+  addLog(item, userId, '派廠商', `${userLabel(userId)}${done.text}`, done.residentText)
   return presentForManagement(item)
 }
 
@@ -288,15 +314,40 @@ export async function assignVendor(id, userId, { vendorId = '', vendorName = '',
 //   text         管理端看的內容（可以寫廠商、報價這些細節），必填
 //   residentText 給住戶看的一句，選填；沒寫就不給住戶看
 //   scheduledAt  改期時填新的預約到場時間，選填
-export async function addCaseLog(id, userId, { text, residentText = '', scheduledAt = '' }) {
+export async function addCaseLog(id, userId, log) {
   await delay()
   const item = findHandleableCase(id, userId, ['accepted', 'in_progress', 'to_verify'])
-  if (!item || !text?.trim()) return undefined
-  if (scheduledAt) {
-    item.scheduledAt = scheduledAt
-    setFirstVisit(item, scheduledAt)
-  }
-  addLog(item, userId, '處理紀錄', text.trim(), residentText.trim())
+  const done = item && applyLog(item, log)
+  if (!done) return undefined
+  addLog(item, userId, '處理紀錄', done.text, done.residentText)
+  return presentForManagement(item)
+}
+
+// 更新進度（案件詳情底部的按鈕）：關聯設備、派廠商、處理紀錄有填的一次做完，**只寫一筆紀錄**
+//   changes 三個都選填，至少要有一個：
+//     equipmentId 關聯設備（和 setCaseEquipment 一樣）
+//     vendor      { vendorId, vendorName, scheduledAt }（和 assignVendor 一樣）
+//     log         { text, residentText, scheduledAt }（和 addCaseLog 一樣）
+//   紀錄：「更新進度」／「主委 李委員：關聯設備「揚水馬達」；指派 欣欣機電，預約 10/21 09:10 到場；改了時間」
+//   住戶看到：派廠商、處理紀錄給住戶看的那幾句接在一起（都沒有就不給住戶看）
+// 待結案的案件只能寫處理紀錄（設備、廠商不能改了）；有一樣做不了就全部不做，回傳 undefined
+export async function updateCase(id, userId, { equipmentId = '', vendor = null, log = null } = {}) {
+  await delay()
+  const statuses = equipmentId || vendor ? ['accepted', 'in_progress'] : ['accepted', 'in_progress', 'to_verify']
+  const item = findHandleableCase(id, userId, statuses)
+  if (!item || !(equipmentId || vendor || log)) return undefined
+  // 先檢查做得到，再改資料，才不會改到一半
+  if (equipmentId && !equipment.some((entry) => entry.id === equipmentId)) return undefined
+  if (vendor && !vendors.some((entry) => entry.id === vendor.vendorId) && !vendor.vendorName?.trim()) return undefined
+  if (log && !log.text?.trim()) return undefined
+  const steps = [
+    equipmentId && applyEquipment(item, equipmentId),
+    vendor && applyVendor(item, vendor),
+    log && applyLog(item, log),
+  ].filter(Boolean)
+  const text = `${userLabel(userId)}：${steps.map((step) => step.text).join('；')}`
+  const residentText = steps.map((step) => step.residentText).filter(Boolean).join(' ')
+  addLog(item, userId, '更新進度', text, residentText)
   return presentForManagement(item)
 }
 
