@@ -94,6 +94,7 @@
   - 主委、副主委受理後交辦給管理人員：**另開一筆交辦，用 `caseId` 連到這個案件**（2026-10-15 定案）。案件的負責人不換人
 - **主要流程的動作**（2026-10-15，規則和示範故事見 [case-flow.md](case-flow.md)，都只改記憶體）：主委、副主委、管理人員才能做（`canHandleCases`）
   - `acceptCase(id, userId, { deadline, category, equipmentId })` 受理：待受理 → 已受理，受理的人是負責人；完成日期選填，不依緊急給預設值
+  - `setCaseEquipment(id, userId, equipmentId)` 關聯設備：已受理、處理中可以選（或換）；設備狀態跟著變，換掉的那台變回正常使用中。畫面上受理是按了就受理，設備在案件詳情的「關聯設備」卡片選
   - `assignVendor(id, userId, { vendorId, vendorName, scheduledAt })` 派廠商（名冊裡的傳 `vendorId`，名冊裡沒有、自己打的傳 `vendorName`，先只記在案件上）：已受理、處理中 → 處理中；住戶看到「已安排廠商，預計 10/3 到場。」，不寫廠商名稱
   - `addCaseLog(id, userId, { text, residentText, scheduledAt })` 處理紀錄：給住戶看的另外寫一句（沒寫就不給看）；改期也用這個，同時更新 `scheduledAt`
   - `completeCase(id, userId, { note, photos })` 完工驗收（已受理、處理中都可以；現場驗收，沒有「驗收不通過」）：按的人是負責人 → 直接結案；不是 → 待結案，連到的交辦一起回報完成

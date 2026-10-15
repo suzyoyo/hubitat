@@ -64,6 +64,7 @@ function presentForManagement(item) {
     // 名冊裡的廠商用名冊的名字；自己打的（名冊裡沒有）存在案件的 vendorName
     vendorName: vendor ? vendor.name : (item.vendorName ?? ''),
     equipmentName: device ? device.name : '',
+    equipmentPlace: device ? device.place : '', // 設備的安裝位置，例如「A 棟 1 樓機房」
     supporterCount: item.supporters.length, // 附議戶數
     // 還沒完成的交辦（進行中或待確認）的編號；沒有就是空字串。有的話不能再交辦
     openTaskId: tasks.find((task) => task.caseId === item.id && ['in_progress', 'reported'].includes(task.status))?.id ?? '',
@@ -214,6 +215,21 @@ export async function acceptCase(id, userId, options = {}) {
   setEquipmentStatus(item, 'needs_repair')
   const deadlineText = item.deadline ? `，預計 ${formatDate(item.deadline)} 前完成` : ''
   addLog(item, userId, '已受理', `${userLabel(userId)}受理${deadlineText}`, `${handlerWord(userId)}已受理。`)
+  return presentForManagement(item)
+}
+
+// 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
+//   設備狀態跟著案件：已受理 → 待維修、處理中 → 維修中；換掉的那台變回正常使用中
+//   結案時，這台設備的維修紀錄會多一筆（見 closeItem）
+export async function setCaseEquipment(id, userId, equipmentId) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+  const device = equipment.find((entry) => entry.id === equipmentId)
+  if (!item || !device) return undefined
+  if (item.equipmentId && item.equipmentId !== equipmentId) setEquipmentStatus(item, 'normal')
+  item.equipmentId = equipmentId
+  setEquipmentStatus(item, item.status === 'in_progress' ? 'repairing' : 'needs_repair')
+  addLog(item, userId, '關聯設備', `${userLabel(userId)}關聯設備「${device.name}」`)
   return presentForManagement(item)
 }
 

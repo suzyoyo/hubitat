@@ -1,17 +1,17 @@
 <script setup>
 // 管委會端、管理人員端共用・案件詳情：一件案件的基本資料、通報內容、廠商、處理紀錄（設計稿 1134:17558）
 // 按鈕依「這個人能做什麼＋案件狀態」顯示，不分哪一端（規則見 docs/case-flow.md）：
-//   廠商卡片裡選廠商、處理紀錄卡片裡新增紀錄：卡片裡按「確定」先記下來（顯示在卡片上、標「尚未更新」），
+//   關聯設備、廠商、處理紀錄三張卡片：卡片裡按「確定」先記下來（顯示在卡片上、標「尚未更新」），
 //   按底部「更新現況」才一起存
-//   底部：更新現況＋完工驗收（到回報完成頁）並排；受理、交辦、結案依狀態出現
-//   （發布公告從「＋」選單進去，這裡不放）
-//   受理、交辦、結案的彈窗是 013 做的，還沒接上前按了只跳提示
+//   底部：更新現況＋完工驗收（到回報完成頁）並排；受理（按了就受理）、交辦（到新增交辦頁）、
+//   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
 import { ImageIcon, VideoIcon } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { caseStatusBadge } from '@/components/admin/caseStatusBadge'
 import BottomCta from '@/components/app/BottomCta.vue'
+import CaseEquipmentPicker from '@/components/case/CaseEquipmentPicker.vue'
 import CaseLogForm from '@/components/case/CaseLogForm.vue'
 import CaseVendorPicker from '@/components/case/CaseVendorPicker.vue'
 import { Badge } from '@/components/ui/badge'
@@ -21,13 +21,16 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate, formatTime } from '@/lib/date'
 import {
+  acceptCase,
   addCaseLog,
   assignVendor,
   canAssignTasks,
   canHandleCases,
   getCaseById,
   getCurrentUser,
+  getEquipmentList,
   getVendors,
+  setCaseEquipment,
 } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
@@ -41,8 +44,10 @@ const loading = ref(true)
 const item = ref(null)
 const userId = ref('') // 我是誰（看目前在哪一端）
 const vendors = ref([]) // 選廠商時的清單：合作中的廠商
+const devices = ref([]) // 選設備時的清單：設備清冊（已報廢的不列）
 const pending = ref(false) // 送出還在路上
 // 卡片裡按「確定」記下來、還沒存的內容；按「更新現況」後清掉
+const equipmentDraft = ref(null) // { equipmentId, name, place }
 const vendorDraft = ref(null) // { vendorId, vendorName, scheduledAt }
 const logDraft = ref(null) // { text, residentText, scheduledAt }
 
@@ -50,14 +55,16 @@ const logDraft = ref(null) // { text, residentText, scheduledAt }
 async function load() {
   if (!route.params.id) return // 正要離開這一頁（換到沒有案件編號的網址），不用拿
   loading.value = true
-  const [user, data, vendorList] = await Promise.all([
+  const [user, data, vendorList, deviceList] = await Promise.all([
     getCurrentUser(route.meta.roleId),
     getCaseById(route.params.id),
     getVendors('active'),
+    getEquipmentList(route.meta.roleId),
   ])
   userId.value = user.id
   item.value = data
   vendors.value = vendorList
+  devices.value = deviceList.filter((device) => device.status !== 'retired')
   loading.value = false
 }
 // 一打開就拿（immediate），之後網址換到另一件案件時也重新拿
@@ -67,7 +74,7 @@ watch(() => route.params.id, load, { immediate: true })
 // ── 這個人能做什麼 ──────────────────────────────────────
 const canHandle = computed(() => canHandleCases(userId.value)) // 主委、副主委、管理人員
 const isAssignee = computed(() => item.value?.assigneeId === userId.value) // 我是負責人
-// 已受理、處理中才能選廠商（處理中可以換廠商）
+// 已受理、處理中才能選設備和廠商（處理中可以換）
 const canPickVendor = computed(() => canHandle.value && ['accepted', 'in_progress'].includes(item.value?.status))
 // 受理之後、結案之前都能寫處理紀錄
 const canAddLog = computed(() => canHandle.value && ['accepted', 'in_progress', 'to_verify'].includes(item.value?.status))
@@ -89,7 +96,13 @@ const actions = computed(() => {
 })
 // 「更新現況」：能選廠商或寫紀錄的時候才出現；有記下來的內容才能按
 const canUpdate = computed(() => canPickVendor.value || canAddLog.value)
-const hasDraft = computed(() => Boolean(vendorDraft.value || logDraft.value))
+const hasDraft = computed(() => Boolean(equipmentDraft.value || vendorDraft.value || logDraft.value))
+// 設備卡片上顯示的：有記下來的就顯示記下來的，沒有就顯示已經存的
+const shownEquipment = computed(() =>
+  equipmentDraft.value
+    ? { name: equipmentDraft.value.name, place: equipmentDraft.value.place }
+    : { name: item.value?.equipmentName ?? '', place: item.value?.equipmentPlace ?? '' },
+)
 // 廠商卡片上顯示的：有記下來的就顯示記下來的，沒有就顯示已經存的
 const shownVendor = computed(() =>
   vendorDraft.value
@@ -103,13 +116,25 @@ const topActions = computed(() => actions.value.filter((action) => action.key ==
 const mainActions = computed(() => actions.value.filter((action) => action.key !== 'assign'))
 
 function runAction(action) {
+  const base = `/${route.meta.roleId}`
+  if (action.key === 'accept') accept()
   if (action.key === 'complete') goComplete()
-  else comingSoon(action)
+  // 交辦、結案到另一頁做（新增交辦頁、結案頁是 013 做的）；交辦只有主委、副主委看得到，所以一定是管委會端
+  if (action.key === 'assign') router.push(`/committee/tasks/new?caseId=${item.value.id}`)
+  if (action.key === 'close') router.push(`${base}/cases/${item.value.id}/close`)
 }
 
-// 受理、交辦、結案的彈窗是 013 做的，還沒接上前先跳提示
-function comingSoon(action) {
-  toast.info(`「${action.label}」的表單還在做`)
+// 受理：按了就受理，受理的人是負責人（完成日期、分類之後再加地方填）
+async function accept() {
+  pending.value = true
+  const result = await acceptCase(item.value.id, userId.value)
+  pending.value = false
+  if (!result) {
+    toast.error('沒有受理成功', { description: '可能已經有人受理了，請重新整理' })
+    return
+  }
+  item.value = result
+  toast.success('已受理', { description: '接著可以選設備、派廠商' })
 }
 
 // 完工驗收：到回報完成頁。有記下來還沒存的，先幫他存好，才不會弄丟
@@ -123,6 +148,10 @@ async function goComplete() {
 async function updateStatus() {
   pending.value = true
   let result = item.value
+  if (equipmentDraft.value) {
+    result = await setCaseEquipment(item.value.id, userId.value, equipmentDraft.value.equipmentId)
+    if (!result) return failUpdate()
+  }
   if (vendorDraft.value) {
     result = await assignVendor(item.value.id, userId.value, vendorDraft.value)
     if (!result) return failUpdate()
@@ -133,6 +162,7 @@ async function updateStatus() {
   }
   pending.value = false
   item.value = result
+  equipmentDraft.value = null
   vendorDraft.value = null
   logDraft.value = null
   toast.success('已更新現況')
@@ -232,6 +262,24 @@ function isVideo(name) {
           </div>
         </div>
         <p v-else class="type-body text-muted-foreground">沒有照片或影片</p>
+      </section>
+
+      <!-- 關聯設備：選了，結案時才會記進這台設備的維修紀錄 -->
+      <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
+        <h2 class="type-card-title text-foreground">關聯設備</h2>
+        <div class="space-y-1 rounded-lg bg-muted p-3.5">
+          <p class="type-body-strong text-foreground">{{ shownEquipment.name || '尚未關聯設備' }}</p>
+          <p class="type-date text-muted-foreground">
+            {{ shownEquipment.name ? shownEquipment.place : '選了之後，結案時會記進這台設備的維修紀錄' }}
+          </p>
+          <p v-if="equipmentDraft" class="type-date text-muted-foreground">尚未更新</p>
+        </div>
+        <CaseEquipmentPicker
+          v-if="canPickVendor"
+          v-model:draft="equipmentDraft"
+          :devices="devices"
+          :button-text="shownEquipment.name ? '更換設備' : '選擇設備'"
+        />
       </section>
 
       <!-- 廠商 -->
