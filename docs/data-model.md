@@ -103,7 +103,7 @@
   - `setCaseEquipment(id, userId, equipmentId)` 關聯設備：已受理、處理中可以選（或換）；設備先變待維修（維修中從廠商第一次到場那天起用日期算），換掉的那台變回正常使用中。畫面上受理是按了就受理，設備在案件詳情的「關聯設備」卡片選
   - `assignVendor(id, userId, { vendorId, vendorName, scheduledAt })` 派廠商（名冊裡的傳 `vendorId`，名冊裡沒有、自己打的傳 `vendorName`，先只記在案件上）：已受理、處理中 → 處理中；住戶看到「已安排廠商，預計 10/3 到場。」，不寫廠商名稱
   - `addCaseLog(id, userId, { text, residentText, scheduledAt })` 處理紀錄：給住戶看的另外寫一句（沒寫就不給看）；假 API 還能傳 `scheduledAt` 改期，但畫面上改期是在廠商卡片改預約時間
-  - `updateCase(id, userId, { equipmentId, vendor, log })` 更新進度（2026-10-15）：上面三樣有填的一次做完，**只寫一筆**「更新進度」紀錄。案件詳情底部的「更新進度」用這個
+  - `updateCase(id, userId, { equipmentId, vendor, log })` 更新進度（2026-10-15）：上面三樣有填的一次做完，**只寫一筆**「更新進度」紀錄（一項一行，不寫是誰按的）。案件詳情底部的「更新進度」用這個
   - `completeCase(id, userId, { note, photos })` 完工驗收（已受理、處理中都可以；現場驗收，沒有「驗收不通過」）：按的人是負責人 → 直接結案；不是 → 待結案，連到的交辦一起回報完成
   - `closeCase(id, userId, { cost, rating })` 結案：待結案 → 已結案，只有負責人能做；連到的交辦一起確認完成
   - 結案時有關聯設備的話，設備的維修紀錄多一筆（費用只記在這裡，只有委員填得了）。設備狀態跟著案件變：受理 → 待維修、**廠商第一次到場那天** → 維修中（用案件的 `firstVisitAt` 和今天算，不存在資料裡；已經來過、改期的還是維修中；待結案也算維修中）、結案 → 正常使用中
