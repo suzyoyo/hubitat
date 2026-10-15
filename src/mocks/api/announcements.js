@@ -266,7 +266,7 @@ export async function updateAnnouncement(id, userId, changes) {
   for (const key of FORM_FIELDS) delete item[key]
   Object.assign(item, pickFormFields(changes))
   notifyResidents(item, `公告已更新：${item.title}`)
-  if (findUser(userId).roles.includes('staff')) notifyChairs(item, `${userLabel(userId)} 修改了公告`)
+  if (findUser(userId).roles.includes('staff')) notifyChairs(item, `${userLabel(userId)}修改了公告`)
   return present(item, 'committee')
 }
 

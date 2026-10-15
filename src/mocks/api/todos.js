@@ -1,6 +1,6 @@
 // 我的待辦：不另外存資料，而是從交辦、案件、提案、公告、合約、文件、留存裡，
 // 挑出「跟我有關、還沒完成」的項目彙整而成
-import { addDays, diffDays } from '@/lib/date'
+import { addDays, diffDays, formatDateTime, formatRelativeTime, formatTime } from '@/lib/date'
 import { announcements } from '../data/announcements'
 import { cases } from '../data/cases'
 import { contracts } from '../data/contracts'
@@ -10,10 +10,10 @@ import { quickSaves } from '../data/quickSaves'
 import { tasks } from '../data/tasks'
 import { COMMITTEE_TITLES } from '../data/users'
 import { vendors } from '../data/vendors'
-import { areaName } from './community'
+import { reporterLabel } from './cases'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
-import { MOCK_TODAY, delay } from './helpers'
+import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
 import { proposalStatus } from './proposals'
 import { findUser, userLabel } from './users'
 
@@ -57,6 +57,33 @@ function todo(kind, title, hint, createdAt, dueAt, link, isUrgent = false) {
   }
 }
 
+// ── 待辦第二行的說明 ─────────────────────────────
+// 原則（2026-10-15 決定）：放卡片上其他地方看不到的「誰、什麼時候、做到哪裡」，不重複徽章（狀態）和標題
+// 每種情況都一定有一句，卡片高度才會一樣；畫面上只顯示一行，太長用「…」截掉
+
+// 期限的文字：今天的寫「今天 18:00」，其他寫「10/3 18:00」
+function deadlineText(value) {
+  if (value.startsWith(MOCK_TODAY)) return `今天 ${formatTime(value)}`
+  return formatDateTime(value)
+}
+
+// 案件的說明，看案件走到哪一步：
+//   待受理         → 誰通報、多久以前：「陳先生（B 棟 8 樓）・2 小時前通報」
+//   已派廠商       → 廠商＋預約到場時間：「大同電梯・10/3 14:00 到場」
+//   受理了、沒廠商 → 誰受理：「張管理員受理・尚未派廠商」
+function caseHint(item) {
+  if (item.status === 'pending') {
+    const when = formatRelativeTime(item.reportedAt, MOCK_NOW) // 「2 小時前」「昨天 09:00」「9/25」
+    // 「2 小時前」後面直接接「通報」；日期、時間後面空一格比較好讀
+    const gap = when.endsWith('前') ? '' : ' '
+    return `${reporterLabel(item)}・${when}${gap}通報`
+  }
+  const vendor = vendors.find((entry) => entry.id === item.vendorId)
+  const name = vendor ? vendor.name : item.vendorName // 自己打的廠商存在 vendorName
+  if (name) return item.scheduledAt ? `${name}・${formatDateTime(item.scheduledAt)} 到場` : `${name}・尚未約到場時間`
+  return `${userLabel(item.assigneeId)}受理・尚未派廠商`
+}
+
 // 我還沒補齊的留存（兩種角色都會用到）
 function incompleteQuickSaves(userId) {
   return quickSaves
@@ -75,7 +102,10 @@ function assignedTasks(userId) {
   return tasks
     .filter((task) => task.assigneeId === userId && task.status === 'in_progress')
     .map((task) => {
-      const hint = task.returnNote ? `已退回：${task.returnNote.note}` : `交辦人：${userLabel(task.assignerId)}`
+      // 例如「李主委交辦・今天 18:00 前完成」
+      const hint = task.returnNote
+        ? `已退回：${task.returnNote.note}`
+        : `${userLabel(task.assignerId)}交辦・${deadlineText(task.deadline)} 前完成`
       return todo('assigned', task.title, hint, task.createdAt, task.deadline, {
         type: 'task',
         id: task.id,
@@ -93,7 +123,7 @@ function committeeTodos(userId) {
     const waitingClose = cases.some((item) => item.id === task.caseId && item.status === 'to_verify')
     if (task.assignerId === userId && task.status === 'reported' && !waitingClose) {
       items.push(
-        todo('confirm', task.title, `${userLabel(task.assigneeId)} 已回報完成`, task.createdAt, task.deadline, {
+        todo('confirm', task.title, `${userLabel(task.assigneeId)}已回報完成`, task.createdAt, task.deadline, {
           type: 'task',
           id: task.id,
         }),
@@ -106,7 +136,7 @@ function committeeTodos(userId) {
   if (['chair', 'viceChair'].includes(user.committeeTitle)) {
     for (const item of cases) {
       if (item.status === 'pending') {
-        items.push(todo('new_case', item.title, areaName(item.areaId), item.reportedAt, item.reportedAt, { type: 'case', id: item.id }, item.isUrgent))
+        items.push(todo('new_case', item.title, caseHint(item), item.reportedAt, item.reportedAt, { type: 'case', id: item.id }, item.isUrgent))
       }
     }
   }
@@ -129,7 +159,7 @@ function committeeTodos(userId) {
     for (const item of announcements) {
       if (item.status === 'pending') {
         items.push(
-          todo('review', item.title, `${userLabel(item.authorId)} 送出`, item.createdAt, item.startAt, {
+          todo('review', item.title, `${userLabel(item.authorId)}送出`, item.createdAt, item.startAt, {
             type: 'announcement',
             id: item.id,
           }),
@@ -149,10 +179,7 @@ function committeeTodos(userId) {
         items.push(todo('to_close', item.title, hint, item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
         continue
       }
-      const vendor = vendors.find((entry) => entry.id === item.vendorId)
-      const name = vendor ? vendor.name : item.vendorName // 自己打的廠商存在 vendorName
-      const hint = name ? `廠商：${name}` : '尚未派廠商'
-      items.push(todo('my_case', item.title, hint, item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
+      items.push(todo('my_case', item.title, caseHint(item), item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
     }
   }
 
@@ -196,9 +223,7 @@ function staffTodos(userId) {
     else if (item.status === 'in_progress') kind = 'in_progress'
     else if (item.status === 'accepted' && item.assigneeId === userId) kind = 'in_progress'
     if (!kind) continue
-    const vendor = vendors.find((entry) => entry.id === item.vendorId)
-    const name = vendor ? vendor.name : item.vendorName // 自己打的廠商存在 vendorName
-    const hint = name ? `廠商：${name}` : '尚未派廠商'
+    const hint = caseHint(item)
     // 新報修沒有期限，用通報時間排序；其他用處理期限
     const dueAt = kind === 'new_case' ? item.reportedAt : (item.deadline ?? null)
     items.push(todo(kind, item.title, hint, item.reportedAt, dueAt, { type: 'case', id: item.id }, item.isUrgent))
@@ -261,7 +286,7 @@ function committeeDoneTodos(userId) {
     }
     // 我交辦出去、我確認完成的
     if (task.assignerId === userId) {
-      items.push(doneTodo('confirm', task.title, `已確認 ${userLabel(task.assigneeId)} 的回報`, task.doneAt, { type: 'task', id: task.id }))
+      items.push(doneTodo('confirm', task.title, `已確認${userLabel(task.assigneeId)}的回報`, task.doneAt, { type: 'task', id: task.id }))
     }
   }
   // 我簽過的提案（不管提案通過了沒）

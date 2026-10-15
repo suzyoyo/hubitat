@@ -40,8 +40,9 @@ export function caseOverdueDays(item) {
 }
 
 // 通報人的顯示文字，例如「陳先生（B 棟 8 樓）」；管理人員登記的顯示職稱
-// 委員或管理人員代住戶登記的，例如「主委 李委員（代 A 棟 6樓之3）」
-function reporterLabel(item) {
+// 委員或管理人員代住戶登記的，例如「李主委（代 A 棟 6樓之3）」
+// 我的待辦（todos.js）的說明也會用到，所以 export
+export function reporterLabel(item) {
   const user = findUser(item.reporterId)
   if (!user) return ''
   if (item.reporterUnit) return `${userLabel(item.reporterId)}（代 ${unitLabel(item.reporterUnit)}）`
@@ -328,7 +329,7 @@ export async function addCaseLog(id, userId, log) {
 //     equipmentId 關聯設備（和 setCaseEquipment 一樣）
 //     vendor      { vendorId, vendorName, scheduledAt }（和 assignVendor 一樣）
 //     log         { text, residentText, scheduledAt }（和 addCaseLog 一樣）
-//   紀錄：「更新進度」／「主委 李委員：關聯設備「揚水馬達」；指派 欣欣機電，預約 10/21 09:10 到場；改了時間」
+//   紀錄：「更新進度」／「李主委：關聯設備「揚水馬達」；指派 欣欣機電，預約 10/21 09:10 到場；改了時間」
 //   住戶看到：派廠商、處理紀錄給住戶看的那幾句接在一起（都沒有就不給住戶看）
 // 待結案的案件只能寫處理紀錄（設備、廠商不能改了）；有一樣做不了就全部不做，回傳 undefined
 export async function updateCase(id, userId, { equipmentId = '', vendor = null, log = null } = {}) {
