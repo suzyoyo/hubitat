@@ -333,6 +333,13 @@ export default {
 
 存檔後打開那個網址，看到步驟 1 的文字就表示路由通了。
 
+**兩端共用的頁面**（2026-10-15）：管理人員端沒畫的畫面沿用管委會的（Figma 管理人員區塊的名稱就這樣寫），例如案件列表、案件詳情、交辦詳情。這種頁面不複製一份，檔案留在 `views/committee/`，在 `staff.js` 的 `views` 直接匯入同一個檔案。頁面裡要注意：
+
+- **連結不要寫死 `/committee/...`**：用 `route.meta.roleId`（`'committee'` 或 `'staff'`）接出來，例如 ``:to="`/${route.meta.roleId}/cases/${item.id}`"``。`roleId` 是 `router/index.js` 自動幫每一頁加的
+- **「我是誰」也看這一端**：`getCurrentUser(route.meta.roleId)`，不要寫死 `'committee'`
+- 按鈕依「這個人能做什麼」決定，不要依「在哪一端」決定（例如用 `canHandleCases(userId)`），兩端才會一致
+- 檔案開頭的註解寫明「管委會端、管理人員端共用」，改的時候才知道兩端都會受影響
+
 ### 步驟 3：拿資料
 
 頁面拿資料的寫法固定是這四件事：
