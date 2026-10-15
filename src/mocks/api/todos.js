@@ -11,7 +11,7 @@ import { quickSaves } from '../data/quickSaves'
 import { tasks } from '../data/tasks'
 import { COMMITTEE_TITLES } from '../data/users'
 import { vendors } from '../data/vendors'
-import { reporterLabel } from './cases'
+import { canCloseCases, reporterLabel } from './cases'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
 import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
@@ -27,13 +27,13 @@ export const TODO_KINDS = {
   sign: { label: '等我簽核' },
   review: { label: '待我審核' },
   my_case: { label: '我負責的案件' },
-  to_close: { label: '待我結案' }, // 我負責的案件，管理人員已完工驗收，等我結案（2026-10-15）
+  to_close: { label: '待我結案' }, // 管理人員已完工驗收、等主委或副主委結案的案件（2026-10-15；主委、副主委兩人都有）
   expiring: { label: '快到期文件' },
   incomplete: { label: '需補資料' },
   // 管理人員
   new_case: { label: '新通報' }, // 待受理的案件（2026-10-15 從「新報修」改，用詞統一叫「通報」）；管委會只有主委、副主委有
   in_progress: { label: '處理中' }, // 2026-10-15 從「施工中」改名（docs/case-flow.md）
-  to_verify: { label: '待標記完成' }, // 2026-10-15 起不會出現在待辦（待結案是負責人的事），只有「已完成」還用這個種類
+  to_verify: { label: '待標記完成' }, // 2026-10-15 起不會出現在待辦（待結案是主委、副主委的事），只有「已完成」還用這個種類
 }
 
 // 建立一筆待辦
@@ -177,17 +177,19 @@ function committeeTodos(userId) {
     }
   }
 
-  // 我負責、還沒結案的案件
+  // 管理人員已完工驗收、等結案的：主委、副主委兩個人都有「待我結案」，誰先結案都可以（2026-10-15 改，原本只有負責人）
+  //   說明寫是誰完工驗收的
+  const canClose = canCloseCases(userId)
   for (const item of cases) {
-    const open = item.status !== 'closed'
-    if (item.assigneeId === userId && open) {
-      // 管理人員已完工驗收、等我結案的：換成「待我結案」，說明寫是誰完工驗收的
-      if (item.status === 'to_verify') {
-        const completedBy = item.logs.findLast((log) => log.label === '完工驗收')?.actorId
-        const hint = completedBy ? `${userLabel(completedBy)}已完工驗收，請結案` : '已完工驗收，請結案'
-        items.push(todo('to_close', item.title, hint, item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
-        continue
-      }
+    if (!canClose || item.status !== 'to_verify') continue
+    const completedBy = item.logs.findLast((log) => log.label === '完工驗收')?.actorId
+    const hint = completedBy ? `${userLabel(completedBy)}已完工驗收，請結案` : '已完工驗收，請結案'
+    items.push(todo('to_close', item.title, hint, item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
+  }
+
+  // 我負責、還在處理的案件（待結案的在上面）
+  for (const item of cases) {
+    if (item.assigneeId === userId && !['closed', 'to_verify'].includes(item.status)) {
       items.push(todo('my_case', item.title, caseHint(item), item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
     }
   }
@@ -318,9 +320,10 @@ function committeeDoneTodos(userId) {
       items.push(doneTodo('review', item.title, '審核通過', item.publishedAt, { type: 'announcement', id: item.id }))
     }
   }
-  // 我負責、已經結案的案件
+  // 我負責或我結案的、已經結案的案件
   for (const item of cases) {
-    if (item.assigneeId === userId && item.status === 'closed') {
+    const closedBy = item.logs.findLast((log) => log.label === '已結案')?.actorId
+    if ((item.assigneeId === userId || closedBy === userId) && item.status === 'closed') {
       items.push(doneTodo('my_case', item.title, '已結案', item.closedAt, { type: 'case', id: item.id }))
     }
   }
@@ -335,8 +338,10 @@ function staffDoneTodos(userId) {
       items.push(doneTodo('assigned', task.title, `交辦人：${userLabel(task.assignerId)}`, task.doneAt, { type: 'task', id: task.id }))
     }
   }
+  // 我受理或我完工驗收的、已經結案的案件（管理人員完工後由主委、副主委結案）
   for (const item of cases) {
-    if (item.assigneeId === userId && item.status === 'closed') {
+    const completedBy = item.logs.findLast((log) => log.label === '完工驗收')?.actorId
+    if ((item.assigneeId === userId || completedBy === userId) && item.status === 'closed') {
       items.push(doneTodo('to_verify', item.title, '已結案', item.closedAt, { type: 'case', id: item.id }))
     }
   }
