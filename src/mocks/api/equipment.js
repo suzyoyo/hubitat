@@ -1,5 +1,6 @@
 // 設備相關的假 API
 import { addMonths, diffDays } from '@/lib/date'
+import { CASE_STATUSES, cases } from '../data/cases'
 import { equipment, MAINTENANCE_CYCLES, MAINTENANCE_DUE_SOON_DAYS } from '../data/equipment'
 import { vendors } from '../data/vendors'
 import { areaName } from './community'
@@ -11,9 +12,21 @@ export function nextMaintenanceDate(item) {
   return addMonths(item.lastMaintainedAt, MAINTENANCE_CYCLES[item.cycle].months)
 }
 
+// 有關聯案件在修的設備：待維修還是維修中（2026-10-15，docs/case-flow.md）
+//   廠商第一次到場那天起（案件的 firstVisitAt）→ 維修中；已經完工驗收、等結案的也算維修中
+//   還沒派廠商、派了但還沒到預約那天、沒填預約時間 → 待維修
+function repairStatus(item) {
+  const openCase = cases.find((entry) => entry.equipmentId === item.id && CASE_STATUSES[entry.status].isOpen)
+  if (!openCase) return item.status // 沒有在修的案件，就照資料寫的
+  if (openCase.status === 'to_verify') return 'repairing'
+  if (openCase.firstVisitAt && openCase.firstVisitAt.split('T')[0] <= MOCK_TODAY) return 'repairing'
+  return 'needs_repair'
+}
+
 // 算出清冊上要顯示的狀態
 // 設備本身有狀況（待維修、維修中、已報廢）時優先顯示；正常的設備再看保養日期
 export function equipmentDisplayStatus(item) {
+  if (['needs_repair', 'repairing'].includes(item.status)) return repairStatus(item)
   if (item.status !== 'normal') return item.status
   const nextDate = nextMaintenanceDate(item)
   if (!nextDate) return 'normal'
