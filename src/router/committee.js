@@ -10,6 +10,7 @@ import FilesView from '@/views/committee/FilesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
 import MeView from '@/views/committee/MeView.vue'
 import NewRepairView from '@/views/committee/NewRepairView.vue'
+import NewTaskView from '@/views/committee/NewTaskView.vue'
 import NotificationsView from '@/views/committee/NotificationsView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
@@ -42,6 +43,7 @@ export default {
     todos: TodosView,
     tasks: TasksView,
     proposals: ProposalsView,
+    'tasks/new': NewTaskView,
     'tasks/:id': TaskDetailView,
     'cases/new': NewRepairView,
     'me/urgent-log': UrgentLogView,
