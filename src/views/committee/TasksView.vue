@@ -46,6 +46,7 @@ const openCount = computed(() => tasks.value.filter((task) => task.isOpen).lengt
 
 // '2026-09-30T18:00' → '2026/09/30 18:00'（管委會端的日期有年份）
 function dateText(value) {
+  if (!value) return '未設定' // 完成期限是選填，沒有期限的交辦（2026-10-15）
   return `${formatFullDate(value)} ${formatTime(value)}`
 }
 </script>

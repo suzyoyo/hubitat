@@ -3,6 +3,7 @@
 // 主要從案件詳情的「交辦」進來，網址帶案件編號（/committee/tasks/new?caseId=CASE-…），這時關聯案件鎖定不能改
 // 從「＋」選單進來的沒有關聯案件（設計稿可以搜尋例行會議決議或案件，還沒做）
 // 只有主委、副主委可以交辦；同一件案件還有沒完成的交辦時不能再交辦（假 API createTask 會擋）
+// 交辦對象只有管理人員（2026-10-15 013 決定）；完成期限選填
 // 寫法參考案件詳情頁（CaseDetailView）：送出中按鈕先不能按、成功失敗用 toast 提示
 import { LockIcon, SearchIcon, XIcon } from '@lucide/vue'
 import { computed, onMounted, reactive, ref } from 'vue'
@@ -22,7 +23,6 @@ import {
   canAssignTasks,
   createTask,
   getCaseById,
-  getCommitteeMembers,
   getCurrentUser,
   getStaffMembers,
 } from '@/mocks/api'
@@ -33,27 +33,23 @@ const router = useRouter()
 
 const CONTENT_MAX = 200 // 交辦內容最多幾個字（和假資料的說明一樣）
 const DEADLINE_TIME = '18:00' // 完成期限只選日期，時間固定是當天 18:00（和假資料的交辦一樣）
-// 交辦給管理人員時，下面那行灰字（設計稿）
+// 選好交辦對象後，下面那行灰字（設計稿）
 const STAFF_DUTY = '負責事項：現場確認、聯繫廠商、回報處理進度'
 
 const loading = ref(true)
 const userId = ref('')
 const canAssign = ref(false) // 我能不能交辦（主委、副主委）
 const relatedCase = ref(null) // 從案件進來時的那件案件；沒有就是 null
-const members = ref([]) // 可以交辦的人：管理人員在前，接著是委員（不含自己）
+const members = ref([]) // 可以交辦的人：管理人員
 
 onMounted(async () => {
   const user = await getCurrentUser('committee')
   userId.value = user.id
   canAssign.value = canAssignTasks(user.id)
   const caseId = route.query.caseId
-  const [caseData, staff, committee] = await Promise.all([
-    caseId ? getCaseById(caseId) : null,
-    getStaffMembers(),
-    getCommitteeMembers(),
-  ])
+  const [caseData, staff] = await Promise.all([caseId ? getCaseById(caseId) : null, getStaffMembers()])
   relatedCase.value = caseData ?? null
-  members.value = [...staff, ...committee.filter((member) => member.id !== user.id)]
+  members.value = staff
   loading.value = false
 })
 
@@ -72,7 +68,7 @@ const form = reactive({
   title: '',
   content: '',
   assigneeId: '',
-  deadline: '', // '2026-10-08'（只有日期）
+  deadline: '', // '2026-10-08'（只有日期）；選填
 })
 
 // 交辦對象：搜尋框打的字，和選好的人
@@ -96,7 +92,6 @@ const errors = computed(() => {
   if (!form.title.trim()) result.title = '請填寫交辦標題'
   if (!form.content.trim()) result.content = '請填寫交辦內容'
   if (!form.assigneeId) result.assignee = '請選擇交辦對象'
-  if (!form.deadline) result.deadline = '請選擇完成期限'
   return result
 })
 const shownErrors = computed(() => (submitted.value ? errors.value : {}))
@@ -112,7 +107,7 @@ async function submit() {
     title: form.title.trim(),
     content: form.content.trim(),
     assigneeId: form.assigneeId,
-    deadline: `${form.deadline}T${DEADLINE_TIME}`,
+    deadline: form.deadline ? `${form.deadline}T${DEADLINE_TIME}` : '',
     caseId: relatedCase.value?.id,
   })
   pending.value = false
@@ -205,7 +200,7 @@ function cancel() {
             {{ assignee.surname }}
           </span>
           <div class="min-w-0 flex-1">
-            <p class="type-date text-muted-foreground">{{ assignee.roles.includes('staff') ? '管理人員' : assignee.titleLabel }}</p>
+            <p class="type-date text-muted-foreground">管理人員</p>
             <p class="type-body-strong text-foreground">{{ assignee.displayName }}</p>
           </div>
           <Button type="button" variant="ghost" size="icon" aria-label="重新選擇交辦對象" @click="form.assigneeId = ''">
@@ -218,7 +213,7 @@ function cancel() {
             <Input
               id="task-assignee"
               v-model="query"
-              placeholder="搜尋管理人員或委員"
+              placeholder="搜尋管理人員"
               autocomplete="off"
               class="pl-9"
               :aria-invalid="Boolean(shownErrors.assignee)"
@@ -232,30 +227,24 @@ function cancel() {
                   {{ member.surname }}
                 </span>
                 <span class="min-w-0 flex-1">
-                  <span class="block type-date text-muted-foreground">
-                    {{ member.roles.includes('staff') ? '管理人員' : member.titleLabel }}
-                  </span>
+                  <span class="block type-date text-muted-foreground">管理人員</span>
                   <span class="block type-body-strong text-foreground">{{ member.displayName }}</span>
                 </span>
               </button>
             </li>
           </ul>
-          <p v-else class="type-date text-muted-foreground">找不到符合的人</p>
+          <p v-else class="type-date text-muted-foreground">找不到符合的管理人員</p>
         </template>
         <p v-if="shownErrors.assignee" class="type-date text-warning-strong">{{ shownErrors.assignee }}</p>
-        <p v-else-if="assignee?.roles.includes('staff')" class="type-date text-muted-foreground">{{ STAFF_DUTY }}</p>
+        <p v-else-if="assignee" class="type-date text-muted-foreground">{{ STAFF_DUTY }}</p>
       </div>
 
       <div class="space-y-2">
-        <Label for="task-deadline" class="text-base">完成期限 <span class="text-warning-strong">*</span></Label>
-        <DatePicker
-          id="task-deadline"
-          v-model="form.deadline"
-          placeholder="選擇完成期限（必填）"
-          :min="MOCK_TODAY"
-          :aria-invalid="Boolean(shownErrors.deadline)"
-        />
-        <p v-if="shownErrors.deadline" class="type-date text-warning-strong">{{ shownErrors.deadline }}</p>
+        <!-- 選填的寫法照專案規則：灰色小字「選填」 -->
+        <Label for="task-deadline" class="text-base">
+          完成期限<span class="type-date text-muted-foreground">選填</span>
+        </Label>
+        <DatePicker id="task-deadline" v-model="form.deadline" placeholder="選擇完成期限" :min="MOCK_TODAY" />
       </div>
 
       <BottomCta vertical>

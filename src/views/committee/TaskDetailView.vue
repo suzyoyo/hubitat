@@ -79,7 +79,8 @@ const reason = ref('')
 const newDeadline = ref('')
 
 // 原本的期限是不是已經過了；過了的話，退回時一定要給新期限，不然對方一被退回就逾期
-const deadlinePassed = computed(() => task.value.deadline <= MOCK_NOW)
+// 沒有期限的不算過了（期限是選填）
+const deadlinePassed = computed(() => Boolean(task.value.deadline) && task.value.deadline <= MOCK_NOW)
 
 function openDialog(mode) {
   dialogMode.value = mode
@@ -116,6 +117,7 @@ async function submitDialog() {
 
 // '2026-09-30T18:00' → '2026/09/30 18:00'（管委會端的日期有年份）
 function dateText(value) {
+  if (!value) return '未設定' // 完成期限是選填，沒有期限的交辦（2026-10-15）
   return `${formatFullDate(value)} ${formatTime(value)}`
 }
 
