@@ -287,7 +287,9 @@ function applyLog(item, { text, residentText = '', scheduledAt = '' }) {
     item.scheduledAt = scheduledAt
     setFirstVisit(item, scheduledAt)
   }
-  return { text: text.trim(), lines: [text.trim()], residentText: residentText.trim() }
+  // 「更新進度」的紀錄多一行「給住戶：…」，管理端才看得到這次給住戶看了什麼（有寫才有）
+  const lines = residentText.trim() ? [text.trim(), `給住戶：${residentText.trim()}`] : [text.trim()]
+  return { text: text.trim(), lines, residentText: residentText.trim() }
 }
 
 // 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
@@ -337,6 +339,7 @@ export async function addCaseLog(id, userId, log) {
 //     廠商：欣欣機電
 //     到場：10/21 09:10
 //     我改了時間和地點
+//     給住戶：廠商將於 10/21 到場處理。（處理紀錄有寫給住戶看的說明才有這行）
 //   住戶看到：派廠商、處理紀錄給住戶看的那幾句接在一起（都沒有就不給住戶看）
 // 待結案的案件只能寫處理紀錄（設備、廠商不能改了）；有一樣做不了就全部不做，回傳 undefined
 export async function updateCase(id, userId, { equipmentId = '', vendor = null, log = null } = {}) {
