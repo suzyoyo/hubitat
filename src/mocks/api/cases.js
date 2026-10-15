@@ -209,8 +209,16 @@ function findEditableCase(id, userId) {
   return item
 }
 
-// 撤回紀錄的標籤：看是誰通報的
-const WITHDRAW_LABELS = { resident: '住戶撤回', committee: '委員撤回', staff: '管理人員撤回' }
+// 撤回紀錄的標籤：看是誰通報的（巡查發現的是管理人員登記的，也算管理人員）
+const WITHDRAW_LABELS = { resident: '住戶撤回', committee: '委員撤回', staff: '管理人員撤回', patrol: '管理人員撤回' }
+
+// 住戶看到的撤回說明：住戶自己撤回的寫「你」，其他寫是誰撤回的
+const WITHDRAW_RESIDENT_TEXTS = {
+  resident: '你已撤回這筆通報。',
+  committee: '管委會已撤回這筆通報。',
+  staff: '管理人員已撤回這筆通報。',
+  patrol: '管理人員已撤回這筆通報。',
+}
 
 // 修改通報（住戶用）：只能改補充說明和照片，地點和主旨送出後就不能改
 //   changes 可以傳 description（補充說明）、photos（照片或影片檔名的清單），沒傳的不會動
@@ -242,7 +250,7 @@ export async function withdrawReport(id, userId, reason = '') {
     label: WITHDRAW_LABELS[item.source],
     text: reason ? `通報人撤回通報，原因：${reason}` : '通報人撤回通報',
     // 代住戶登記的，住戶看到的是管委會或管理人員撤回的
-    residentText: item.source === 'resident' ? '你已撤回這筆通報。' : `${item.source === 'staff' ? '管理人員' : '管委會'}已撤回這筆通報。`,
+    residentText: WITHDRAW_RESIDENT_TEXTS[item.source],
   })
   return true
 }
@@ -269,7 +277,8 @@ export async function createReport(userId, input) {
     id: nextCaseId(),
     place: input.place,
     subject: input.subject,
-    title: input.subject, // 標題就是通報人自己打的「通報問題」，範圍和地點另外顯示
+    // 標題是地點＋通報問題，例如「1F 大廳門鎖壞了」；範圍（A 棟）在卡片的標籤上，不放進標題
+    title: `${input.place}${input.subject}`,
     areaId: input.areaId,
     category: 'other',
     source: 'resident',
@@ -307,7 +316,8 @@ export async function createRepair(userId, input, role = 'committee') {
     id: nextCaseId(),
     place: input.place,
     subject: input.subject,
-    title: input.subject, // 標題就是通報人自己打的「通報問題」，範圍和地點另外顯示
+    // 標題是地點＋通報問題，例如「1F 大廳門鎖壞了」；範圍（A 棟）在卡片的標籤上，不放進標題
+    title: `${input.place}${input.subject}`,
     areaId: input.areaId,
     category: 'other',
     source: role,
