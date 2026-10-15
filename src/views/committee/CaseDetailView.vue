@@ -1,31 +1,61 @@
 <script setup>
 // 管委會端、管理人員端共用・案件詳情：一件案件的基本資料、通報內容、廠商、處理紀錄（設計稿 1134:17558）
-// 這一版只有「看」；底部的發布社區公告、交辦、完工標記與結案要新的假 API，之後再做
+// 這一版只有「看」，加上撤回自己登記的通報；底部的發布社區公告、交辦、完工標記與結案要新的假 API，之後再做
 import { ImageIcon, VideoIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { toast } from 'vue-sonner'
+import BottomCta from '@/components/app/BottomCta.vue'
 import { caseStatusBadge } from '@/components/admin/caseStatusBadge'
+import ReportWithdrawDialog from '@/components/report/ReportWithdrawDialog.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate, formatTime } from '@/lib/date'
-import { getCaseById } from '@/mocks/api'
+import { getCaseById, getCurrentUser, withdrawReport } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 // 網址是 /committee/cases/:id 或 /staff/cases/:id，所以 route.params.id 就是案件編號
 // 管理人員端的設計稿內容和管委會一樣，只有底部按鈕不同（Figma 1484:15491）；route.meta.roleId 是目前在哪一端
 const route = useRoute()
+const router = useRouter()
 
 const loading = ref(true)
 // 這一件案件；編號不存在時，假 API 會回傳 undefined
 const item = ref(null)
 
+// 現在登入的人（委員或管理人員，看目前在哪一端）；撤回時要用
+const userId = ref('')
+
 onMounted(async () => {
-  item.value = await getCaseById(route.params.id)
+  const user = await getCurrentUser(route.meta.roleId)
+  userId.value = user.id
+  // 傳 userId 進去，假 API 才知道能不能撤回（canWithdraw）
+  item.value = await getCaseById(route.params.id, user.id)
   loading.value = false
 })
+
+// ── 撤回通報：只有自己登記、還沒結案的才有按鈕 ─────────
+const withdrawOpen = ref(false)
+// withdrawing：撤回還在路上時是 true
+const withdrawing = ref(false)
+
+// 撤回彈窗按了「確認撤回」
+async function withdraw(reason) {
+  withdrawing.value = true
+  const ok = await withdrawReport(item.value.id, userId.value, reason)
+  withdrawing.value = false
+  withdrawOpen.value = false
+  if (!ok) {
+    toast.error('撤回失敗', { description: '這筆通報已經不能撤回了。' })
+    return
+  }
+  toast.success('已撤回通報')
+  // 撤回後回到案件列表（未結案的列表已經看不到這一筆）
+  router.replace(`/${route.meta.roleId}/cases`)
+}
 
 const statusBadge = computed(() => caseStatusBadge(item.value))
 
@@ -56,7 +86,8 @@ function isVideo(name) {
 </script>
 
 <template>
-  <div class="space-y-4 px-5 pt-4 pb-5">
+  <!-- 有撤回按鈕時，底部多留空間，不然會被按鈕區蓋住 -->
+  <div class="space-y-4 px-5 pt-4" :class="item?.canWithdraw ? 'pb-28' : 'pb-5'">
     <template v-if="loading">
       <Skeleton class="h-[208px] rounded-xl" />
       <Skeleton class="h-[137px] rounded-xl" />
@@ -159,6 +190,14 @@ function isVideo(name) {
           <p class="type-date text-muted-foreground">施工中拍下收據或單據，系統自動帶入日期與記錄者。</p>
         </div>
       </section>
+
+      <!-- 撤回通報：自己登記、還沒結案的才有 -->
+      <template v-if="item.canWithdraw">
+        <BottomCta>
+          <Button variant="outline" @click="withdrawOpen = true">撤回通報</Button>
+        </BottomCta>
+        <ReportWithdrawDialog v-model:open="withdrawOpen" :pending="withdrawing" @confirm="withdraw" />
+      </template>
     </template>
   </div>
 </template>
