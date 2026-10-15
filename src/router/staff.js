@@ -2,6 +2,7 @@
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 // 寫法可以參考住戶端的 resident.js
 // 管理人員端沒畫的畫面沿用管委會的（Figma 管理人員區塊 1483:15338），直接用 views/committee/ 的頁面
+import CaseCompleteView from '@/views/committee/CaseCompleteView.vue'
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
@@ -14,6 +15,7 @@ export default {
     // 和管委會端共用的頁面
     cases: CasesView,
     'cases/:id': CaseDetailView,
+    'cases/:id/complete': CaseCompleteView,
     'tasks/:id': TaskDetailView,
   },
 
