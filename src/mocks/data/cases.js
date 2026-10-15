@@ -18,6 +18,7 @@
 //   status      狀態，見下方 CASE_STATUSES
 //   deadline    完成日期（受理時選填，沒有就不寫）。「逾期」是用今天的日期算出來的
 //   scheduledAt 廠商預約到場的時間（派廠商、改期時選填，沒有就不寫）
+//   firstVisitAt 廠商第一次到場的時間（假 API 依 scheduledAt 自動記，不用自己填）。這天起關聯設備算「維修中」
 //   assigneeId  負責人（還沒指派就不寫）
 //   vendorId    指派的廠商（還沒指派就不寫）
 //   vendorName  名冊裡沒有、自己打的廠商名字（這時沒有 vendorId）
@@ -38,7 +39,8 @@
 //   isOpen        是否算「未結案」
 export const CASE_STATUSES = {
   pending: { label: '待受理', residentLabel: '已收到', isOpen: true },
-  accepted: { label: '已受理', residentLabel: '處理中', isOpen: true },
+  // 2026-10-15：管理端也顯示「處理中」（和 in_progress 一樣）。資料的值不變，假 API 還是分得出「已受理、還沒派廠商」
+  accepted: { label: '處理中', residentLabel: '處理中', isOpen: true },
   // 2026-10-15 改名（docs/case-flow.md）：施工中 → 處理中、待驗收 → 待結案
   in_progress: { label: '處理中', residentLabel: '處理中', isOpen: true },
   to_verify: { label: '待結案', residentLabel: '處理中', isOpen: true }, // 管理人員已完工驗收，等負責人結案

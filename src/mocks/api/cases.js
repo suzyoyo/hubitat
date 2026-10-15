@@ -192,7 +192,8 @@ function addLog(item, userId, label, text, residentText = '') {
 }
 
 // 關聯設備的狀態跟著案件變（沒有關聯設備就不做）
-//   'needs_repair' 待維修 / 'repairing' 維修中 / 'normal' 正常使用中
+//   'needs_repair' 待維修（受理時）/ 'normal' 正常使用中（結案時）
+//   「維修中」不存在資料裡：廠商到場那天才算，由設備的假 API 用日期算（equipmentDisplayStatus）
 function setEquipmentStatus(item, status) {
   const device = equipment.find((entry) => entry.id === item.equipmentId)
   if (device) device.status = status
@@ -218,9 +219,18 @@ export async function acceptCase(id, userId, options = {}) {
   return presentForManagement(item)
 }
 
+// 記下廠商「第一次到場」的時間，設備從這天起算「維修中」
+// 廠商已經來過（第一次到場的時間已經過了）就不改：例如 10/3 來過、改約 10/5，10/4 還是維修中
+// 還沒來過就跟著新的預約改（換廠商、改期都算）；沒有預約時間就拿掉
+function setFirstVisit(item, scheduledAt) {
+  if (item.firstVisitAt && item.firstVisitAt <= MOCK_NOW) return
+  if (scheduledAt) item.firstVisitAt = scheduledAt
+  else delete item.firstVisitAt
+}
+
 // 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
-//   設備狀態跟著案件：已受理 → 待維修、處理中 → 維修中；換掉的那台變回正常使用中
-//   結案時，這台設備的維修紀錄會多一筆（見 closeItem）
+//   設備一律先設成待維修；「維修中」不存在資料裡，從廠商第一次到場那天起由設備的假 API 用日期算
+//   換掉的那台變回正常使用中。結案時，這台設備的維修紀錄會多一筆（見 closeItem）
 export async function setCaseEquipment(id, userId, equipmentId) {
   await delay()
   const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
@@ -228,7 +238,7 @@ export async function setCaseEquipment(id, userId, equipmentId) {
   if (!item || !device) return undefined
   if (item.equipmentId && item.equipmentId !== equipmentId) setEquipmentStatus(item, 'normal')
   item.equipmentId = equipmentId
-  setEquipmentStatus(item, item.status === 'in_progress' ? 'repairing' : 'needs_repair')
+  setEquipmentStatus(item, 'needs_repair')
   addLog(item, userId, '關聯設備', `${userLabel(userId)}關聯設備「${device.name}」`)
   return presentForManagement(item)
 }
@@ -254,7 +264,7 @@ export async function assignVendor(id, userId, { vendorId = '', vendorName = '',
   }
   if (scheduledAt) item.scheduledAt = scheduledAt
   else delete item.scheduledAt // 換廠商又沒填時間，就不要留著上一家的預約
-  setEquipmentStatus(item, 'repairing')
+  setFirstVisit(item, scheduledAt)
   // 住戶看到的不寫廠商名稱
   const text = scheduledAt
     ? `${userLabel(userId)}指派 ${name}，預約 ${formatDateTime(scheduledAt)} 到場`
@@ -272,7 +282,10 @@ export async function addCaseLog(id, userId, { text, residentText = '', schedule
   await delay()
   const item = findHandleableCase(id, userId, ['accepted', 'in_progress', 'to_verify'])
   if (!item || !text?.trim()) return undefined
-  if (scheduledAt) item.scheduledAt = scheduledAt
+  if (scheduledAt) {
+    item.scheduledAt = scheduledAt
+    setFirstVisit(item, scheduledAt)
+  }
   addLog(item, userId, '處理紀錄', text.trim(), residentText.trim())
   return presentForManagement(item)
 }

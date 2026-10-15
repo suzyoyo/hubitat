@@ -5,6 +5,7 @@
 //   按底部「更新現況」才一起存
 //   底部：更新現況＋完工驗收（到回報完成頁）並排；受理（按了就受理）、交辦（到新增交辦頁）、
 //   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
+//   沒有「撤回通報」：2026-10-15 和 013 決定拿掉撤回，不需要處理的通報由處理的人完工驗收時寫明原因結案
 import { ImageIcon, VideoIcon } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -51,17 +52,17 @@ const equipmentDraft = ref(null) // { equipmentId, name, place }
 const vendorDraft = ref(null) // { vendorId, vendorName, scheduledAt }
 const logDraft = ref(null) // { text, residentText, scheduledAt }
 
-// 拿這一頁要的資料：我是誰、這件案件、可以選的廠商
+// 拿這一頁要的資料：我是誰、這件案件、可以選的設備和廠商
 async function load() {
   if (!route.params.id) return // 正要離開這一頁（換到沒有案件編號的網址），不用拿
   loading.value = true
-  const [user, data, vendorList, deviceList] = await Promise.all([
-    getCurrentUser(route.meta.roleId),
+  const user = await getCurrentUser(route.meta.roleId)
+  userId.value = user.id
+  const [data, vendorList, deviceList] = await Promise.all([
     getCaseById(route.params.id),
     getVendors('active'),
     getEquipmentList(route.meta.roleId),
   ])
-  userId.value = user.id
   item.value = data
   vendors.value = vendorList
   devices.value = deviceList.filter((device) => device.status !== 'retired')
@@ -354,16 +355,18 @@ function isVideo(name) {
           <p class="type-date text-muted-foreground">施工中拍下收據或單據，系統自動帶入日期與記錄者。</p>
         </div>
       </section>
+
     </template>
 
     <!-- 底部按鈕：上面一排是更新現況，下面一排是依狀態出現的動作（排法照設計稿 1134:17558，
          設計稿上面那排原本是「發布社區公告」，2026-10-15 改成更新現況） -->
     <BottomCta v-if="hasBottom" vertical>
+      <!-- 上面一排：交辦（主委、副主委、還沒交辦時才有） -->
       <Button v-for="action in topActions" :key="action.key" variant="outline" @click="runAction(action)">
         {{ action.label }}
       </Button>
       <!-- 下面一排：更新現況（次要）和主要動作並排 -->
-      <div class="flex gap-3 *:flex-1">
+      <div v-if="canUpdate || mainActions.length" class="flex gap-3 *:flex-1">
         <Button v-if="canUpdate" variant="secondary" :disabled="!hasDraft || pending" @click="updateStatus">
           更新現況
         </Button>
