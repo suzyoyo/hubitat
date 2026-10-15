@@ -8,13 +8,13 @@ import SortSelect from '@/components/common/SortSelect.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { todoLink } from '@/lib/todo'
-import { DONE_TODO_DAYS, getCurrentUser, getMyDoneTodos, getMyTodos } from '@/mocks/api'
+import { getCurrentUser, getMyDoneTodos, getMyTodos } from '@/mocks/api'
 
 // loading：資料還在路上時是 true，畫面先顯示灰色的佔位方塊
 const loading = ref(true)
 // 我的待辦：getMyTodos() 回傳 items（每一筆待辦）和 total（共幾件）
 const todos = ref({ items: [], total: 0 })
-// 最近完成的事
+// 最近完成的事：假 API 只給最近 30 天（DONE_TODO_DAYS）完成的，更早的不列。這是內部規則，畫面上不寫出來（2026-10-15 suzy 決定）
 const doneTodos = ref([])
 
 // 現在看哪個分頁：'open' 未完成 / 'done' 已完成
@@ -96,14 +96,13 @@ const shownTodos = computed(() => {
       <FilterSelect v-model="type" label="類型" :options="TYPE_FILTERS" />
     </div>
 
-    <!-- 同一行：左邊件數、右邊排序（灰色小字）。已完成固定新的在前，不用排序 -->
-    <div class="flex min-h-11 items-center justify-between gap-3">
+    <!-- 同一行：左邊件數、右邊排序（灰色小字）。只有「未完成」有這一行：
+         已完成固定新的在前，不用排序；件數也不寫（以前寫「最近 30 天完成 N 件」，2026-10-15 拿掉） -->
+    <div v-if="tab === 'open'" class="flex min-h-11 items-center justify-between gap-3">
       <p class="type-date text-muted-foreground">
-        <template v-if="!loading">
-          {{ tab === 'done' ? `最近 ${DONE_TODO_DAYS} 天完成 ${shownTodos.length} 件` : `共 ${shownTodos.length} 件待辦` }}
-        </template>
+        <template v-if="!loading">共 {{ shownTodos.length }} 件待辦</template>
       </p>
-      <SortSelect v-if="tab === 'open'" v-model="sort" :options="SORT_OPTIONS" />
+      <SortSelect v-model="sort" :options="SORT_OPTIONS" />
     </div>
 
     <template v-if="loading">
@@ -111,7 +110,7 @@ const shownTodos = computed(() => {
     </template>
     <!-- 沒有任何待辦，或是選的類型剛好沒有 -->
     <div v-else-if="!shownTodos.length" class="rounded-xl bg-card p-4 shadow-card">
-      <p v-if="tab === 'done'" class="type-body text-muted-foreground">最近 {{ DONE_TODO_DAYS }} 天沒有完成的事</p>
+      <p v-if="tab === 'done'" class="type-body text-muted-foreground">目前沒有已完成的事</p>
       <p v-else class="type-body text-muted-foreground">{{ type === 'all' ? '目前沒有待辦事項' : '沒有這類待辦' }}</p>
     </div>
     <template v-else>
