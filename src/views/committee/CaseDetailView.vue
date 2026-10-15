@@ -1,5 +1,5 @@
 <script setup>
-// 管委會端・案件詳情：一件案件的基本資料、通報內容、廠商、處理紀錄（設計稿 1134:17558）
+// 管委會端、管理人員端共用・案件詳情：一件案件的基本資料、通報內容、廠商、處理紀錄（設計稿 1134:17558）
 // 這一版只有「看」，加上撤回自己登記的通報；底部的發布社區公告、交辦、完工標記與結案要新的假 API，之後再做
 import { ImageIcon, VideoIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
@@ -17,7 +17,8 @@ import { formatFullDate, formatTime } from '@/lib/date'
 import { getCaseById, getCurrentUser, withdrawReport } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
-// 網址是 /committee/cases/:id，所以 route.params.id 就是案件編號
+// 網址是 /committee/cases/:id 或 /staff/cases/:id，所以 route.params.id 就是案件編號
+// 管理人員端的設計稿內容和管委會一樣，只有底部按鈕不同（Figma 1484:15491）；route.meta.roleId 是目前在哪一端
 const route = useRoute()
 const router = useRouter()
 
@@ -25,11 +26,11 @@ const loading = ref(true)
 // 這一件案件；編號不存在時，假 API 會回傳 undefined
 const item = ref(null)
 
-// 現在登入的委員；撤回時要用
+// 現在登入的人（委員或管理人員，看目前在哪一端）；撤回時要用
 const userId = ref('')
 
 onMounted(async () => {
-  const user = await getCurrentUser('committee')
+  const user = await getCurrentUser(route.meta.roleId)
   userId.value = user.id
   // 傳 userId 進去，假 API 才知道能不能撤回（canWithdraw）
   item.value = await getCaseById(route.params.id, user.id)
@@ -53,7 +54,7 @@ async function withdraw(reason) {
   }
   toast.success('已撤回通報')
   // 撤回後回到案件列表（未結案的列表已經看不到這一筆）
-  router.replace('/committee/cases')
+  router.replace(`/${route.meta.roleId}/cases`)
 }
 
 const statusBadge = computed(() => caseStatusBadge(item.value))
@@ -102,7 +103,7 @@ function isVideo(name) {
       <EmptyTitle class="type-greeting">找不到這件案件</EmptyTitle>
       <EmptyDescription class="type-body">可能已經刪除，或是網址不正確。</EmptyDescription>
       <Button as-child class="mt-4">
-        <RouterLink to="/committee/cases">回到案件列表</RouterLink>
+        <RouterLink :to="`/${route.meta.roleId}/cases`">回到案件列表</RouterLink>
       </Button>
     </Empty>
 

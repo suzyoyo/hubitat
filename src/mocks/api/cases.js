@@ -2,10 +2,11 @@
 // 同一份案件資料，管理端和住戶端要看的內容不同，所以分成兩種整理方式：
 //   presentForManagement：管委會、管理人員看的（完整）
 //   presentForResident：  住戶看的（簡化的狀態、只給住戶看的進度說明）
-import { diffDays } from '@/lib/date'
+import { diffDays, formatDate, formatDateTime } from '@/lib/date'
 import { CASE_SOURCES, CASE_STATUSES, CASE_VISIBILITY, cases } from '../data/cases'
 import { ISSUE_CATEGORIES } from '../data/community'
 import { equipment } from '../data/equipment'
+import { tasks } from '../data/tasks'
 import { vendors } from '../data/vendors'
 import { areaName } from './community'
 import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
@@ -151,6 +152,172 @@ export async function getCaseById(id, userId) {
   const item = cases.find((entry) => entry.id === id)
   if (!item) return undefined
   return { ...presentForManagement(item), canWithdraw: item.reporterId === userId && isOpen(item) }
+}
+
+// ── 管理端的動作：受理 → 派廠商 → 處理紀錄 → 完工驗收 → 結案 ──────────
+// 規則見 docs/case-flow.md（2026-10-15 和 013 定案）
+// 下面都只改記憶體裡的資料，重新整理網頁會變回原本的假資料
+// 不能做的時候（沒有權限、狀態不對）回傳 undefined，成功回傳更新後的案件（管理端的樣子）
+
+// 這個人能不能處理案件（受理、派廠商、寫處理紀錄、完工驗收）：主委、副主委、管理人員
+export function canHandleCases(userId) {
+  const user = findUser(userId)
+  if (!user) return false
+  if (user.roles.includes('staff')) return true
+  return ['chair', 'viceChair'].includes(user.committeeTitle)
+}
+
+// 住戶看到的「誰」：管理人員做的寫「管理人員」，委員做的寫「管委會」
+function handlerWord(userId) {
+  return findUser(userId)?.roles.includes('staff') ? '管理人員' : '管委會'
+}
+
+// 找出「這個人可以處理、而且現在是這個狀態」的案件；找不到回傳 undefined
+// statuses 是允許的狀態，例如 ['pending']
+function findHandleableCase(id, userId, statuses) {
+  const item = cases.find((entry) => entry.id === id)
+  if (!item || !canHandleCases(userId) || !statuses.includes(item.status)) return undefined
+  return item
+}
+
+// 在案件上加一筆處理紀錄；residentText 沒傳就不給住戶看
+function addLog(item, userId, label, text, residentText = '') {
+  const log = { at: MOCK_NOW, actorId: userId, label, text }
+  if (residentText) log.residentText = residentText
+  item.logs.push(log)
+}
+
+// 關聯設備的狀態跟著案件變（沒有關聯設備就不做）
+//   'needs_repair' 待維修 / 'repairing' 維修中 / 'normal' 正常使用中
+function setEquipmentStatus(item, status) {
+  const device = equipment.find((entry) => entry.id === item.equipmentId)
+  if (device) device.status = status
+}
+
+// 受理：待受理 → 已受理，受理的人就是負責人
+//   options 都是選填：
+//     deadline    完成日期，例如 '2026-10-08'（不依緊急給預設值）
+//     category    問題分類，例如 'equipment'（住戶通報時先歸「其他」，這時改成正確的）
+//     equipmentId 關聯設備，例如 'e-001'（有選的話設備變「待維修」，結案時進維修歷史）
+export async function acceptCase(id, userId, options = {}) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['pending'])
+  if (!item) return undefined
+  item.status = 'accepted'
+  item.assigneeId = userId
+  if (options.deadline) item.deadline = options.deadline
+  if (options.category) item.category = options.category
+  if (options.equipmentId) item.equipmentId = options.equipmentId
+  setEquipmentStatus(item, 'needs_repair')
+  const deadlineText = item.deadline ? `，預計 ${formatDate(item.deadline)} 前完成` : ''
+  addLog(item, userId, '已受理', `${userLabel(userId)}受理${deadlineText}`, `${handlerWord(userId)}已受理。`)
+  return presentForManagement(item)
+}
+
+// 派廠商：已受理、處理中 → 處理中（處理中也可以換廠商）
+//   vendorId    廠商，例如 'v-001'
+//   scheduledAt 預約到場時間，例如 '2026-10-03T14:00'（選填）
+export async function assignVendor(id, userId, vendorId, scheduledAt = '') {
+  await delay()
+  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+  const vendor = vendors.find((entry) => entry.id === vendorId)
+  if (!item || !vendor) return undefined
+  item.status = 'in_progress'
+  item.vendorId = vendorId
+  if (scheduledAt) item.scheduledAt = scheduledAt
+  else delete item.scheduledAt // 換廠商又沒填時間，就不要留著上一家的預約
+  setEquipmentStatus(item, 'repairing')
+  // 住戶看到的不寫廠商名稱
+  const text = scheduledAt
+    ? `${userLabel(userId)}指派 ${vendor.name}，預約 ${formatDateTime(scheduledAt)} 到場`
+    : `${userLabel(userId)}指派 ${vendor.name}`
+  const residentText = scheduledAt ? `已安排廠商，預計 ${formatDate(scheduledAt)} 到場。` : '已安排廠商處理。'
+  addLog(item, userId, '派廠商', text, residentText)
+  return presentForManagement(item)
+}
+
+// 寫一筆處理紀錄（還沒結案的都可以寫）
+//   text         管理端看的內容（可以寫廠商、報價這些細節），必填
+//   residentText 給住戶看的一句，選填；沒寫就不給住戶看
+//   scheduledAt  改期時填新的預約到場時間，選填
+export async function addCaseLog(id, userId, { text, residentText = '', scheduledAt = '' }) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['accepted', 'in_progress', 'to_verify'])
+  if (!item || !text?.trim()) return undefined
+  if (scheduledAt) item.scheduledAt = scheduledAt
+  addLog(item, userId, '處理紀錄', text.trim(), residentText.trim())
+  return presentForManagement(item)
+}
+
+// 結案（closeCase 和「負責人自己完工驗收」共用）：狀態改成已結案，並把後續的事一起做完
+//   cost 維修費用，只有委員填得了；rating 廠商評分 { score: 1～5, comment }
+function closeItem(item, userId, cost, rating) {
+  item.status = 'closed'
+  item.closedAt = MOCK_NOW
+  if (rating) item.rating = { score: rating.score, comment: rating.comment ?? '' }
+  // 連到這件案件、等確認的交辦，一起確認完成
+  for (const task of tasks) {
+    if (task.caseId === item.id && task.status === 'reported') {
+      task.status = 'done'
+      task.doneAt = MOCK_NOW
+    }
+  }
+  // 有關聯設備：設備變回正常，維修紀錄多一筆（費用只有委員填得了，管理人員看不到費用）
+  const device = equipment.find((entry) => entry.id === item.equipmentId)
+  if (device) {
+    device.status = 'normal'
+    const allRecords = equipment.flatMap((entry) => entry.records)
+    const maxNumber = Math.max(0, ...allRecords.map((record) => Number(record.id.slice(3))))
+    const record = {
+      id: `er-${String(maxNumber + 1).padStart(3, '0')}`,
+      date: MOCK_TODAY,
+      type: 'repair',
+      title: item.title,
+      vendorId: item.vendorId,
+      caseId: item.id,
+    }
+    const isCommittee = findUser(userId)?.roles.includes('committee')
+    if (isCommittee && cost > 0) record.cost = cost
+    device.records.unshift(record) // 紀錄是新的在前
+  }
+  addLog(item, userId, '已結案', `${userLabel(userId)}結案`, '已完成維修，感謝你的通報。')
+}
+
+// 完工驗收：處理中 → 廠商當場修好、當場驗收（沒有「驗收不通過」）
+//   note 完工備註、photos 照片檔名的清單
+//   按的人是案件負責人（管理人員自己受理的）→ 直接結案
+//   負責人是別人（主委或副主委交辦出去的）→ 待結案，並把交辦給這個人的那筆交辦一起回報完成
+export async function completeCase(id, userId, { note = '', photos = [] }) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['in_progress'])
+  if (!item) return undefined
+  item.completion = { at: MOCK_NOW, note, photos: [...photos] }
+  addLog(item, userId, '完工驗收', note || '已完工驗收')
+  if (item.assigneeId === userId) {
+    closeItem(item, userId)
+    return presentForManagement(item)
+  }
+  item.status = 'to_verify'
+  item.logs.at(-1).residentText = `維修已完成，等待${handlerWord(item.assigneeId)}結案。`
+  const task = tasks.find((entry) => entry.caseId === id && entry.assigneeId === userId && entry.status === 'in_progress')
+  if (task) {
+    task.status = 'reported'
+    task.report = { at: MOCK_NOW, note: note || '已完工驗收', files: [...photos] }
+    delete task.returnNote
+  }
+  return presentForManagement(item)
+}
+
+// 結案：待結案 → 已結案。只有案件負責人（受理的人）能結案
+//   options 都是選填：cost 維修費用（只有委員填得了）、rating 廠商評分 { score: 1～5, comment }
+export async function closeCase(id, userId, options = {}) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['to_verify'])
+  if (!item || item.assigneeId !== userId) return undefined
+  const { cost, rating } = options
+  if (rating && !(rating.score >= 1 && rating.score <= 5)) return undefined
+  closeItem(item, userId, cost, rating)
+  return presentForManagement(item)
 }
 
 // 某家廠商處理過的報修統計（廠商詳情頁用）

@@ -182,10 +182,11 @@ export const notifications = [
   },
   {
     id: 'n-204',
-    userId: 'u-s02',
-    role: 'staff',
-    title: '案件待標記完成',
-    body: 'C 棟電梯異音檢修，廠商已完工',
+    // 2026-10-15 改：完工驗收後等負責人（張副主委）結案，通知負責人（docs/case-flow.md）
+    userId: 'u-c02',
+    role: 'committee',
+    title: '案件待結案',
+    body: 'C 棟電梯異音檢修，已完工驗收，請結案',
     at: '2026-09-25T16:30',
     read: true,
     link: { type: 'case', id: 'CASE-20260922-002' },

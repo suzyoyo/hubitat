@@ -28,8 +28,8 @@ export const TODO_KINDS = {
   incomplete: { label: '需補資料' },
   // 管理人員
   new_case: { label: '新報修' },
-  in_progress: { label: '施工中' },
-  to_verify: { label: '待標記完成' },
+  in_progress: { label: '處理中' }, // 2026-10-15 從「施工中」改名（docs/case-flow.md）
+  to_verify: { label: '待標記完成' }, // 2026-10-15 起不會出現在待辦（待結案是負責人的事），只有「已完成」還用這個種類
 }
 
 // 建立一筆待辦
@@ -164,14 +164,18 @@ function committeeTodos(userId) {
 function staffTodos(userId) {
   const items = [...assignedTasks(userId)]
 
-  // 管理人員要處理所有進行中的案件，依狀態分成三種
-  const kindOfStatus = { pending: 'new_case', in_progress: 'in_progress', to_verify: 'to_verify' }
+  // 管理人員要處理的案件（規則見 docs/case-flow.md）：
+  //   待受理 → 新報修（誰都可以受理）
+  //   處理中 → 處理中；已受理、負責人是我（我受理、還沒派廠商）也算
+  //   待結案不列入：那是等負責人（主委或副主委）結案，管理人員已經做完了
   for (const item of cases) {
-    const kind = kindOfStatus[item.status]
-    if (!kind) continue // 其他狀態（已受理、已結案…）不列入
+    let kind = ''
+    if (item.status === 'pending') kind = 'new_case'
+    else if (item.status === 'in_progress') kind = 'in_progress'
+    else if (item.status === 'accepted' && item.assigneeId === userId) kind = 'in_progress'
+    if (!kind) continue
     const vendor = vendors.find((entry) => entry.id === item.vendorId)
-    let hint = vendor ? `廠商：${vendor.name}` : '尚未派廠商'
-    if (kind === 'to_verify') hint = '廠商已完工，請確認後標記完成'
+    const hint = vendor ? `廠商：${vendor.name}` : '尚未派廠商'
     // 新報修沒有期限，用通報時間排序；其他用處理期限
     const dueAt = kind === 'new_case' ? item.reportedAt : (item.deadline ?? null)
     items.push(todo(kind, item.title, hint, item.reportedAt, dueAt, { type: 'case', id: item.id }, item.isUrgent))

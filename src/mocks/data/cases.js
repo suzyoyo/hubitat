@@ -16,7 +16,8 @@
 //   description 通報人寫的問題描述
 //   photos      照片或影片的檔名（欄位名稱沿用 photos，影片也放這裡，例如 '異音.mp4'）
 //   status      狀態，見下方 CASE_STATUSES
-//   deadline    處理期限（還沒設定就不寫）。「逾期」是用今天的日期算出來的
+//   deadline    完成日期（受理時選填，沒有就不寫）。「逾期」是用今天的日期算出來的
+//   scheduledAt 廠商預約到場的時間（派廠商、改期時選填，沒有就不寫）
 //   assigneeId  負責人（還沒指派就不寫）
 //   vendorId    指派的廠商（還沒指派就不寫）
 //   equipmentId 相關設備（沒有就不寫）
@@ -37,8 +38,9 @@
 export const CASE_STATUSES = {
   pending: { label: '待受理', residentLabel: '已收到', isOpen: true },
   accepted: { label: '已受理', residentLabel: '處理中', isOpen: true },
-  in_progress: { label: '施工中', residentLabel: '處理中', isOpen: true },
-  to_verify: { label: '待驗收', residentLabel: '處理中', isOpen: true },
+  // 2026-10-15 改名（docs/case-flow.md）：施工中 → 處理中、待驗收 → 待結案
+  in_progress: { label: '處理中', residentLabel: '處理中', isOpen: true },
+  to_verify: { label: '待結案', residentLabel: '處理中', isOpen: true }, // 管理人員已完工驗收，等負責人結案
   closed: { label: '已結案', residentLabel: '已完成', isOpen: false },
   cancelled: { label: '已取消', residentLabel: '已撤回', isOpen: false },
 }

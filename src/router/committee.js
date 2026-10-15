@@ -2,16 +2,19 @@
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 // 寫法可以參考住戶端的 resident.js
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
+import AnnouncementFormView from '@/views/committee/AnnouncementFormView.vue'
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
 import FilesView from '@/views/committee/FilesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
+import MeView from '@/views/committee/MeView.vue'
 import NewRepairView from '@/views/committee/NewRepairView.vue'
 import NotificationsView from '@/views/committee/NotificationsView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TasksView from '@/views/committee/TasksView.vue'
 import TodosView from '@/views/committee/TodosView.vue'
+import UrgentLogView from '@/views/committee/UrgentLogView.vue'
 import VendorDetailView from '@/views/committee/VendorDetailView.vue'
 import VendorListView from '@/views/committee/VendorListView.vue'
 import VendorsView from '@/views/committee/VendorsView.vue'
@@ -22,6 +25,7 @@ export default {
   // 沒列在這裡的頁面，會先顯示佔位頁
   views: {
     home: HomeView,
+    me: MeView,
     notifications: NotificationsView,
     cases: CasesView,
     files: FilesView,
@@ -30,11 +34,15 @@ export default {
     'vendors/:id': VendorDetailView,
     'cases/:id': CaseDetailView,
     'announcements/:id': AnnouncementDetailView,
+    // 發布和修改是同一個表單
+    'announcements/new': AnnouncementFormView,
+    'announcements/:id/edit': AnnouncementFormView,
     todos: TodosView,
     tasks: TasksView,
     proposals: ProposalsView,
     'tasks/:id': TaskDetailView,
     'cases/new': NewRepairView,
+    'me/urgent-log': UrgentLogView,
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
@@ -66,6 +74,14 @@ export default {
     { path: 'cases/new', title: '新增通報' },
     { path: 'files/upload', title: '上傳文件' },
     { path: 'quick-saves/new', title: '快速留存' },
+    // 「我的」頁點進去的頁面
+    { path: 'me/profile', title: '個人資料' },
+    { path: 'me/handover', title: '換屆交接' },
+    { path: 'me/settings', title: '社區設定' },
+    { path: 'me/urgent-log', title: '緊急標示使用紀錄' },
+    { path: 'me/notifications', title: '通知設定' },
+    { path: 'me/help', title: '使用說明' },
+    { path: 'me/account', title: '帳號與安全' },
     // 「社區」分頁點進去的頁面
     { path: 'search', title: '搜尋' },
     { path: 'meetings', title: '會議紀錄' },
