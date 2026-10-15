@@ -63,9 +63,13 @@ function presentForManagement(item) {
     isOpen: isOpen(item),
     reporterLabel: reporterLabel(item),
     assigneeLabel: item.assigneeId ? userLabel(item.assigneeId) : '',
-    vendorName: vendor ? vendor.name : '',
+    // 名冊裡的廠商用名冊的名字；自己打的（名冊裡沒有）存在案件的 vendorName
+    vendorName: vendor ? vendor.name : (item.vendorName ?? ''),
     equipmentName: device ? device.name : '',
+    equipmentPlace: device ? device.place : '', // 設備的安裝位置，例如「A 棟 1 樓機房」
     supporterCount: item.supporters.length, // 附議戶數
+    // 還沒完成的交辦（進行中或待確認）的編號；沒有就是空字串。有的話不能再交辦
+    openTaskId: tasks.find((task) => task.caseId === item.id && ['in_progress', 'reported'].includes(task.status))?.id ?? '',
     isOverdue: overdueDays > 0,
     overdueDays,
     // 每筆紀錄補上「是誰做的」；沒有 actorId 的是系統自動產生的
@@ -226,23 +230,47 @@ function setFirstVisit(item, scheduledAt) {
   else delete item.firstVisitAt
 }
 
-// 派廠商：已受理、處理中 → 處理中（處理中也可以換廠商）
-//   vendorId    廠商，例如 'v-001'
-//   scheduledAt 預約到場時間，例如 '2026-10-03T14:00'（選填）
-export async function assignVendor(id, userId, vendorId, scheduledAt = '') {
+// 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
+//   設備一律先設成待維修；「維修中」不存在資料裡，從廠商第一次到場那天起由設備的假 API 用日期算
+//   換掉的那台變回正常使用中。結案時，這台設備的維修紀錄會多一筆（見 closeItem）
+export async function setCaseEquipment(id, userId, equipmentId) {
   await delay()
   const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
-  const vendor = vendors.find((entry) => entry.id === vendorId)
-  if (!item || !vendor) return undefined
+  const device = equipment.find((entry) => entry.id === equipmentId)
+  if (!item || !device) return undefined
+  if (item.equipmentId && item.equipmentId !== equipmentId) setEquipmentStatus(item, 'normal')
+  item.equipmentId = equipmentId
+  setEquipmentStatus(item, 'needs_repair')
+  addLog(item, userId, '關聯設備', `${userLabel(userId)}關聯設備「${device.name}」`)
+  return presentForManagement(item)
+}
+
+// 派廠商：已受理、處理中 → 處理中（處理中也可以換廠商）
+//   vendorId    名冊裡的廠商，例如 'v-001'
+//   vendorName  名冊裡沒有的廠商，自己打的名字，例如 '順達環保'（vendorId 和 vendorName 傳一個就好）
+//               先只記在案件上；之後要自動加進廠商名冊、出現「需補資料」待辦（CLAUDE.md 待辦提醒）
+//   scheduledAt 預約到場時間，例如 '2026-10-03T14:00'（選填）
+export async function assignVendor(id, userId, { vendorId = '', vendorName = '', scheduledAt = '' }) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
+  const listed = vendors.find((entry) => entry.id === vendorId)
+  const name = listed ? listed.name : vendorName.trim()
+  if (!item || !name) return undefined
   item.status = 'in_progress'
-  item.vendorId = vendorId
+  if (listed) {
+    item.vendorId = listed.id
+    delete item.vendorName
+  } else {
+    delete item.vendorId
+    item.vendorName = name
+  }
   if (scheduledAt) item.scheduledAt = scheduledAt
   else delete item.scheduledAt // 換廠商又沒填時間，就不要留著上一家的預約
   setFirstVisit(item, scheduledAt)
   // 住戶看到的不寫廠商名稱
   const text = scheduledAt
-    ? `${userLabel(userId)}指派 ${vendor.name}，預約 ${formatDateTime(scheduledAt)} 到場`
-    : `${userLabel(userId)}指派 ${vendor.name}`
+    ? `${userLabel(userId)}指派 ${name}，預約 ${formatDateTime(scheduledAt)} 到場`
+    : `${userLabel(userId)}指派 ${name}`
   const residentText = scheduledAt ? `已安排廠商，預計 ${formatDate(scheduledAt)} 到場。` : '已安排廠商處理。'
   addLog(item, userId, '派廠商', text, residentText)
   return presentForManagement(item)
@@ -288,9 +316,11 @@ function closeItem(item, userId, cost, rating) {
       date: MOCK_TODAY,
       type: 'repair',
       title: item.title,
-      vendorId: item.vendorId,
       caseId: item.id,
     }
+    // 名冊裡的廠商記編號，自己打的記名字
+    if (item.vendorId) record.vendorId = item.vendorId
+    else if (item.vendorName) record.vendorName = item.vendorName
     const isCommittee = findUser(userId)?.roles.includes('committee')
     if (isCommittee && cost > 0) record.cost = cost
     device.records.unshift(record) // 紀錄是新的在前
@@ -298,13 +328,14 @@ function closeItem(item, userId, cost, rating) {
   addLog(item, userId, '已結案', `${userLabel(userId)}結案`, '已完成維修，感謝你的通報。')
 }
 
-// 完工驗收：處理中 → 廠商當場修好、當場驗收（沒有「驗收不通過」）
+// 完工驗收：已受理、處理中 → 當場修好、當場驗收（沒有「驗收不通過」）
+//   已受理也可以：管理人員自己就修好的（例如換燈管），不一定要派廠商
 //   note 完工備註、photos 照片檔名的清單
 //   按的人是案件負責人（管理人員自己受理的）→ 直接結案
 //   負責人是別人（主委或副主委交辦出去的）→ 待結案，並把交辦給這個人的那筆交辦一起回報完成
 export async function completeCase(id, userId, { note = '', photos = [] }) {
   await delay()
-  const item = findHandleableCase(id, userId, ['in_progress'])
+  const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
   if (!item) return undefined
   item.completion = { at: MOCK_NOW, note, photos: [...photos] }
   addLog(item, userId, '完工驗收', note || '已完工驗收')

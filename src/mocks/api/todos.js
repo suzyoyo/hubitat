@@ -150,7 +150,8 @@ function committeeTodos(userId) {
         continue
       }
       const vendor = vendors.find((entry) => entry.id === item.vendorId)
-      const hint = vendor ? `廠商：${vendor.name}` : '尚未派廠商'
+      const name = vendor ? vendor.name : item.vendorName // 自己打的廠商存在 vendorName
+      const hint = name ? `廠商：${name}` : '尚未派廠商'
       items.push(todo('my_case', item.title, hint, item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
     }
   }
@@ -196,7 +197,8 @@ function staffTodos(userId) {
     else if (item.status === 'accepted' && item.assigneeId === userId) kind = 'in_progress'
     if (!kind) continue
     const vendor = vendors.find((entry) => entry.id === item.vendorId)
-    const hint = vendor ? `廠商：${vendor.name}` : '尚未派廠商'
+    const name = vendor ? vendor.name : item.vendorName // 自己打的廠商存在 vendorName
+    const hint = name ? `廠商：${name}` : '尚未派廠商'
     // 新報修沒有期限，用通報時間排序；其他用處理期限
     const dueAt = kind === 'new_case' ? item.reportedAt : (item.deadline ?? null)
     items.push(todo(kind, item.title, hint, item.reportedAt, dueAt, { type: 'case', id: item.id }, item.isUrgent))
