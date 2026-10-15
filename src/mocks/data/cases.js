@@ -21,6 +21,7 @@
 //   firstVisitAt 廠商第一次到場的時間（假 API 依 scheduledAt 自動記，不用自己填）。這天起關聯設備算「維修中」
 //   assigneeId  負責人（還沒指派就不寫）
 //   vendorId    指派的廠商（還沒指派就不寫）
+//   vendorName  名冊裡沒有、自己打的廠商名字（這時沒有 vendorId）
 //   equipmentId 相關設備（沒有就不寫）
 //   supporters  按了「我也遇到了」的住戶（附議）
 //   logs        處理進度紀錄（由舊到新）

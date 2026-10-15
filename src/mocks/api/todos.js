@@ -10,6 +10,7 @@ import { quickSaves } from '../data/quickSaves'
 import { tasks } from '../data/tasks'
 import { COMMITTEE_TITLES } from '../data/users'
 import { vendors } from '../data/vendors'
+import { areaName } from './community'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
 import { MOCK_TODAY, delay } from './helpers'
@@ -24,10 +25,11 @@ export const TODO_KINDS = {
   sign: { label: '等我簽核' },
   review: { label: '待我審核' },
   my_case: { label: '我負責的案件' },
+  to_close: { label: '待我結案' }, // 我負責的案件，管理人員已完工驗收，等我結案（2026-10-15）
   expiring: { label: '快到期文件' },
   incomplete: { label: '需補資料' },
   // 管理人員
-  new_case: { label: '新報修' },
+  new_case: { label: '新通報' }, // 待受理的案件（2026-10-15 從「新報修」改，用詞統一叫「通報」）；管委會只有主委、副主委有
   in_progress: { label: '處理中' }, // 2026-10-15 從「施工中」改名（docs/case-flow.md）
   to_verify: { label: '待標記完成' }, // 2026-10-15 起不會出現在待辦（待結案是負責人的事），只有「已完成」還用這個種類
 }
@@ -86,14 +88,26 @@ function committeeTodos(userId) {
   const items = [...assignedTasks(userId)]
 
   // 我交辦出去、對方已回報完成，等我確認的
+  // 連到案件、案件在等結案的不算：結案時交辦會一起確認完成，待辦裡只放「待我結案」那一筆
   for (const task of tasks) {
-    if (task.assignerId === userId && task.status === 'reported') {
+    const waitingClose = cases.some((item) => item.id === task.caseId && item.status === 'to_verify')
+    if (task.assignerId === userId && task.status === 'reported' && !waitingClose) {
       items.push(
         todo('confirm', task.title, `${userLabel(task.assigneeId)} 已回報完成`, task.createdAt, task.deadline, {
           type: 'task',
           id: task.id,
         }),
       )
+    }
+  }
+
+  // 待受理的案件：只有能受理的主委、副主委有（管理人員在 staffTodos）
+  // 沒有期限，用通報時間排序（越早通報的越前面）；畫面上的徽章是「尚未受理」，不是「逾期」
+  if (['chair', 'viceChair'].includes(user.committeeTitle)) {
+    for (const item of cases) {
+      if (item.status === 'pending') {
+        items.push(todo('new_case', item.title, areaName(item.areaId), item.reportedAt, item.reportedAt, { type: 'case', id: item.id }, item.isUrgent))
+      }
     }
   }
 
@@ -128,8 +142,16 @@ function committeeTodos(userId) {
   for (const item of cases) {
     const open = !['closed', 'cancelled'].includes(item.status)
     if (item.assigneeId === userId && open) {
+      // 管理人員已完工驗收、等我結案的：換成「待我結案」，說明寫是誰完工驗收的
+      if (item.status === 'to_verify') {
+        const completedBy = item.logs.findLast((log) => log.label === '完工驗收')?.actorId
+        const hint = completedBy ? `${userLabel(completedBy)}已完工驗收，請結案` : '已完工驗收，請結案'
+        items.push(todo('to_close', item.title, hint, item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
+        continue
+      }
       const vendor = vendors.find((entry) => entry.id === item.vendorId)
-      const hint = vendor ? `廠商：${vendor.name}` : '尚未派廠商'
+      const name = vendor ? vendor.name : item.vendorName // 自己打的廠商存在 vendorName
+      const hint = name ? `廠商：${name}` : '尚未派廠商'
       items.push(todo('my_case', item.title, hint, item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
     }
   }
@@ -175,7 +197,8 @@ function staffTodos(userId) {
     else if (item.status === 'accepted' && item.assigneeId === userId) kind = 'in_progress'
     if (!kind) continue
     const vendor = vendors.find((entry) => entry.id === item.vendorId)
-    const hint = vendor ? `廠商：${vendor.name}` : '尚未派廠商'
+    const name = vendor ? vendor.name : item.vendorName // 自己打的廠商存在 vendorName
+    const hint = name ? `廠商：${name}` : '尚未派廠商'
     // 新報修沒有期限，用通報時間排序；其他用處理期限
     const dueAt = kind === 'new_case' ? item.reportedAt : (item.deadline ?? null)
     items.push(todo(kind, item.title, hint, item.reportedAt, dueAt, { type: 'case', id: item.id }, item.isUrgent))

@@ -30,3 +30,21 @@ export async function getUnreadCount(userId, role) {
     (item) => item.userId === userId && item.role === role && !item.read,
   ).length
 }
+
+// 設為已讀（只改記憶體，重新整理網頁會變回原本的假資料）
+// 之後接真的後端時，畫面一樣呼叫這兩個函式，只要改這裡面的內容
+
+// 單則設為已讀：點進某一則通知時用
+export async function markNotificationRead(id) {
+  await delay()
+  const item = notifications.find((entry) => entry.id === id)
+  if (item) item.read = true
+}
+
+// 全部設為已讀：通知頁的「全部已讀」用。只改這個人、這個身分的通知
+export async function markAllNotificationsRead(userId, role) {
+  await delay()
+  for (const item of notifications) {
+    if (item.userId === userId && item.role === role) item.read = true
+  }
+}

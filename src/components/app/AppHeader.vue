@@ -13,6 +13,8 @@ const props = defineProps({
   title: { type: String, default: '' },
   // 通知頁的網址，例如 /resident/notifications
   notificationsTo: { type: String, required: true },
+  // 有沒有沒讀過的通知；有的話鈴鐺右上角加紅點
+  hasUnread: { type: Boolean, default: false },
   // 沒有上一頁可以回去時要去哪裡，例如 /resident/home
   homeTo: { type: String, required: true },
 })
@@ -63,11 +65,17 @@ function goBack() {
     <!-- 外層 44px 是可點擊範圍（長輩好按），裡面的藍色圓形是設計稿的 40px -->
     <RouterLink
       :to="notificationsTo"
-      aria-label="通知"
+      :aria-label="hasUnread ? '通知，有未讀' : '通知'"
       class="-mr-0.5 flex size-11 items-center justify-center"
     >
-      <span class="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+      <!-- relative：讓紅點對齊藍色圓形的右上角 -->
+      <span class="relative flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
         <BellIcon class="size-4" />
+        <!-- 未讀紅點：和通知頁每一則的未讀紅點同一個顏色；白色外圈讓它在藍色上看得清楚 -->
+        <span
+          v-if="hasUnread"
+          class="absolute top-0.5 right-0.5 size-2.5 rounded-full bg-destructive ring-2 ring-background"
+        />
       </span>
     </RouterLink>
   </header>
