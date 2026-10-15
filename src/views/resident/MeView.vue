@@ -1,5 +1,5 @@
 <script setup>
-// 住戶端・我的：個人資料、身分、顯示設定、系統與支援、登出、版本
+// 住戶端・我的：個人資料、身分、我的紀錄、顯示設定、系統與支援、登出、版本
 import { computed, onMounted, ref, watch } from 'vue'
 import {
   ArrowLeftRightIcon,
@@ -7,6 +7,7 @@ import {
   ChevronRightIcon,
   CircleHelpIcon,
   LockIcon,
+  MessageSquareTextIcon,
   UserRoundIcon,
   UsersIcon,
 } from '@lucide/vue'
@@ -133,6 +134,16 @@ onMounted(async () => {
           to="/resident/me/join"
         >
           <UsersIcon />
+        </MenuItem>
+      </div>
+    </section>
+
+    <!-- 我的紀錄：目前只有「我的留言」（會議紀錄的提問和管委會回覆） -->
+    <section class="space-y-3">
+      <SectionHeader title="我的紀錄" />
+      <div class="rounded-xl bg-card px-4 py-1 shadow-card">
+        <MenuItem title="我的留言" description="向管委會的提問與回覆" to="/resident/me/comments">
+          <MessageSquareTextIcon />
         </MenuItem>
       </div>
     </section>
