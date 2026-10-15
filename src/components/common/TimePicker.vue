@@ -29,15 +29,15 @@ function pad(number) {
   return String(number).padStart(2, '0')
 }
 
-// 「時」00～23；「分」每 15 分鐘一格（公告的時段通常是整點、半點，選項少比較好點）
+// 「時」00～23；「分」每 5 分鐘一格（00、05、10…55）
 const HOURS = Array.from({ length: 24 }, (_, index) => pad(index))
-const MINUTES = ['00', '15', '30', '45']
+const MINUTES = Array.from({ length: 12 }, (_, index) => pad(index * 5))
 
 // 現在選的時、分；還沒選是空字串
 const hour = computed(() => value.value.split(':')[0] || '')
 const minute = computed(() => value.value.split(':')[1] || '')
 
-// 修改既有公告時，分鐘可能不在選項裡（例如 10:20），就把它也放進去，才看得到選中的是哪一格
+// 修改既有公告時，分鐘可能不在選項裡（例如 10:23），就把它也放進去，才看得到選中的是哪一格
 const minuteOptions = computed(() =>
   minute.value && !MINUTES.includes(minute.value) ? [...MINUTES, minute.value].toSorted() : MINUTES,
 )
@@ -52,15 +52,17 @@ function pickMinute(nextMinute) {
   open.value = false
 }
 
-// 打開時，「時」那一欄捲到選中的那一格（24 格放不下，不捲的話要自己往下找）
+// 打開時，兩欄都捲到選中的那一格（格子太多放不下，不捲的話要自己往下找）
 const hourList = ref(null)
+const minuteList = ref(null)
 watch(open, async (isOpen) => {
   if (!isOpen) return
   await nextTick()
-  const list = hourList.value
-  const selected = list?.querySelector('[aria-pressed="true"]')
-  // 只捲這一欄，讓選中的那格在中間（不用 scrollIntoView，它會連整個頁面一起捲）
-  if (selected) list.scrollTop = selected.offsetTop - list.clientHeight / 2 + selected.offsetHeight / 2
+  for (const list of [hourList.value, minuteList.value]) {
+    const selected = list?.querySelector('[aria-pressed="true"]')
+    // 只捲這一欄，讓選中的那格在中間（不用 scrollIntoView，它會連整個頁面一起捲）
+    if (selected) list.scrollTop = selected.offsetTop - list.clientHeight / 2 + selected.offsetHeight / 2
+  }
 })
 </script>
 
@@ -81,7 +83,7 @@ watch(open, async (isOpen) => {
         <p class="text-center type-date text-muted-foreground">分</p>
       </div>
       <div class="grid grid-cols-2 gap-2">
-        <!-- 「時」：24 格，超過的往下捲 -->
+        <!-- 「時」：24 格、「分」：12 格，超過的往下捲 -->
         <!-- relative：讓 offsetTop 從這一欄的頂端算起 -->
         <div ref="hourList" class="relative max-h-[220px] space-y-1 overflow-y-auto">
           <button
@@ -97,8 +99,7 @@ watch(open, async (isOpen) => {
             {{ option }}
           </button>
         </div>
-        <!-- 「分」 -->
-        <div class="space-y-1">
+        <div ref="minuteList" class="relative max-h-[220px] space-y-1 overflow-y-auto">
           <button
             v-for="option in minuteOptions"
             :key="option"
