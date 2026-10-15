@@ -16,11 +16,10 @@ import { findUser, userLabel } from './users'
 
 // 決議結果的顯示文字
 //   管委會看到完整票數：「通過（同意 5、反對 0）」
-//   住戶看到簡化的：    「通過（5 票）」
+//   住戶、管理人員只看到結果，不顯示票數：「通過」（2026-10-14 suzy 決定）
 function resultText(resolution, forResident) {
   const label = RESOLUTION_RESULTS[resolution.result].label
-  if (!resolution.votes) return label
-  if (forResident) return `${label}（${resolution.votes.yes} 票）`
+  if (!resolution.votes || forResident) return label
   return `${label}（同意 ${resolution.votes.yes}、反對 ${resolution.votes.no}）`
 }
 
