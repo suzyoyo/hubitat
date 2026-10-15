@@ -20,6 +20,7 @@
 //   scheduledAt 廠商預約到場的時間（派廠商、改期時選填，沒有就不寫）
 //   assigneeId  負責人（還沒指派就不寫）
 //   vendorId    指派的廠商（還沒指派就不寫）
+//   vendorName  名冊裡沒有、自己打的廠商名字（這時沒有 vendorId）
 //   equipmentId 相關設備（沒有就不寫）
 //   supporters  按了「我也遇到了」的住戶（附議）
 //   logs        處理進度紀錄（由舊到新）

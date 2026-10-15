@@ -21,6 +21,7 @@ export default {
   // title 是還沒做好時，佔位頁上顯示的名稱
   innerPages: [
     { path: 'cases/:id', title: '案件詳情' },
+    { path: 'cases/:id/complete', title: '回報完成' }, // 案件詳情的「完工驗收」
     { path: 'tasks/:id', title: '交辦詳情' },
     // 全域新增選單（「＋」）的項目；管理人員不能交辦，所以沒有新增交辦
     { path: 'cases/new', title: '新增通報' },

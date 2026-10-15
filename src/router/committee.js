@@ -56,6 +56,7 @@ export default {
     { path: 'meetings/:id', title: '會議詳情' },
     // 待辦點進去的詳情頁
     { path: 'cases/:id', title: '案件詳情' },
+    { path: 'cases/:id/complete', title: '回報完成' }, // 案件詳情的「完工驗收」
     { path: 'vendors/list', title: '廠商名冊' },
     { path: 'vendors/new', title: '新增廠商' },
     { path: 'vendors/:id', title: '廠商詳細' },

@@ -47,7 +47,8 @@ function present(item, role) {
     records: item.records
       .toSorted((a, b) => b.date.localeCompare(a.date))
       .map((record) => {
-        const full = { ...record, vendorName: vendorName(record.vendorId) }
+        // 自己打的廠商（名冊裡沒有）紀錄上直接存名字
+        const full = { ...record, vendorName: record.vendorName ?? vendorName(record.vendorId) }
         // 費用只有管委會看得到
         return role === 'committee' ? full : omit(full, ['cost'])
       }),
