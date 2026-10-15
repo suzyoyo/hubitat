@@ -5,6 +5,7 @@ import { announcements } from '../data/announcements'
 import { cases } from '../data/cases'
 import { contracts } from '../data/contracts'
 import { legalDocuments } from '../data/documents'
+import { notifications } from '../data/notifications'
 import { proposals } from '../data/proposals'
 import { quickSaves } from '../data/quickSaves'
 import { tasks } from '../data/tasks'
@@ -41,7 +42,8 @@ export const TODO_KINDS = {
 //   dueAt 到期時間（沒有期限就是 null）
 //   link 點了要去哪裡：type 資料種類、id 編號
 //   isUrgent 是否緊急（案件由通報的人標示；其他種類不傳，預設是 false）
-function todo(kind, title, hint, createdAt, dueAt, link, isUrgent = false) {
+//   isNew 是不是剛交辦、我還沒看過（只有交辦會用到，預設是 false）
+function todo(kind, title, hint, createdAt, dueAt, link, isUrgent = false, isNew = false) {
   return {
     id: `${kind}-${link.id}`,
     kind,
@@ -54,6 +56,7 @@ function todo(kind, title, hint, createdAt, dueAt, link, isUrgent = false) {
     daysLeft: dueAt ? diffDays(MOCK_TODAY, dueAt.split('T')[0]) : null,
     link,
     isUrgent,
+    isNew,
   }
 }
 
@@ -96,6 +99,14 @@ function incompleteQuickSaves(userId) {
     )
 }
 
+// 這件交辦是不是「剛交辦、我還沒看過」：還有一則沒讀的「新的交辦」通知（2026-10-15）
+//   點那則通知、或打開交辦詳情，通知就會變成已讀，這件交辦就不算新的了
+function isUnseenTask(userId, taskId) {
+  return notifications.some(
+    (item) => item.userId === userId && item.title === '新的交辦' && item.link?.id === taskId && !item.read,
+  )
+}
+
 // 交辦給我、還在進行中的
 //   被退回過的，提示改成退回原因，讓對方知道要改什麼
 function assignedTasks(userId) {
@@ -105,10 +116,8 @@ function assignedTasks(userId) {
       // 例如「李主委交辦・今天 18:00 前完成」；沒有期限的只寫「李主委交辦」
       const due = task.deadline ? `・${deadlineText(task.deadline)} 前完成` : ''
       const hint = task.returnNote ? `已退回：${task.returnNote.note}` : `${userLabel(task.assignerId)}交辦${due}`
-      return todo('assigned', task.title, hint, task.createdAt, task.deadline || null, {
-        type: 'task',
-        id: task.id,
-      })
+      const link = { type: 'task', id: task.id }
+      return todo('assigned', task.title, hint, task.createdAt, task.deadline || null, link, false, isUnseenTask(userId, task.id))
     })
 }
 
@@ -234,13 +243,17 @@ function staffTodos(userId) {
 // 取得我的待辦
 //   role 是 'committee' 或 'staff'（住戶沒有待辦）
 // 回傳：
-//   items  待辦清單，到期日近的排前面，沒有期限的排最後
+//   items  待辦清單：還沒看過的新交辦排最前面（新的在前），
+//          其他照到期日，近的排前面，沒有期限的排最後
 //   counts 每一種各有幾件，例如 { sign: 2, expiring: 3 }
 //   total  總共幾件
 export async function getMyTodos(userId, role) {
   await delay()
   const raw = role === 'staff' ? staffTodos(userId) : committeeTodos(userId)
   const items = raw.toSorted((a, b) => {
+    // 新交辦排前面：首頁只顯示前 2 張，不這樣排會被日期比較早的案件擋住（2026-10-15）
+    if (a.isNew !== b.isNew) return a.isNew ? -1 : 1
+    if (a.isNew) return b.createdAt.localeCompare(a.createdAt)
     if (a.dueAt === null) return 1
     if (b.dueAt === null) return -1
     return a.dueAt.localeCompare(b.dueAt)

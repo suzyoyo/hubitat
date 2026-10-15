@@ -17,7 +17,15 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { formatFullDate, formatTime } from '@/lib/date'
 import { taskStatusBadge } from '@/lib/task'
-import { MOCK_NOW, confirmTask, getCurrentUser, getTaskById, returnTask, withdrawTask } from '@/mocks/api'
+import {
+  MOCK_NOW,
+  confirmTask,
+  getCurrentUser,
+  getTaskById,
+  markNotificationsReadByLink,
+  returnTask,
+  withdrawTask,
+} from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 // 網址是 /committee/tasks/:id 或 /staff/tasks/:id，所以 route.params.id 就是這件交辦的編號
@@ -36,6 +44,8 @@ onMounted(async () => {
   userId.value = user.id
   task.value = item
   loading.value = false
+  // 被交辦的人打開了，連到這件交辦的通知就算看過（待辦不再把它當成新交辦排最前面）
+  if (item?.assigneeId === user.id) markNotificationsReadByLink(user.id, route.meta.roleId, { type: 'task', id: item.id })
 })
 
 const statusBadge = computed(() => taskStatusBadge(task.value))

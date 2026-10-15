@@ -48,3 +48,15 @@ export async function markAllNotificationsRead(userId, role) {
     if (item.userId === userId && item.role === role) item.read = true
   }
 }
+
+// 把連到某一筆資料的通知都設為已讀：打開那筆資料的詳情頁時用
+//   例如打開交辦詳情，「新的交辦」通知就算看過了，待辦也不再排到最前面
+//   link 是 { type: 'task', id: 'TASK-105' } 這種格式，和通知裡的 link 一樣
+export async function markNotificationsReadByLink(userId, role, link) {
+  await delay()
+  for (const item of notifications) {
+    if (item.userId === userId && item.role === role && item.link?.type === link.type && item.link?.id === link.id) {
+      item.read = true
+    }
+  }
+}
