@@ -8,6 +8,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import BottomCta from '@/components/app/BottomCta.vue'
 import DatePicker from '@/components/common/DatePicker.vue'
+import TimePicker from '@/components/common/TimePicker.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
@@ -260,12 +261,6 @@ async function submit() {
   router.replace(`/committee/announcements/${result.id}`)
 }
 
-// 點時間框的任何地方，都直接跳出選時間的畫面
-// （瀏覽器預設要點到右邊的小圖示才會跳出來；showPicker 是瀏覽器內建的功能）
-function openPicker(event) {
-  event.target.showPicker?.()
-}
-
 // 取消：回到上一頁；直接打網址進來的沒有上一頁，就回管委會首頁
 function cancel() {
   if (window.history.state?.back) {
@@ -399,7 +394,7 @@ function cancel() {
             多日
           </Button>
         </div>
-        <!-- 日期用月曆（DatePicker）；時間先用手機內建的轉盤（type="time"），Kit 還沒有時間選擇器 -->
+        <!-- 日期用月曆（DatePicker）、時間用時分兩欄（TimePicker），都是 components/common/ 自己做的 -->
         <!-- 多日時開始、結束日期上下排：按鈕上的「2026/10/12（一）」放在半寬的框裡會擠不下 -->
         <div class="grid grid-cols-1 gap-2">
           <div class="space-y-1.5">
@@ -418,13 +413,13 @@ function cancel() {
             <Label for="an-start-time" class="type-date text-muted-foreground">
               {{ form.dateMode === 'multi' ? '每日開始時間' : '開始時間' }}
             </Label>
-            <Input id="an-start-time" v-model="form.startTime" type="time" @click="openPicker" />
+            <TimePicker id="an-start-time" v-model="form.startTime" />
           </div>
           <div class="space-y-1.5">
             <Label for="an-end-time" class="type-date text-muted-foreground">
               {{ form.dateMode === 'multi' ? '每日結束時間' : '結束時間' }}
             </Label>
-            <Input id="an-end-time" v-model="form.endTime" type="time" @click="openPicker" />
+            <TimePicker id="an-end-time" v-model="form.endTime" />
           </div>
         </div>
         <p v-if="shownErrors.date" class="type-date text-warning-strong">{{ shownErrors.date }}</p>
