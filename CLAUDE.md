@@ -114,7 +114,7 @@
   - ✅ 第二部分「留言」（2026-10-14，分支 `resident/meeting-comments`）：右下角「留言」按鈕 `app/AppMessage`（和其他頁的「通報」按鈕同一個位置），點了從底部滑出 `message/MessageSheetContent`：輸入中（會議名稱、字數、最多 300 字、只打空白不能送）→ 送出成功（「完成」「查看我的留言」）
     - 「回到頂端」移到留言按鈕上面（兩個疊在一起、置中對齊，照設計稿）；頁面底部多留空間，最後一段不會被按鈕蓋住
     - 假 API `createMeetingComment(meetingId, userId, text)`（分支 `shared/meeting-comment-api`）：只有已發布的會議能留言，留言會出現在管委會首頁的「住戶意見」。只改記憶體
-    - 「查看我的留言」連到佔位頁 `/resident/me/comments`（我的留言頁還沒做，設計稿有）
+    - 「查看我的留言」連到「我的留言」頁 `/resident/me/comments`（見下一項）
     - 抽屜裡的字照團隊規則放大到 16px（設計稿 14px）
     - 留言按鈕是半透明的，捲動時後面的字會透出來、和「留言」兩個字疊在一起，照設計稿先不改
 - ✅ 住戶端「我的留言」頁（2026-10-15，分支 `resident/my-comments`）：`src/views/resident/MyCommentsView.vue`，網址 `/resident/me/comments`（會議紀錄留言送出後的「查看我的留言」）
