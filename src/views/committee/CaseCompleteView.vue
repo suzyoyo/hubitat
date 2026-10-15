@@ -1,9 +1,9 @@
 <script setup>
 // 管委會端、管理人員端共用・回報完成（案件詳情的「完工驗收」，設計稿 1134:13682）
 // 由上到下：案件摘要、附件（選填，最多 5 個）、備註說明（選填）；底部「回報」先跳確認彈窗，確認了才完工驗收
-// 完工驗收之後（規則見 docs/case-flow.md 4-5）：
-//   我是負責人（管理人員自己受理的）→ 直接結案
-//   負責人是別人（主委或副主委交辦出去的）→ 待結案，交辦給我的那筆交辦一起回報完成
+// 完工驗收之後（規則見 docs/case-flow.md 4-5，2026-10-15 改）：
+//   主委、副主委按的（自己處理的）→ 直接結案
+//   管理人員按的 → 待結案，回到主委、副主委審核；交辦給我的那筆交辦一起回報完成
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
@@ -16,7 +16,7 @@ import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { formatFullDate } from '@/lib/date'
-import { canHandleCases, completeCase, getCaseById, getCurrentUser } from '@/mocks/api'
+import { canCloseCases, canHandleCases, completeCase, getCaseById, getCurrentUser } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 const ATTACHMENT_MAX = 5 // 附件最多幾個（設計稿）
@@ -51,20 +51,19 @@ const detailPath = computed(() => `/${route.meta.roleId}/cases/${route.params.id
 const canComplete = computed(
   () => canHandleCases(userId.value) && ['accepted', 'in_progress'].includes(item.value?.status),
 )
-// 我是負責人 → 回報後直接結案
-const isAssignee = computed(() => item.value?.assigneeId === userId.value)
+// 我是主委或副主委 → 回報後直接結案（我本身就是審核的人）
+const closesDirectly = computed(() => canCloseCases(userId.value))
 
 // 摘要卡的第二行：負責人｜期限（管委會、管理人員端的日期有年份，例如 2026/10/08）
 const summaryText = computed(() => {
   const deadline = item.value.deadline ? formatFullDate(item.value.deadline) : '尚未設定'
-  return `負責人：${item.value.assigneeLabel || '尚未指派'}｜期限：${deadline}`
+  // 負責人：實際處理的人（交辦出去就是交辦對象，case-flow 第 3 節）
+  return `負責人：${item.value.handlerLabel || '尚未指派'}｜期限：${deadline}`
 })
 
 // 確認彈窗的說明：按了之後會發生什麼
 const confirmText = computed(() =>
-  isAssignee.value
-    ? '你是這件案件的負責人，回報後會直接結案。'
-    : `回報後會通知負責人 ${item.value.assigneeLabel} 結案。`,
+  closesDirectly.value ? '回報後會直接結案。' : '回報後會交給主委、副主委結案。',
 )
 
 async function submit() {
@@ -80,7 +79,7 @@ async function submit() {
   if (result.status === 'closed') {
     toast.success('已結案', { description: result.equipmentName ? `已記進「${result.equipmentName}」的維修紀錄` : '' })
   }
-  else toast.success('已回報完成', { description: `等待 ${result.assigneeLabel} 結案` })
+  else toast.success('已回報完成', { description: '等待主委、副主委結案' })
   // 從案件詳情來的就回上一頁；直接打開這一頁的（沒有上一頁）就換到案件詳情
   if (window.history.state?.back === detailPath.value) router.back()
   else router.replace(detailPath.value)

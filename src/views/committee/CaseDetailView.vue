@@ -24,6 +24,7 @@ import { formatFullDate, formatTime } from '@/lib/date'
 import {
   acceptCase,
   canAssignTasks,
+  canCloseCases,
   canHandleCases,
   getCaseById,
   getCurrentUser,
@@ -72,7 +73,6 @@ watch(() => route.params.id, load, { immediate: true })
 
 // ── 這個人能做什麼 ──────────────────────────────────────
 const canHandle = computed(() => canHandleCases(userId.value)) // 主委、副主委、管理人員
-const isAssignee = computed(() => item.value?.assigneeId === userId.value) // 我是負責人
 // 已受理、處理中才能選設備和廠商（處理中可以換）
 const canPickVendor = computed(() => canHandle.value && ['accepted', 'in_progress'].includes(item.value?.status))
 // 受理之後、結案之前都能寫處理紀錄
@@ -90,7 +90,8 @@ const actions = computed(() => {
   if (['accepted', 'in_progress'].includes(data.status) && canHandle.value) {
     list.push({ key: 'complete', label: '完工驗收', main: true })
   }
-  if (data.status === 'to_verify' && isAssignee.value) list.push({ key: 'close', label: '結案', main: true })
+  // 結案：主委、副主委都可以，不管是誰受理的（2026-10-15 改，原本只有負責人）
+  if (data.status === 'to_verify' && canCloseCases(userId.value)) list.push({ key: 'close', label: '結案', main: true })
   return list
 })
 // 「更新進度」：能選廠商或寫紀錄的時候才出現；有記下來的內容才能按
@@ -173,7 +174,8 @@ const basicRows = computed(() => {
     if (data.isOverdue) deadline += `（已逾期 ${data.overdueDays} 天）`
   }
   return [
-    { label: '負責人', value: data.assigneeLabel || '尚未指派' },
+    // 負責人：實際處理的人（交辦出去就是交辦對象，case-flow 第 3 節），不是資料上受理的人
+    { label: '負責人', value: data.handlerLabel || '尚未指派' },
     { label: '附議', value: data.supporterCount ? `${data.supporterCount} 戶` : '無' },
     { label: '處理期限', value: deadline },
   ]

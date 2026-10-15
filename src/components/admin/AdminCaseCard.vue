@@ -20,7 +20,8 @@ const statusBadge = computed(() => caseStatusBadge(props.item))
 const footerText = computed(() => {
   const { item } = props
   if (item.status === 'pending') return '尚未受理'
-  const assignee = item.assigneeLabel ? `負責：${item.assigneeLabel}` : '尚未指派負責人'
+  // 負責：實際處理的人（交辦出去就是交辦對象，case-flow 第 3 節）
+  const assignee = item.handlerLabel ? `負責：${item.handlerLabel}` : '尚未指派負責人'
   const vendor = item.vendorName ? `廠商：${item.vendorName}` : '尚未派廠商'
   return `${assignee}｜${vendor}`
 })
