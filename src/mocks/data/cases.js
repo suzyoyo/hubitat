@@ -150,6 +150,8 @@ export const cases = [
     vendorId: 'v-001',
     equipmentId: 'e-003',
     supporters: ['u-c03'],
+    // 張管理員完工驗收的紀錄（和下面「完工驗收」那一筆處理紀錄同一個時間）
+    completion: { at: '2026-09-25T16:30', note: '大同電梯修好了，現場測試運轉正常', photos: [] },
     logs: [
       {
         at: '2026-09-22T19:05',
@@ -174,8 +176,9 @@ export const cases = [
       {
         at: '2026-09-25T16:30',
         actorId: 'u-s02',
-        label: '廠商已完工',
-        text: '廠商回報完工，待確認後標記完成',
+        label: '完工驗收',
+        text: '大同電梯修好了，現場測試運轉正常',
+        residentText: '維修已完成，等待管委會結案。',
       },
     ],
   },

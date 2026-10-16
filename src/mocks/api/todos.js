@@ -11,7 +11,7 @@ import { quickSaves } from '../data/quickSaves'
 import { tasks } from '../data/tasks'
 import { COMMITTEE_TITLES } from '../data/users'
 import { vendors } from '../data/vendors'
-import { canCloseCases, reporterLabel } from './cases'
+import { TO_CLOSE_TITLE, canCloseCases, reporterLabel } from './cases'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
 import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
@@ -43,7 +43,7 @@ export const TODO_KINDS = {
 //   dueAt 到期時間（沒有期限就是 null）
 //   link 點了要去哪裡：type 資料種類、id 編號
 //   isUrgent 是否緊急（案件由通報的人標示；其他種類不傳，預設是 false）
-//   isNew 是不是剛交辦、我還沒看過（只有交辦會用到，預設是 false）
+//   isNew 是不是剛進來、我還沒看過（交辦、待我結案會用到，預設是 false）
 function todo(kind, title, hint, createdAt, dueAt, link, isUrgent = false, isNew = false) {
   return {
     id: `${kind}-${link.id}`,
@@ -103,9 +103,12 @@ function incompleteQuickSaves(userId) {
 // 這件交辦是不是「剛交辦、我還沒看過」：還有一則沒讀的「新的交辦」通知（2026-10-15）
 //   點那則通知、或打開交辦詳情，通知就會變成已讀，這件交辦就不算新的了
 function isUnseenTask(userId, taskId) {
-  return notifications.some(
-    (item) => item.userId === userId && item.title === NEW_TASK_TITLE && item.link?.id === taskId && !item.read,
-  )
+  return isUnseen(userId, NEW_TASK_TITLE, taskId)
+}
+
+// 有沒有一則還沒讀的通知：標題是 title、連到編號 id 的那筆資料
+function isUnseen(userId, title, id) {
+  return notifications.some((item) => item.userId === userId && item.title === title && item.link?.id === id && !item.read)
 }
 
 // 交辦給我、還在進行中的
@@ -184,7 +187,10 @@ function committeeTodos(userId) {
     if (!canClose || item.status !== 'to_verify') continue
     const completedBy = item.logs.findLast((log) => log.label === '完工驗收')?.actorId
     const hint = completedBy ? `${userLabel(completedBy)}已完工驗收，請結案` : '已完工驗收，請結案'
-    items.push(todo('to_close', item.title, hint, item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
+    // 日期用完工驗收的時間；還沒看過的（「案件待結案」通知沒讀）排最前面，首頁才看得到（2026-10-16）
+    const createdAt = item.completion?.at ?? item.reportedAt
+    const isNew = isUnseen(userId, TO_CLOSE_TITLE, item.id)
+    items.push(todo('to_close', item.title, hint, createdAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent, isNew))
   }
 
   // 我負責、還在處理的案件（待結案的在上面）
@@ -246,7 +252,7 @@ function staffTodos(userId) {
 // 取得我的待辦
 //   role 是 'committee' 或 'staff'（住戶沒有待辦）
 // 回傳：
-//   items  待辦清單：還沒看過的新交辦排最前面（新的在前），
+//   items  待辦清單：還沒看過的新交辦、待我結案排最前面（新的在前），
 //          其他照到期日，近的排前面，沒有期限的排最後
 //   counts 每一種各有幾件，例如 { sign: 2, expiring: 3 }
 //   total  總共幾件
