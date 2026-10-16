@@ -14,14 +14,6 @@ export function todoDeadlineBadge(todo) {
   return { text: `剩餘 ${days} 天`, variant: 'secondary' }
 }
 
-// 首頁「我的待辦」要放的幾張：建立時間新的在前（2026-10-16 和 suzy 定的）
-//   剛進來的事（新通報、新交辦、待我結案）首頁一定看得到；全部待辦頁才照緊急程度排
-//   沒有建立時間的（快到期的合約、文件，是系統依日期提醒的）排最後
-//   items 是 getMyTodos() 回傳的 items；count 是要幾張
-export function newestTodos(items, count = 2) {
-  return items.toSorted((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? '')).slice(0, count)
-}
-
 // 待辦的 link.type 對應到哪一種頁面
 const TODO_LINK_PATHS = {
   case: 'cases',
