@@ -94,6 +94,9 @@ export const users = [
   { id: 'u-r02', name: '吳小姐', surname: '吳', roles: ['resident'], building: 'A', unit: '2樓之1' },
   { id: 'u-r03', name: '周太太', surname: '周', roles: ['resident'], building: 'A', unit: '5樓之2' },
   { id: 'u-r04', name: '許先生', surname: '許', roles: ['resident'], building: 'C', unit: '4樓之1' },
+  // 2026-10-16 加：B 棟 5 樓噪音的通報人（樓下吵，所以住 6 樓）。原本是陳先生，
+  //   改掉是為了讓示範住戶陳先生一開始沒有進行中的通報（展示最後「我的通報」是空狀態）
+  { id: 'u-r05', name: '林小姐', surname: '林', roles: ['resident'], building: 'B', unit: '6樓之1' },
 ]
 
 // 住戶端可以切換的示範住戶（在 /playground 的「假資料」區切換）
