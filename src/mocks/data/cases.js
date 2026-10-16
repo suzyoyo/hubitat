@@ -174,8 +174,9 @@ export const cases = [
       {
         at: '2026-09-25T16:30',
         actorId: 'u-s02',
-        label: '廠商已完工',
-        text: '廠商回報完工，待確認後標記完成',
+        label: '完工驗收',
+        text: '大同電梯修好了，現場測試運轉正常',
+        residentText: '維修已完成，等待管委會結案。',
       },
     ],
   },

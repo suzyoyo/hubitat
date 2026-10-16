@@ -53,12 +53,12 @@ export function reporterLabel(item) {
 
 // 畫面上的「負責人」：實際處理這件事的人（docs/case-flow.md 第 3 節，2026-10-15）
 //   資料上的負責人（assigneeId）是受理的人，不會換；這裡另外算出來給畫面顯示
-//   結案了 → 按「完工驗收」的那個人
+//   待結案、結案了 → 按「完工驗收」的那個人（2026-10-16：待結案也是，負責人就是標示完工的人）
 //   有交辦出去、還沒完成的（進行中或待確認）→ 交辦對象
 //     被退回的還是進行中（請對方再做一次），所以還是交辦對象；交辦被撤回 → 換回受理的人
 //   其他 → 受理的人
 function handlerIdOf(item) {
-  if (item.status === 'closed') {
+  if (['to_verify', 'closed'].includes(item.status)) {
     return item.logs.findLast((log) => log.label === '完工驗收')?.actorId ?? item.assigneeId
   }
   const task = tasks.find(
@@ -451,7 +451,37 @@ export async function completeCase(id, userId, { note = '', photos = [] }) {
     task.report = { at: MOCK_NOW, note: note || '已完工驗收', files: [...photos] }
     delete task.returnNote
   }
+  notifyToClose(item, userId)
   return presentForManagement(item)
+}
+
+// 「案件待結案」通知的標題：todos.js 用它判斷哪件待結案還沒看過、要排在待辦最前面，要改字只改這裡
+export const TO_CLOSE_TITLE = '案件待結案'
+
+// 管理人員完工驗收後：通知主委、副主委來結案（2026-10-16）
+function notifyToClose(item, userId) {
+  for (const user of users) {
+    if (!canCloseCases(user.id)) continue
+    notifications.push({
+      id: `n-${item.id}-close-${user.id}-${notifications.length + 1}`,
+      userId: user.id,
+      role: 'committee',
+      title: TO_CLOSE_TITLE,
+      body: `${item.title}：${userLabel(userId)}已完工驗收，請結案`,
+      at: MOCK_NOW,
+      read: false,
+      link: { type: 'case', id: item.id },
+    })
+  }
+}
+
+// 主委、副主委打開待結案的案件時用：只把這件案件的「案件待結案」通知設為已讀
+//   待辦就不再把它排到最前面；其他通知不動
+export async function markToCloseNotificationRead(userId, caseId) {
+  await delay()
+  for (const item of notifications) {
+    if (item.userId === userId && item.title === TO_CLOSE_TITLE && item.link?.id === caseId) item.read = true
+  }
 }
 
 // 結案：待結案 → 已結案。主委、副主委都能結案，不管是誰受理的（2026-10-15 改，原本只有負責人）
