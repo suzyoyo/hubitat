@@ -5,6 +5,8 @@
 import CaseCompleteView from '@/views/committee/CaseCompleteView.vue'
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
+import EquipmentDetailView from '@/views/staff/EquipmentDetailView.vue'
+import EquipmentListView from '@/views/staff/EquipmentListView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TaskReportView from '@/views/committee/TaskReportView.vue'
 import FilesView from '@/views/staff/FilesView.vue'
@@ -26,6 +28,9 @@ export default {
     me: MeView,
     notifications: NotificationsView, // 右上角的鈴鐺
     todos: TodosView, // 首頁的「查看全部待辦事項」
+    // 社區分頁的「設備清冊」：內容和管委會的一樣，但連結只連管理人員端有的頁面，維修史沒有費用
+    equipment: EquipmentListView,
+    'equipment/:id': EquipmentDetailView,
     // 和管委會端共用的頁面
     cases: CasesView,
     'cases/:id': CaseDetailView,
@@ -60,6 +65,7 @@ export default {
     { path: 'documents', title: '法定文件' },
     { path: 'contracts', title: '廠商合約' },
     { path: 'equipment', title: '設備清冊' },
+    { path: 'equipment/:id', title: '設備詳情' },
     { path: 'timeline', title: '社區時間軸' },
     // 「我的」頁點進去的頁面
     { path: 'me/profile', title: '個人資料' },

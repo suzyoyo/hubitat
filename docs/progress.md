@@ -134,3 +134,7 @@
   - 沒有關聯案件的（例如彙整報告、檢查滅火器）→ 新的交辦回報頁 `src/views/committee/TaskReportView.vue`，網址 `/committee/tasks/:id/report`、`/staff/tasks/:id/report`。設計稿沒有這一頁，版面照案件的回報完成頁：交辦摘要（標題＋「交辦人｜期限」）、附件、備註，「回報」先跳確認彈窗再呼叫 `reportTask`，完成後回到交辦詳情
   - 交辦的狀態徽章看「誰在看」（`src/lib/task.js` 的 `taskStatusBadge(task, viewerId)`）：交辦人看到橘色「待我確認」；被交辦的人回報後看到藍色「待確認」（在等別人）。原本兩邊都是「待我確認」
   - 回報後通知交辦人（`reportTask`）：管委會端的通知「交辦已回報完成」／「檢查滅火器效期：張管理員已回報完成，請確認」，點了到交辦詳情。有關聯案件的不另外發，完工驗收時主委、副主委已經會收到「案件待結案」
+- ✅ 管理人員端設備清冊、設備詳情（2026-10-16，分支 `staff/equipment`）：`src/views/staff/EquipmentListView.vue`、`EquipmentDetailView.vue`，網址 `/staff/equipment`（社區分頁的「設備清冊」）、`/staff/equipment/:id`。讓管理人員也看得到結案後記進設備的維修史
+  - 設計稿沒畫，照管委會的頁面（013 的，#100）做一份管理人員版，不動她的檔案；之後可以和 013 討論合成一份、用 `route.meta.roleId` 分辨哪一端
+  - 和管委會版的差別：假 API 傳 `'staff'`，維修史沒有費用；管理人員端沒有廠商詳細、合約詳情，所以「負責廠商」不能點、不顯示合約提醒，維修史只有從案件來的可以點（到案件詳情），例行保養不能點
+  - 案件詳情（兩端共用、013 的檔案）的「查看設備」改成管理人員端也有、連到 `/staff/equipment/:id`；這個改動放在另一個分支 `shared/case-equipment-link`，要等 013 同意才合併。「查看廠商」管理人員端還是不放
