@@ -81,7 +81,7 @@ npm run dev
 
 ### 在真的手機上測（加到主畫面）
 
-2026-10-16 加了 PWA（`vite-plugin-pwa`，設定在 `vite.config.js`、`index.html`；圖示在 `public/icon/`，從 `app-icon-1024.png` 縮出來的）。手機「加到主畫面」後，打開時沒有網址列，看起來像 App。
+2026-10-16 加了 PWA（`vite-plugin-pwa`，設定在 `vite.config.js`、`index.html`；圖示在 `public/icon/`，從 `app-icon-1024.png` 縮出來的；`icon-maskable-512.png` 是給 Android 的，四周多留白，裁成圓形也不會切到 logo。換 logo 時這四張都要重新縮）。手機「加到主畫面」後，打開時沒有網址列，看起來像 App。
 
 1. 手機和電腦連同一個網路（同一個 Wi-Fi，或電腦連手機的個人熱點）
 2. 打包並開預覽（PWA 只在打包後的版本有作用，`npm run dev` 不會啟用）：
