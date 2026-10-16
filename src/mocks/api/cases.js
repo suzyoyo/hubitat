@@ -454,7 +454,9 @@ function notifyResidentsClosed(item) {
 //   note 完工備註、photos 照片檔名的清單
 //   管理人員按的 → 待結案，回到主委、副主委審核，並把交辦給這個人的那筆交辦一起回報完成
 //   主委、副主委按的（自己處理的）→ 直接結案
-export async function completeCase(id, userId, { note = '', photos = [] }) {
+//   cost 維修費用：主委、副主委直接結案時才用得到（和 closeCase 一樣）；管理人員按的會忽略
+//     直接結案不另外寫結案說明，完工備註就是說明（2026-10-16 suzy 決定，兩個文字框合成一個）
+export async function completeCase(id, userId, { note = '', photos = [], cost }) {
   await delay()
   const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
   if (!item) return undefined
@@ -462,7 +464,7 @@ export async function completeCase(id, userId, { note = '', photos = [] }) {
   addLog(item, userId, '完工驗收', note || '已完工驗收')
   // 主委、副主委自己處理、自己按的：他本身就是審核的人，直接結案
   if (canCloseCases(userId)) {
-    closeItem(item, userId)
+    closeItem(item, userId, cost)
     return presentForManagement(item)
   }
   // 管理人員按的：一律待結案，回到主委、副主委審核（管理人員自己受理的也一樣，2026-10-15 改）

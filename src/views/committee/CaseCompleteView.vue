@@ -1,6 +1,8 @@
 <script setup>
 // 管委會端、管理人員端共用・回報完成（案件詳情的「完工驗收」，設計稿 1134:13682）
 // 由上到下：案件摘要、附件（選填，最多 5 個）、備註說明（選填）；底部「回報」先跳確認彈窗，確認了才完工驗收
+// 主委、副主委按的會直接結案，所以多一欄維修費用（有關聯設備才有），和結案頁（CaseCloseView.vue）一樣（2026-10-16）
+//   結案頁的「結案說明」這裡不另外放，備註說明就是說明（兩個文字框合成一個）
 // 完工驗收之後（規則見 docs/case-flow.md 4-5，2026-10-15 改）：
 //   主委、副主委按的（自己處理的）→ 直接結案
 //   管理人員按的 → 待結案，回到主委、副主委審核；交辦給我的那筆交辦一起回報完成
@@ -13,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { formatFullDate } from '@/lib/date'
@@ -31,6 +34,7 @@ const item = ref(null) // 這一件案件；編號不存在時是 undefined
 const userId = ref('')
 const files = ref([]) // 附件的檔名
 const note = ref('') // 備註說明
+const cost = ref('') // 維修費用（直接結案才有；輸入框的文字，送出時才轉成數字）
 const confirmOpen = ref(false) // 確認彈窗開了沒
 const pending = ref(false) // 送出還在路上
 
@@ -66,9 +70,17 @@ const confirmText = computed(() =>
   closesDirectly.value ? '回報後會直接結案。' : '回報後會交給主委、副主委結案。',
 )
 
+// 費用只能打數字：把不是數字的字拿掉
+function onCostInput(value) {
+  cost.value = String(value).replace(/\D/g, '')
+}
+
 async function submit() {
   pending.value = true
-  const result = await completeCase(item.value.id, userId.value, { note: note.value.trim(), photos: files.value })
+  const options = { note: note.value.trim(), photos: files.value }
+  // 直接結案的才送費用
+  if (closesDirectly.value && Number(cost.value) > 0) options.cost = Number(cost.value)
+  const result = await completeCase(item.value.id, userId.value, options)
   pending.value = false
   if (!result) {
     toast.error('沒有回報成功', { description: '案件的狀態可能已經改變，請重新整理' })
@@ -142,6 +154,26 @@ async function submit() {
           placeholder="簡單說明完成情況，例如改善已完成、廠商已簽收..."
           class="min-h-[88px]"
         />
+      </section>
+
+      <!-- 維修費用：只有主委、副主委看得到（回報後直接結案）；費用記在設備的維修紀錄上，沒有關聯設備就不記（case-flow 4-6） -->
+      <section v-if="closesDirectly && item.equipmentName" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
+        <h2 class="type-card-title text-foreground">
+          <label for="complete-cost">維修費用</label><span class="ml-1.5 type-date text-muted-foreground">選填</span>
+        </h2>
+        <div class="flex items-center gap-2">
+          <!-- inputmode="numeric"：手機會跳出數字鍵盤 -->
+          <Input
+            id="complete-cost"
+            :model-value="cost"
+            inputmode="numeric"
+            placeholder="例如 4500"
+            class="flex-1"
+            @update:model-value="onCostInput"
+          />
+          <span class="type-body text-foreground">元</span>
+        </div>
+        <p class="type-date text-muted-foreground">會記進「{{ item.equipmentName }}」的維修紀錄，只有委員看得到。</p>
       </section>
     </template>
 
