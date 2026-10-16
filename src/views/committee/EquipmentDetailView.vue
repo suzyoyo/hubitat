@@ -6,6 +6,7 @@
 import { ChevronRightIcon } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { equipmentStatusBadge } from '@/components/admin/equipmentStatusBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
@@ -13,7 +14,7 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate } from '@/lib/date'
 import { getContractById, getEquipmentById, getVendorById } from '@/mocks/api'
-import { EQUIPMENT_DISPLAY_STATUSES, MAINTENANCE_CYCLES } from '@/mocks/data/equipment'
+import { MAINTENANCE_CYCLES } from '@/mocks/data/equipment'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 const SHOW_FIRST = 5 // 維修史先列幾筆，其他按「查看全部」
@@ -38,19 +39,8 @@ async function load() {
 // 從一台設備連到另一台時，Vue 會沿用同一個頁面，所以看網址有沒有變
 watch(() => route.params.id, load, { immediate: true })
 
-// 狀態徽章（dev-guide 第 5 節管理端的顏色）：待維修、保養逾期紅；保養將到期橘；維修中藍；正常、已報廢灰
-const STATUS_VARIANTS = {
-  needs_repair: 'destructive',
-  overdue: 'destructive',
-  due_soon: 'secondary',
-  repairing: 'default',
-  normal: 'outline',
-  retired: 'outline',
-}
-const statusBadge = computed(() => ({
-  text: EQUIPMENT_DISPLAY_STATUSES[device.value.displayStatus].label,
-  variant: STATUS_VARIANTS[device.value.displayStatus],
-}))
+// 狀態徽章：規則在 admin/equipmentStatusBadge.js，設備清冊共用
+const statusBadge = computed(() => equipmentStatusBadge(device.value))
 
 // 位置：A 棟 › A 棟 1 樓機房（範圍 › 安裝位置）
 const locationText = computed(() => `${device.value.areaName} › ${device.value.place}`)

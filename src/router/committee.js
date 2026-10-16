@@ -9,6 +9,7 @@ import CasesView from '@/views/committee/CasesView.vue'
 import ContractDetailView from '@/views/committee/ContractDetailView.vue'
 import ContractsView from '@/views/committee/ContractsView.vue'
 import EquipmentDetailView from '@/views/committee/EquipmentDetailView.vue'
+import EquipmentListView from '@/views/committee/EquipmentListView.vue'
 import FilesView from '@/views/committee/FilesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
 import MeView from '@/views/committee/MeView.vue'
@@ -41,6 +42,7 @@ export default {
     'cases/:id/complete': CaseCompleteView,
     contracts: ContractsView,
     'contracts/:id': ContractDetailView,
+    equipment: EquipmentListView,
     'equipment/:id': EquipmentDetailView,
     'announcements/:id': AnnouncementDetailView,
     // 發布和修改是同一個表單
