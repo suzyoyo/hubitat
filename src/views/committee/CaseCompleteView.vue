@@ -1,7 +1,7 @@
 <script setup>
 // 管委會端、管理人員端共用・回報完成（案件詳情的「完工驗收」，設計稿 1134:13682）
-// 由上到下：案件摘要、附件（選填，最多 5 個）、備註說明（選填）；底部「回報」先跳確認彈窗，確認了才完工驗收
-// 主委、副主委按的會直接結案，所以多一欄維修費用（有關聯設備才有），和結案頁（CaseCloseView.vue）一樣（2026-10-16）
+// 由上到下：案件摘要、附件（選填，最多 5 個）、維修費用（只有主委、副主委）、備註說明（選填）；底部「回報」先跳確認彈窗，確認了才完工驗收
+// 主委、副主委按的會直接結案，所以多一欄維修費用（有關聯設備才有），和結案頁（CaseCloseView.vue）一樣放在說明上面（2026-10-16）
 //   結案頁的「結案說明」這裡不另外放，備註說明就是說明（兩個文字框合成一個）
 // 完工驗收之後（規則見 docs/case-flow.md 4-5，2026-10-15 改）：
 //   主委、副主委按的（自己處理的）→ 直接結案
@@ -141,21 +141,6 @@ async function submit() {
         <CaseAttachmentList v-model="files" :max="ATTACHMENT_MAX" />
       </section>
 
-      <!-- 備註說明 -->
-      <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
-        <h2 class="type-card-title text-foreground">
-          <!-- label 包住標題，點標題也會把游標放進輸入框 -->
-          <label for="complete-note">備註說明</label><span class="ml-1.5 type-date text-muted-foreground">選填</span>
-        </h2>
-        <Textarea
-          id="complete-note"
-          v-model="note"
-          :maxlength="NOTE_MAX"
-          placeholder="簡單說明完成情況，例如改善已完成、廠商已簽收..."
-          class="min-h-[88px]"
-        />
-      </section>
-
       <!-- 維修費用：只有主委、副主委看得到（回報後直接結案）；費用記在設備的維修紀錄上，沒有關聯設備就不記（case-flow 4-6） -->
       <section v-if="closesDirectly && item.equipmentName" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">
@@ -174,6 +159,21 @@ async function submit() {
           <span class="type-body text-foreground">元</span>
         </div>
         <p class="type-date text-muted-foreground">會記進「{{ item.equipmentName }}」的維修紀錄，只有委員看得到。</p>
+      </section>
+
+      <!-- 備註說明 -->
+      <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
+        <h2 class="type-card-title text-foreground">
+          <!-- label 包住標題，點標題也會把游標放進輸入框 -->
+          <label for="complete-note">備註說明</label><span class="ml-1.5 type-date text-muted-foreground">選填</span>
+        </h2>
+        <Textarea
+          id="complete-note"
+          v-model="note"
+          :maxlength="NOTE_MAX"
+          placeholder="簡單說明完成情況，例如改善已完成、廠商已簽收..."
+          class="min-h-[88px]"
+        />
       </section>
     </template>
 
