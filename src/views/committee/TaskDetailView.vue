@@ -1,6 +1,6 @@
 <script setup>
 // 管委會端、管理人員端共用・交辦詳情：一件交辦的內容、期限和處理紀錄
-//   交辦人看到「確認完成、退回、撤回」；被交辦的人（例如管理人員）看到「回報完成」（之後加）
+//   交辦人看到「確認完成、退回、撤回」；被交辦的人（例如管理人員）看到「回報完成」
 //   設計稿沒有這一頁，版型借用管委會端的公告詳情（node 1134:17718）
 import { ChevronRightIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
@@ -49,13 +49,23 @@ onMounted(async () => {
   if (item?.assigneeId === user.id) markNewTaskNotificationRead(user.id, route.meta.roleId, item.id)
 })
 
-const statusBadge = computed(() => taskStatusBadge(task.value))
+const statusBadge = computed(() => taskStatusBadge(task.value, userId.value))
 
 // 底部要放哪些按鈕：只有交辦人看得到
 //   待確認 → 退回說明、確認完成；進行中（含已逾期）→ 撤回交辦；已完成、已撤回 → 沒有按鈕
 const isMine = computed(() => task.value?.assignerId === userId.value)
 const canConfirm = computed(() => isMine.value && task.value.status === 'reported')
 const canWithdraw = computed(() => isMine.value && task.value.status === 'in_progress')
+// 被交辦的人：進行中（含已逾期、被退回的）→ 回報完成
+const canReport = computed(() => task.value?.assigneeId === userId.value && task.value.status === 'in_progress')
+// 回報完成要去哪一頁（2026-10-16）
+//   有關聯案件 → 案件的回報完成頁（完工驗收時這筆交辦會一起回報，案件和交辦的狀態才對得上，case-flow 4-5）
+//   沒有關聯案件 → 交辦自己的回報完成頁
+const reportPath = computed(() =>
+  task.value.caseId
+    ? `/${route.meta.roleId}/cases/${task.value.caseId}/complete`
+    : `/${route.meta.roleId}/tasks/${task.value.id}/report`,
+)
 
 // pending：動作還在路上時是 true，按鈕先不能按，避免連按兩次
 const pending = ref(false)
@@ -174,7 +184,7 @@ const recordRows = computed(() => {
 
 <template>
   <!-- 有按鈕時底部有固定的按鈕區，pb-24 留空間給它，內容才不會被蓋住 -->
-  <div class="space-y-4 px-5 pt-4" :class="canConfirm || canWithdraw ? 'pb-24' : 'pb-5'">
+  <div class="space-y-4 px-5 pt-4" :class="canConfirm || canWithdraw || canReport ? 'pb-24' : 'pb-5'">
     <!-- 載入中：三個和卡片差不多高的灰色方塊 -->
     <template v-if="loading">
       <Skeleton class="h-[200px] rounded-xl" />
@@ -244,6 +254,11 @@ const recordRows = computed(() => {
       </BottomCta>
       <BottomCta v-else-if="canWithdraw">
         <Button variant="outline" :disabled="pending" @click="openDialog('withdraw')">撤回交辦</Button>
+      </BottomCta>
+      <BottomCta v-else-if="canReport">
+        <Button as-child>
+          <RouterLink :to="reportPath">回報完成</RouterLink>
+        </Button>
       </BottomCta>
 
       <!-- 退回、撤回的彈窗：平常看不到，dialogOpen 變成 true 才會出現 -->

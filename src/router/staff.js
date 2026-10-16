@@ -6,6 +6,7 @@ import CaseCompleteView from '@/views/committee/CaseCompleteView.vue'
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
+import TaskReportView from '@/views/committee/TaskReportView.vue'
 import FilesView from '@/views/staff/FilesView.vue'
 import HomeView from '@/views/staff/HomeView.vue'
 import MeView from '@/views/staff/MeView.vue'
@@ -30,6 +31,7 @@ export default {
     'cases/:id': CaseDetailView,
     'cases/:id/complete': CaseCompleteView,
     'tasks/:id': TaskDetailView,
+    'tasks/:id/report': TaskReportView, // 交辦詳情的「回報完成」（沒有關聯案件的交辦）
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
@@ -46,6 +48,7 @@ export default {
     { path: 'cases/:id', title: '案件詳情' },
     { path: 'cases/:id/complete', title: '回報完成' }, // 案件詳情的「完工驗收」
     { path: 'tasks/:id', title: '交辦詳情' },
+    { path: 'tasks/:id/report', title: '回報完成' },
     // 「廠商」分頁點進去的頁面
     { path: 'vendors/list', title: '廠商名冊' },
     // 「社區」分頁點進去的頁面
