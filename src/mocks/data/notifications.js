@@ -24,16 +24,6 @@ export const notifications = [
     link: { type: 'meeting', id: 'm-2026-03' },
   },
   {
-    id: 'n-002',
-    userId: 'u-c04',
-    role: 'resident',
-    title: '通報有新進度',
-    body: '頂樓花園｜灑水噴頭漏水・廠商已初步查勘',
-    at: '2026-10-01T12:40',
-    read: false,
-    link: { type: 'case', id: 'CASE-20260923-001' },
-  },
-  {
     id: 'n-003',
     userId: 'u-c04',
     role: 'resident',
@@ -53,16 +43,6 @@ export const notifications = [
     read: true,
     link: { type: 'announcement', id: 'an-001' },
   },
-  {
-    id: 'n-005',
-    userId: 'u-c04',
-    role: 'resident',
-    title: '通報有新進度',
-    body: '1F 大廳｜感應門故障・已通報原廠工程師排查線路',
-    at: '2026-09-25T14:30',
-    read: true,
-    link: { type: 'case', id: 'CASE-20260920-001' },
-  },
 
   {
     id: 'n-006',
@@ -73,6 +53,28 @@ export const notifications = [
     at: '2026-10-01T13:40',
     read: false,
     link: { type: 'announcement', id: 'an-011' },
+  },
+
+  // ── 住戶：其他住戶（2026-10-16 從李伯伯那一區搬過來：這兩件通報的通報人換成鄰居了）──────
+  {
+    id: 'n-002',
+    userId: 'u-r04', // 2026-10-16 跟著通報人改（原本是李伯伯）
+    role: 'resident',
+    title: '通報有新進度',
+    body: '頂樓花園｜灑水噴頭漏水・廠商已初步查勘',
+    at: '2026-10-01T12:40',
+    read: false,
+    link: { type: 'case', id: 'CASE-20260923-001' },
+  },
+  {
+    id: 'n-005',
+    userId: 'u-r03', // 2026-10-16 跟著通報人改（原本是李伯伯）
+    role: 'resident',
+    title: '通報有新進度',
+    body: '1F 大廳｜感應門故障・已通報原廠工程師排查線路',
+    at: '2026-09-25T14:30',
+    read: true,
+    link: { type: 'case', id: 'CASE-20260920-001' },
   },
 
   // ── 管委會：李委員（主委）──────────────────────────────────────
