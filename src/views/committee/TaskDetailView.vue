@@ -2,6 +2,7 @@
 // 管委會端、管理人員端共用・交辦詳情：一件交辦的內容、期限和處理紀錄
 //   交辦人看到「確認完成、退回、撤回」；被交辦的人（例如管理人員）看到「回報完成」（之後加）
 //   設計稿沒有這一頁，版型借用管委會端的公告詳情（node 1134:17718）
+import { ChevronRightIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
@@ -139,8 +140,11 @@ const basicRows = computed(() => {
     { label: '完成期限', value: dateText(item.deadline) },
     { label: '交辦時間', value: dateText(item.createdAt) },
   ]
-  // 有關聯案件才顯示
-  if (item.caseTitle) rows.push({ label: '關聯案件', value: item.caseTitle })
+  // 有關聯案件才顯示；可以點，直接到案件詳情（2026-10-16）
+  //   管理人員從通知、待辦點進來是這一頁，派廠商、完工驗收要到案件詳情做
+  if (item.caseTitle) {
+    rows.push({ label: '關聯案件', value: item.caseTitle, to: `/${route.meta.roleId}/cases/${item.caseId}` })
+  }
   return rows
 })
 
@@ -203,10 +207,18 @@ const recordRows = computed(() => {
         </div>
         <h2 class="type-card-title text-foreground">{{ task.title }}</h2>
         <Separator />
-        <div v-for="row in basicRows" :key="row.label" class="flex items-baseline gap-3">
-          <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
-          <p class="min-w-0 flex-1 text-right type-body-strong text-foreground">{{ row.value }}</p>
-        </div>
+        <template v-for="row in basicRows" :key="row.label">
+          <!-- 有 to 的那一列整列可以點（關聯案件），右邊多一個 › -->
+          <RouterLink v-if="row.to" :to="row.to" class="flex min-h-11 items-center gap-3">
+            <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
+            <p class="min-w-0 flex-1 text-right type-body-strong text-foreground">{{ row.value }}</p>
+            <ChevronRightIcon class="size-5 shrink-0" />
+          </RouterLink>
+          <div v-else class="flex items-baseline gap-3">
+            <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
+            <p class="min-w-0 flex-1 text-right type-body-strong text-foreground">{{ row.value }}</p>
+          </div>
+        </template>
       </section>
 
       <section class="space-y-3.5 rounded-xl bg-card p-4 shadow-card">
