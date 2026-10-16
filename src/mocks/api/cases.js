@@ -424,6 +424,29 @@ function closeItem(item, userId, cost, note = '') {
   // 有結案說明的話多一行，例如「李主委結案」下面一行「費用已付清」
   const text = note ? `${userLabel(userId)}結案\n${note}` : `${userLabel(userId)}結案`
   addLog(item, userId, '已結案', text, '已完成維修，感謝你的通報。')
+  notifyResidentsClosed(item)
+}
+
+// 結案：通知住戶（2026-10-16，case-flow 第 5 節）
+//   通報的人：「你通報的『B 棟電梯異音』已結案，點擊查看處理結果」
+//   按過「我也遇到了」的人：「你也遇到的『…』已結案，…」
+//   管委會、管理人員登記的通報（不是住戶通報的）不通知通報人
+function notifyResidentsClosed(item) {
+  const targets = item.source === 'resident' ? [{ id: item.reporterId, lead: '你通報的' }] : []
+  for (const id of item.supporters) targets.push({ id, lead: '你也遇到的' })
+  for (const { id, lead } of targets) {
+    if (!findUser(id)?.roles.includes('resident')) continue
+    notifications.push({
+      id: `n-${item.id}-closed-${id}`,
+      userId: id,
+      role: 'resident',
+      title: '通報已結案',
+      body: `${lead}「${item.title}」已結案，點擊查看處理結果`,
+      at: MOCK_NOW,
+      read: false,
+      link: { type: 'case', id: item.id },
+    })
+  }
 }
 
 // 完工驗收：已受理、處理中 → 當場修好、當場驗收（沒有「驗收不通過」）
