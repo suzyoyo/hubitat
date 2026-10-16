@@ -1,7 +1,7 @@
 <script setup>
 // 管委會端・新增交辦（設計稿：已帶入案件 1134:13996、選擇交辦對象 1134:14144）
 // 主要從案件詳情的「交辦」進來，網址帶案件編號（/committee/tasks/new?caseId=CASE-…），這時關聯案件鎖定不能改
-// 從「＋」選單進來的沒有關聯案件（設計稿可以搜尋例行會議決議或案件，還沒做）
+// 從「＋」選單進來的：關聯案件用下拉選單自己選（選填，2026-10-16），列出還沒交辦、可以交辦的案件（已受理、處理中）
 // 只有主委、副主委可以交辦；同一件案件還有沒完成的交辦時不能再交辦（假 API createTask 會擋）
 // 交辦對象只有管理人員（2026-10-15 013 決定）；交辦內容、完成期限選填
 // 寫法參考案件詳情頁（CaseDetailView）：送出中按鈕先不能按、成功失敗用 toast 提示
@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -23,6 +24,7 @@ import {
   canAssignTasks,
   createTask,
   getCaseById,
+  getCases,
   getCurrentUser,
   getStaffMembers,
 } from '@/mocks/api'
@@ -41,15 +43,24 @@ const userId = ref('')
 const canAssign = ref(false) // 我能不能交辦（主委、副主委）
 const relatedCase = ref(null) // 從案件進來時的那件案件；沒有就是 null
 const members = ref([]) // 可以交辦的人：管理人員
+const NONE = 'none' // 下拉選單「不關聯」的值（選單的值不能是空字串）
+const openCases = ref([]) // 下拉選單可以選的案件
+const pickedCaseId = ref(NONE) // 下拉選單選了哪一件
 
 onMounted(async () => {
   const user = await getCurrentUser('committee')
   userId.value = user.id
   canAssign.value = canAssignTasks(user.id)
   const caseId = route.query.caseId
-  const [caseData, staff] = await Promise.all([caseId ? getCaseById(caseId) : null, getStaffMembers()])
+  const [caseData, staff, caseList] = await Promise.all([
+    caseId ? getCaseById(caseId) : null,
+    getStaffMembers(),
+    getCases(),
+  ])
   relatedCase.value = caseData ?? null
   members.value = staff
+  // 可以交辦的案件：和案件詳情的「交辦」按鈕同一個規則（已受理、處理中，還沒有沒完成的交辦）
+  openCases.value = caseList.filter((item) => ['accepted', 'in_progress'].includes(item.status) && !item.openTaskId)
   loading.value = false
 })
 
@@ -62,6 +73,11 @@ const caseProblem = computed(() => {
   if (data.openTaskId) return `這件案件已經交辦了（${data.openTaskId}），對方完成或撤回後才能再交辦`
   return ''
 })
+
+// 這次交辦關聯的案件：從案件進來的是鎖定的那件，不然是下拉選單選的那件
+const linkedCase = computed(
+  () => relatedCase.value ?? openCases.value.find((item) => item.id === pickedCaseId.value) ?? null,
+)
 
 // ── 表單 ─────────────────────────────────────
 const form = reactive({
@@ -107,7 +123,7 @@ async function submit() {
     content: form.content.trim(),
     assigneeId: form.assigneeId,
     deadline: form.deadline ? `${form.deadline}T${DEADLINE_TIME}` : '',
-    caseId: relatedCase.value?.id,
+    caseId: linkedCase.value?.id,
   })
   pending.value = false
   if (!task) {
@@ -115,7 +131,7 @@ async function submit() {
     return
   }
   toast.success('已交辦', { description: `已通知${task.assigneeLabel}` })
-  // 從案件來的回到案件詳情（看得到「交辦」那一筆紀錄），其他的到這件交辦的詳情
+  // 從案件來的回到案件詳情（看得到「交辦」那一筆紀錄），其他的到這件交辦的詳情（下拉選了案件的也是）
   router.replace(relatedCase.value ? `/committee/cases/${relatedCase.value.id}` : `/committee/tasks/${task.id}`)
 }
 
@@ -157,13 +173,31 @@ function cancel() {
           <p class="min-w-0 flex-1 type-body">#{{ relatedCase.id }} {{ relatedCase.title }}</p>
         </div>
       </div>
+      <!-- 從「＋」進來的：下拉選單自己選關聯案件（選填），寫法和發布公告的「關聯案件」一樣 -->
+      <div v-else class="space-y-2">
+        <Label for="task-case" class="text-base">
+          關聯案件<span class="type-date text-muted-foreground">選填</span>
+        </Label>
+        <Select v-model="pickedCaseId">
+          <SelectTrigger id="task-case" class="h-11 w-full bg-card type-body">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem :value="NONE" class="min-h-11 px-3 type-body">不關聯</SelectItem>
+            <SelectItem v-for="item in openCases" :key="item.id" :value="item.id" class="min-h-11 px-3 type-body">
+              {{ item.title }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        <p class="type-date text-muted-foreground">只列出還沒交辦、處理中的案件</p>
+      </div>
 
       <div class="space-y-2">
         <Label for="task-title" class="text-base">交辦標題 <span class="text-warning-strong">*</span></Label>
         <Input
           id="task-title"
           v-model="form.title"
-          :placeholder="relatedCase ? `例如：聯繫廠商處理${relatedCase.title}` : '例如：聯繫兩家廠商報價植栽'"
+          :placeholder="linkedCase ? `例如：聯繫廠商處理${linkedCase.title}` : '例如：聯繫兩家廠商報價植栽'"
           maxlength="40"
           :aria-invalid="Boolean(shownErrors.title)"
         />
@@ -198,7 +232,6 @@ function cancel() {
             {{ assignee.surname }}
           </span>
           <div class="min-w-0 flex-1">
-            <p class="type-date text-muted-foreground">管理人員</p>
             <p class="type-body-strong text-foreground">{{ assignee.displayName }}</p>
           </div>
           <Button type="button" variant="ghost" size="icon" aria-label="重新選擇交辦對象" @click="form.assigneeId = ''">
@@ -225,7 +258,6 @@ function cancel() {
                   {{ member.surname }}
                 </span>
                 <span class="min-w-0 flex-1">
-                  <span class="block type-date text-muted-foreground">管理人員</span>
                   <span class="block type-body-strong text-foreground">{{ member.displayName }}</span>
                 </span>
               </button>
