@@ -45,7 +45,7 @@ import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好�
 // 管理人員端的設計稿內容和管委會一樣，只有底部按鈕不同（Figma 1484:15491）；route.meta.roleId 是目前在哪一端
 const route = useRoute()
 const router = useRouter()
-// 設備詳情、廠商詳細只有管委會端有頁面，管理人員端先不放「查看設備」「查看廠商」
+// 廠商詳細只有管委會端有頁面，管理人員端先不放「查看廠商」（設備詳情兩端都有，「查看設備」都放）
 const showDetailLinks = route.meta.roleId === 'committee'
 
 const loading = ref(true)
@@ -345,8 +345,8 @@ function isVideo(name) {
             <p v-if="item.equipmentName" class="type-date text-muted-foreground">{{ item.equipmentPlace }}</p>
           </div>
           <RouterLink
-            v-if="showDetailLinks && item.equipmentId"
-            :to="`/committee/equipment/${item.equipmentId}`"
+            v-if="item.equipmentId"
+            :to="`/${route.meta.roleId}/equipment/${item.equipmentId}`"
             class="relative flex shrink-0 items-center gap-1 type-link text-foreground before:absolute before:inset-x-0 before:-inset-y-3"
           >
             查看設備

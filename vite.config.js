@@ -28,8 +28,8 @@ export default defineConfig({
         icons: [
           { src: '/icon/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icon/icon-512.png', sizes: '512x512', type: 'image/png' },
-          // Android 會把圖示裁成圓形等形狀；logo 在中間 60% 左右，裁了也不會切到
-          { src: '/icon/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          // Android 會把圖示裁成圓形等形狀：另外一張四周多留白的，logo 縮在中間的圓裡，裁了也不會切到（2026-10-16）
+          { src: '/icon/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
     }),

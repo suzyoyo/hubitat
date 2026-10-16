@@ -39,6 +39,8 @@ export const TODO_KINDS = {
 // 建立一筆待辦
 //   kind 種類 / title 標題 / hint 第二行的說明
 //   createdAt 建立時間：交辦、提案、公告是建立或送出的時間，案件是通報時間，留存是留存時間；
+//             「待我確認」是對方回報完成的時間、「待我結案」是完工驗收的時間、被退回的交辦是退回的時間
+//             （首頁放建立時間新的在前，剛發生的事才看得到，2026-10-16）；
 //             快到期的合約、文件是系統依日期提醒的，沒有建立時間，是 null
 //   dueAt 到期時間（沒有期限就是 null）
 //   link 點了要去哪裡：type 資料種類、id 編號
@@ -121,7 +123,9 @@ function assignedTasks(userId) {
       const due = task.deadline ? `・${deadlineText(task.deadline)} 前完成` : ''
       const hint = task.returnNote ? `已退回：${task.returnNote.note}` : `${userLabel(task.assignerId)}交辦${due}`
       const link = { type: 'task', id: task.id }
-      return todo('assigned', task.title, hint, task.createdAt, task.deadline || null, link, false, isUnseenTask(userId, task.id))
+      // 被退回的用退回的時間（2026-10-16，suzy 在 #111 提的）：剛被退回的才會出現在首頁（首頁放建立時間新的在前）
+      const createdAt = task.returnNote?.at ?? task.createdAt
+      return todo('assigned', task.title, hint, createdAt, task.deadline || null, link, false, isUnseenTask(userId, task.id))
     })
 }
 
@@ -134,8 +138,10 @@ function committeeTodos(userId) {
   for (const task of tasks) {
     const waitingClose = cases.some((item) => item.id === task.caseId && item.status === 'to_verify')
     if (task.assignerId === userId && task.status === 'reported' && !waitingClose) {
+      // 日期用回報完成的時間（2026-10-16）：剛回報的才會出現在首頁（首頁放建立時間新的在前）
+      const createdAt = task.report?.at ?? task.createdAt
       items.push(
-        todo('confirm', task.title, `${userLabel(task.assigneeId)}已回報完成`, task.createdAt, task.deadline || null, {
+        todo('confirm', task.title, `${userLabel(task.assigneeId)}已回報完成`, createdAt, task.deadline || null, {
           type: 'task',
           id: task.id,
         }),
