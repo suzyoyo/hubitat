@@ -51,7 +51,12 @@ onMounted(async () => {
 })
 
 // 首頁每一區只放最前面的幾筆，其餘的按「看全部」
-const latestReport = computed(() => reports.value[0])
+// 首頁放最新通報的那一筆（照通報時間，2026-10-16 和 013 定的）；getMyReports 是照最後更新時間排的
+//   時間一樣時改比案件編號（|| 的意思：前面比出來是 0 就改用後面的比）：
+//   假資料裡新送出的通報時間都是固定的 MOCK_NOW，連送兩筆時間會一樣；編號新的比較大（-001 → -002）
+const latestReport = computed(
+  () => reports.value.toSorted((a, b) => b.submittedAt.localeCompare(a.submittedAt) || b.id.localeCompare(a.id))[0],
+)
 // 公告只放「與我有關」的（全社區的，或影響到我住的那一棟）
 const homeNotices = computed(() => allNotices.value.filter((item) => item.relatedToMe).slice(0, 2))
 const latestMeeting = computed(() => meetings.value[0])
