@@ -529,6 +529,9 @@ export async function returnCase(id, userId, reason) {
   if (!item || !canCloseCases(userId) || !reason?.trim()) return undefined
   const note = reason.trim()
   item.status = 'in_progress'
+  // 完工紀錄清掉：退回就是還沒完工，案件詳情才不會在「處理中」的案件上還顯示完工區塊（suzy 在 #97 提的）
+  //   處理紀錄裡「完工驗收」那一筆還留著，看得到之前回報過
+  delete item.completion
   addLog(item, userId, '退回', `${userLabel(userId)}退回：${note}`, '管委會確認後還需要再處理，處理中。')
 
   const task = tasks.find((entry) => entry.caseId === id && entry.status === 'reported')
