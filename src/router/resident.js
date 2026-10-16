@@ -1,6 +1,7 @@
 // 住戶端的頁面清單
 // 做好一個新畫面時，只要改這個檔案：匯入畫面，加進 views
 import AnnouncementsView from '@/views/resident/AnnouncementsView.vue'
+import EquipmentView from '@/views/resident/EquipmentView.vue'
 import FilesView from '@/views/resident/FilesView.vue'
 import HomeView from '@/views/resident/HomeView.vue'
 import JoinCommitteeView from '@/views/resident/JoinCommitteeView.vue'
@@ -26,6 +27,7 @@ export default {
     reports: ReportsView,
     'reports/:id': ReportDetailView,
     announcements: AnnouncementsView,
+    equipment: EquipmentView, // 「社區」分頁的「設備與維修史」
     notifications: NotificationsView, // 右上角的鈴鐺
     'reports/new': NewReportView, // 右下角「通報」按鈕（網址定在 src/config/roles.js 的 fab）
   },
