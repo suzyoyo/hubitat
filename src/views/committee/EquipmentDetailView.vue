@@ -186,11 +186,12 @@ const shownRecords = computed(() =>
             :to="recordLink(record)?.to"
             class="block space-y-0.5 py-3"
           >
-            <p class="type-date text-muted-foreground">{{ formatFullDate(record.date) }}</p>
-            <div class="flex items-start gap-2">
-              <p class="min-w-0 flex-1 type-body-strong text-foreground">{{ record.title }}</p>
-              <Badge variant="outline" class="mt-0.5 shrink-0">{{ RECORD_TYPES[record.type] }}</Badge>
+            <!-- 同一行：左邊日期，右邊「保養／維修」徽章（2026-10-16） -->
+            <div class="flex items-center gap-2">
+              <p class="min-w-0 flex-1 type-date text-muted-foreground">{{ formatFullDate(record.date) }}</p>
+              <Badge variant="outline" class="shrink-0">{{ RECORD_TYPES[record.type] }}</Badge>
             </div>
+            <p class="type-body-strong text-foreground">{{ record.title }}</p>
             <!-- 同一行：左邊廠商、費用（費用只有管委會看得到），右邊「查看案件 ›」或「查看廠商 ›」 -->
             <div class="flex items-center gap-2">
               <p class="min-w-0 flex-1 type-date text-muted-foreground">
