@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595 842" width="595" height="842">
+  <!-- 合約內文頁的示意圖（示範用，不是真的合約）：真的上線時換成後端從 PDF 轉出來的圖片 -->
+  <rect width="595" height="842" fill="#ffffff"/>
+  <g font-family="'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif" fill="#1f2937" font-size="20" font-weight="700">
+    <text x="80" y="110">第一條　服務內容</text>
+    <text x="80" y="330">第二條　服務頻率與到場時間</text>
+    <text x="80" y="550">第三條　費用與付款方式</text>
+  </g>
+  <g fill="#e5e7eb">
+    <rect x="80" y="140" width="435" height="12" rx="6"/>
+    <rect x="80" y="170" width="410" height="12" rx="6"/>
+    <rect x="80" y="200" width="430" height="12" rx="6"/>
+    <rect x="80" y="230" width="260" height="12" rx="6"/>
+    <rect x="80" y="360" width="425" height="12" rx="6"/>
+    <rect x="80" y="390" width="435" height="12" rx="6"/>
+    <rect x="80" y="420" width="380" height="12" rx="6"/>
+    <rect x="80" y="450" width="300" height="12" rx="6"/>
+    <rect x="80" y="580" width="435" height="12" rx="6"/>
+    <rect x="80" y="610" width="415" height="12" rx="6"/>
+    <rect x="80" y="640" width="430" height="12" rx="6"/>
+    <rect x="80" y="670" width="220" height="12" rx="6"/>
+  </g>
+  <text x="297.5" y="800" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#9ca3af">示意頁面・示範用</text>
+</svg>

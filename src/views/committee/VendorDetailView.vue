@@ -4,6 +4,7 @@
 import { ChevronRightIcon, PhoneCallIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { contractBadge } from '@/components/admin/contractBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
@@ -11,7 +12,6 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate } from '@/lib/date'
 import { getContractById, getVendorById } from '@/mocks/api'
-import { CONTRACT_STATUSES } from '@/mocks/data/contracts'
 import { VENDOR_STATUSES } from '@/mocks/data/vendors'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
@@ -39,13 +39,8 @@ const maintenanceText = computed(() =>
 )
 
 // ── 合約 ───────────────────────────────────
-// 合約徽章（dev-guide 第 5 節管理端的顏色）：即將到期橘、尚未生效藍、合約內灰
-const contractBadge = computed(() => {
-  const item = contract.value
-  if (item.status === 'expiring') return { variant: 'secondary', text: `${item.daysLeft} 天後到期` }
-  if (item.status === 'upcoming') return { variant: 'default', text: CONTRACT_STATUSES.upcoming.label }
-  return { variant: 'outline', text: CONTRACT_STATUSES[item.status].label }
-})
+// 合約徽章：規則在 admin/contractBadge.js，合約列表、合約詳情共用
+const badge = computed(() => contract.value && contractBadge(contract.value))
 
 const contractRows = computed(() => {
   const item = contract.value
@@ -170,7 +165,7 @@ function telLink(phone) {
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <div class="flex items-start gap-2">
           <h2 class="min-w-0 flex-1 type-card-title text-foreground">合約資訊</h2>
-          <Badge v-if="contract" :variant="contractBadge.variant" class="mt-0.5 shrink-0">{{ contractBadge.text }}</Badge>
+          <Badge v-if="contract" :variant="badge.variant" class="mt-0.5 shrink-0">{{ badge.text }}</Badge>
           <Badge v-else variant="destructive" class="mt-0.5 shrink-0">無合約</Badge>
         </div>
         <template v-if="contract">

@@ -53,12 +53,12 @@ export function reporterLabel(item) {
 
 // 畫面上的「負責人」：實際處理這件事的人（docs/case-flow.md 第 3 節，2026-10-15）
 //   資料上的負責人（assigneeId）是受理的人，不會換；這裡另外算出來給畫面顯示
-//   結案了 → 按「完工驗收」的那個人
+//   待結案、結案了 → 按「完工驗收」的那個人（2026-10-16：待結案也是，負責人就是標示完工的人）
 //   有交辦出去、還沒完成的（進行中或待確認）→ 交辦對象
 //     被退回的還是進行中（請對方再做一次），所以還是交辦對象；交辦被撤回 → 換回受理的人
 //   其他 → 受理的人
 function handlerIdOf(item) {
-  if (item.status === 'closed') {
+  if (['to_verify', 'closed'].includes(item.status)) {
     return item.logs.findLast((log) => log.label === '完工驗收')?.actorId ?? item.assigneeId
   }
   const task = tasks.find(
@@ -390,11 +390,10 @@ export async function updateCase(id, userId, { equipmentId = '', vendor = null, 
 }
 
 // 結案（closeCase 和「負責人自己完工驗收」共用）：狀態改成已結案，並把後續的事一起做完
-//   cost 維修費用，只有委員填得了；rating 廠商評分 { score: 1～5, comment }
-function closeItem(item, userId, cost, rating) {
+//   cost 維修費用，只有委員填得了；note 結案說明，寫在「已結案」那筆紀錄裡（管理端看得到，住戶看不到）
+function closeItem(item, userId, cost, note = '') {
   item.status = 'closed'
   item.closedAt = MOCK_NOW
-  if (rating) item.rating = { score: rating.score, comment: rating.comment ?? '' }
   // 連到這件案件、等確認的交辦，一起確認完成
   for (const task of tasks) {
     if (task.caseId === item.id && task.status === 'reported') {
@@ -422,7 +421,32 @@ function closeItem(item, userId, cost, rating) {
     if (isCommittee && cost > 0) record.cost = cost
     device.records.unshift(record) // 紀錄是新的在前
   }
-  addLog(item, userId, '已結案', `${userLabel(userId)}結案`, '已完成維修，感謝你的通報。')
+  // 有結案說明的話多一行，例如「李主委結案」下面一行「費用已付清」
+  const text = note ? `${userLabel(userId)}結案\n${note}` : `${userLabel(userId)}結案`
+  addLog(item, userId, '已結案', text, '已完成維修，感謝你的通報。')
+  notifyResidentsClosed(item)
+}
+
+// 結案：通知住戶（2026-10-16，case-flow 第 5 節）
+//   通報的人：「你通報的『電梯／電梯口運轉有異音』已結案，點擊查看處理結果」
+//   按過「我也遇到了」的人：「你也遇到的『…』已結案，…」
+//   管委會、管理人員登記的通報（不是住戶通報的）不通知通報人
+function notifyResidentsClosed(item) {
+  const targets = item.source === 'resident' ? [{ id: item.reporterId, lead: '你通報的' }] : []
+  for (const id of item.supporters) targets.push({ id, lead: '你也遇到的' })
+  for (const { id, lead } of targets) {
+    if (!findUser(id)?.roles.includes('resident')) continue
+    notifications.push({
+      id: `n-${item.id}-closed-${id}`,
+      userId: id,
+      role: 'resident',
+      title: '通報已結案',
+      body: `${lead}「${item.title}」已結案，點擊查看處理結果`,
+      at: MOCK_NOW,
+      read: false,
+      link: { type: 'case', id: item.id },
+    })
+  }
 }
 
 // 完工驗收：已受理、處理中 → 當場修好、當場驗收（沒有「驗收不通過」）
@@ -450,18 +474,86 @@ export async function completeCase(id, userId, { note = '', photos = [] }) {
     task.report = { at: MOCK_NOW, note: note || '已完工驗收', files: [...photos] }
     delete task.returnNote
   }
+  notifyToClose(item, userId)
   return presentForManagement(item)
 }
 
+// 「案件待結案」通知的標題：todos.js 用它判斷哪件待結案還沒看過、要排在待辦最前面，要改字只改這裡
+export const TO_CLOSE_TITLE = '案件待結案'
+
+// 管理人員完工驗收後：通知主委、副主委來結案（2026-10-16）
+function notifyToClose(item, userId) {
+  for (const user of users) {
+    if (!canCloseCases(user.id)) continue
+    notifications.push({
+      id: `n-${item.id}-close-${user.id}-${notifications.length + 1}`,
+      userId: user.id,
+      role: 'committee',
+      title: TO_CLOSE_TITLE,
+      body: `${item.title}：${userLabel(userId)}已完工驗收，請結案`,
+      at: MOCK_NOW,
+      read: false,
+      link: { type: 'case', id: item.id },
+    })
+  }
+}
+
+// 主委、副主委打開待結案的案件時用：只把這件案件的「案件待結案」通知設為已讀
+//   待辦就不再把它排到最前面；其他通知不動
+export async function markToCloseNotificationRead(userId, caseId) {
+  await delay()
+  for (const item of notifications) {
+    if (item.userId === userId && item.title === TO_CLOSE_TITLE && item.link?.id === caseId) item.read = true
+  }
+}
+
 // 結案：待結案 → 已結案。主委、副主委都能結案，不管是誰受理的（2026-10-15 改，原本只有負責人）
-//   options 都是選填：cost 維修費用（只有委員填得了）、rating 廠商評分 { score: 1～5, comment }
+//   options 都是選填：cost 維修費用（只有委員填得了）、note 結案說明
+//   廠商評分 2026-10-16 從結案拿掉了（舊的假資料還留著 rating，廠商詳情的平均評分照樣算）
 export async function closeCase(id, userId, options = {}) {
   await delay()
   const item = findHandleableCase(id, userId, ['to_verify'])
   if (!item || !canCloseCases(userId)) return undefined
-  const { cost, rating } = options
-  if (rating && !(rating.score >= 1 && rating.score <= 5)) return undefined
-  closeItem(item, userId, cost, rating)
+  const { cost, note } = options
+  closeItem(item, userId, cost, note?.trim() ?? '')
+  return presentForManagement(item)
+}
+
+// 退回：待結案 → 處理中，請完工驗收的人再處理一次（2026-10-16）
+//   誰：主委、副主委（和結案同一批人）；reason 退回原因，必填
+//   有連到這件案件、待確認的交辦 → 一起退回（交辦回到進行中，記下退回原因），通知交辦對象
+//   沒有交辦的（管理人員自己受理的）→ 通知按完工驗收的人
+export async function returnCase(id, userId, reason) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['to_verify'])
+  if (!item || !canCloseCases(userId) || !reason?.trim()) return undefined
+  const note = reason.trim()
+  item.status = 'in_progress'
+  // 完工紀錄清掉：退回就是還沒完工，案件詳情才不會在「處理中」的案件上還顯示完工區塊（suzy 在 #97 提的）
+  //   處理紀錄裡「完工驗收」那一筆還留著，看得到之前回報過
+  delete item.completion
+  addLog(item, userId, '退回', `${userLabel(userId)}退回：${note}`, '管委會確認後還需要再處理，處理中。')
+
+  const task = tasks.find((entry) => entry.caseId === id && entry.status === 'reported')
+  if (task) {
+    task.status = 'in_progress'
+    task.returnNote = { at: MOCK_NOW, note }
+  }
+  // 通知要再處理的人：有交辦就是交辦對象，沒有就是按完工驗收的人
+  const targetId = task ? task.assigneeId : item.logs.findLast((log) => log.label === '完工驗收')?.actorId
+  const target = findUser(targetId)
+  if (target) {
+    notifications.push({
+      id: `n-${item.id}-return-${notifications.length + 1}`,
+      userId: target.id,
+      role: target.roles.includes('staff') ? 'staff' : 'committee',
+      title: task ? '交辦被退回' : '案件被退回',
+      body: `${item.title}：${note}`,
+      at: MOCK_NOW,
+      read: false,
+      link: task ? { type: 'task', id: task.id } : { type: 'case', id: item.id },
+    })
+  }
   return presentForManagement(item)
 }
 

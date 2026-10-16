@@ -153,10 +153,10 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Admin/Meeting Card` | `admin/AdminMeetingCard.vue` | ⬜ | 變體 State：待整理／待發布／已發布 |
 | `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ✅ | 廠商卡：名稱＋合約徽章＋›、處理項目的小標籤。整張卡可以點。合約徽章：無合約紅；即將到期橘；尚未生效藍；合約內灰。管委會端「廠商名冊」在用 |
 | `Admin/Case Card` | `admin/AdminCaseCard.vue` | ✅ | 案件卡：標題＋狀態徽章＋›、地點徽章、負責人｜廠商（2026-10-14 照 Kit 改版）。整張卡可以點。狀態徽章：逾期、尚未受理紅；待結案橘；處理中（已受理、處理中）藍；已結案、已取消灰（規則在 `admin/caseStatusBadge.js`，案件詳情頁共用）。prop 叫 `item`（`case` 是 JavaScript 的保留字）。管委會端「案件」分頁在用 |
-| `Admin/Contract Card` | `admin/AdminContractCard.vue` | ⬜ | 合約卡。合約金額只有管委會看得到，管理人員端要能正常顯示沒有金額的樣子 |
+| `Admin/Contract Card` | `admin/AdminContractCard.vue` | ✅ | 合約卡（2026-10-16）：廠商名稱＋狀態徽章、合約期間、合約金額、負責窗口，右下「查看詳情 ›」，整張卡可以點。傳 `getContracts()` 的一筆 `item`、`contactName`、`to`。合約金額只有管委會看得到，沒有 `amount` 時那一列不顯示（管理人員端可以直接用）。狀態徽章的規則在 `admin/contractBadge.js`（即將到期橘、尚未生效藍、合約內和已到期灰），合約詳情、廠商詳細共用。管委會端「廠商合約」在用 |
 | `Admin/Doc Card` | `admin/AdminDocCard.vue` | ⬜ | 文件卡 |
 | `Admin/Notification Item` | `admin/AdminNotificationItem.vue` | ⬜ | 通知的一筆。做之前先看能不能和 `Notification/Item` 共用 |
-| `Admin/Equipment Row` | `admin/AdminEquipmentRow.vue` | ⬜ | 設備的一列：名稱、位置與廠商、保養資訊 |
+| `Admin/Equipment Row` | `admin/AdminEquipmentRow.vue` | ✅ | 設備的一列（2026-10-16）：左邊類別圖示（設計稿是設備照片，假資料沒有照片）、名稱＋狀態徽章、位置｜廠商，右邊 ›，整列可以點。傳 `getEquipmentList()` 的一筆 `item` 和 `to`。狀態徽章的規則在 `admin/equipmentStatusBadge.js`（待維修、保養逾期紅；保養將到期橘；維修中藍；正常、已報廢灰），設備詳情共用。管委會端「設備清冊」在用 |
 
 ---
 

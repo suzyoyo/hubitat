@@ -3,9 +3,14 @@
 // 寫法可以參考住戶端的 resident.js
 import AnnouncementDetailView from '@/views/committee/AnnouncementDetailView.vue'
 import AnnouncementFormView from '@/views/committee/AnnouncementFormView.vue'
+import CaseCloseView from '@/views/committee/CaseCloseView.vue'
 import CaseCompleteView from '@/views/committee/CaseCompleteView.vue'
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
+import ContractDetailView from '@/views/committee/ContractDetailView.vue'
+import ContractsView from '@/views/committee/ContractsView.vue'
+import EquipmentDetailView from '@/views/committee/EquipmentDetailView.vue'
+import EquipmentListView from '@/views/committee/EquipmentListView.vue'
 import FilesView from '@/views/committee/FilesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
 import MeView from '@/views/committee/MeView.vue'
@@ -36,6 +41,11 @@ export default {
     'vendors/:id': VendorDetailView,
     'cases/:id': CaseDetailView,
     'cases/:id/complete': CaseCompleteView,
+    'cases/:id/close': CaseCloseView,
+    contracts: ContractsView,
+    'contracts/:id': ContractDetailView,
+    equipment: EquipmentListView,
+    'equipment/:id': EquipmentDetailView,
     'announcements/:id': AnnouncementDetailView,
     // 發布和修改是同一個表單
     'announcements/new': AnnouncementFormView,
@@ -63,7 +73,7 @@ export default {
     // 待辦點進去的詳情頁
     { path: 'cases/:id', title: '案件詳情' },
     { path: 'cases/:id/complete', title: '回報完成' }, // 案件詳情的「完工驗收」
-    { path: 'cases/:id/close', title: '結案' }, // 案件詳情的「結案」（013 做）
+    { path: 'cases/:id/close', title: '結案' }, // 案件詳情的「結案」
     { path: 'vendors/list', title: '廠商名冊' },
     { path: 'vendors/new', title: '新增廠商' },
     { path: 'vendors/:id', title: '廠商詳細' },

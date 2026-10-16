@@ -6,7 +6,7 @@
 //   底部：更新進度＋完工驗收（到回報完成頁）並排；受理（按了就受理）、交辦（到新增交辦頁）、
 //   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
 //   沒有「撤回通報」：2026-10-15 和 013 決定拿掉撤回，不需要處理的通報由處理的人完工驗收時寫明原因結案
-import { ImageIcon, VideoIcon } from '@lucide/vue'
+import { ChevronRightIcon, ImageIcon, VideoIcon } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
@@ -17,9 +17,12 @@ import CaseLogForm from '@/components/case/CaseLogForm.vue'
 import CaseVendorPicker from '@/components/case/CaseVendorPicker.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Textarea } from '@/components/ui/textarea'
 import { formatFullDate, formatTime } from '@/lib/date'
 import {
   acceptCase,
@@ -29,8 +32,12 @@ import {
   getCaseById,
   getCurrentUser,
   getEquipmentList,
+  getTaskById,
   getVendors,
+  markToCloseNotificationRead,
+  returnCase,
   updateCase,
+  withdrawTask,
 } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
@@ -38,6 +45,8 @@ import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好�
 // 管理人員端的設計稿內容和管委會一樣，只有底部按鈕不同（Figma 1484:15491）；route.meta.roleId 是目前在哪一端
 const route = useRoute()
 const router = useRouter()
+// 設備詳情、廠商詳細只有管委會端有頁面，管理人員端先不放「查看設備」「查看廠商」
+const showDetailLinks = route.meta.roleId === 'committee'
 
 const loading = ref(true)
 // 這一件案件；編號不存在時，假 API 會回傳 undefined
@@ -46,6 +55,12 @@ const userId = ref('') // 我是誰（看目前在哪一端）
 const vendors = ref([]) // 選廠商時的清單：合作中的廠商
 const devices = ref([]) // 選設備時的清單：設備清冊（已報廢的不列）
 const pending = ref(false) // 送出還在路上
+const openTask = ref(null) // 這件案件還沒完成的交辦（進行中或待確認）；沒有就是 null
+// 寫原因的彈窗：退回案件（待結案）和撤回交辦共用一個；reasonMode 是 'return' 或 'withdraw'
+const reasonOpen = ref(false)
+const reasonMode = ref('return')
+const reason = ref('') // 原因（必填）
+const REASON_MAX = 200 // 原因最多幾個字
 // 卡片裡按「確定」記下來、還沒存的內容；按「更新進度」後清掉
 const equipmentDraft = ref(null) // { equipmentId, name, place }
 const vendorDraft = ref(null) // { vendorId, vendorName, scheduledAt }
@@ -64,6 +79,9 @@ async function load() {
   ])
   item.value = data
   vendors.value = vendorList
+  openTask.value = data?.openTaskId ? await getTaskById(data.openTaskId) : null
+  // 主委、副主委打開待結案的案件：「案件待結案」通知就算看過（待辦不再把它排最前面）
+  if (data?.status === 'to_verify' && canCloseCases(user.id)) markToCloseNotificationRead(user.id, data.id)
   devices.value = deviceList.filter((device) => device.status !== 'retired')
   loading.value = false
 }
@@ -75,8 +93,12 @@ watch(() => route.params.id, load, { immediate: true })
 const canHandle = computed(() => canHandleCases(userId.value)) // 主委、副主委、管理人員
 // 已受理、處理中才能選設備和廠商（處理中可以換）
 const canPickVendor = computed(() => canHandle.value && ['accepted', 'in_progress'].includes(item.value?.status))
-// 受理之後、結案之前都能寫處理紀錄
-const canAddLog = computed(() => canHandle.value && ['accepted', 'in_progress', 'to_verify'].includes(item.value?.status))
+// 主委、副主委看待結案的案件：只做審核（退回或確認結案），不寫處理紀錄（2026-10-16）
+const isReviewing = computed(() => item.value?.status === 'to_verify' && canCloseCases(userId.value))
+// 受理之後、結案之前都能寫處理紀錄（審核中的主委、副主委除外）
+const canAddLog = computed(
+  () => canHandle.value && !isReviewing.value && ['accepted', 'in_progress', 'to_verify'].includes(item.value?.status),
+)
 
 // 底部的按鈕；main 是主要動作（藍底），其他是次要動作
 const actions = computed(() => {
@@ -87,11 +109,18 @@ const actions = computed(() => {
     list.push({ key: 'assign', label: '交辦' })
   }
   // 已受理也可以完工驗收：管理人員自己就修好的，不一定要派廠商
-  if (['accepted', 'in_progress'].includes(data.status) && canHandle.value) {
+  //   管委會端交辦出去之後，交給被交辦的人完工驗收，這裡不放（2026-10-16）；交辦的人看到的是「撤回交辦」
+  const delegated = route.meta.roleId === 'committee' && openTask.value?.status === 'in_progress'
+  if (['accepted', 'in_progress'].includes(data.status) && canHandle.value && !delegated) {
     list.push({ key: 'complete', label: '完工驗收', main: true })
   }
-  // 結案：主委、副主委都可以，不管是誰受理的（2026-10-15 改，原本只有負責人）
-  if (data.status === 'to_verify' && canCloseCases(userId.value)) list.push({ key: 'close', label: '結案', main: true })
+  if (delegated && openTask.value.assignerId === userId.value) list.push({ key: 'withdraw', label: '撤回交辦' })
+  // 待結案：主委、副主委都可以審核，不管是誰受理的（2026-10-15 改，原本只有負責人）
+  //   左「退回」跳彈窗寫原因；右「確認結案」到結案頁填費用、結案說明（2026-10-16）
+  if (isReviewing.value) {
+    list.push({ key: 'return', label: '退回' })
+    list.push({ key: 'close', label: '確認結案', main: true })
+  }
   return list
 })
 // 「更新進度」：能選廠商或寫紀錄的時候才出現；有記下來的內容才能按
@@ -112,6 +141,56 @@ function runAction(action) {
   // 交辦、結案到另一頁做（新增交辦頁、結案頁是 013 做的）；交辦只有主委、副主委看得到，所以一定是管委會端
   if (action.key === 'assign') router.push(`/committee/tasks/new?caseId=${item.value.id}`)
   if (action.key === 'close') router.push(`${base}/cases/${item.value.id}/close`)
+  if (action.key === 'return' || action.key === 'withdraw') openReason(action.key)
+}
+
+function openReason(mode) {
+  reasonMode.value = mode
+  reason.value = ''
+  reasonOpen.value = true
+}
+
+// 彈窗的文字：退回案件、撤回交辦各一套
+const reasonText = computed(() => {
+  const who = reasonMode.value === 'withdraw' ? openTask.value?.assigneeLabel : item.value?.handlerLabel
+  return reasonMode.value === 'withdraw'
+    ? { title: '撤回交辦？', note: `撤回後${who || '對方'}不用再處理，會通知對方。`, label: '撤回原因', button: '確認撤回' }
+    : { title: '退回給管理人員？', note: `案件會回到「處理中」，請${who || '管理人員'}再處理一次。`, label: '退回原因', button: '確認退回' }
+})
+
+function submitReason() {
+  if (reasonMode.value === 'withdraw') withdraw()
+  else sendBack()
+}
+
+// 撤回交辦：交辦變成已撤回，負責人換回受理的人，底部又會出現「交辦」「完工驗收」
+async function withdraw() {
+  pending.value = true
+  const ok = await withdrawTask(openTask.value.id, userId.value, reason.value.trim())
+  pending.value = false
+  if (!ok) {
+    toast.error('沒有撤回成功', { description: '交辦的狀態可能已經改變，請重新整理' })
+    return
+  }
+  const who = openTask.value.assigneeLabel
+  reasonOpen.value = false
+  toast.success('已撤回交辦', { description: who ? `已通知${who}` : '' })
+  await load()
+}
+
+// 退回：案件回到處理中，交辦對象（沒有交辦就是完工驗收的人）會收到通知（case-flow 4-6b）
+async function sendBack() {
+  pending.value = true
+  const result = await returnCase(item.value.id, userId.value, reason.value)
+  pending.value = false
+  if (!result) {
+    toast.error('沒有退回成功', { description: '案件的狀態可能已經改變，請重新整理' })
+    return
+  }
+  item.value = result
+  openTask.value = result.openTaskId ? await getTaskById(result.openTaskId) : null
+  reasonOpen.value = false
+  toast.success('已退回', { description: `已通知${result.handlerLabel || '管理人員'}再處理` })
 }
 
 // 受理：按了就受理，受理的人是負責人（完成日期、分類之後再加地方填）
@@ -258,23 +337,46 @@ function isVideo(name) {
           :devices="devices"
           :current="{ name: item.equipmentName, place: item.equipmentPlace }"
         />
-        <div v-else class="space-y-0.5">
-          <p class="type-body-strong text-foreground">{{ item.equipmentName || '尚未關聯設備' }}</p>
-          <p v-if="item.equipmentName" class="type-date text-muted-foreground">{{ item.equipmentPlace }}</p>
+        <!-- 「查看設備」靠右，和左邊文字的最下排對齊（2026-10-16）；已經存好的設備才有連結
+             可以點的範圍用 before 往上下各補 12px，超過 44px -->
+        <div v-else class="flex items-end justify-between gap-3">
+          <div class="min-w-0 space-y-0.5">
+            <p class="type-body-strong text-foreground">{{ item.equipmentName || '尚未關聯設備' }}</p>
+            <p v-if="item.equipmentName" class="type-date text-muted-foreground">{{ item.equipmentPlace }}</p>
+          </div>
+          <RouterLink
+            v-if="showDetailLinks && item.equipmentId"
+            :to="`/committee/equipment/${item.equipmentId}`"
+            class="relative flex shrink-0 items-center gap-1 type-link text-foreground before:absolute before:inset-x-0 before:-inset-y-3"
+          >
+            查看設備
+            <ChevronRightIcon class="size-4" />
+          </RouterLink>
         </div>
       </section>
 
       <!-- 廠商 -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
-        <h2 class="type-card-title text-foreground">廠商履歷</h2>
+        <h2 class="type-card-title text-foreground">廠商</h2>
         <!-- 可以派廠商的時候直接顯示欄位（欄位裡已經帶入存好的廠商和預約時間，2026-10-15 拿掉灰底區塊）；
              不能改的只看文字 -->
         <CaseVendorPicker v-if="canPickVendor" v-model:draft="vendorDraft" :vendors="vendors" :current="shownVendor" />
-        <div v-else class="space-y-0.5">
-          <p class="type-body-strong text-foreground">{{ shownVendor.name || '尚未派廠商' }}</p>
-          <p v-if="shownVendor.scheduledAt" class="type-date text-muted-foreground">
-            預約 {{ dateTimeText(shownVendor.scheduledAt) }} 到場
-          </p>
+        <!-- 「查看廠商」靠右，和左邊文字的最下排對齊；名冊裡的廠商才有詳細頁，自己打名字的（沒有 vendorId）沒有連結 -->
+        <div v-else class="flex items-end justify-between gap-3">
+          <div class="min-w-0 space-y-0.5">
+            <p class="type-body-strong text-foreground">{{ shownVendor.name || '尚未派廠商' }}</p>
+            <p v-if="shownVendor.scheduledAt" class="type-date text-muted-foreground">
+              預約 {{ dateTimeText(shownVendor.scheduledAt) }} 到場
+            </p>
+          </div>
+          <RouterLink
+            v-if="showDetailLinks && item.vendorId"
+            :to="`/committee/vendors/${item.vendorId}`"
+            class="relative flex shrink-0 items-center gap-1 type-link text-foreground before:absolute before:inset-x-0 before:-inset-y-3"
+          >
+            查看廠商
+            <ChevronRightIcon class="size-4" />
+          </RouterLink>
         </div>
       </section>
 
@@ -333,5 +435,28 @@ function isVideo(name) {
         <Button v-if="canUpdate" :disabled="!hasDraft || pending" @click="updateStatus">更新進度</Button>
       </div>
     </BottomCta>
+
+    <!-- 寫原因的彈窗：退回案件、撤回交辦共用；原因必填，寫法和交辦詳情的彈窗一樣 -->
+    <Dialog v-model:open="reasonOpen">
+      <DialogContent v-if="item" :show-close-button="false" class="gap-3.5 p-5">
+        <!-- 結尾的 ! 是「一定要用這個」：DialogTitle 本身有預設的字級，要蓋過它 -->
+        <DialogTitle class="type-card-title!">{{ reasonText.title }}</DialogTitle>
+        <DialogDescription class="type-body!">{{ reasonText.note }}</DialogDescription>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <!-- 必填只用紅色星號（dev-guide 第 5 節「表單」） -->
+            <Label for="case-reason" class="text-base">{{ reasonText.label }}<span class="text-destructive">*</span></Label>
+            <p class="type-date text-muted-foreground">{{ reason.length }} / {{ REASON_MAX }} 字</p>
+          </div>
+          <Textarea id="case-reason" v-model="reason" :maxlength="REASON_MAX" class="min-h-[100px]" />
+        </div>
+        <div class="flex gap-3">
+          <DialogClose as-child>
+            <Button variant="outline" class="flex-1">取消</Button>
+          </DialogClose>
+          <Button class="flex-1" :disabled="pending || !reason.trim()" @click="submitReason">{{ reasonText.button }}</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>

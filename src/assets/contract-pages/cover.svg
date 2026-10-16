@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595 842" width="595" height="842">
+  <!-- 合約封面頁的示意圖（示範用，不是真的合約）：真的上線時換成後端從 PDF 轉出來的圖片 -->
+  <rect width="595" height="842" fill="#ffffff"/>
+  <g font-family="'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif" fill="#1f2937" text-anchor="middle">
+    <text x="297.5" y="150" font-size="34" font-weight="700">廠商服務合約書</text>
+    <text x="297.5" y="196" font-size="18" fill="#6b7280">（示意頁面・示範用）</text>
+  </g>
+  <g font-family="'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif" fill="#374151" font-size="18">
+    <text x="80" y="300">甲方：翠峰閣社區管理委員會</text>
+    <text x="80" y="345">乙方：＿＿＿＿＿＿＿＿＿＿</text>
+    <text x="80" y="390">合約期間：＿＿年＿＿月＿＿日至＿＿年＿＿月＿＿日</text>
+  </g>
+  <g fill="#e5e7eb">
+    <rect x="80" y="460" width="435" height="12" rx="6"/>
+    <rect x="80" y="492" width="400" height="12" rx="6"/>
+    <rect x="80" y="524" width="420" height="12" rx="6"/>
+    <rect x="80" y="556" width="300" height="12" rx="6"/>
+  </g>
+  <g font-family="'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif" fill="#374151" font-size="16">
+    <text x="80" y="720">甲方代表簽章：</text>
+    <text x="330" y="720">乙方代表簽章：</text>
+  </g>
+  <g stroke="#9ca3af" stroke-width="1.5">
+    <line x1="80" y1="770" x2="270" y2="770"/>
+    <line x1="330" y1="770" x2="515" y2="770"/>
+  </g>
+</svg>
