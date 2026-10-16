@@ -134,8 +134,10 @@ function committeeTodos(userId) {
   for (const task of tasks) {
     const waitingClose = cases.some((item) => item.id === task.caseId && item.status === 'to_verify')
     if (task.assignerId === userId && task.status === 'reported' && !waitingClose) {
+      // 日期用回報完成的時間（2026-10-16）：剛回報的才會出現在首頁（首頁放建立時間新的在前）
+      const createdAt = task.report?.at ?? task.createdAt
       items.push(
-        todo('confirm', task.title, `${userLabel(task.assigneeId)}已回報完成`, task.createdAt, task.deadline || null, {
+        todo('confirm', task.title, `${userLabel(task.assigneeId)}已回報完成`, createdAt, task.deadline || null, {
           type: 'task',
           id: task.id,
         }),
