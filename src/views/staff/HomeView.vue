@@ -9,7 +9,7 @@ import AppGreeting from '@/components/app/AppGreeting.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { greetingWord } from '@/lib/date'
-import { todoLink } from '@/lib/todo'
+import { newestTodos, todoLink } from '@/lib/todo'
 import { MOCK_NOW, getCurrentUser, getManagedAnnouncements, getMyTodos } from '@/mocks/api'
 
 const loading = ref(true)
@@ -44,7 +44,8 @@ const greeting = computed(() => {
 })
 
 // 首頁只放最前面的 2 筆待辦，其餘的按「查看全部待辦事項」
-const homeTodos = computed(() => todos.value.items.slice(0, 2))
+// 首頁只放最新的 2 張（建立時間新的在前，規則在 src/lib/todo.js）；全部待辦頁才照緊急程度排
+const homeTodos = computed(() => newestTodos(todos.value.items))
 
 // 待辦點了去哪裡：todoLink() 是管委會端的網址，換成管理人員端的
 //   例如 '/committee/cases/CASE-1' → '/staff/cases/CASE-1'

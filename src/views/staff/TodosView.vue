@@ -48,12 +48,14 @@ const TYPE_FILTERS = [
 ]
 const type = ref('all')
 
+// 預設緊急優先（2026-10-16 和 suzy 定的）：緊急的排前面，其他照到期日
+//   首頁只放最新的 2 張；點進全部待辦才照緊急程度排
 const SORT_OPTIONS = [
-  { value: 'due', label: '到期日' },
   { value: 'urgent', label: '緊急優先' },
+  { value: 'due', label: '到期日' },
   { value: 'created', label: '建立日期' },
 ]
-const sort = ref('due')
+const sort = ref('urgent')
 
 // 待辦點了去哪裡：todoLink() 是管委會端的網址，換成管理人員端的（和管理人員首頁一樣）
 function staffTodoLink(todo) {
