@@ -6,6 +6,7 @@
 import { ChevronRightIcon } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { equipmentStatusBadge } from '@/components/admin/equipmentStatusBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
@@ -13,7 +14,7 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate } from '@/lib/date'
 import { getContractById, getEquipmentById, getVendorById } from '@/mocks/api'
-import { EQUIPMENT_DISPLAY_STATUSES, MAINTENANCE_CYCLES } from '@/mocks/data/equipment'
+import { MAINTENANCE_CYCLES } from '@/mocks/data/equipment'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 const SHOW_FIRST = 5 // 維修史先列幾筆，其他按「查看全部」
@@ -38,19 +39,8 @@ async function load() {
 // 從一台設備連到另一台時，Vue 會沿用同一個頁面，所以看網址有沒有變
 watch(() => route.params.id, load, { immediate: true })
 
-// 狀態徽章（dev-guide 第 5 節管理端的顏色）：待維修、保養逾期紅；保養將到期橘；維修中藍；正常、已報廢灰
-const STATUS_VARIANTS = {
-  needs_repair: 'destructive',
-  overdue: 'destructive',
-  due_soon: 'secondary',
-  repairing: 'default',
-  normal: 'outline',
-  retired: 'outline',
-}
-const statusBadge = computed(() => ({
-  text: EQUIPMENT_DISPLAY_STATUSES[device.value.displayStatus].label,
-  variant: STATUS_VARIANTS[device.value.displayStatus],
-}))
+// 狀態徽章：規則在 admin/equipmentStatusBadge.js，設備清冊共用
+const statusBadge = computed(() => equipmentStatusBadge(device.value))
 
 // 位置：A 棟 › A 棟 1 樓機房（範圍 › 安裝位置）
 const locationText = computed(() => `${device.value.areaName} › ${device.value.place}`)
@@ -68,7 +58,8 @@ const infoRows = computed(() => {
   const rows = [
     { label: '安裝日期', value: `${formatFullDate(item.installedAt)}（已使用 ${item.yearsInUse} 年）` },
     { label: '保固到期日', value: `${formatFullDate(item.warrantyUntil)}（${item.inWarranty ? '保固中' : '已過保固'}）` },
-    { label: '負責廠商', value: item.vendorName || '沒有負責廠商' },
+    // 名冊裡的廠商可以點，到廠商詳細（2026-10-16）
+    { label: '負責廠商', value: item.vendorName || '沒有負責廠商', to: item.vendorId ? `/committee/vendors/${item.vendorId}` : '' },
   ]
   if (item.spec) rows.splice(0, 0, { label: '規格', value: item.spec })
   return rows
@@ -95,6 +86,13 @@ const maintenanceRows = computed(() => {
 
 // ── 維修史 ─────────────────────────────────
 const RECORD_TYPES = { maintenance: '保養', repair: '維修' }
+// 每一筆紀錄都可以點（2026-10-16）：從案件來的維修到那件案件；其他（例行保養）到處理的廠商
+//   都沒有的（沒有案件、也沒有名冊裡的廠商）就不能點
+function recordLink(record) {
+  if (record.caseId) return { to: `/committee/cases/${record.caseId}`, text: '查看案件' }
+  if (record.vendorId) return { to: `/committee/vendors/${record.vendorId}`, text: '查看廠商' }
+  return null
+}
 const shownRecords = computed(() =>
   showAllRecords.value ? device.value.records : device.value.records.slice(0, SHOW_FIRST),
 )
@@ -148,10 +146,18 @@ const shownRecords = computed(() =>
       <!-- 設備資訊 -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">設備資訊</h2>
-        <div v-for="row in infoRows" :key="row.label" class="flex items-baseline gap-3">
-          <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
-          <p class="min-w-0 flex-1 text-right type-body-strong text-foreground">{{ row.value }}</p>
-        </div>
+        <template v-for="row in infoRows" :key="row.label">
+          <!-- 有 to 的那一列整列可以點（負責廠商），右邊多一個 › -->
+          <RouterLink v-if="row.to" :to="row.to" class="flex min-h-11 items-center gap-3">
+            <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
+            <p class="min-w-0 flex-1 text-right type-body-strong text-foreground">{{ row.value }}</p>
+            <ChevronRightIcon class="size-5 shrink-0" />
+          </RouterLink>
+          <div v-else class="flex items-baseline gap-3">
+            <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
+            <p class="min-w-0 flex-1 text-right type-body-strong text-foreground">{{ row.value }}</p>
+          </div>
+        </template>
       </section>
 
       <!-- 保養：不需要定期保養的設備不顯示 -->
@@ -168,31 +174,35 @@ const shownRecords = computed(() =>
         </div>
       </section>
 
-      <!-- 維修史：保養和維修紀錄，新的在前；從案件來的維修可以點回那件案件 -->
+      <!-- 維修史：保養和維修紀錄，新的在前；每一筆都可以點（從案件來的到案件，其他到廠商） -->
       <section class="space-y-1 rounded-xl bg-card p-4 shadow-card">
         <h2 class="pb-2 type-card-title text-foreground">維修史</h2>
         <p v-if="!device.records.length" class="type-body text-muted-foreground">還沒有紀錄</p>
         <template v-for="(record, index) in shownRecords" :key="record.id">
           <Separator v-if="index > 0" />
-          <div class="space-y-0.5 py-3">
-            <p class="type-date text-muted-foreground">{{ formatFullDate(record.date) }}</p>
-            <div class="flex items-start gap-2">
-              <p class="min-w-0 flex-1 type-body-strong text-foreground">{{ record.title }}</p>
-              <Badge variant="outline" class="mt-0.5 shrink-0">{{ RECORD_TYPES[record.type] }}</Badge>
+          <!-- 整筆可以點；不能點的（沒有案件、也沒有廠商）用 div -->
+          <component
+            :is="recordLink(record) ? 'RouterLink' : 'div'"
+            :to="recordLink(record)?.to"
+            class="block space-y-0.5 py-3"
+          >
+            <!-- 同一行：左邊日期，右邊「保養／維修」徽章（2026-10-16） -->
+            <div class="flex items-center gap-2">
+              <p class="min-w-0 flex-1 type-date text-muted-foreground">{{ formatFullDate(record.date) }}</p>
+              <Badge variant="outline" class="shrink-0">{{ RECORD_TYPES[record.type] }}</Badge>
             </div>
-            <!-- 廠商、費用（費用只有管委會看得到，假 API 給其他角色時會拿掉） -->
-            <p class="type-date text-muted-foreground">
-              {{ record.vendorName || '沒有廠商' }}<template v-if="record.cost">・{{ record.cost.toLocaleString() }} 元</template>
-            </p>
-            <RouterLink
-              v-if="record.caseId"
-              :to="`/committee/cases/${record.caseId}`"
-              class="flex min-h-11 items-center justify-end gap-1 type-link text-foreground"
-            >
-              查看案件
-              <ChevronRightIcon class="size-4" />
-            </RouterLink>
-          </div>
+            <p class="type-body-strong text-foreground">{{ record.title }}</p>
+            <!-- 同一行：左邊廠商、費用（費用只有管委會看得到），右邊「查看案件 ›」或「查看廠商 ›」 -->
+            <div class="flex items-center gap-2">
+              <p class="min-w-0 flex-1 type-date text-muted-foreground">
+                {{ record.vendorName || '沒有廠商' }}<template v-if="record.cost">・{{ record.cost.toLocaleString() }} 元</template>
+              </p>
+              <span v-if="recordLink(record)" class="flex shrink-0 items-center gap-1 type-link text-foreground">
+                {{ recordLink(record).text }}
+                <ChevronRightIcon class="size-4" />
+              </span>
+            </div>
+          </component>
         </template>
         <!-- 超過 5 筆才有「查看全部」 -->
         <button
