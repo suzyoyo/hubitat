@@ -2,7 +2,7 @@
 // 管委會端的待辦動作卡（對應 Figma 的 Admin/Action Card），「我的待辦」列表用
 //   Kit 的變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」當提示（2026-10-13 改，原本是滿版藍色按鈕）
 //   「按鈕」「文字」等有頁面用到再加
-//   和 Kit 不一樣的地方同 AdminTodoCard：期限一律用徽章，緊急用淺紅底色
+//   和 Kit 不一樣的地方同 AdminTodoCard：期限一律用徽章，沒有「緊急」（只有公告能標示緊急）
 //   已完成的待辦（getMyDoneTodos() 的一筆，有 doneAt）：灰色「已完成」徽章、寫完成時間、右下角「查看詳情 ›」
 import { computed } from 'vue'
 import { ChevronRightIcon } from '@lucide/vue'
@@ -41,8 +41,7 @@ const dateLine = computed(() => {
 </script>
 
 <template>
-  <!-- 緊急的底色還沒有語意色，先用色階 red-50（和 AdminTodoCard 一樣） -->
-  <RouterLink :to="to" class="block space-y-3 rounded-xl p-4 shadow-card" :class="todo.isUrgent ? 'bg-red-50' : 'bg-card'">
+  <RouterLink :to="to" class="block space-y-3 rounded-xl bg-card p-4 shadow-card">
     <div class="flex items-center gap-1.5">
       <p class="min-w-0 flex-1 type-date text-muted-foreground">{{ todo.kindLabel }}</p>
       <Badge v-if="deadlineBadge" :variant="deadlineBadge.variant">{{ deadlineBadge.text }}</Badge>

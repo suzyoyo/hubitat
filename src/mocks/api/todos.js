@@ -44,9 +44,8 @@ export const TODO_KINDS = {
 //             快到期的合約、文件是系統依日期提醒的，沒有建立時間，是 null
 //   dueAt 到期時間（沒有期限就是 null）
 //   link 點了要去哪裡：type 資料種類、id 編號
-//   isUrgent 是否緊急（案件由通報的人標示；其他種類不傳，預設是 false）
 //   isNew 是不是剛進來、我還沒看過（交辦、待我結案會用到，預設是 false）
-function todo(kind, title, hint, createdAt, dueAt, link, isUrgent = false, isNew = false) {
+function todo(kind, title, hint, createdAt, dueAt, link, isNew = false) {
   return {
     id: `${kind}-${link.id}`,
     kind,
@@ -58,7 +57,6 @@ function todo(kind, title, hint, createdAt, dueAt, link, isUrgent = false, isNew
     // 距離到期還有幾天：0 是今天，負數是已經過了幾天；沒有期限是 null
     daysLeft: dueAt ? diffDays(MOCK_TODAY, dueAt.split('T')[0]) : null,
     link,
-    isUrgent,
     isNew,
   }
 }
@@ -125,7 +123,7 @@ function assignedTasks(userId) {
       const link = { type: 'task', id: task.id }
       // 被退回的用退回的時間（2026-10-16，suzy 在 #111 提的）：剛被退回的才會出現在首頁（首頁放建立時間新的在前）
       const createdAt = task.returnNote?.at ?? task.createdAt
-      return todo('assigned', task.title, hint, createdAt, task.deadline || null, link, false, isUnseenTask(userId, task.id))
+      return todo('assigned', task.title, hint, createdAt, task.deadline || null, link, isUnseenTask(userId, task.id))
     })
 }
 
@@ -154,7 +152,7 @@ function committeeTodos(userId) {
   if (['chair', 'viceChair'].includes(user.committeeTitle)) {
     for (const item of cases) {
       if (item.status === 'pending') {
-        items.push(todo('new_case', item.title, caseHint(item), item.reportedAt, item.reportedAt, { type: 'case', id: item.id }, item.isUrgent))
+        items.push(todo('new_case', item.title, caseHint(item), item.reportedAt, item.reportedAt, { type: 'case', id: item.id }))
       }
     }
   }
@@ -196,13 +194,13 @@ function committeeTodos(userId) {
     // 日期用完工驗收的時間；還沒看過的（「案件待結案」通知沒讀）排最前面，首頁才看得到（2026-10-16）
     const createdAt = item.completion?.at ?? item.reportedAt
     const isNew = isUnseen(userId, TO_CLOSE_TITLE, item.id)
-    items.push(todo('to_close', item.title, hint, createdAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent, isNew))
+    items.push(todo('to_close', item.title, hint, createdAt, item.deadline ?? null, { type: 'case', id: item.id }, isNew))
   }
 
   // 我負責、還在處理的案件（待結案的在上面）
   for (const item of cases) {
     if (item.assigneeId === userId && !['closed', 'to_verify'].includes(item.status)) {
-      items.push(todo('my_case', item.title, caseHint(item), item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }, item.isUrgent))
+      items.push(todo('my_case', item.title, caseHint(item), item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }))
     }
   }
 
@@ -249,7 +247,7 @@ function staffTodos(userId) {
     const hint = caseHint(item)
     // 新報修沒有期限，用通報時間排序；其他用處理期限
     const dueAt = kind === 'new_case' ? item.reportedAt : (item.deadline ?? null)
-    items.push(todo(kind, item.title, hint, item.reportedAt, dueAt, { type: 'case', id: item.id }, item.isUrgent))
+    items.push(todo(kind, item.title, hint, item.reportedAt, dueAt, { type: 'case', id: item.id }))
   }
 
   return [...items, ...incompleteQuickSaves(userId)]

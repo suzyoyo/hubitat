@@ -8,7 +8,6 @@
 //   category    問題分類（對應 community.js 的 ISSUE_CATEGORIES）
 //   source      來源，見下方 CASE_SOURCES
 //   isPrivate   是否保密。true：涉及住戶行為，只有管委會與管理人員看得到
-//   isUrgent    是否標示為緊急
 //   reporterId  通報人（對應 users.js）。管委會、管理人員代住戶登記時，是登記的人
 //   reporterUnit 代哪一戶登記：{ building: 'A', unit: '6樓之3' }（代登記時才有）
 //               同一戶的住戶在「我的通報」都看得到這一筆
@@ -71,7 +70,6 @@ export const cases = [
     category: 'plumbing',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-r02',
     reportedAt: '2026-10-01T11:42',
     description: '2 樓公共走廊靠茶水間的牆面一直滲水，地板已經積水，走過去容易滑倒。',
@@ -96,7 +94,6 @@ export const cases = [
     category: 'leak',
     source: 'resident',
     isPrivate: false,
-    isUrgent: true,
     reporterId: 'u-r03', // 2026-10-16 從陳先生改成周太太（展示用：陳先生一開始沒有進行中的通報）
     reportedAt: '2026-09-25T10:12',
     description:
@@ -139,7 +136,6 @@ export const cases = [
     category: 'equipment',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-r04',
     reportedAt: '2026-09-22T19:05',
     description: 'C 棟電梯上下樓時有明顯的金屬摩擦聲，到 4 樓附近特別大聲。',
@@ -191,7 +187,6 @@ export const cases = [
     category: 'leak',
     source: 'patrol',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-s01',
     reportedAt: '2026-09-18T10:00',
     description: '巡查發現 B 棟頂樓防水層多處龜裂，雨後 10 樓梯間天花板有水漬。',
@@ -216,7 +211,6 @@ export const cases = [
     category: 'lighting',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-r03',
     reportedAt: '2026-09-30T20:15',
     description: '晚上經過中庭時感應燈不會亮，要走到很近才閃一下，長輩散步很危險。',
@@ -242,7 +236,6 @@ export const cases = [
     category: 'noise',
     source: 'resident',
     isPrivate: true,
-    isUrgent: false,
     reporterId: 'u-r05', // 2026-10-16 從陳先生改成林小姐（同上）
     reportedAt: '2026-09-27T23:40',
     description: '樓下住戶連續幾晚半夜拖動家具、大聲播放音樂。',
@@ -278,7 +271,6 @@ export const cases = [
     category: 'door',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-c04',
     reportedAt: '2026-09-20T10:15',
     description: '進入大廳時，感應門偶爾不會自動開啟，需要用力推才會動，已持續約三天。',
@@ -320,7 +312,6 @@ export const cases = [
     category: 'lighting',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-r03',
     reportedAt: '2026-09-26T18:20',
     description: '沙發區上方崁燈持續微弱閃爍，訪客休息時光線不適。',
@@ -345,7 +336,6 @@ export const cases = [
     category: 'lighting',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-c04',
     reportedAt: '2026-09-25T08:40',
     description: 'B2 電梯口靠車道側的燈不亮，晚上取車時很暗。',
@@ -371,7 +361,6 @@ export const cases = [
     category: 'leak',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-c04',
     reportedAt: '2026-09-23T16:05',
     description: '頂樓花園東側的灑水噴頭一直滴水，地面有積水。',
@@ -408,7 +397,6 @@ export const cases = [
     category: 'noise',
     source: 'resident',
     isPrivate: true,
-    isUrgent: false,
     reporterId: 'u-c04',
     reportedAt: '2026-09-08T23:20',
     description: '深夜 11 點後隔壁仍在裝潢施工，連續三晚影響睡眠。',
@@ -451,7 +439,6 @@ export const cases = [
     category: 'other',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-c04',
     reportedAt: '2026-09-02T18:30',
     description: 'B1 車道轉彎處的反光鏡角度歪掉，看不到對向來車。',
@@ -486,7 +473,6 @@ export const cases = [
     category: 'door',
     source: 'staff',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-s03',
     reportedAt: '2026-09-15T09:00',
     description: '住戶臨櫃反映 C 棟 3 樓之 2 信箱門片鉸鏈斷裂，無法上鎖。',
@@ -515,7 +501,6 @@ export const cases = [
     category: 'equipment',
     source: 'resident',
     isPrivate: false,
-    isUrgent: true,
     reporterId: 'u-r02',
     reportedAt: '2026-06-30T08:20',
     description: '電梯上升時明顯抖動，並有異常聲響。',
@@ -542,7 +527,6 @@ export const cases = [
     category: 'equipment',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-r01',
     reportedAt: '2026-06-10T12:00',
     description: '電梯門開關時有刮擦聲。',
@@ -569,7 +553,6 @@ export const cases = [
     category: 'equipment',
     source: 'staff',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-s02',
     reportedAt: '2026-03-12T09:30',
     description: '住戶反映電梯門會夾到人，感應器反應慢。',
@@ -596,7 +579,6 @@ export const cases = [
     category: 'equipment',
     source: 'resident',
     isPrivate: false,
-    isUrgent: false,
     reporterId: 'u-r04',
     reportedAt: '2026-01-17T14:00',
     description: '6 樓按鈕按了沒反應。',

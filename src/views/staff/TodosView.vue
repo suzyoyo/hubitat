@@ -48,14 +48,14 @@ const TYPE_FILTERS = [
 ]
 const type = ref('all')
 
-// 預設緊急優先（2026-10-16 和 suzy 定的）：緊急的排前面，其他照到期日
-//   首頁只放最新的 2 張；點進全部待辦才照緊急程度排
+// 預設到期日，可以換建立日期（2026-10-16）
+//   沒有「緊急優先」：只有公告能標示緊急，待辦不會有緊急的
+//   首頁只放最新的 2 張；點進全部待辦才照到期日排
 const SORT_OPTIONS = [
-  { value: 'urgent', label: '緊急優先' },
   { value: 'due', label: '到期日' },
   { value: 'created', label: '建立日期' },
 ]
-const sort = ref('urgent')
+const sort = ref('due')
 
 // 待辦點了去哪裡：todoLink() 是管委會端的網址，換成管理人員端的（和管理人員首頁一樣）
 function staffTodoLink(todo) {
@@ -70,10 +70,6 @@ const shownTodos = computed(() => {
   // 已完成的固定新的在前（getMyDoneTodos() 已經排好），不用排序選單
   if (tab.value === 'done') return items
   // getMyTodos() 本來就照到期日排好了
-  if (sort.value === 'urgent') {
-    // 緊急的排前面，其他維持到期日的順序
-    return items.toSorted((a, b) => Number(b.isUrgent) - Number(a.isUrgent))
-  }
   if (sort.value === 'created') {
     // 新建立的排前面；沒有建立日期的（快到期的合約、文件）排最後
     return items.toSorted((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''))

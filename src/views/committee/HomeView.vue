@@ -54,7 +54,7 @@ const greeting = computed(() => {
 })
 
 // 首頁只放最前面的 2 筆待辦，其餘的按標題右邊的「查看 N 件待辦」
-// 首頁只放最新的 2 張（建立時間新的在前，規則在 src/lib/todo.js）；全部待辦頁才照緊急程度排
+// 首頁只放最新的 2 張（建立時間新的在前，規則在 src/lib/todo.js）；全部待辦頁才照到期日排
 const homeTodos = computed(() => newestTodos(todos.value.items))
 
 // 捷徑方塊：不是 Kit 元件，直接寫在頁面裡
