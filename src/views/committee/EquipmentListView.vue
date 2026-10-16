@@ -1,6 +1,6 @@
 <script setup>
 // 管委會端・設備清冊（社區分頁「設備清冊」，設計稿 1134:16415、狀態下拉 1449:28680）
-// 搜尋設備名稱、位置或廠商；依狀態篩選；點一列到設備詳情
+// 搜尋設備名稱、位置或廠商；依狀態、地點篩選（地點是 2026-10-16 013 加的，設計稿沒有）；點一列到設備詳情
 // 這一版只有「看」；「新增設備」還沒有假 API，先不放
 import { SearchIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
@@ -32,6 +32,14 @@ const STATUS_FILTERS = [
 ]
 const status = ref('all')
 
+// 地點：用設備資料裡有的範圍做選項，照範圍的編號排（A 棟、B 棟、C 棟在前，再來是中庭、停車場、泳池）
+const areaOptions = computed(() => {
+  const names = new Map(devices.value.map((item) => [item.areaId, item.areaName]))
+  const list = [...names].map(([value, label]) => ({ value, label }))
+  return [{ value: 'all', label: '全部' }, ...list.toSorted((a, b) => a.value.localeCompare(b.value))]
+})
+const area = ref('all')
+
 const SORT_OPTIONS = [
   { value: 'status', label: '需要處理的在前' },
   { value: 'maintenance', label: '保養日由近至遠' },
@@ -45,6 +53,7 @@ const shownDevices = computed(() => {
   const word = keyword.value.trim()
   const items = devices.value.filter((item) => {
     if (status.value !== 'all' && item.displayStatus !== status.value) return false
+    if (area.value !== 'all' && item.areaId !== area.value) return false
     if (!word) return true
     return [item.name, item.place, item.vendorName].some((text) => text?.includes(word))
   })
@@ -65,7 +74,11 @@ const shownDevices = computed(() => {
       <Input v-model="keyword" type="search" aria-label="搜尋設備" placeholder="搜尋設備名稱、位置或廠商" class="pl-10" />
     </div>
 
-    <FilterSelect v-model="status" label="狀態" :options="STATUS_FILTERS" />
+    <!-- 兩個下拉選單平分一行 -->
+    <div class="flex gap-2 *:flex-1">
+      <FilterSelect v-model="status" label="狀態" :options="STATUS_FILTERS" />
+      <FilterSelect v-model="area" label="地點" :options="areaOptions" />
+    </div>
     <!-- 同一行：左邊件數、右邊排序（灰色小字） -->
     <div class="flex items-center justify-between gap-3">
       <p class="type-date text-muted-foreground">{{ loading ? '' : `共 ${shownDevices.length} 項` }}</p>
