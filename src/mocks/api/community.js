@@ -33,10 +33,12 @@ export async function getInternalContacts() {
   return internalContacts.map((contact) => {
     // 沒有 userId 的是固定單位（例如中控室），直接回傳
     if (!contact.userId) return contact
-    // 委員顯示成「李委員・主委」，管理人員顯示成「王小姐・總幹事」
+    // 名字用 userLabel 的叫法（「李主委」「王總幹事」「王委員」）
+    // 職稱已經在名字裡的不再重複寫（李主委不寫「主委」）；一般委員才補上「修繕委員」這類職稱
     const user = findUser(contact.userId)
     const info = describeUser(user, user.committeeTitle ? 'committee' : 'staff')
-    return { ...contact, name: info.displayName, note: info.titleLabel }
+    const note = info.displayName.endsWith(info.titleLabel) ? '' : info.titleLabel
+    return { ...contact, name: info.displayName, note }
   })
 }
 

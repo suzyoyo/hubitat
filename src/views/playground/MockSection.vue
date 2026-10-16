@@ -193,7 +193,7 @@ function dueText(item) {
         <div class="flex flex-wrap gap-2">
           <Badge v-for="member in committee" :key="member.id" variant="secondary">{{ member.shortName }}</Badge>
           <Badge v-for="member in staff" :key="member.id" variant="outline">
-            {{ member.titleLabel }} {{ member.displayName }}
+            {{ member.displayName }}
           </Badge>
         </div>
       </div>

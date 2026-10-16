@@ -10,21 +10,22 @@ import {
 import { delay } from './helpers'
 
 // 依「目前用哪個身分看」決定要顯示的名稱與職稱
-// 例如李伯伯：住戶身分是「李伯伯」，管委會身分是「李委員」「主委」
+// 例如李伯伯：住戶身分是「李伯伯」，管委會身分是「李主委」「主委」
+// displayName 和 userLabel 同一套叫法（姓＋職稱，2026-10-16 跟著 userLabel 改）
 export function describeUser(user, role) {
   if (role === 'committee' && user.committeeTitle) {
     const title = COMMITTEE_TITLES[user.committeeTitle]
     return {
-      displayName: `${user.surname}委員`, // 李委員
+      displayName: userLabel(user.id), // 李主委、王委員
       titleLabel: title.label, // 主委
       shortName: `${user.surname}${title.short}`, // 李主委
     }
   }
   if (role === 'staff' && user.staffTitle) {
     return {
-      displayName: user.name,
+      displayName: userLabel(user.id), // 王總幹事、張管理員
       titleLabel: STAFF_TITLES[user.staffTitle].label,
-      shortName: user.name,
+      shortName: userLabel(user.id),
     }
   }
   return { displayName: user.name, titleLabel: '住戶', shortName: user.name }
