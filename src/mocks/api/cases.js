@@ -390,11 +390,10 @@ export async function updateCase(id, userId, { equipmentId = '', vendor = null, 
 }
 
 // 結案（closeCase 和「負責人自己完工驗收」共用）：狀態改成已結案，並把後續的事一起做完
-//   cost 維修費用，只有委員填得了；rating 廠商評分 { score: 1～5, comment }
-function closeItem(item, userId, cost, rating) {
+//   cost 維修費用，只有委員填得了；note 結案說明，寫在「已結案」那筆紀錄裡（管理端看得到，住戶看不到）
+function closeItem(item, userId, cost, note = '') {
   item.status = 'closed'
   item.closedAt = MOCK_NOW
-  if (rating) item.rating = { score: rating.score, comment: rating.comment ?? '' }
   // 連到這件案件、等確認的交辦，一起確認完成
   for (const task of tasks) {
     if (task.caseId === item.id && task.status === 'reported') {
@@ -422,7 +421,9 @@ function closeItem(item, userId, cost, rating) {
     if (isCommittee && cost > 0) record.cost = cost
     device.records.unshift(record) // 紀錄是新的在前
   }
-  addLog(item, userId, '已結案', `${userLabel(userId)}結案`, '已完成維修，感謝你的通報。')
+  // 有結案說明的話多一行，例如「李主委結案」下面一行「費用已付清」
+  const text = note ? `${userLabel(userId)}結案\n${note}` : `${userLabel(userId)}結案`
+  addLog(item, userId, '已結案', text, '已完成維修，感謝你的通報。')
 }
 
 // 完工驗收：已受理、處理中 → 當場修好、當場驗收（沒有「驗收不通過」）
@@ -454,14 +455,14 @@ export async function completeCase(id, userId, { note = '', photos = [] }) {
 }
 
 // 結案：待結案 → 已結案。主委、副主委都能結案，不管是誰受理的（2026-10-15 改，原本只有負責人）
-//   options 都是選填：cost 維修費用（只有委員填得了）、rating 廠商評分 { score: 1～5, comment }
+//   options 都是選填：cost 維修費用（只有委員填得了）、note 結案說明
+//   廠商評分 2026-10-16 從結案拿掉了（舊的假資料還留著 rating，廠商詳情的平均評分照樣算）
 export async function closeCase(id, userId, options = {}) {
   await delay()
   const item = findHandleableCase(id, userId, ['to_verify'])
   if (!item || !canCloseCases(userId)) return undefined
-  const { cost, rating } = options
-  if (rating && !(rating.score >= 1 && rating.score <= 5)) return undefined
-  closeItem(item, userId, cost, rating)
+  const { cost, note } = options
+  closeItem(item, userId, cost, note?.trim() ?? '')
   return presentForManagement(item)
 }
 
