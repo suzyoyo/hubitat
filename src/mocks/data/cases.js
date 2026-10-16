@@ -97,7 +97,7 @@ export const cases = [
     source: 'resident',
     isPrivate: false,
     isUrgent: true,
-    reporterId: 'u-r01',
+    reporterId: 'u-r03', // 2026-10-16 從陳先生改成周太太（展示用：陳先生一開始沒有進行中的通報）
     reportedAt: '2026-09-25T10:12',
     description:
       '昨晚大雨後 B2 車道轉角入口處嚴重積水約 5 公分，排水溝孔蓋卡滿大量枯枝落葉，機車下坡轉彎時輪胎打滑十分危險。',
@@ -105,12 +105,12 @@ export const cases = [
     status: 'accepted',
     deadline: '2026-09-28',
     assigneeId: 'u-c04',
-    supporters: ['u-r03', 'u-r04', 'u-c03', 'u-c05'],
+    supporters: ['u-r04', 'u-c03', 'u-c05'],
     logs: [
       {
         at: '2026-09-25T10:12',
         label: '住戶通報',
-        text: '陳先生（B 棟 8 樓）通報，附 2 張照片',
+        text: '周太太（A 棟 5 樓）通報，附 2 張照片',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
       {
@@ -240,7 +240,7 @@ export const cases = [
     source: 'resident',
     isPrivate: true,
     isUrgent: false,
-    reporterId: 'u-r01',
+    reporterId: 'u-r05', // 2026-10-16 從陳先生改成林小姐（同上）
     reportedAt: '2026-09-27T23:40',
     description: '樓下住戶連續幾晚半夜拖動家具、大聲播放音樂。',
     photos: [],
@@ -252,7 +252,7 @@ export const cases = [
       {
         at: '2026-09-27T23:40',
         label: '住戶通報',
-        text: '陳先生（B 棟 8 樓）通報',
+        text: '林小姐（B 棟 6 樓）通報',
         residentText: '已收到通報，好彼管家已轉交管委會。',
       },
       {
