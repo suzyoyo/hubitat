@@ -232,7 +232,6 @@ function cancel() {
             {{ assignee.surname }}
           </span>
           <div class="min-w-0 flex-1">
-            <p class="type-date text-muted-foreground">管理人員</p>
             <p class="type-body-strong text-foreground">{{ assignee.displayName }}</p>
           </div>
           <Button type="button" variant="ghost" size="icon" aria-label="重新選擇交辦對象" @click="form.assigneeId = ''">
@@ -259,7 +258,6 @@ function cancel() {
                   {{ member.surname }}
                 </span>
                 <span class="min-w-0 flex-1">
-                  <span class="block type-date text-muted-foreground">管理人員</span>
                   <span class="block type-body-strong text-foreground">{{ member.displayName }}</span>
                 </span>
               </button>
