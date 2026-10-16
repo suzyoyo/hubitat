@@ -147,9 +147,9 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
-| `Admin/Todo Card` | `admin/AdminTodoCard.vue` | ✅ | 待辦卡。傳 `getMyTodos()` 的一筆 `todo` 進去。變體 Type 沒有做成 prop，依 `todo.isUrgent` 自動切換；期限徽章和緊急的標示方式和 Kit 不同，見[第 4 節](#4-kit-和程式不一樣的地方)。左上角的建立日期要等 `getMyTodos()` 帶出 `createdAt` 才會顯示 |
+| `Admin/Todo Card` | `admin/AdminTodoCard.vue` | ✅ | 待辦卡。傳 `getMyTodos()` 的一筆 `todo` 進去。變體 Type 只做「一般」：只有公告能標示緊急，待辦不會有（2026-10-16 拿掉淺紅底色）；期限徽章和 Kit 不同，見[第 4 節](#4-kit-和程式不一樣的地方)。左上角的建立日期要等 `getMyTodos()` 帶出 `createdAt` 才會顯示 |
 | `Admin/Notice Card` | `admin/AdminNoticeCard.vue` | ✅ | 變體 Type 沒有做成 prop：傳 `announcement`（`getManagedAnnouncements()` 的一筆）是公告，傳 `opinion`（`getResidentOpinions()` 的一筆）是住戶意見。住戶意見的標題用留言所在的會議名稱 |
-| `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`；也可以傳 `getMyDoneTodos()` 的一筆（有 `doneAt`），會變成灰色「已完成」、寫完成時間、右下角「查看詳情」。變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」只是提示（2026-10-13 從滿版藍色按鈕改過來，卡片變短，也不會整頁都是主要按鈕）；「按鈕」「文字」還沒做，有頁面用到再加。期限徽章、緊急底色和 `AdminTodoCard` 一樣，規則在 `src/lib/todo.js` |
+| `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`；也可以傳 `getMyDoneTodos()` 的一筆（有 `doneAt`），會變成灰色「已完成」、寫完成時間、右下角「查看詳情」。變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」只是提示（2026-10-13 從滿版藍色按鈕改過來，卡片變短，也不會整頁都是主要按鈕）；「按鈕」「文字」還沒做，有頁面用到再加。期限徽章和 `AdminTodoCard` 一樣（沒有緊急底色），規則在 `src/lib/todo.js` |
 | `Admin/Meeting Card` | `admin/AdminMeetingCard.vue` | ⬜ | 變體 State：待整理／待發布／已發布 |
 | `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ✅ | 廠商卡：名稱＋合約徽章＋›、處理項目的小標籤。整張卡可以點。合約徽章：無合約紅；即將到期橘；尚未生效藍；合約內灰。管委會端「廠商名冊」在用 |
 | `Admin/Case Card` | `admin/AdminCaseCard.vue` | ✅ | 案件卡：標題＋狀態徽章＋›、地點徽章、負責人｜廠商（2026-10-14 照 Kit 改版）。整張卡可以點。狀態徽章：逾期、尚未受理紅；待結案橘；處理中（已受理、處理中）藍；已結案、已取消灰（規則在 `admin/caseStatusBadge.js`，案件詳情頁共用）。prop 叫 `item`（`case` 是 JavaScript 的保留字）。管委會端「案件」分頁在用 |
@@ -214,8 +214,8 @@ import { Button } from '@/components/ui/button'
 | 文字屬性 | 每段文字一個屬性 | 傳一整筆資料 | 見[第 1 節](#1-怎麼讀這份表) |
 | Admin/ 的屬性名稱 | 中文（標題、說明） | 英文 | 程式的命名一律用英文 |
 | 半透明背景、提示訊息 | 自己畫的元件 | 用 shadcn-vue 內建的 | 內建的已經處理好動畫和鍵盤操作 |
-| `Admin/Todo Card` 的期限 | 「緊急」是紅色徽章、「一般」是灰字 | 一律用徽章，照 [dev-guide.md 第 5 節](dev-guide.md#徽章badge)管理端的顏色：逾期、今日到期紅色，剩餘 N 天橘色 | 同一個狀態只用一種顏色。逾期的待辦不管有沒有標緊急都要看得出來 |
-| `Admin/Todo Card` 的緊急 | 用紅色徽章標示 | 整張卡片底色改成 `bg-red-50` | 徽章已經用來顯示期限。`red-50` 還沒有語意色，之後要調整 Kit |
+| `Admin/Todo Card` 的期限 | 「緊急」是紅色徽章、「一般」是灰字 | 一律用徽章，照 [dev-guide.md 第 5 節](dev-guide.md#徽章badge)管理端的顏色：逾期、今日到期紅色，剩餘 N 天橘色 | 同一個狀態只用一種顏色 |
+| `Admin/Todo Card` 的緊急 | 用紅色徽章標示 | 不做（2026-10-16） | 只有公告能標示緊急，待辦不會有緊急的；Kit 的「緊急」變體可以拿掉 |
 
 ---
 

@@ -239,7 +239,7 @@ function setEquipmentStatus(item, status) {
 
 // 受理：待受理 → 已受理，受理的人就是負責人
 //   options 都是選填：
-//     deadline    完成日期，例如 '2026-10-08'（不依緊急給預設值）
+//     deadline    完成日期，例如 '2026-10-08'
 //     category    問題分類，例如 'equipment'（住戶通報時先歸「其他」，這時改成正確的）
 //     equipmentId 關聯設備，例如 'e-001'（有選的話設備變「待維修」，結案時進維修歷史）
 export async function acceptCase(id, userId, options = {}) {
@@ -678,7 +678,6 @@ export async function createReport(userId, input) {
     category: 'other',
     source: 'resident',
     isPrivate: input.isPrivate,
-    isUrgent: false,
     reporterId: userId,
     reportedAt: MOCK_NOW,
     description: input.description,
@@ -739,7 +738,6 @@ export async function createRepair(userId, input, role = 'committee') {
     category: 'other',
     source: role,
     isPrivate: input.isPrivate,
-    isUrgent: false,
     reporterId: userId,
     reportedAt: MOCK_NOW,
     description: input.description,

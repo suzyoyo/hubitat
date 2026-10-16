@@ -15,7 +15,7 @@ export function todoDeadlineBadge(todo) {
 }
 
 // 首頁「我的待辦」要放的幾張：建立時間新的在前（2026-10-16 和 suzy 定的）
-//   剛進來的事（新通報、新交辦、待我結案）首頁一定看得到；全部待辦頁才照緊急程度排
+//   剛進來的事（新通報、新交辦、待我結案）首頁一定看得到；全部待辦頁才照到期日排
 //   沒有建立時間的（快到期的合約、文件，是系統依日期提醒的）排最後
 //   items 是 getMyTodos() 回傳的 items；count 是要幾張
 export function newestTodos(items, count = 2) {

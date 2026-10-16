@@ -24,7 +24,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 // ref()：建立會自動更新畫面的資料；v-model 會把輸入框和這些資料綁在一起
 const title = ref('')
 const detail = ref('')
-const urgency = ref('normal')
+const visibility = ref('public')
 const rating = ref([4]) // Slider 的值是陣列（因為可以有多個拉桿）
 const filter = ref('all')
 const sort = ref('due')
@@ -62,15 +62,16 @@ const sort = ref('due')
 
       <!-- RadioGroup：多選一 -->
       <Field>
-        <FieldLabel>緊急程度</FieldLabel>
-        <RadioGroup v-model="urgency">
+        <!-- 示範用：新增通報的「公開狀態」（2026-10-16 從「緊急程度」換掉，案件沒有緊急了） -->
+        <FieldLabel>公開狀態</FieldLabel>
+        <RadioGroup v-model="visibility">
           <div class="flex items-center gap-2">
-            <RadioGroupItem id="urgency-normal" value="normal" />
-            <FieldLabel for="urgency-normal" class="font-normal">一般</FieldLabel>
+            <RadioGroupItem id="visibility-public" value="public" />
+            <FieldLabel for="visibility-public" class="font-normal">公開（其他住戶看得到）</FieldLabel>
           </div>
           <div class="flex items-center gap-2">
-            <RadioGroupItem id="urgency-urgent" value="urgent" />
-            <FieldLabel for="urgency-urgent" class="font-normal">緊急（影響安全）</FieldLabel>
+            <RadioGroupItem id="visibility-private" value="private" />
+            <FieldLabel for="visibility-private" class="font-normal">保密（僅你本人與管委會可見）</FieldLabel>
           </div>
         </RadioGroup>
       </Field>
@@ -100,7 +101,6 @@ const sort = ref('due')
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="due">到期日</SelectItem>
-            <SelectItem value="urgent">緊急優先</SelectItem>
             <SelectItem value="created">建立日期（新→舊）</SelectItem>
           </SelectContent>
         </Select>
@@ -108,6 +108,6 @@ const sort = ref('due')
     </FieldGroup>
 
     <!-- 即時顯示表單資料，看 v-model 的效果 -->
-    <pre class="overflow-x-auto rounded-lg bg-muted p-3 text-xs">{{ { title, detail, urgency, rating, filter, sort } }}</pre>
+    <pre class="overflow-x-auto rounded-lg bg-muted p-3 text-xs">{{ { title, detail, visibility, rating, filter, sort } }}</pre>
   </section>
 </template>
