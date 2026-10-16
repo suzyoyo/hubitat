@@ -25,7 +25,7 @@ import { getCommunity, getCurrentUser, getTerm } from '@/mocks/api'
 import { version } from '../../../package.json'
 
 const loading = ref(true)
-const user = ref(null) // 我是誰（管委會的身分：displayName 是「李委員」、titleLabel 是「主委」）
+const user = ref(null) // 我是誰（管委會的身分：displayName 是「李主委」、titleLabel 是「主委」）
 const community = ref(null) // 社區基本資料（要顯示社區名稱）
 const term = ref(null) // 這一屆管委會：第幾屆、任期到什麼時候
 
