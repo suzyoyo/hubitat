@@ -6,6 +6,8 @@ import AnnouncementFormView from '@/views/committee/AnnouncementFormView.vue'
 import CaseCompleteView from '@/views/committee/CaseCompleteView.vue'
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
+import ContractDetailView from '@/views/committee/ContractDetailView.vue'
+import ContractsView from '@/views/committee/ContractsView.vue'
 import FilesView from '@/views/committee/FilesView.vue'
 import HomeView from '@/views/committee/HomeView.vue'
 import MeView from '@/views/committee/MeView.vue'
@@ -36,6 +38,8 @@ export default {
     'vendors/:id': VendorDetailView,
     'cases/:id': CaseDetailView,
     'cases/:id/complete': CaseCompleteView,
+    contracts: ContractsView,
+    'contracts/:id': ContractDetailView,
     'announcements/:id': AnnouncementDetailView,
     // 發布和修改是同一個表單
     'announcements/new': AnnouncementFormView,
