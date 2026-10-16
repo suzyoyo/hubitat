@@ -79,6 +79,23 @@ npm run dev
 
 開發者工具的 **Console** 分頁會顯示錯誤訊息（紅字）。畫面怪怪的時候先看這裡。
 
+### 在真的手機上測（加到主畫面）
+
+2026-10-16 加了 PWA（`vite-plugin-pwa`，設定在 `vite.config.js`、`index.html`；圖示在 `public/icon/`，從 `app-icon-1024.png` 縮出來的）。手機「加到主畫面」後，打開時沒有網址列，看起來像 App。
+
+1. 手機和電腦連同一個網路（同一個 Wi-Fi，或電腦連手機的個人熱點）
+2. 打包並開預覽（PWA 只在打包後的版本有作用，`npm run dev` 不會啟用）：
+   ```bash
+   npm run build
+   npm run preview -- --host
+   ```
+3. 終端機會印出一行 `Network: http://172.20.10.2:4173/` 這種網址，用手機打開
+4. iPhone：Safari 下方「分享」→「加入主畫面」；Android：Chrome 右上角「⋮」→「加到主畫面」
+
+- 改了程式要重新 `npm run build`，手機上的 App 關掉再打開才會更新
+- 假資料只在記憶體：App 關掉再打開，做過的事都會不見
+- 這樣是 `http` 網址，iPhone 可以加到主畫面；Android 的「安裝」提示和離線開啟要 `https` 網址才有
+
 ### 認識幾個網址
 
 | 網址 | 是什麼 |
