@@ -88,6 +88,21 @@ function notifyAssignee(task, title, reason) {
   })
 }
 
+// 發一則通知給交辦人（被交辦的人回報完成時，2026-10-16）
+// 交辦人是主委、副主委，發到管委會端
+function notifyAssigner(task, title, reason) {
+  notifications.push({
+    id: `n-${task.id}-${notifications.length + 1}`,
+    userId: task.assignerId,
+    role: 'committee',
+    title,
+    body: `${task.title}：${reason}`,
+    at: MOCK_NOW,
+    read: false,
+    link: { type: 'task', id: task.id },
+  })
+}
+
 // 被交辦的人打開交辦詳情時用：只把這件交辦的「新的交辦」通知設為已讀
 //   這件交辦就不算新的，待辦不再把它排到最前面
 //   「交辦今天到期」「交辦被退回」等其他通知不動，要等他自己在通知頁點
@@ -201,6 +216,7 @@ export async function createTask(userId, input) {
 //   note 備註、files 附件檔名的清單，都是選填
 //   被退回過的，回報後清掉退回原因
 // 連到案件的交辦，在案件上按「完工驗收」時會自動回報，不用再按這個
+// 回報後通知交辦人「交辦已回報完成」
 // 成功回傳 true，不能回報（不是交辦給自己的、狀態不對）回傳 false
 export async function reportTask(id, userId, { note = '', files = [] } = {}) {
   await delay()
@@ -209,5 +225,6 @@ export async function reportTask(id, userId, { note = '', files = [] } = {}) {
   task.status = 'reported'
   task.report = { at: MOCK_NOW, note, files: [...files] }
   delete task.returnNote
+  notifyAssigner(task, '交辦已回報完成', `${userLabel(userId)}已回報完成，請確認`)
   return true
 }

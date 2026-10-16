@@ -19,6 +19,7 @@ import NewTaskView from '@/views/committee/NewTaskView.vue'
 import NotificationsView from '@/views/committee/NotificationsView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
+import TaskReportView from '@/views/committee/TaskReportView.vue'
 import TasksView from '@/views/committee/TasksView.vue'
 import TodosView from '@/views/committee/TodosView.vue'
 import UrgentLogView from '@/views/committee/UrgentLogView.vue'
@@ -55,6 +56,7 @@ export default {
     proposals: ProposalsView,
     'tasks/new': NewTaskView,
     'tasks/:id': TaskDetailView,
+    'tasks/:id/report': TaskReportView, // 交辦詳情的「回報完成」（沒有關聯案件的交辦）
     'cases/new': NewRepairView,
     'me/urgent-log': UrgentLogView,
   },
@@ -79,6 +81,7 @@ export default {
     { path: 'vendors/:id', title: '廠商詳細' },
     { path: 'equipment/:id', title: '設備詳情' },
     { path: 'tasks/:id', title: '交辦詳情' },
+    { path: 'tasks/:id/report', title: '回報完成' },
     { path: 'proposals/:id', title: '提案詳情' },
     { path: 'announcements/:id', title: '公告詳情' },
     { path: 'announcements/new', title: '發布公告' },
