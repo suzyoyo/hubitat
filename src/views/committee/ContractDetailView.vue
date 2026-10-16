@@ -2,14 +2,17 @@
 // 管委會端・合約詳情（設計稿 1134:16362）：廠商名稱（查看廠商）、合約資訊、合約文件、歷次合約
 // 廠商合約列表、廠商詳細、設備詳情的「查看合約」都連到這裡
 // 合約金額、合約檔案只有管委會看得到（假 API 給其他角色時會拿掉）
-// 假資料沒有真的檔案：頁面縮圖只畫圖示，「下載 PDF」按了只跳提示（和會議紀錄的下載一樣）
-import { ChevronRightIcon, DownloadIcon, FileTextIcon } from '@lucide/vue'
-import { computed, ref, watch } from 'vue'
+// 合約文件（2026-10-16 和 013 決定）：點縮圖在 App 裡全螢幕預覽，左右滑換頁；「下載 PDF」是次要按鈕
+//   真的上線時，上傳 PDF 後由後端把每一頁轉成圖片，畫面只顯示圖片（手機上最穩、長輩不用去找下載的檔案）
+//   假資料沒有真的檔案：每一頁先用兩張示意圖代替（第 1 頁封面、其他內文），「下載 PDF」按了只跳提示
+import { ChevronLeftIcon, ChevronRightIcon, DownloadIcon, XIcon } from '@lucide/vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { contractBadge } from '@/components/admin/contractBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -17,6 +20,8 @@ import { formatFullDate } from '@/lib/date'
 import { getContractById } from '@/mocks/api'
 import { CONTRACT_STATUSES } from '@/mocks/data/contracts'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
+import coverPageUrl from '@/assets/contract-pages/cover.svg' // 合約封面頁的示意圖
+import bodyPageUrl from '@/assets/contract-pages/body.svg' // 合約內文頁的示意圖
 
 // 網址是 /committee/contracts/:id
 const route = useRoute()
@@ -48,11 +53,42 @@ const infoRows = computed(() => {
   return rows
 })
 
-// 合約文件：每個檔案的每一頁一格，例如「第 1 頁」「第 2 頁」
+// 合約文件：每個檔案的每一頁一張圖；src 先用示意圖，真的上線換成後端轉好的圖片網址
 const pages = computed(() => {
   const files = contract.value.files ?? []
-  return files.flatMap((file) => Array.from({ length: file.pages }, (_, index) => `${file.name}-${index + 1}`))
+  return files.flatMap((file) =>
+    Array.from({ length: file.pages }, (_, index) => ({
+      key: `${file.name}-${index + 1}`,
+      src: index === 0 ? coverPageUrl : bodyPageUrl,
+    })),
+  )
 })
+
+// ── 全螢幕預覽 ─────────────────────────────────
+// 一頁一張圖橫著排，左右滑換頁（scroll-snap 讓它停在整頁）；也有上一頁、下一頁按鈕
+const previewOpen = ref(false)
+const currentPage = ref(0) // 現在看第幾頁（從 0 開始）
+const track = ref(null) // 橫向捲動的那一排
+
+async function openPreview(index) {
+  currentPage.value = index
+  previewOpen.value = true
+  await nextTick()
+  // 彈窗打開後，直接捲到點的那一頁（不要動畫）
+  requestAnimationFrame(() => track.value?.scrollTo({ left: index * track.value.clientWidth }))
+}
+
+// 滑動時，用捲了多遠算出現在是第幾頁
+function onScroll() {
+  const el = track.value
+  if (el) currentPage.value = Math.round(el.scrollLeft / el.clientWidth)
+}
+
+function goPage(index) {
+  const el = track.value
+  if (!el) return
+  el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' })
+}
 
 function download() {
   const file = contract.value.files?.[0]
@@ -110,20 +146,25 @@ function download() {
       <section v-if="contract.files" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">合約文件</h2>
         <div v-if="pages.length" class="grid grid-cols-3 gap-3">
-          <div
+          <!-- 點縮圖：全螢幕預覽，從這一頁開始看 -->
+          <button
             v-for="(page, index) in pages"
-            :key="page"
-            class="flex aspect-[3/4] flex-col items-center justify-center gap-1.5 rounded-xl bg-muted text-muted-foreground"
+            :key="page.key"
+            type="button"
+            class="space-y-1 text-center"
+            :aria-label="`看第 ${index + 1} 頁`"
+            @click="openPreview(index)"
           >
-            <FileTextIcon class="size-6" />
-            <p class="type-date">第 {{ index + 1 }} 頁</p>
-          </div>
+            <img :src="page.src" alt="" class="aspect-[210/297] w-full rounded-lg border bg-white object-cover" />
+            <span class="type-date text-muted-foreground">第 {{ index + 1 }} 頁</span>
+          </button>
         </div>
         <p v-else class="type-body text-muted-foreground">還沒有上傳合約檔案</p>
         <Button v-if="pages.length" variant="outline" class="w-full" @click="download">
           <DownloadIcon />
           下載 PDF
         </Button>
+        <p v-if="pages.length" class="type-date text-muted-foreground">點頁面可以放大看</p>
         <p class="type-date text-muted-foreground">由{{ contract.uploadedByLabel }}於 {{ formatFullDate(contract.uploadedAt) }} 上傳</p>
       </section>
 
@@ -143,5 +184,46 @@ function download() {
         </template>
       </section>
     </template>
+
+    <!-- 全螢幕預覽：深色底、上面是頁數和關閉，中間左右滑換頁，下面是上一頁、下一頁 -->
+    <Dialog v-model:open="previewOpen">
+      <DialogContent
+        v-if="contract"
+        :show-close-button="false"
+        class="flex h-dvh max-w-none flex-col gap-0 rounded-none bg-neutral-900 p-0 text-white ring-0 sm:max-w-none"
+      >
+        <div class="flex items-center gap-2 px-3 py-2">
+          <DialogTitle class="min-w-0 flex-1 truncate type-body-strong! text-white">
+            {{ contract.vendorName }}・第 {{ currentPage + 1 }} / {{ pages.length }} 頁
+          </DialogTitle>
+          <DialogDescription class="sr-only">左右滑動可以換頁，兩指可以放大</DialogDescription>
+          <DialogClose as-child>
+            <Button variant="ghost" size="icon" class="size-11 text-white hover:bg-white/10" aria-label="關閉預覽">
+              <XIcon class="size-6" />
+            </Button>
+          </DialogClose>
+        </div>
+        <div ref="track" class="flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto" @scroll.passive="onScroll">
+          <div v-for="(page, index) in pages" :key="page.key" class="flex w-full shrink-0 snap-center items-center justify-center p-4">
+            <img :src="page.src" :alt="`第 ${index + 1} 頁`" class="max-h-full max-w-full rounded bg-white" />
+          </div>
+        </div>
+        <div class="flex items-center justify-between px-3 py-3">
+          <Button variant="ghost" class="h-11 text-white hover:bg-white/10" :disabled="currentPage === 0" @click="goPage(currentPage - 1)">
+            <ChevronLeftIcon />
+            上一頁
+          </Button>
+          <Button
+            variant="ghost"
+            class="h-11 text-white hover:bg-white/10"
+            :disabled="currentPage === pages.length - 1"
+            @click="goPage(currentPage + 1)"
+          >
+            下一頁
+            <ChevronRightIcon />
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
