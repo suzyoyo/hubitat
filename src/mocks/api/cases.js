@@ -466,6 +466,41 @@ export async function closeCase(id, userId, options = {}) {
   return presentForManagement(item)
 }
 
+// 退回：待結案 → 處理中，請完工驗收的人再處理一次（2026-10-16）
+//   誰：主委、副主委（和結案同一批人）；reason 退回原因，必填
+//   有連到這件案件、待確認的交辦 → 一起退回（交辦回到進行中，記下退回原因），通知交辦對象
+//   沒有交辦的（管理人員自己受理的）→ 通知按完工驗收的人
+export async function returnCase(id, userId, reason) {
+  await delay()
+  const item = findHandleableCase(id, userId, ['to_verify'])
+  if (!item || !canCloseCases(userId) || !reason?.trim()) return undefined
+  const note = reason.trim()
+  item.status = 'in_progress'
+  addLog(item, userId, '退回', `${userLabel(userId)}退回：${note}`, '管委會確認後還需要再處理，處理中。')
+
+  const task = tasks.find((entry) => entry.caseId === id && entry.status === 'reported')
+  if (task) {
+    task.status = 'in_progress'
+    task.returnNote = { at: MOCK_NOW, note }
+  }
+  // 通知要再處理的人：有交辦就是交辦對象，沒有就是按完工驗收的人
+  const targetId = task ? task.assigneeId : item.logs.findLast((log) => log.label === '完工驗收')?.actorId
+  const target = findUser(targetId)
+  if (target) {
+    notifications.push({
+      id: `n-${item.id}-return-${notifications.length + 1}`,
+      userId: target.id,
+      role: target.roles.includes('staff') ? 'staff' : 'committee',
+      title: task ? '交辦被退回' : '案件被退回',
+      body: `${item.title}：${note}`,
+      at: MOCK_NOW,
+      read: false,
+      link: task ? { type: 'task', id: task.id } : { type: 'case', id: item.id },
+    })
+  }
+  return presentForManagement(item)
+}
+
 // 某家廠商處理過的報修統計（廠商詳情頁用）
 // 回傳：結案件數、從通報到結案的平均天數、平均評分
 export function caseStatsOfVendor(vendorId) {
