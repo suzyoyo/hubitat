@@ -25,7 +25,7 @@ export const notifications = [
   },
   {
     id: 'n-002',
-    userId: 'u-c04',
+    userId: 'u-r04', // 2026-10-16 跟著通報人改（原本是李伯伯）
     role: 'resident',
     title: '通報有新進度',
     body: '頂樓花園｜灑水噴頭漏水・廠商已初步查勘',
@@ -55,7 +55,7 @@ export const notifications = [
   },
   {
     id: 'n-005',
-    userId: 'u-c04',
+    userId: 'u-r03', // 2026-10-16 跟著通報人改（原本是李伯伯）
     role: 'resident',
     title: '通報有新進度',
     body: '1F 大廳｜感應門故障・已通報原廠工程師排查線路',
