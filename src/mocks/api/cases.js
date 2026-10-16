@@ -2,7 +2,7 @@
 // 同一份案件資料，管理端和住戶端要看的內容不同，所以分成兩種整理方式：
 //   presentForManagement：管委會、管理人員看的（完整）
 //   presentForResident：  住戶看的（簡化的狀態、只給住戶看的進度說明）
-import { diffDays, formatDate, formatDateTime } from '@/lib/date'
+import { diffDays, formatDate, formatDateTime, formatRelativeTime } from '@/lib/date'
 import { CASE_SOURCES, CASE_STATUSES, CASE_VISIBILITY, cases } from '../data/cases'
 import { ISSUE_CATEGORIES } from '../data/community'
 import { equipment } from '../data/equipment'
@@ -69,6 +69,45 @@ function handlerIdOf(item) {
   return task ? task.assigneeId : item.assigneeId
 }
 
+// 案件卡、待辦卡第二行的一句說明（2026-10-15 定，2026-10-16 案件列表的卡片也用）
+//   放卡片上其他地方看不到的「誰、什麼時候、做到哪裡」，不重複徽章（狀態）和標題；畫面上只顯示一行
+//   待受理         → 誰通報、多久以前：「陳先生（B 棟 8 樓）・2 小時前通報」
+//   已派廠商       → 廠商＋預約到場時間：「大同電梯・10/3 14:00 到場」
+//   受理了、沒廠商 → 誰受理：「張管理員受理・尚未派廠商」
+// 待結案、已結案的寫法只有案件卡用，在 caseCardHint
+export function caseHint(item) {
+  if (item.status === 'pending') {
+    const when = formatRelativeTime(item.reportedAt, MOCK_NOW) // 「2 小時前」「昨天 09:00」「9/25」
+    // 「2 小時前」後面直接接「通報」；日期、時間後面空一格比較好讀
+    const gap = when.endsWith('前') ? '' : ' '
+    return `${reporterLabel(item)}・${when}${gap}通報`
+  }
+  const name = vendorNameOf(item)
+  if (name) return item.scheduledAt ? `${name}・${formatDateTime(item.scheduledAt)} 到場` : `${name}・尚未約到場時間`
+  return `${userLabel(item.assigneeId)}受理・尚未派廠商`
+}
+
+// 案件卡第三行的說明：除了 caseHint 的三種，再加上
+//   待結案 → 誰、哪天完工驗收：「張管理員・9/25 完工驗收」（「待結案」徽章已經有了，不重複寫）
+//   已結案 → 廠商（沒有廠商就寫負責人）＋結案日期：「大同電梯・9/12 結案」
+function caseCardHint(item) {
+  if (item.status === 'to_verify') {
+    const who = userLabel(handlerIdOf(item))
+    return item.completion?.at ? `${who}・${formatDate(item.completion.at)} 完工驗收` : `${who}已完工驗收`
+  }
+  if (item.status === 'closed') {
+    const who = vendorNameOf(item) || userLabel(handlerIdOf(item))
+    return item.closedAt ? `${who}・${formatDate(item.closedAt)} 結案` : `${who}・已結案`
+  }
+  return caseHint(item)
+}
+
+// 廠商名稱：名冊裡的用名冊的名字；自己打的（名冊裡沒有）存在案件的 vendorName
+function vendorNameOf(item) {
+  const vendor = vendors.find((entry) => entry.id === item.vendorId)
+  return vendor ? vendor.name : (item.vendorName ?? '')
+}
+
 // 管理端看的案件
 function presentForManagement(item) {
   const vendor = vendors.find((entry) => entry.id === item.vendorId)
@@ -86,6 +125,7 @@ function presentForManagement(item) {
     // 畫面上的「負責人」：實際處理的人（見 handlerIdOf）；案件詳情、案件卡片都顯示這個
     handlerId: handlerId ?? '',
     handlerLabel: handlerId ? userLabel(handlerId) : '',
+    hint: caseCardHint(item), // 案件卡第三行的一句說明
     // 名冊裡的廠商用名冊的名字；自己打的（名冊裡沒有）存在案件的 vendorName
     vendorName: vendor ? vendor.name : (item.vendorName ?? ''),
     equipmentName: device ? device.name : '',
