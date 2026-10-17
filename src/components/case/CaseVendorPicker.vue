@@ -68,8 +68,9 @@ watch([name, scheduledAt], () => {
 
 <template>
   <div class="space-y-3">
-    <div class="space-y-2">
-      <Label for="case-vendor" class="text-base">廠商</Label>
+    <div>
+      <!-- 不放「廠商」小標題：卡片標題已經是「廠商」（2026-10-17 suzy）；標籤看不見，螢幕閱讀器還是念得出來 -->
+      <Label for="case-vendor" class="sr-only">廠商</Label>
       <Input
         id="case-vendor"
         v-model="name"
