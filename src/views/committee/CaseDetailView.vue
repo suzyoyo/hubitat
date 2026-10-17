@@ -1,7 +1,7 @@
 <script setup>
 // 管委會端、管理人員端共用・案件詳情：一件案件的基本資料、通報內容、廠商、處理紀錄（設計稿 1134:17558）
 // 按鈕依「這個人能做什麼＋案件狀態」顯示，不分哪一端（規則見 docs/case-flow.md）：
-//   關聯設備、廠商、處理紀錄三張卡片：欄位直接顯示，邊填邊記下來（2026-10-15 拿掉「取消」「確定」），
+//   問題分類、關聯設備、廠商、處理紀錄四張卡片：欄位直接顯示，邊填邊記下來（2026-10-15 拿掉「取消」「確定」），
 //   按底部「更新進度」才一起存，而且只寫一筆紀錄（updateCase）
 //   底部：更新進度＋完工驗收（到回報完成頁）並排；受理（按了就受理）、交辦（到新增交辦頁）、
 //   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
@@ -12,6 +12,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { caseStatusBadge } from '@/components/admin/caseStatusBadge'
 import BottomCta from '@/components/app/BottomCta.vue'
+import CaseCategoryPicker from '@/components/case/CaseCategoryPicker.vue'
 import CaseEquipmentPicker from '@/components/case/CaseEquipmentPicker.vue'
 import CaseLogForm from '@/components/case/CaseLogForm.vue'
 import CaseVendorPicker from '@/components/case/CaseVendorPicker.vue'
@@ -62,6 +63,7 @@ const reasonMode = ref('return')
 const reason = ref('') // 原因（必填）
 const REASON_MAX = 200 // 原因最多幾個字
 // 卡片裡按「確定」記下來、還沒存的內容；按「更新進度」後清掉
+const categoryDraft = ref('') // 問題分類，例如 'leak'
 const equipmentDraft = ref(null) // { equipmentId, name, place }
 const vendorDraft = ref(null) // { vendorId, vendorName, scheduledAt }
 const logDraft = ref(null) // { text, residentText, scheduledAt }
@@ -125,7 +127,7 @@ const actions = computed(() => {
 })
 // 「更新進度」：能選廠商或寫紀錄的時候才出現；有記下來的內容才能按
 const canUpdate = computed(() => canPickVendor.value || canAddLog.value)
-const hasDraft = computed(() => Boolean(equipmentDraft.value || vendorDraft.value || logDraft.value))
+const hasDraft = computed(() => Boolean(categoryDraft.value || equipmentDraft.value || vendorDraft.value || logDraft.value))
 // 已經存好的廠商：帶入選廠商的欄位；不能改的人直接看文字
 const shownVendor = computed(() => ({ name: item.value?.vendorName ?? '', scheduledAt: item.value?.scheduledAt ?? '' }))
 const hasBottom = computed(() => !loading.value && item.value && (actions.value.length > 0 || canUpdate.value))
@@ -193,7 +195,7 @@ async function sendBack() {
   toast.success('已退回', { description: `已通知${result.handlerLabel || '管理人員'}再處理` })
 }
 
-// 受理：按了就受理，受理的人是負責人（完成日期、分類之後再加地方填）
+// 受理：按了就受理，受理的人是負責人（分類受理後在「問題分類」卡片改；處理期限還在討論要不要給案件填）
 async function accept() {
   pending.value = true
   const result = await acceptCase(item.value.id, userId.value)
@@ -212,11 +214,12 @@ async function goComplete() {
   router.push(`/${route.meta.roleId}/cases/${item.value.id}/complete`)
 }
 
-// ── 更新進度：把卡片裡記下來的設備、廠商、處理紀錄一起存，只寫一筆紀錄 ─────────────
+// ── 更新進度：把卡片裡記下來的分類、設備、廠商、處理紀錄一起存，只寫一筆紀錄 ─────────────
 // 成功回傳 true，失敗回傳 false（完工驗收要先存好才換頁）
 async function updateStatus() {
   pending.value = true
   const result = await updateCase(item.value.id, userId.value, {
+    category: categoryDraft.value,
     equipmentId: equipmentDraft.value?.equipmentId,
     vendor: vendorDraft.value,
     log: logDraft.value,
@@ -224,6 +227,7 @@ async function updateStatus() {
   if (!result) return failUpdate()
   pending.value = false
   item.value = result
+  categoryDraft.value = ''
   equipmentDraft.value = null
   vendorDraft.value = null
   logDraft.value = null
@@ -257,6 +261,7 @@ const basicRows = computed(() => {
     { label: '負責人', value: data.handlerLabel || '尚未指派' },
     { label: '附議', value: data.supporterCount ? `${data.supporterCount} 戶` : '無' },
     { label: '處理期限', value: deadline },
+    { label: '問題分類', value: data.categoryLabel },
   ]
 })
 
@@ -325,6 +330,13 @@ function isVideo(name) {
           </div>
         </div>
         <p v-else class="type-body text-muted-foreground">沒有照片或影片</p>
+      </section>
+
+      <!-- 問題分類：可以選廠商的時候（已受理、處理中）才出現，2026-10-17 加
+           不能改的人看上面基本資料的「問題分類」就好，這裡不重複顯示 -->
+      <section v-if="canPickVendor" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
+        <h2 class="type-card-title text-foreground">問題分類</h2>
+        <CaseCategoryPicker v-model:draft="categoryDraft" :current="item.category" />
       </section>
 
       <!-- 關聯設備：選了，結案時才會記進這台設備的維修紀錄

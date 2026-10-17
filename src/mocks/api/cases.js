@@ -239,7 +239,7 @@ function setEquipmentStatus(item, status) {
 
 // 受理：待受理 → 已受理，受理的人就是負責人
 //   options 都是選填：
-//     deadline    完成日期，例如 '2026-10-08'
+//     deadline    處理期限，例如 '2026-10-08'
 //     category    問題分類，例如 'equipment'（住戶通報時先歸「其他」，這時改成正確的）
 //     equipmentId 關聯設備，例如 'e-001'（有選的話設備變「待維修」，結案時進維修歷史）
 export async function acceptCase(id, userId, options = {}) {
@@ -266,8 +266,8 @@ function setFirstVisit(item, scheduledAt) {
   else delete item.firstVisitAt
 }
 
-// ── 關聯設備、派廠商、處理紀錄 ─────────────────────────────
-// 下面三個 apply… 只改案件、不寫紀錄，回傳這次做了什麼（寫紀錄用）；不能做回傳 undefined
+// ── 問題分類、關聯設備、派廠商、處理紀錄 ─────────────────────────────
+// 下面四個 apply… 只改案件、不寫紀錄，回傳這次做了什麼（寫紀錄用）；不能做回傳 undefined
 //   text  單獨寫一筆紀錄時用的一句話，例如「指派 大同電梯，預約 10/3 14:00 到場」
 //   lines 「更新進度」合成一筆時用的精簡寫法，一項一行，例如 ['廠商：大同電梯', '到場：10/3 14:00']
 // 單獨用的 setCaseEquipment、assignVendor、addCaseLog 各寫一筆紀錄；
@@ -319,6 +319,14 @@ function applyLog(item, { text, residentText = '', scheduledAt = '' }) {
   return { text: text.trim(), lines, residentText: residentText.trim() }
 }
 
+// 問題分類（2026-10-17 加）：住戶通報時先歸「其他」，受理後在案件詳情改成正確的
+//   category 例如 'leak'（ISSUE_CATEGORIES 的 key）；給管理端看的，住戶看到的處理進度不寫（沒有 residentText）
+function applyCategory(item, category) {
+  if (!ISSUE_CATEGORIES[category] || category === item.category) return undefined
+  item.category = category
+  return { lines: [`問題分類：${ISSUE_CATEGORIES[category].label}`] }
+}
+
 // 關聯設備：已受理、處理中的案件可以選（或換）是哪一台設備壞了
 export async function setCaseEquipment(id, userId, equipmentId) {
   await delay()
@@ -356,8 +364,9 @@ export async function addCaseLog(id, userId, log) {
   return presentForManagement(item)
 }
 
-// 更新進度（案件詳情底部的按鈕）：關聯設備、派廠商、處理紀錄有填的一次做完，**只寫一筆紀錄**
-//   changes 三個都選填，至少要有一個：
+// 更新進度（案件詳情底部的按鈕）：問題分類、關聯設備、派廠商、處理紀錄有填的一次做完，**只寫一筆紀錄**
+//   changes 四個都選填，至少要有一個：
+//     category    問題分類，例如 'leak'（2026-10-17 加）
 //     equipmentId 關聯設備（和 setCaseEquipment 一樣）
 //     vendor      { vendorId, vendorName, scheduledAt }（和 assignVendor 一樣）
 //     log         { text, residentText, scheduledAt }（和 addCaseLog 一樣）
@@ -369,20 +378,23 @@ export async function addCaseLog(id, userId, log) {
 //     給住戶：廠商將於 10/21 到場處理。（處理紀錄有寫給住戶看的說明才有這行）
 //   住戶看到：派廠商、處理紀錄給住戶看的那幾句接在一起（都沒有就不給住戶看）
 // 待結案的案件只能寫處理紀錄（設備、廠商不能改了）；有一樣做不了就全部不做，回傳 undefined
-export async function updateCase(id, userId, { equipmentId = '', vendor = null, log = null } = {}) {
+export async function updateCase(id, userId, { category = '', equipmentId = '', vendor = null, log = null } = {}) {
   await delay()
-  const statuses = equipmentId || vendor ? ['accepted', 'in_progress'] : ['accepted', 'in_progress', 'to_verify']
+  const statuses = category || equipmentId || vendor ? ['accepted', 'in_progress'] : ['accepted', 'in_progress', 'to_verify']
   const item = findHandleableCase(id, userId, statuses)
-  if (!item || !(equipmentId || vendor || log)) return undefined
+  if (!item || !(category || equipmentId || vendor || log)) return undefined
   // 先檢查做得到，再改資料，才不會改到一半
+  if (category && !ISSUE_CATEGORIES[category]) return undefined
   if (equipmentId && !equipment.some((entry) => entry.id === equipmentId)) return undefined
   if (vendor && !vendors.some((entry) => entry.id === vendor.vendorId) && !vendor.vendorName?.trim()) return undefined
   if (log && !log.text?.trim()) return undefined
   const steps = [
+    category && applyCategory(item, category),
     equipmentId && applyEquipment(item, equipmentId),
     vendor && applyVendor(item, vendor),
     log && applyLog(item, log),
   ].filter(Boolean)
+  if (!steps.length) return undefined // 什麼都沒變（例如選回原本的分類），不寫紀錄
   const text = steps.flatMap((step) => step.lines).join('\n')
   const residentText = steps.map((step) => step.residentText).filter(Boolean).join(' ')
   addLog(item, userId, '更新進度', text, residentText)
