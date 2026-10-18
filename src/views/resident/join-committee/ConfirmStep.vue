@@ -48,7 +48,8 @@ const declineOpen = ref(false)
 
     <Alert class="text-left">
       <AlertTitle>{{ invite.roleLabel }}可以做的事</AlertTitle>
-      <AlertDescription>簽核提案、廠商評分、新增交辦、查看管委會會議紀錄</AlertDescription>
+      <!-- 一般委員不能新增交辦，結案也不評分廠商（docs/permissions.md），所以只寫這兩項 -->
+      <AlertDescription>簽核提案、查看管委會會議紀錄</AlertDescription>
     </Alert>
 
     <div class="space-y-4">
