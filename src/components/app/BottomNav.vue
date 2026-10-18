@@ -24,6 +24,13 @@ const compact = computed(() => props.tabs.length > 3)
 // 全域新增選單是開還是關
 const menuOpen = ref(false)
 
+// 點灰色的地方：選單本來在「手指按下去」那一刻就關掉，灰色跟著消失，
+// 手機在手指離開後才補送「點擊」，就會點到灰色下面的卡片（suzy 在 #131 提醒的）
+// 所以按在灰色上時先不關，等灰色自己收到「點擊」才關（灰色的 @click）
+function keepOpenOnOverlay(event) {
+  if (event.detail.originalEvent.target?.closest?.('[data-fab-overlay]')) event.preventDefault()
+}
+
 // 「＋」按鈕的樣子：連結和開選單的按鈕共用
 const fabClass = computed(() => [
   'flex shrink-0 flex-col items-center justify-center rounded-full border border-nav-border bg-fab type-nav text-fab-foreground shadow-fab',
@@ -60,7 +67,7 @@ const fabClass = computed(() => [
 
     <!-- 選單打開時，後面的畫面蓋一層灰色（點灰色的地方也會關掉選單）
          放在分頁列和「＋」中間：分頁列、頂部列會被蓋住，「＋」和選單在灰色上面 -->
-    <div v-if="menuOpen" class="fixed inset-0 bg-black/40" aria-hidden="true" @click="menuOpen = false" />
+    <div v-if="menuOpen" data-fab-overlay class="fixed inset-0 bg-black/40" aria-hidden="true" @click="menuOpen = false" />
 
     <!-- 管委會、管理人員：按下去在按鈕上方跳出全域新增選單；打開時「＋」變成叉叉，再按一次關掉 -->
     <Popover v-if="fab.menu" v-model:open="menuOpen">
@@ -70,7 +77,12 @@ const fabClass = computed(() => [
         </button>
       </PopoverTrigger>
       <!-- side="top" align="end"：出現在按鈕上方、靠右對齊 -->
-      <PopoverContent side="top" align="end" :side-offset="12" class="w-[270px] gap-0 rounded-xl p-2 shadow-card ring-0">
+      <PopoverContent
+        side="top"
+        align="end"
+        :side-offset="12"
+        @pointer-down-outside="keepOpenOnOverlay"
+        class="w-[270px] gap-0 rounded-xl p-2 shadow-card ring-0">
         <!-- 點了任何一項就關掉選單，再換頁 -->
         <MenuItem
           v-for="item in menuItems"
