@@ -218,11 +218,13 @@ const recordRows = computed(() => {
         <h2 class="type-card-title text-foreground">{{ task.title }}</h2>
         <Separator />
         <template v-for="row in basicRows" :key="row.label">
-          <!-- 有 to 的那一列整列可以點（關聯案件），右邊多一個 › -->
-          <RouterLink v-if="row.to" :to="row.to" class="flex min-h-11 items-center gap-3">
+          <!-- 有 to 的那一列整列可以點（關聯案件），右邊多一個 ›
+               名稱很長時（2026-10-18 013 調）：左邊標籤和右邊名稱的第一行對齊，多的字往下換行、卡片跟著長高；
+               右邊最多佔六成寬，早一點換行，和左邊標籤之間留出空隙；› 對齊第一行 -->
+          <RouterLink v-if="row.to" :to="row.to" class="flex min-h-11 items-start gap-3 py-1.5">
             <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
-            <p class="min-w-0 flex-1 text-right type-body-strong text-foreground">{{ row.value }}</p>
-            <ChevronRightIcon class="size-5 shrink-0" />
+            <p class="ml-auto min-w-0 max-w-[60%] text-right type-body-strong text-foreground">{{ row.value }}</p>
+            <ChevronRightIcon class="mt-0.5 size-5 shrink-0" />
           </RouterLink>
           <div v-else class="flex items-baseline gap-3">
             <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
