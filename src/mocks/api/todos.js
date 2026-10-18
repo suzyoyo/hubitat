@@ -1,6 +1,6 @@
 // 我的待辦：不另外存資料，而是從交辦、案件、提案、公告、合約、文件、留存裡，
 // 挑出「跟我有關、還沒完成」的項目彙整而成
-import { addDays, diffDays, formatDateTime, formatRelativeTime, formatTime } from '@/lib/date'
+import { addDays, diffDays, formatDateTime, formatTime } from '@/lib/date'
 import { announcements } from '../data/announcements'
 import { cases } from '../data/cases'
 import { contracts } from '../data/contracts'
@@ -11,7 +11,7 @@ import { quickSaves } from '../data/quickSaves'
 import { tasks } from '../data/tasks'
 import { COMMITTEE_TITLES } from '../data/users'
 import { vendors } from '../data/vendors'
-import { TO_CLOSE_TITLE, canCloseCases, reporterLabel } from './cases'
+import { TO_CLOSE_TITLE, canCloseCases, caseHint } from './cases'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
 import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
@@ -71,22 +71,7 @@ function deadlineText(value) {
   return formatDateTime(value)
 }
 
-// 案件的說明，看案件走到哪一步：
-//   待受理         → 誰通報、多久以前：「陳先生（B 棟 8 樓）・2 小時前通報」
-//   已派廠商       → 廠商＋預約到場時間：「大同電梯・10/3 14:00 到場」
-//   受理了、沒廠商 → 誰受理：「張管理員受理・尚未派廠商」
-function caseHint(item) {
-  if (item.status === 'pending') {
-    const when = formatRelativeTime(item.reportedAt, MOCK_NOW) // 「2 小時前」「昨天 09:00」「9/25」
-    // 「2 小時前」後面直接接「通報」；日期、時間後面空一格比較好讀
-    const gap = when.endsWith('前') ? '' : ' '
-    return `${reporterLabel(item)}・${when}${gap}通報`
-  }
-  const vendor = vendors.find((entry) => entry.id === item.vendorId)
-  const name = vendor ? vendor.name : item.vendorName // 自己打的廠商存在 vendorName
-  if (name) return item.scheduledAt ? `${name}・${formatDateTime(item.scheduledAt)} 到場` : `${name}・尚未約到場時間`
-  return `${userLabel(item.assigneeId)}受理・尚未派廠商`
-}
+// 案件的說明（caseHint）放在 cases.js，案件列表的卡片也用同一份（2026-10-16）
 
 // 我還沒補齊的留存（兩種角色都會用到）
 function incompleteQuickSaves(userId) {

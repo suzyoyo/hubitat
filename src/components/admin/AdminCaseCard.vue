@@ -1,6 +1,6 @@
 <script setup>
 // 管委會端的案件卡（對應 Figma 的 Admin/Case Card）
-// 第一行標題＋狀態徽章＋›；第二行地點；第三行負責人和廠商
+// 第一行標題＋狀態徽章＋›；第二行地點；第三行一句說明（誰、什麼時候、做到哪裡）
 import { computed } from 'vue'
 import { ChevronRightIcon } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
@@ -15,16 +15,6 @@ const props = defineProps({
 
 // 狀態徽章的規則放在 caseStatusBadge.js，案件詳情頁也用同一份
 const statusBadge = computed(() => caseStatusBadge(props.item))
-
-// 最下面那一行：還沒受理的只寫「尚未受理」，其他寫負責人和廠商
-const footerText = computed(() => {
-  const { item } = props
-  if (item.status === 'pending') return '尚未受理'
-  // 負責：實際處理的人（交辦出去就是交辦對象，case-flow 第 3 節）
-  const assignee = item.handlerLabel ? `負責：${item.handlerLabel}` : '尚未指派負責人'
-  const vendor = item.vendorName ? `廠商：${item.vendorName}` : '尚未派廠商'
-  return `${assignee}｜${vendor}`
-})
 </script>
 
 <template>
@@ -39,6 +29,7 @@ const footerText = computed(() => {
     <div>
       <Badge variant="outline">{{ item.areaName }}</Badge>
     </div>
-    <p class="type-body text-muted-foreground">{{ footerText }}</p>
+    <!-- 第三行：假 API 算好的說明（cases.js 的 caseCardHint，和待辦卡同一套），只顯示一行，太長用「…」截掉 -->
+    <p class="truncate type-body text-muted-foreground">{{ item.hint }}</p>
   </RouterLink>
 </template>
