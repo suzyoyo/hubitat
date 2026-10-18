@@ -15,7 +15,7 @@ export async function getQuickSaves(ownerId, pendingOnly = false) {
     .toSorted((a, b) => b.savedAt.localeCompare(a.savedAt))
 }
 
-// 新增一筆留存（「＋」選單的「快速留存」，2026-10-19）
+// 新增一筆留存（「＋」選單的「快速留存」，2026-10-18）
 //   fields：{ name, note, photos }，都是選填，但至少要有一樣（畫面會先擋）
 //   新的留存還沒補齊，會出現在留存者的待辦「需補資料」裡
 //   只改記憶體，重新整理網頁會變回原本的假資料
@@ -34,7 +34,7 @@ export async function addQuickSave(ownerId, fields) {
   return item
 }
 
-// 取得一筆留存（留存詳情頁用，2026-10-19）；找不到回傳 undefined
+// 取得一筆留存（留存詳情頁用，2026-10-18）；找不到回傳 undefined
 //   多給畫面：ownerLabel 留存的人；linkedTitle 歸到的案件標題或設備名稱
 export async function getQuickSaveById(id) {
   await delay()
@@ -51,7 +51,7 @@ export async function getQuickSaveById(id) {
   }
 }
 
-// 把留存歸到一件案件（補齊資料，2026-10-19）
+// 把留存歸到一件案件（補齊資料，2026-10-18）
 //   留存變成已補齊（待辦「需補資料」那張就消失），案件的處理紀錄多一筆「附上留存」，照片放在那一筆下面
 //   設備不在這裡選：到案件詳情的「關聯設備」選
 //   只有留存的人自己能歸、還沒補齊的才能歸，案件要是處理中的；不行時回傳 undefined
