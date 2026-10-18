@@ -76,13 +76,15 @@ const shortcuts = [
           <!-- 「查看 N 件待辦 ›」（2026-10-15 suzy 改：拿掉件數徽章和下面的「查看全部待辦事項」按鈕，管理人員首頁也一樣）
                樣式和「看全部 ›」一樣（SectionHeader），只是文字不同，所以這裡照著寫一份。
                h-11 是 44px 的可點擊範圍；-my-1 讓這一列的高度維持 36px -->
+          <!-- 箭頭尖和卡片右邊對齊（2026-10-18）：-mr-2.5 抵掉按鈕左右各 10px 的點擊範圍，
+               箭頭的 -mr-1.5 抵掉 icon 本身右邊約 6px 的透明空白。只是往外推、沒有裁掉，外層不要加 overflow-hidden -->
           <RouterLink
             v-if="!loading && todos.total"
             to="/committee/todos"
-            class="-my-1 flex h-11 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
+            class="-my-1 -mr-2.5 flex h-11 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
           >
             查看 {{ todos.total }} 件待辦
-            <ChevronRightIcon class="size-4" />
+            <ChevronRightIcon class="-mr-1.5 size-4" />
           </RouterLink>
         </div>
         <template v-if="loading">
