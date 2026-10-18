@@ -46,7 +46,7 @@ const fabClass = computed(() => [
     :class="compact ? 'gap-3 pr-5' : 'gap-6 pr-[27px]'"
   >
     <!-- 毛玻璃（2026-10-18）：半透明底色＋把後面的畫面模糊（backdrop-blur），後面卡片的字才不會和分頁的字疊在一起；
-         backdrop-saturate 把模糊後變灰的顏色拉回來。數字照 Apple 官網的導覽列（白 80%、模糊 20px、飽和度 1.8）。不支援模糊的舊瀏覽器只會看到原本的半透明白 -->
+         backdrop-saturate 把模糊後變灰的顏色拉回來。模糊 20px、飽和度 1.8 照 Apple 官網的導覽列；底色是 style.css 的 --nav（白 60%，比 Apple 的 80% 透一點）。不支援模糊的舊瀏覽器只會看到原本的半透明白 -->
     <nav
       class="flex min-w-0 flex-1 items-stretch rounded-full border border-nav-border bg-nav p-1 text-nav-foreground shadow-nav backdrop-blur-[20px] backdrop-saturate-[1.8]"
       :class="compact ? '' : 'h-[70px]'"

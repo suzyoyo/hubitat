@@ -113,7 +113,7 @@
   --success: var(--color-blue-800); /* 完成 status/success */
 
   /* 外框（底部導覽、＋ 按鈕）；數字是不透明度 */
-  --nav: rgb(255 255 255 / 0.8); /* 導覽列底色（2026-10-18 照 Apple 官網導覽列：白 80%，搭配 BottomNav 的模糊） */
+  --nav: rgb(255 255 255 / 0.6); /* 導覽列底色（2026-10-18：模糊、飽和度照 Apple 官網導覽列，底色比 Apple 的 80% 透一點） */
   --nav-foreground: var(--color-gray-900); /* 一般分頁的字和圖示 */
   --nav-border: #e9e9e9;
   --nav-active: rgb(111 183 226 / 0.74); /* 目前分頁的底色（藍 500） */
