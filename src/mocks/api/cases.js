@@ -74,6 +74,7 @@ function handlerIdOf(item) {
 //   待受理         → 誰通報、多久以前：「陳先生（B 棟 8 樓）・2 小時前通報」
 //   已派廠商       → 廠商＋預約到場時間：「大同電梯・10/3 14:00 到場」
 //   受理了、沒廠商 → 誰受理：「張管理員受理・尚未派廠商」
+//                    有交辦出去的寫交辦對象：「交辦給張管理員・尚未派廠商」（2026-10-18，PR #121 013 的意見）
 // 待結案、已結案的寫法只有案件卡用，在 caseCardHint
 export function caseHint(item) {
   if (item.status === 'pending') {
@@ -84,6 +85,8 @@ export function caseHint(item) {
   }
   const name = vendorNameOf(item)
   if (name) return item.scheduledAt ? `${name}・${formatDateTime(item.scheduledAt)} 到場` : `${name}・尚未約到場時間`
+  const handlerId = handlerIdOf(item)
+  if (handlerId !== item.assigneeId) return `交辦給${userLabel(handlerId)}・尚未派廠商`
   return `${userLabel(item.assigneeId)}受理・尚未派廠商`
 }
 
