@@ -15,7 +15,7 @@
 //   description 通報人寫的問題描述
 //   photos      照片或影片的檔名（欄位名稱沿用 photos，影片也放這裡，例如 '異音.mp4'）
 //   status      狀態，見下方 CASE_STATUSES
-//   deadline    完成日期（受理時選填，沒有就不寫）。「逾期」是用今天的日期算出來的
+//   deadline    處理期限（要在哪天前處理完；受理後選填，沒有就不寫）。「逾期」是用今天的日期算出來的
 //   scheduledAt 廠商預約到場的時間（派廠商、改期時選填，沒有就不寫）
 //   firstVisitAt 廠商第一次到場的時間（假 API 依 scheduledAt 自動記，不用自己填）。這天起關聯設備算「維修中」
 //   assigneeId  負責人（還沒指派就不寫）

@@ -196,7 +196,7 @@ import { Button } from '@/components/ui/button'
 
 專案裡有、但 Kit 沒有獨立頁面的基礎元件：`empty`、`label`、`progress`、`select`、`sheet`、`skeleton`、`slider`、`sonner`、`spinner`、`stepper`。
 
-`select`（2026-10-12 加入）：點選的下拉選單，例如排序。Kit 的下拉選項在 Combobox 頁；選項預設高 28px，用的時候要放大到 44px、字 16px。篩選的下拉（選項 5 個以上）用包好的 `common/FilterSelect.vue`（2026-10-13，膠囊按鈕）；排序用 `common/SortSelect.vue`（2026-10-14，灰色小字、靠右）。兩個都已經放大好了，不用自己調。規則見 dev-guide 第 5 節「篩選」。
+`select`（2026-10-12 加入）：點選的下拉選單，例如排序。Kit 的下拉選項在 Combobox 頁；選項預設高 28px，用的時候要放大到 44px、字 16px。篩選的下拉（選項 5 個以上）用包好的 `common/FilterSelect.vue`（2026-10-13，膠囊按鈕）；排序用 `common/SortSelect.vue`（2026-10-14，灰色小字、靠右）。兩個都已經放大好了，不用自己調。規則見 dev-guide 第 5 節「篩選」。表單裡的下拉（輸入框的樣子，白底外框、高 44px）直接用 `select`：新增交辦的「關聯案件」、案件詳情的「問題分類」（`case/CaseCategoryPicker`，2026-10-17）。
 
 **圖示**：Kit 有 Lucide、Tabler、HugeIcons 三套圖示的頁面，程式只裝了 Lucide（`@lucide/vue`）。設計稿上的圖示如果在 Lucide 找不到，先跟對方確認，不要另外安裝第二套。
 
