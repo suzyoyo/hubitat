@@ -14,7 +14,7 @@ import ReportFlowProgress from '@/components/report/ReportFlowProgress.vue'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { REPORT_TYPES } from '@/lib/report'
-import { createReport, getAreas, getCurrentUser, getSimilarReports, supportReport } from '@/mocks/api'
+import { createReport, getAreas, getCurrentUser, getEquipmentById, getSimilarReports, supportReport } from '@/mocks/api'
 import ReportConfirmStep from '@/components/report/ReportConfirmStep.vue'
 import ReportDescribeStep from '@/components/report/ReportDescribeStep.vue'
 import ReportPlaceStep from '@/components/report/ReportPlaceStep.vue'
@@ -64,14 +64,44 @@ const areas = ref([]) // 可以選的範圍和地點
 
 // onMounted：畫面一出現就去拿資料
 onMounted(async () => {
+  // 從「設備與維修史」的「通報問題」來的，網址會帶設備編號（?equipment=e-001），先記下來
+  const equipmentId = route.query.equipment
   // 重新整理網頁後，填到一半的資料會不見，所以不管網址寫第幾步都回到第 1 步重新開始
-  if (step.value !== 1) router.replace({ query: {} })
-  // Promise.all：兩種資料同時去拿，全部回來才往下走
-  const [user, areaList] = await Promise.all([getCurrentUser('resident'), getAreas()])
+  // 網址上的設備編號也一起拿掉，按返回、重新整理都不會再帶入一次
+  if (step.value !== 1 || equipmentId) router.replace({ query: {} })
+  // Promise.all：三種資料同時去拿，全部回來才往下走；沒有帶設備的話，第三個直接是 undefined
+  const [user, areaList, device] = await Promise.all([
+    getCurrentUser('resident'),
+    getAreas(),
+    equipmentId ? getEquipmentById(equipmentId, 'resident') : undefined,
+  ])
   userId.value = user.id
   areas.value = areaList
+  if (device) fillFromEquipment(device)
   loading.value = false
 })
+
+// 從設備帶入：地點、類型（公共設施問題）、通報問題先填設備名稱，住戶接著打哪裡壞了
+// 住戶還是一步一步往下走，每一步都已經選好，看一眼按「下一步」就好；想改也可以改
+function fillFromEquipment(device) {
+  const area = areas.value.find((item) => item.id === device.areaId)
+  if (!area) return
+  form.areaId = area.id
+  // 地點要填「住戶在哪裡遇到問題」，不是設備裝在哪裡（電梯裝在機房，但住戶是在電梯口遇到）
+  //   電梯 → 選這一棟的「電梯／電梯口」
+  //   其他設備 → 清單上有和設備位置一樣的就選它；沒有的話選「其他」，填設備的位置
+  // 設備的位置有時候開頭就是範圍名稱（「A 棟 1 樓機房」），拿掉，不然第 4 步會變成「A 棟・A 棟 1 樓機房」
+  const listedPlaces = area.places.filter((item) => item.common)
+  const devicePlace = device.place.replace(`${area.name} `, '')
+  const listed =
+    device.category === 'elevator'
+      ? listedPlaces.find((item) => item.name.includes('電梯'))
+      : listedPlaces.find((item) => item.name === devicePlace)
+  form.place = listed ? listed.name : devicePlace
+  form.isOtherPlace = !listed
+  form.visibility = 'public'
+  form.subject = device.name
+}
 
 // 這一步填好了沒，決定「下一步」能不能按
 const canGoNext = computed(() => {
