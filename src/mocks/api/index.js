@@ -7,7 +7,7 @@
 // 很多函式可以傳入 role（'resident' / 'committee' / 'staff'），
 // 假 API 會依角色拿掉不該看到的欄位（例如合約金額只有管委會看得到）。
 
-export { MOCK_NOW, MOCK_TODAY, getMockFail, setMockFail } from './helpers'
+export { MOCK_NOW, MOCK_TODAY, mockFail } from './helpers'
 export * from './users'
 export * from './invites'
 export * from './community'

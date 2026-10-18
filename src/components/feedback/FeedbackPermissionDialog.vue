@@ -1,5 +1,5 @@
 <script setup>
-// 權限被拒的彈窗：相機、相簿、通知
+// 權限被拒的彈窗：相機、相簿、通知；另外一種是教使用者「加入主畫面」（iPhone 要加入後才有通知）
 // 使用者之前按了「不允許」，網頁沒辦法再跳出詢問，只能教他自己去設定打開
 // 例：<FeedbackPermissionDialog v-model:open="cameraDenied" kind="camera" @use-photos="pickFromPhotos" />
 import { computed } from 'vue'
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
 const props = defineProps({
-  // camera：相機 / photos：相簿 / notifications：通知
+  // camera：相機 / photos：相簿 / notifications：通知 / add-to-home：加入主畫面
   kind: { type: String, required: true },
 })
 
@@ -29,12 +29,18 @@ const KINDS = {
     iphone: '「設定」→「隱私權與安全性」→「照片」→ 瀏覽器（例如 Safari）→「完整取用」',
     android: '「設定」→「應用程式」→ 瀏覽器（例如 Chrome）→「權限」→「相片和影片」→「允許」',
   },
-  // iPhone 用瀏覽器開的話根本沒有通知，要先加入主畫面，所以標題不寫「關掉了」
   notifications: {
-    title: '還沒開啟通知',
+    title: '通知已經關掉了',
     description: '請開啟通知，才收得到受理、結案和緊急公告。',
-    iphone: '先「加入主畫面」，再到「設定」→「通知」→「好彼社區」→ 打開「允許通知」',
+    iphone: '「設定」→「通知」→「好彼社區」→ 打開「允許通知」',
     android: '「設定」→「應用程式」→「好彼社區」（或瀏覽器）→「通知」→ 打開',
+  },
+  // iPhone 用 Safari 開的網頁沒有通知功能，要先加入主畫面（2026-10-19，suzy 在 #144 提的）
+  'add-to-home': {
+    title: '加入主畫面',
+    description: '加入後點圖示打開，就像 App 一樣，也收得到通知。',
+    iphone: '用 Safari 打開 → 下方的「分享」→「加入主畫面」→「新增」',
+    android: '用 Chrome 打開 → 右上角「⋮」→「加到主畫面」或「安裝應用程式」',
   },
 }
 

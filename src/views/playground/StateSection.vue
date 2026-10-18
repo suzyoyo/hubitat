@@ -12,12 +12,10 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { toastSubmitError } from '@/lib/feedback'
-import { getMockFail, getVendors, setMockFail } from '@/mocks/api'
+import { getVendors, mockFail } from '@/mocks/api'
 
-// 假 API 故意失敗的開關
-const mockFail = ref(getMockFail())
+// 假 API 故意失敗的開關（mockFail 是共用的，外框的橘色橫幅也看它）
 function changeMockFail(on) {
-  setMockFail(on)
   mockFail.value = on
   loadVendors()
 }
@@ -65,7 +63,7 @@ function openPermission(kind) {
     <div class="space-y-2 rounded-lg border bg-card p-3">
       <p class="type-body-strong">假 API 故意失敗</p>
       <p class="type-date text-muted-foreground">
-        打開後所有假 API 都會失敗（換頁、重新整理都還在）。還沒處理錯誤的頁面會一直轉圈，<strong>看完要關掉</strong>。
+        打開後所有假 API 都會失敗（換頁、重新整理都還在）。開著時每一頁上方會有橘色橫幅提醒。還沒處理錯誤的頁面會一直轉圈，<strong>看完要關掉</strong>。
       </p>
       <div class="flex gap-2">
         <Button size="sm" :variant="mockFail ? 'outline' : 'default'" @click="changeMockFail(false)">正常</Button>
@@ -159,10 +157,15 @@ function openPermission(kind) {
     <div class="space-y-2">
       <h3 class="type-card-title">8. 開啟通知提醒</h3>
       <p class="type-date text-muted-foreground">
-        放在三端首頁最上面，還沒開通知就一直出現，但不擋。「先不要」只藏到這次關掉 App；拒絕過或 iPhone 沒加入主畫面時，按「開啟通知」會教他到設定打開。
+        放在三端首頁最上面，還沒開通知就一直出現，但不擋。「先不要」只藏到這次關掉 App；拒絕過時，按「開啟通知」會教他到設定打開。
       </p>
       <NotificationReminder preview />
-      <Button variant="outline" class="w-full" @click="openPermission('notifications')">直接看「還沒開啟通知」彈窗</Button>
+      <p class="type-date text-muted-foreground">iPhone 用 Safari 開（沒有通知功能）時，改成提醒加入主畫面：</p>
+      <NotificationReminder preview preview-install />
+      <div class="grid grid-cols-2 gap-2">
+        <Button variant="outline" @click="openPermission('notifications')">「通知已關掉」彈窗</Button>
+        <Button variant="outline" @click="openPermission('add-to-home')">「加入主畫面」彈窗</Button>
+      </div>
     </div>
 
     <div class="space-y-2">
