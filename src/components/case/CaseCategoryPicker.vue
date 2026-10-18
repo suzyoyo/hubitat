@@ -5,7 +5,7 @@
 //   選了就記下來（v-model:draft）；真的存是按頁面底部的「更新進度」，和其他卡片一樣
 //   不放欄位的小標題：卡片標題已經是「問題分類」（2026-10-17 suzy 覺得重複太亂）；
 //     標籤留著但看不見（sr-only），螢幕閱讀器還是念得出欄位名稱
-//   處理期限原本也放在這張卡片，2026-10-17 先拿掉：要不要讓案件自己有期限，還在和 013 討論
+//   處理期限原本也放在這張卡片，2026-10-17 拿掉：案件不自己填期限，用交辦的完成期限（2026-10-18 和 013 定）
 import { computed } from 'vue'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'

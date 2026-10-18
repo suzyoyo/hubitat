@@ -31,11 +31,25 @@ function isMyHousehold(item, userId) {
   return user?.building === item.reporterUnit.building && user?.unit === item.reporterUnit.unit
 }
 
+// 案件的處理期限：案件自己不填期限，用交辦的完成期限（2026-10-18 和 013 定，PR #122）
+//   有還沒完成的交辦（進行中或待確認）→ 那筆交辦的期限
+//   沒有的話，用最後一筆已完成的交辦（已結案的案件也看得到當初的期限）
+//   沒有交辦、交辦被撤回、交辦沒填期限 → 空字串（畫面寫「尚未設定」，也不會逾期）
+//   回傳的是交辦的格式，例如 '2026-10-08T18:00'
+export function caseDeadlineOf(item) {
+  const caseTasks = tasks.filter((task) => task.caseId === item.id)
+  const task =
+    caseTasks.find((entry) => ['in_progress', 'reported'].includes(entry.status)) ??
+    caseTasks.findLast((entry) => entry.status === 'done')
+  return task?.deadline ?? ''
+}
+
 // 逾期幾天；沒逾期回傳 0
-// 有設定期限、還沒結案、而且期限已經過了，才算逾期
+// 有處理期限、還沒結案、而且期限那天已經過了，才算逾期
 export function caseOverdueDays(item) {
-  if (!item.deadline || !isOpen(item)) return 0
-  const days = diffDays(item.deadline, MOCK_TODAY)
+  const deadline = caseDeadlineOf(item)
+  if (!deadline || !isOpen(item)) return 0
+  const days = diffDays(deadline.split('T')[0], MOCK_TODAY)
   return days > 0 ? days : 0
 }
 
@@ -136,6 +150,7 @@ function presentForManagement(item) {
     supporterCount: item.supporters.length, // 附議戶數
     // 還沒完成的交辦（進行中或待確認）的編號；沒有就是空字串。有的話不能再交辦
     openTaskId: tasks.find((task) => task.caseId === item.id && ['in_progress', 'reported'].includes(task.status))?.id ?? '',
+    deadline: caseDeadlineOf(item), // 處理期限（交辦的完成期限，見 caseDeadlineOf）；沒有是空字串
     isOverdue: overdueDays > 0,
     overdueDays,
     // 每筆紀錄補上「是誰做的」；沒有 actorId 的是系統自動產生的
@@ -281,8 +296,7 @@ function setEquipmentStatus(item, status) {
 }
 
 // 受理：待受理 → 已受理，受理的人就是負責人
-//   options 都是選填：
-//     deadline    處理期限，例如 '2026-10-08'
+//   options 都是選填（處理期限不在這裡填，用交辦的完成期限，見 caseDeadlineOf）：
 //     category    問題分類，例如 'equipment'（住戶通報時先歸「其他」，這時改成正確的）
 //     equipmentId 關聯設備，例如 'e-001'（有選的話設備變「待維修」，結案時進維修歷史）
 export async function acceptCase(id, userId, options = {}) {
@@ -291,12 +305,10 @@ export async function acceptCase(id, userId, options = {}) {
   if (!item) return undefined
   item.status = 'accepted'
   item.assigneeId = userId
-  if (options.deadline) item.deadline = options.deadline
   if (options.category) item.category = options.category
   if (options.equipmentId) item.equipmentId = options.equipmentId
   setEquipmentStatus(item, 'needs_repair')
-  const deadlineText = item.deadline ? `，預計 ${formatDate(item.deadline)} 前完成` : ''
-  addLog(item, userId, '已受理', `${userLabel(userId)}受理${deadlineText}`, `${handlerWord(userId)}已受理。`)
+  addLog(item, userId, '已受理', `${userLabel(userId)}受理`, `${handlerWord(userId)}已受理。`)
   notifyResidents(item, 'accepted')
   return presentForManagement(item)
 }

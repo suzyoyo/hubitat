@@ -92,7 +92,7 @@ export const tasks = [
     assignerId: 'u-c04',
     assigneeId: 'u-s01',
     createdAt: '2026-09-26T09:40',
-    deadline: '2026-10-08T18:00',
+    deadline: '2026-09-28T18:00', // 已逾期：案件「B2 車道排水孔堵塞」的處理期限就是這個（展示逾期的案件）
     status: 'in_progress',
     caseId: 'CASE-20260925-003',
   },
