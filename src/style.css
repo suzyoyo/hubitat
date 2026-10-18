@@ -315,3 +315,36 @@
     @apply bg-background font-sans text-foreground;
   }
 }
+
+/* ───────────────────────────────────────────────────────────
+   大字（2026-10-19，展示用）：住戶「我的 → 顯示設定」選「大」時，外框在 <main> 加上 .large-text
+   照 WCAG（網頁無障礙標準）的「大字」：一般字 24px 以上，或粗體 19px 以上
+   目前只套在住戶端的三個底部分頁（src/lib/fontSize.js）；底部 tab 不在 <main> 裡，不會變
+   ─────────────────────────────────────────────────────────── */
+.large-text .type-body,
+.large-text .type-body-strong,
+.large-text .type-date,
+.large-text .type-note,
+.large-text .type-link {
+  font-size: 24px;
+  line-height: 34px;
+}
+.large-text .type-card-title,
+.large-text .type-greeting {
+  font-size: 26px;
+  line-height: 36px;
+}
+.large-text .type-title {
+  font-size: 30px;
+  line-height: 40px;
+}
+.large-text .type-button,
+.large-text [data-slot='badge'] {
+  font-size: 19px;
+  line-height: 26px;
+  font-weight: 700;
+}
+.large-text [data-slot='badge'] {
+  height: auto;
+  padding: 2px 10px;
+}
