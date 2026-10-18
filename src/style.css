@@ -27,7 +27,7 @@
   --color-blue-900: #1b4354;
   --color-blue-950: #062630;
 
-  /* 紅色（2026-10-19 換成 Kit 的 rdx/colors 紅 1～12，也就是 Radix Colors 的紅色）
+  /* 紅色（2026-10-18 換成 Kit 的 rdx/colors 紅 1～12，也就是 Radix Colors 的紅色）
      只有 500 是品牌輔色 #ff5657，不在 1～12 裡，留著（＋ 按鈕、status/warning）
      --color-red-*: initial 先清掉 Tailwind 內建的 red-50～950，免得 bg-red-100 這類舊寫法偷偷用到 Tailwind 的紅 */
   --color-red-*: initial;
@@ -105,7 +105,7 @@
   --remind-strong: var(--color-orange-600);
   --remind-subtle: var(--color-orange-100);
   --warning: var(--color-red-500); /* 警告 status/warning */
-  /* 紅色的字（Kit 的 text-destructive，#e7000b 不在紅 1～12 裡，2026-10-19 013 指定）：
+  /* 紅色的字（Kit 的 text-destructive，#e7000b 不在紅 1～12 裡，2026-10-18 013 指定）：
      紅色徽章的字、錯誤訊息、必填星號、destructive 按鈕 */
   --warning-strong: #e7000b;
   --warning-subtle: var(--color-red-4);
@@ -317,7 +317,7 @@
 }
 
 /* ───────────────────────────────────────────────────────────
-   大字（2026-10-19，展示用）：住戶「我的 → 顯示設定」選「大」時，外框在 <main> 加上 .large-text
+   大字（2026-10-18，展示用）：住戶「我的 → 顯示設定」選「大」時，外框在 <main> 加上 .large-text
    照 WCAG（網頁無障礙標準）的「大字」：一般字 24px 以上，或粗體 19px 以上
    目前只套在住戶端的三個底部分頁（src/lib/fontSize.js）；底部 tab 不在 <main> 裡，不會變
    ─────────────────────────────────────────────────────────── */
