@@ -6,7 +6,7 @@ import ArticleCard from '@/components/ArticleCard.vue'
 import FaqList from '@/components/FaqList.vue'
 import { FAQS } from '@/content/faqs'
 import { findRole, ROLES } from '@/content/roles'
-import { getCategoriesForRole } from '@/lib/content'
+import { getArticle, getCategoriesForRole } from '@/lib/content'
 import { setCurrentRole } from '@/lib/role'
 
 const props = defineProps({
@@ -15,6 +15,8 @@ const props = defineProps({
 
 const role = computed(() => findRole(props.roleId))
 const categories = computed(() => getCategoriesForRole(props.roleId).filter((c) => !c.shared))
+// 第一次使用的人先看這幾篇（文章 id 寫在 content/roles.js 的 quickStart）
+const quickStart = computed(() => (role.value.quickStart ?? []).map(getArticle).filter(Boolean))
 const faqs = computed(() => FAQS.filter((faq) => faq.roles.includes(props.roleId)).slice(0, 5))
 const otherRoles = computed(() => ROLES.filter((r) => r.id !== props.roleId))
 
@@ -43,6 +45,16 @@ watch(() => props.roleId, setCurrentRole, { immediate: true })
   </section>
 
   <div class="page-container">
+    <!-- 第一次使用？從這裡開始：依序看這三篇 -->
+    <section v-if="quickStart.length" class="mt-10" aria-labelledby="quick-start">
+      <h2 id="quick-start" class="text-2xl font-bold text-brand-950">第一次使用？從這裡開始</h2>
+      <ol class="mt-5 grid gap-4 lg:grid-cols-3">
+        <li v-for="(article, index) in quickStart" :key="article.id">
+          <ArticleCard :article="article" :show-roles="false" :step="index + 1" />
+        </li>
+      </ol>
+    </section>
+
     <section v-for="category in categories" :key="category.id" class="mt-12" :aria-labelledby="category.id">
       <h2 :id="category.id" class="scroll-mt-24 text-2xl font-bold text-brand-950">{{ category.title }}</h2>
       <ul class="mt-5 grid gap-4 md:grid-cols-2">
