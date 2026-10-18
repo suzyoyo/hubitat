@@ -4,6 +4,7 @@
 // 管理人員端沒畫的畫面沿用管委會的（Figma 管理人員區塊 1483:15338），直接用 views/committee/ 的頁面
 import CaseCompleteView from '@/views/committee/CaseCompleteView.vue'
 import CaseDetailView from '@/views/committee/CaseDetailView.vue'
+import AnnouncementFormView from '@/views/committee/AnnouncementFormView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
 import EquipmentDetailView from '@/views/staff/EquipmentDetailView.vue'
 import EquipmentListView from '@/views/staff/EquipmentListView.vue'
@@ -11,6 +12,7 @@ import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TaskReportView from '@/views/committee/TaskReportView.vue'
 import FilesView from '@/views/staff/FilesView.vue'
 import HomeView from '@/views/staff/HomeView.vue'
+import NewRepairView from '@/views/committee/NewRepairView.vue'
 import MeView from '@/views/staff/MeView.vue'
 import NotificationsView from '@/views/staff/NotificationsView.vue'
 import TodosView from '@/views/staff/TodosView.vue'
@@ -37,6 +39,9 @@ export default {
     'cases/:id/complete': CaseCompleteView,
     'tasks/:id': TaskDetailView,
     'tasks/:id/report': TaskReportView, // 交辦詳情的「回報完成」（沒有關聯案件的交辦）
+    // 「＋」選單：和管委會端同一頁（2026-10-19）
+    'cases/new': NewRepairView,
+    'announcements/new': AnnouncementFormView,
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
