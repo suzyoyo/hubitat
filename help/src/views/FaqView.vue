@@ -26,13 +26,13 @@ const groups = FAQ_GROUPS.map((group) => ({
     </nav>
 
     <section v-for="group in groups" :key="group.id" class="mt-12" :aria-labelledby="group.id">
-      <div class="flex items-end gap-4">
-        <div class="flex-1">
+      <div class="flex items-center gap-3">
+        <!-- 疑難排解才放好彼管家，放在標題左邊 -->
+        <img v-if="group.id === 'trouble'" :src="surprised" alt="" class="h-24 w-auto shrink-0" width="68" height="96" />
+        <div class="min-w-0 flex-1">
           <h2 :id="group.id" class="scroll-mt-24 text-2xl font-bold text-brand-950">{{ group.title }}</h2>
           <p v-if="group.description" class="mt-1 text-ink-soft">{{ group.description }}</p>
         </div>
-        <!-- 疑難排解才放好彼管家 -->
-        <img v-if="group.id === 'trouble'" :src="surprised" alt="" class="h-24 w-auto" width="68" height="96" />
       </div>
       <FaqList class="mt-5" :faqs="group.faqs" />
     </section>
