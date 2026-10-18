@@ -160,7 +160,6 @@ onMounted(async () => {
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <p class="type-date text-muted-foreground">「大」是無障礙標準的大字。目前只有首頁、社區、我的這三頁會變（展示用）。</p>
       </div>
     </section>
 
