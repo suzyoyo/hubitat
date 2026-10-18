@@ -25,7 +25,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 const title = ref('')
 const detail = ref('')
 const visibility = ref('public')
-const rating = ref([4]) // Slider 的值是陣列（因為可以有多個拉桿）
+const remindDays = ref([7]) // Slider 的值是陣列（因為可以有多個拉桿）
 const filter = ref('all')
 const sort = ref('due')
 </script>
@@ -38,7 +38,7 @@ const sort = ref('due')
     <FieldGroup>
       <Field>
         <!-- for 要對應 Input 的 id，點標籤時游標才會跳進輸入框 -->
-        <FieldLabel for="ticket-title">報修標題</FieldLabel>
+        <FieldLabel for="ticket-title">通報問題</FieldLabel>
         <Input id="ticket-title" v-model="title" placeholder="例如：B 棟電梯異音" />
         <FieldDescription>簡短描述問題，方便管委會快速了解</FieldDescription>
       </Field>
@@ -76,10 +76,10 @@ const sort = ref('due')
         </RadioGroup>
       </Field>
 
-      <!-- Slider：拖曳選數值，這裡用來示範「評分」 -->
+      <!-- Slider：拖曳選數值，這裡用來示範「保養提前幾天提醒」 -->
       <Field>
-        <FieldLabel>廠商服務評分：{{ rating[0] }} 分</FieldLabel>
-        <Slider v-model="rating" :min="1" :max="5" :step="1" />
+        <FieldLabel>保養提前提醒：{{ remindDays[0] }} 天</FieldLabel>
+        <Slider v-model="remindDays" :min="1" :max="14" :step="1" />
       </Field>
 
       <!-- ToggleGroup：一排按鈕選一個，用來做篩選標籤（還沒照 Kit 調整樣式） -->
@@ -108,6 +108,6 @@ const sort = ref('due')
     </FieldGroup>
 
     <!-- 即時顯示表單資料，看 v-model 的效果 -->
-    <pre class="overflow-x-auto rounded-lg bg-muted p-3 text-xs">{{ { title, detail, visibility, rating, filter, sort } }}</pre>
+    <pre class="overflow-x-auto rounded-lg bg-muted p-3 text-xs">{{ { title, detail, visibility, remindDays, filter, sort } }}</pre>
   </section>
 </template>

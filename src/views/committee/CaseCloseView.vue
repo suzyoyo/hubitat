@@ -96,7 +96,7 @@ function backToDetail() {
     <Empty v-else-if="!item || !canClose" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="233" height="330" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">{{ item ? '這件案件現在不能結案' : '找不到這件案件' }}</EmptyTitle>
       <EmptyDescription class="type-body">

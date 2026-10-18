@@ -34,7 +34,7 @@ import { Spinner } from '@/components/ui/spinner'
     <div class="space-y-2">
       <h3 class="text-sm font-medium text-muted-foreground">Button</h3>
       <div class="flex flex-wrap gap-2">
-        <Button>送出報修</Button>
+        <Button>送出通報</Button>
         <Button variant="secondary">儲存草稿</Button>
         <Button variant="outline">取消</Button>
         <Button variant="ghost">略過</Button>
@@ -55,7 +55,7 @@ import { Spinner } from '@/components/ui/spinner'
       <Card>
         <CardHeader>
           <CardTitle>B 棟電梯異音</CardTitle>
-          <CardDescription>報修單 #1024 · 2 小時前</CardDescription>
+          <CardDescription>通報 #1024 · 2 小時前</CardDescription>
         </CardHeader>
         <CardContent>
           <p class="text-sm">電梯運行時有明顯摩擦聲，已通知維修廠商。</p>
@@ -67,7 +67,7 @@ import { Spinner } from '@/components/ui/spinner'
       </Card>
     </div>
 
-    <!-- Badge：小標籤，適合顯示報修狀態 -->
+    <!-- Badge：小標籤，適合顯示通報狀態 -->
     <div class="space-y-2">
       <h3 class="text-sm font-medium text-muted-foreground">Badge</h3>
       <div class="flex flex-wrap gap-2">
@@ -140,10 +140,10 @@ import { Spinner } from '@/components/ui/spinner'
       <Empty class="border">
         <EmptyHeader>
           <EmptyMedia variant="icon"><InboxIcon /></EmptyMedia>
-          <EmptyTitle>目前沒有報修</EmptyTitle>
-          <EmptyDescription>社區一切正常，有問題隨時可以報修。</EmptyDescription>
+          <EmptyTitle>目前沒有通報</EmptyTitle>
+          <EmptyDescription>社區一切正常，有問題隨時可以通報。</EmptyDescription>
         </EmptyHeader>
-        <Button>我要報修</Button>
+        <Button>我要通報</Button>
       </Empty>
     </div>
   </section>

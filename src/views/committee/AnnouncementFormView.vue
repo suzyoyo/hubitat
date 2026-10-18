@@ -287,7 +287,7 @@ function cancel() {
     <Empty v-else-if="!allowed" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="233" height="330" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">{{ isEdit ? '這則公告不能修改' : '你沒有發布公告的權限' }}</EmptyTitle>
       <EmptyDescription class="type-body">

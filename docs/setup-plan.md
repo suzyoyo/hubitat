@@ -52,7 +52,7 @@
 - **Commit**：`chore: init shadcn-vue`
 
 ## Step 6｜加入首批元件 + 元件盤點頁
-先加入與報修閉環最相關的元件，做一個 `/playground`（或暫時的 App.vue）陳列，用來盤點外觀與用法：
+先加入與通報閉環最相關的元件，做一個 `/playground`（或暫時的 App.vue）陳列，用來盤點外觀與用法：
 - 基礎：button, card, badge, avatar, separator, skeleton, spinner, empty
 - 手機互動：drawer, sheet, sonner, tabs
 - 表單：field, input, textarea, radio-group, slider
@@ -79,7 +79,7 @@
 
 ## Step 8｜設計 Token（依賴 wireframe / 品牌）
 - 在 CSS 變數中定義好彼社區的 primary、accent、destructive、圓角 `--radius`
-- 新增報修狀態色（例如：待處理 / 施工中 / 已完成）
+- 新增通報狀態色（例如：待受理 / 處理中 / 已完成；「施工中」2026-10-15 改叫「處理中」）
 - 調整字級與觸控區，考慮長輩可讀性
 - 指定中文字型
 - **Commit**：`feat: add hubitat design tokens`
@@ -91,11 +91,11 @@
 |---|---|
 | Community | 社區 |
 | User | 角色：住戶 / 管委會 / 管理人員 |
-| RepairTicket | 報修單 |
-| TicketStatusLog | 報修進度紀錄（閉環的核心） |
+| RepairTicket | 通報（實際做成「案件」`cases.js`，見 `docs/data-model.md`） |
+| TicketStatusLog | 處理進度紀錄（閉環的核心，實際是案件的 `logs`） |
 | Vendor | 廠商名冊 |
-| WorkLog | 施工日誌（含照片） |
-| Review | 住戶 / 管委會對廠商的評價 |
+| WorkLog | 完工紀錄（含照片，實際是案件的 `completion`；2026-10-18 改名，原本叫施工日誌） |
+| ~~Review~~ | ~~對廠商的評價~~：2026-10-16 拿掉，結案不評分，改寫結案說明 |
 | HandoverItem | 管委會交接包項目（決議、文件） |
 
 - 檔案位置：`src/mocks/`（例如 `tickets.js`、`vendors.js`），欄位說明用註解或 JSDoc 標註

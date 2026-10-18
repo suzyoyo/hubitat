@@ -230,9 +230,29 @@ export async function createAnnouncement(userId, input) {
     item.status = 'published'
     item.publishedAt = MOCK_NOW
     notifyResidents(item, `新公告：${item.title}`)
+    if (item.isUrgent) notifyCommittee(item, userId)
   }
   announcements.push(item)
   return present(item, 'committee')
+}
+
+// 緊急公告直接發布時，同步通知管委會（2026-10-18 補做；規則見 CLAUDE.md「公告審核規則」、permissions.md）
+//   通知所有委員（管委會身分），發布的人自己不用收
+//   標題「緊急公告已發布」，內容「張管理員發布了緊急公告：B2 車道臨時封閉」，點了到公告詳情
+function notifyCommittee(item, authorId) {
+  for (const user of users) {
+    if (!user.roles.includes('committee') || user.id === authorId) continue
+    notifications.push({
+      id: `n-${item.id}-urgent-${user.id}`,
+      userId: user.id,
+      role: 'committee',
+      title: '緊急公告已發布',
+      body: `${userLabel(authorId)}發布了緊急公告：${item.title}`,
+      at: MOCK_NOW,
+      read: false,
+      link: { type: 'announcement', id: item.id },
+    })
+  }
 }
 
 // 發通知給主委和副主委（例如管理人員修改了公告），發到管委會端

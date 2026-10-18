@@ -345,6 +345,9 @@ function applyVendor(item, { vendorId = '', vendorName = '', scheduledAt = '' })
   const listed = vendors.find((entry) => entry.id === vendorId)
   const name = listed ? listed.name : vendorName.trim()
   if (!name) return undefined
+  // 同一家廠商、原本有約、只改時間＝改期（2026-10-18 suzy 在 #132 提的：住戶不會只在通知看到，要寫進處理進度）
+  const sameVendor = listed ? item.vendorId === listed.id : !item.vendorId && item.vendorName === name
+  const isReschedule = sameVendor && Boolean(item.scheduledAt) && Boolean(scheduledAt) && scheduledAt !== item.scheduledAt
   item.status = 'in_progress'
   if (listed) {
     item.vendorId = listed.id
@@ -356,6 +359,13 @@ function applyVendor(item, { vendorId = '', vendorName = '', scheduledAt = '' })
   if (scheduledAt) item.scheduledAt = scheduledAt
   else delete item.scheduledAt // 換廠商又沒填時間，就不要留著上一家的預約
   setFirstVisit(item, scheduledAt)
+  if (isReschedule) {
+    return {
+      text: `${name} 改期，預約 ${formatDateTime(scheduledAt)} 到場`,
+      lines: [`廠商改期：${formatDateTime(scheduledAt)} 到場`],
+      residentText: rescheduleText(scheduledAt),
+    }
+  }
   return {
     text: scheduledAt ? `指派 ${name}，預約 ${formatDateTime(scheduledAt)} 到場` : `指派 ${name}`,
     lines: scheduledAt ? [`廠商：${name}`, `到場：${formatDateTime(scheduledAt)}`] : [`廠商：${name}`],
@@ -363,12 +373,20 @@ function applyVendor(item, { vendorId = '', vendorName = '', scheduledAt = '' })
   }
 }
 
+// 改期時給住戶看的一句（住戶不會收到通知，靠處理進度看到新的日期，case-flow 第 5 節）
+function rescheduleText(scheduledAt) {
+  return `廠商改期，預計 ${formatDate(scheduledAt)} 到場。`
+}
+
 // 處理紀錄：改期時同時更新預約到場時間
+//   改期了、但沒寫給住戶看的說明 → 自動補「廠商改期，預計 10/5 到場。」，住戶的處理進度才看得到新日期
 function applyLog(item, { text, residentText = '', scheduledAt = '' }) {
   if (!text?.trim()) return undefined
   if (scheduledAt) {
+    const changed = scheduledAt !== item.scheduledAt
     item.scheduledAt = scheduledAt
     setFirstVisit(item, scheduledAt)
+    if (changed && !residentText.trim()) residentText = rescheduleText(scheduledAt)
   }
   // 「更新進度」的紀錄多一行「給住戶：…」，管理端才看得到這次給住戶看了什麼（有寫才有）
   const lines = residentText.trim() ? [text.trim(), `給住戶：${residentText.trim()}`] : [text.trim()]
