@@ -54,7 +54,7 @@ function dateTimeText(value) {
       <Empty v-if="!log.items.length" class="gap-1 pt-10">
         <EmptyMedia>
           <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-          <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+          <img :src="mascotUrl" alt="" width="233" height="330" class="h-[120px] w-auto" />
         </EmptyMedia>
         <EmptyTitle class="type-greeting">還沒有緊急標示紀錄</EmptyTitle>
       </Empty>

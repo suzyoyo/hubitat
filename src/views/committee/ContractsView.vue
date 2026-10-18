@@ -76,7 +76,7 @@ const shownContracts = computed(() => {
     <Empty v-else-if="!shownContracts.length" class="gap-1 pt-6">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="330" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">沒有符合的合約</EmptyTitle>
       <EmptyDescription class="type-body">換個關鍵字或狀態試試看。</EmptyDescription>
