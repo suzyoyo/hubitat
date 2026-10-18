@@ -93,7 +93,7 @@ const shownDevices = computed(() => {
     <Empty v-else-if="!shownDevices.length" class="gap-1 pt-6">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="233" height="330" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">沒有符合的設備</EmptyTitle>
       <EmptyDescription class="type-body">換個關鍵字或狀態試試看。</EmptyDescription>
