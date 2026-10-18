@@ -1,7 +1,7 @@
 <script setup>
 // 搜尋頁：/search?q=關鍵字&role=身分
 // 邊打邊搜尋；可以只看某個身分的教學；搜尋字會寫進網址，可以分享
-//   沒選身分：結果依身分分組，「我的身分」（側邊選單記住的那個）排第一組，不會混在一起
+//   沒選身分：結果依身分分組（我的身分排第一組），多個身分共用的文章另外放在「共用教學」，每篇只出現一次
 //   有選身分：只列這個身分用得到的，只給這個身分的文章排前面
 //   標題、介紹裡符合搜尋字的地方用黃色底標出來
 import { CheckIcon } from '@lucide/vue'
@@ -11,7 +11,7 @@ import ArticleCard from '@/components/ArticleCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import { ROLES } from '@/content/roles'
-import { appliesTo, searchArticles, searchWords } from '@/lib/content'
+import { searchArticles, searchWords } from '@/lib/content'
 import { currentRole } from '@/lib/role'
 
 const route = useRoute()
@@ -22,16 +22,19 @@ const words = computed(() => searchWords(query.value))
 const roleFilter = computed(() => (ROLES.some((r) => r.id === route.query.role) ? route.query.role : null))
 const results = computed(() => searchArticles(query.value, roleFilter.value))
 
-// 沒選身分時的分組：每篇放進「第一個用得到它的身分」，順序是我的身分在前
+// 沒選身分時的分組（每篇只出現一次，各組加起來就是總數）：
+//   只給一個身分看的文章 → 放進那個身分的組，我的身分排第一組
+//   兩個以上身分都用得到的文章 → 放進最後的「共用教學」
 const groups = computed(() => {
   if (roleFilter.value) return []
   const order = [currentRole.value, ...ROLES.map((r) => r.id).filter((id) => id !== currentRole.value)]
-  return order
-    .map((roleId) => ({
-      role: ROLES.find((r) => r.id === roleId),
-      articles: results.value.filter((article) => order.find((id) => appliesTo(article, id)) === roleId),
-    }))
-    .filter((group) => group.articles.length > 0)
+  const roleGroups = order.map((roleId) => ({
+    id: roleId,
+    title: `${ROLES.find((r) => r.id === roleId).label}的教學`,
+    articles: results.value.filter((a) => a.applicableRoles.length === 1 && a.applicableRoles[0] === roleId),
+  }))
+  const shared = { id: 'shared', title: '共用教學', articles: results.value.filter((a) => a.applicableRoles.length > 1) }
+  return [...roleGroups, shared].filter((group) => group.articles.length > 0)
 })
 
 const filters = [{ id: null, label: '全部身分' }, ...ROLES.map((r) => ({ id: r.id, label: r.label }))]
@@ -98,9 +101,9 @@ function update(changes) {
 
       <!-- 沒選身分：依身分分組 -->
       <template v-else-if="results.length">
-        <section v-for="group in groups" :key="group.role.id" class="mt-8" :aria-labelledby="`result-${group.role.id}`">
-          <h2 :id="`result-${group.role.id}`" class="text-xl font-bold text-brand-950">
-            {{ group.role.label }}的教學
+        <section v-for="group in groups" :key="group.id" class="mt-8" :aria-labelledby="`result-${group.id}`">
+          <h2 :id="`result-${group.id}`" class="text-xl font-bold text-brand-950">
+            {{ group.title }}
             <span class="ml-1 text-base font-medium text-muted">{{ group.articles.length }} 篇</span>
           </h2>
           <ul class="mt-3 space-y-3">
