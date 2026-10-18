@@ -136,7 +136,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | （Kit 沒有）同時操作衝突 | `feedback/FeedbackConflictDialog.vue` | 🟡 | 「這筆資料剛剛有人改過了」彈窗：`description` 寫誰、什麼時候改了，只有「重新整理」（送出 `refresh`）。頁面還沒套上 |
 | （Kit 沒有）權限被拒 | `feedback/FeedbackPermissionDialog.vue` | 🟡 | 相機（多一顆「改從相簿選照片」，送出 `use-photos`）、相簿、通知被拒時，教使用者到手機「設定」打開，iPhone、Android 各一行。`add-to-home` 教使用者加入主畫面 |
 | （Kit 沒有）開啟通知提醒 | `feedback/NotificationReminder.vue` | 🟡 | 三端首頁最上面，還沒開通知就一直出現、不擋（2026-10-18 013）。「先不要」藏到這次關掉 App（sessionStorage）；拒絕過時，按「開啟通知」跳出權限被拒的彈窗。iPhone 用 Safari 開（沒有通知功能）時，改成「加入主畫面，才收得到通知」＋「怎麼加入」（2026-10-19，suzy 在 #144 提的） |
-| （Kit 沒有）假 API 故意失敗橫幅 | `app/MockFailBanner.vue` | ✅ | `/playground`「狀態畫面」的「故意失敗」開著時，頂部列下面一條橘色橫幅，點了回 playground 關掉（2026-10-19，suzy 在 #144 提的），接在 `AppShell` |
+| （Kit 沒有）測試模式橫幅 | `app/MockFailBanner.vue` | ✅ | `/playground`「狀態畫面」的「模擬連線失敗」開著時，頂部列下面一條橘色橫幅「測試模式：正在模擬連線失敗，點這裡關閉」，點了回 playground 關掉（2026-10-19，suzy 在 #144 提的），接在 `AppShell` |
 | （Kit 沒有）離線橫幅 | `app/OfflineBanner.vue` | ✅ | 沒有網路時，頂部列下面一條深灰色橫幅，已經接在 `AppShell`，每一頁都有 |
 | `Feedback/Toast` | ➖ | ➖ | 用基礎元件 `ui/sonner`（`toast('訊息')`）。樣式和 Kit 不同時調整 sonner，不另外做元件 |
 | `Feedback/Dialog Header` | ➖ | ➖ | 用基礎元件 dialog 的標題（`DialogTitle`）。用法見 `notice/NoticeDetailDialog.vue` |

@@ -61,13 +61,13 @@ function openPermission(kind) {
 
     <!-- 假 API 故意失敗：打開後，App 裡所有頁面拿資料都會失敗 -->
     <div class="space-y-2 rounded-lg border bg-card p-3">
-      <p class="type-body-strong">假 API 故意失敗</p>
+      <p class="type-body-strong">模擬連線失敗（測試模式）</p>
       <p class="type-date text-muted-foreground">
-        打開後所有假 API 都會失敗（換頁、重新整理都還在）。開著時每一頁上方會有橘色橫幅提醒。還沒處理錯誤的頁面會一直轉圈，<strong>看完要關掉</strong>。
+        打開後 App 裡拿資料都會失敗，像網路斷掉一樣（換頁、重新整理都還在）。開著時每一頁上方會有橘色的「測試模式」橫幅。還沒處理錯誤的頁面會一直轉圈，<strong>看完要關掉</strong>。
       </p>
       <div class="flex gap-2">
         <Button size="sm" :variant="mockFail ? 'outline' : 'default'" @click="changeMockFail(false)">正常</Button>
-        <Button size="sm" :variant="mockFail ? 'default' : 'outline'" @click="changeMockFail(true)">故意失敗</Button>
+        <Button size="sm" :variant="mockFail ? 'default' : 'outline'" @click="changeMockFail(true)">模擬失敗</Button>
       </div>
     </div>
 
