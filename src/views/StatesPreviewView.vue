@@ -6,6 +6,7 @@ import OfflineBanner from '@/components/app/OfflineBanner.vue'
 import FeedbackConflictDialog from '@/components/feedback/FeedbackConflictDialog.vue'
 import FeedbackPermissionDialog from '@/components/feedback/FeedbackPermissionDialog.vue'
 import FeedbackState from '@/components/feedback/FeedbackState.vue'
+import NotificationReminder from '@/components/feedback/NotificationReminder.vue'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { toastSubmitError } from '@/lib/feedback'
@@ -116,6 +117,15 @@ function openPermission(kind) {
         :kind="permissionKind"
         @use-photos="toast('（示範）打開相簿')"
       />
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="type-card-title">8. 開啟通知提醒</h2>
+      <p class="type-date text-muted-foreground">
+        放在三端首頁最上面，還沒開通知就一直出現，但不擋。「先不要」只藏到這次關掉 App；拒絕過或 iPhone 沒加入主畫面時，按「開啟通知」會教他到設定打開。
+      </p>
+      <NotificationReminder preview />
+      <Button variant="outline" class="w-full" @click="openPermission('notifications')">直接看「還沒開啟通知」彈窗</Button>
     </section>
   </div>
 </template>

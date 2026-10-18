@@ -1,5 +1,5 @@
 <script setup>
-// 權限被拒的彈窗：相機、相簿
+// 權限被拒的彈窗：相機、相簿、通知
 // 使用者之前按了「不允許」，網頁沒辦法再跳出詢問，只能教他自己去設定打開
 // 例：<FeedbackPermissionDialog v-model:open="cameraDenied" kind="camera" @use-photos="pickFromPhotos" />
 import { computed } from 'vue'
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 
 const props = defineProps({
-  // camera：相機 / photos：相簿
+  // camera：相機 / photos：相簿 / notifications：通知
   kind: { type: String, required: true },
 })
 
@@ -28,6 +28,13 @@ const KINDS = {
     description: '請開啟照片權限。',
     iphone: '「設定」→「隱私權與安全性」→「照片」→ 瀏覽器（例如 Safari）→「完整取用」',
     android: '「設定」→「應用程式」→ 瀏覽器（例如 Chrome）→「權限」→「相片和影片」→「允許」',
+  },
+  // iPhone 用瀏覽器開的話根本沒有通知，要先加入主畫面，所以標題不寫「關掉了」
+  notifications: {
+    title: '還沒開啟通知',
+    description: '請開啟通知，才收得到受理、結案和緊急公告。',
+    iphone: '先「加入主畫面」，再到「設定」→「通知」→「好彼社區」→ 打開「允許通知」',
+    android: '「設定」→「應用程式」→「好彼社區」（或瀏覽器）→「通知」→ 打開',
   },
 }
 

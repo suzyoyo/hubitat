@@ -5,6 +5,7 @@ import { computed, onMounted, ref } from 'vue'
 import AdminNoticeCard from '@/components/admin/AdminNoticeCard.vue'
 import AdminTodoCard from '@/components/admin/AdminTodoCard.vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
+import NotificationReminder from '@/components/feedback/NotificationReminder.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import IconTile from '@/components/common/IconTile.vue'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -70,6 +71,9 @@ const shortcuts = [
     <Skeleton v-else class="h-[104px] rounded-t-none rounded-b-3xl" />
 
     <div class="space-y-8 px-5 pt-5">
+      <!-- 還沒開通知就一直提醒，但不擋（2026-10-18 013） -->
+      <NotificationReminder />
+
       <section class="space-y-3">
         <div class="flex items-center justify-between">
           <h2 class="type-title text-heading">我的待辦</h2>

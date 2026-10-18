@@ -6,6 +6,7 @@ import { computed, onMounted, ref } from 'vue'
 import AdminNoticeCard from '@/components/admin/AdminNoticeCard.vue'
 import AdminTodoCard from '@/components/admin/AdminTodoCard.vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
+import NotificationReminder from '@/components/feedback/NotificationReminder.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { greetingWord } from '@/lib/date'
@@ -60,6 +61,9 @@ function staffTodoLink(todo) {
     <Skeleton v-else class="h-[104px] rounded-t-none rounded-b-3xl" />
 
     <div class="space-y-8 px-5 pt-5">
+      <!-- 還沒開通知就一直提醒，但不擋（2026-10-18 013） -->
+      <NotificationReminder />
+
       <section class="space-y-3">
         <!-- 標題右邊是「查看 N 件待辦 ›」（2026-10-15 suzy 改：拿掉件數徽章和下面的「查看全部待辦事項」按鈕）
              樣式和下面「公告與動態」的「看全部 ›」一樣（SectionHeader），只是文字不同，所以這裡照著寫一份 -->
