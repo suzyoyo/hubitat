@@ -254,6 +254,7 @@ export async function acceptCase(id, userId, options = {}) {
   setEquipmentStatus(item, 'needs_repair')
   const deadlineText = item.deadline ? `，預計 ${formatDate(item.deadline)} 前完成` : ''
   addLog(item, userId, '已受理', `${userLabel(userId)}受理${deadlineText}`, `${handlerWord(userId)}已受理。`)
+  notifyResidents(item, 'accepted')
   return presentForManagement(item)
 }
 
@@ -424,24 +425,31 @@ function closeItem(item, userId, cost, note = '') {
   // 有結案說明的話多一行，例如「李主委結案」下面一行「費用已付清」
   const text = note ? `${userLabel(userId)}結案\n${note}` : `${userLabel(userId)}結案`
   addLog(item, userId, '已結案', text, '已完成維修，感謝你的通報。')
-  notifyResidentsClosed(item)
+  notifyResidents(item, 'closed')
 }
 
-// 結案：通知住戶（2026-10-16，case-flow 第 5 節）
-//   通報的人：「你通報的『電梯／電梯口運轉有異音』已結案，點擊查看處理結果」
-//   按過「我也遇到了」的人：「你也遇到的『…』已結案，…」
+// 受理、結案時通知住戶（結案 2026-10-16、受理 2026-10-18，case-flow 第 5 節）
+//   通報的人：「你通報的『電梯／電梯口運轉有異音』已受理，點擊查看處理進度」
+//   按過「我也遇到了」的人：「你也遇到的『…』已受理，…」
 //   管委會、管理人員登記的通報（不是住戶通報的）不通知通報人
-function notifyResidentsClosed(item) {
+//   type：'accepted' 受理 / 'closed' 結案
+const RESIDENT_NOTICES = {
+  accepted: { title: '通報已受理', body: '已受理，點擊查看處理進度' },
+  closed: { title: '通報已結案', body: '已結案，點擊查看處理結果' },
+}
+
+function notifyResidents(item, type) {
+  const notice = RESIDENT_NOTICES[type]
   const targets = item.source === 'resident' ? [{ id: item.reporterId, lead: '你通報的' }] : []
   for (const id of item.supporters) targets.push({ id, lead: '你也遇到的' })
   for (const { id, lead } of targets) {
     if (!findUser(id)?.roles.includes('resident')) continue
     notifications.push({
-      id: `n-${item.id}-closed-${id}`,
+      id: `n-${item.id}-${type}-${id}`,
       userId: id,
       role: 'resident',
-      title: '通報已結案',
-      body: `${lead}「${item.title}」已結案，點擊查看處理結果`,
+      title: notice.title,
+      body: `${lead}「${item.title}」${notice.body}`,
       at: MOCK_NOW,
       read: false,
       link: { type: 'case', id: item.id },
