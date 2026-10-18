@@ -60,11 +60,12 @@
   - 頂部列維持外框的 logo＋鈴鐺（設計稿是置中的「我的」標題，先不改外框）
   - 個人資料卡的社區名稱和戶號分成兩行（放大到 16px 後同一行放不下）
   - 「切換至管委會」只有委員看得到，連到 `/committee/home`；下面的「有 N 件事等你處理」是 `getMyTodos()` 的 `total`，和管委會端首頁同一個數字。不是委員的住戶看到的是「加入管委會」（見下面的流程）
-  - 字體大小**只做外觀**：選了會記在瀏覽器的 `localStorage`（`hubitat-font-size`），但不會改變文字大小。真的要縮放得改 `style.css` 裡寫死 px 的 `type-` 樣式，三端都會受影響，另外做並先跟 013 說。卡片裡「調整後，所有頁面的文字大小會一起改變。」這句還留著
+  - 字體大小原本只做外觀（2026-10-13）；2026-10-19 接起來了，見下一條
   - 個人資料、通知設定、使用說明、帳號與安全都連到佔位頁（`/resident/me/...`，設計稿沒畫）；登出先回到角色選擇頁 `/`
   - 「版本資訊」不做成一列和一頁（2026-10-13 決定）：登出按鈕下面放一行灰字「好彼社區 V0.1.0」，版本號讀 `package.json` 的 `version`。Figma 的「系統與支援」要跟著拿掉這一列
   - 新元件：`app/MenuItem`（圖示＋標題＋說明＋箭頭的一列，有傳 `to` 才能點、才有箭頭）。設計稿這幾列用的是基礎元件 Item，還沒和 Kit 的 `App/Menu Item` 對過
   - Figma 要跟著改的：兩張「我的」畫面的姓名和戶號不一致；「住戶」徽章借用了「處理中」，應該是灰色
+  - 字體大小接起來了（2026-10-19，展示用，013 做的，分支 `shared/large-text-demo`）：選「大」＝WCAG 大字（內文 24px、粗體 19px），只有首頁、社區、我的三個分頁會變，底部 tab 和內頁不變；「小」「中」是原本的字級。選的值在 `src/lib/fontSize.js`，外框（`AppShell`）在 `<main>` 加 `.large-text`，樣式在 `style.css` 最下面
 - ✅ 住戶端「加入管委會」流程（2026-10-14，分支 `resident/join-committee`）：`src/views/resident/JoinCommitteeView.vue`，網址 `/resident/me/join`（「我的」頁身分卡的「加入管委會」，不是委員才看得到）
   - 三步：輸入邀請碼 → 確認邀請 → 接受完成。每一步的畫面在 `src/views/resident/join-committee/`（`CodeStep`、`ConfirmStep`、`AcceptedDone`），`JoinCommitteeView.vue` 負責記住查到的邀請、決定顯示哪一步；步驟記在網址上（`?step=confirm`、`?step=done`），寫法和新增通報一樣
   - 輸入邀請碼：只能打數字、滿 6 位自動查、可以用就自動到下一步；不能用的在輸入框下面顯示紅字（查無此碼、已過期、已使用，文字在 `INVITE_STATUSES`）。「開啟相機掃描」只跳提示，還沒做
@@ -146,3 +147,14 @@
   - 設計稿沒畫，照管委會的頁面（013 的，#100）做一份管理人員版，不動她的檔案；之後可以和 013 討論合成一份、用 `route.meta.roleId` 分辨哪一端
   - 和管委會版的差別：假 API 傳 `'staff'`，維修史沒有費用；管理人員端沒有廠商詳細、合約詳情，所以「負責廠商」不能點、不顯示合約提醒，維修史只有從案件來的可以點（到案件詳情），例行保養不能點
   - 案件詳情（兩端共用、013 的檔案）的「查看設備」改成管理人員端也有、連到 `/staff/equipment/:id`；這個改動放在另一個分支 `shared/case-equipment-link`，要等 013 同意才合併。「查看廠商」管理人員端還是不放
+- ✅ 管委會端、管理人員端共用「快速留存」頁（2026-10-18，分支 `committee/quick-save`，013 做的）：`src/views/committee/QuickSaveView.vue`，網址 `/committee/quick-saves/new`、`/staff/quick-saves/new`（「＋」選單的「快速留存」），設計稿 1134:19280
+  - 照片、名稱、備註都是選填，三樣都沒填時「留存」按不了；留存後回上一頁，自己的待辦多一張「需補資料」（假 API `addQuickSave`，分支 `shared/quick-save`）
+  - 照片用 `case/CaseAttachmentList`（最多 5 個），所以和設計稿有兩處不同：按鈕寫「新增」不是「拍照或上傳」；說明是「支援照片、影片與 PDF」，不是「支援 JPG、PNG，大小不超過 10MB」
+  - 底部說明設計稿是「留存後將存至代辦事項」，改成「留存後會放進你的待辦，之後再補齊資料」（「代辦」是錯字）
+  - 「＋」選單的快速留存圖示改成 Kit 的 `clipboard-pen-line`（`roles.js`，在 `shared/quick-save`）
+  - 留存詳情（2026-10-18，同一個分支）：`src/views/committee/QuickSaveDetailView.vue`，網址 `/committee/quick-saves/:id`、`/staff/quick-saves/:id`（待辦「需補資料」點進來）。設計稿沒有這一頁
+    - 照片（`case/CaseFileGrid`，點了全螢幕）、名稱、備註、留存時間；還沒補齊的底部選一件處理中的案件 →「歸到這件案件」→ 跳到那件案件的詳情，接著可以完工驗收
+    - 案件詳情的處理紀錄多一筆「附上留存」，照片顯示在那一筆下面（`log.files`）。設備不在這裡選，到案件詳情的「關聯設備」選
+    - 已補齊的顯示「已歸到案件／設備」，可以點過去
+    - 「附上留存」那筆沒有給住戶看的說明，住戶的通報詳情看不到
+  - 待辦卡：沒有期限的「需補資料」（快速留存）原本沒有徽章，補上橘色「待補資料」（`src/lib/todo.js`，在 `shared/quick-save`）

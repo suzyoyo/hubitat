@@ -7,6 +7,7 @@ import { useRoute } from 'vue-router'
 import AppHeader from '@/components/app/AppHeader.vue'
 import BottomNav from '@/components/app/BottomNav.vue'
 import { canUseMenuItem, getRole } from '@/config/roles'
+import { fontSize } from '@/lib/fontSize'
 import { getCurrentUser, getUnreadCount } from '@/mocks/api'
 
 const props = defineProps({
@@ -21,6 +22,9 @@ const basePath = computed(() => `/${props.roleId}`)
 const route = useRoute()
 // 目前這一頁是不是底部分頁的其中一頁
 const isTab = computed(() => route.meta.isTab)
+
+// 住戶選了「大」字：底部分頁那幾頁的內容換成 WCAG 大字（展示用，見 src/lib/fontSize.js）
+const largeText = computed(() => props.roleId === 'resident' && isTab.value && fontSize.value === 'large')
 
 // 「＋」跳出的選單裡，這個人看得到的項目（例如一般委員看不到「新增交辦」）
 // 要先知道是誰，所以一開始是空的；換到另一端時重新拿
@@ -63,7 +67,7 @@ watch(
     />
     <!-- pb-32：留空間給固定在底部的導覽列，內容才不會被蓋住；沒有導覽列時只留 pb-10 -->
     <!-- relative：讓內容疊在光暈的上面 -->
-    <main class="relative" :class="isTab ? 'pb-32' : 'pb-10'">
+    <main class="relative" :class="[isTab ? 'pb-32' : 'pb-10', { 'large-text': largeText }]">
       <!-- RouterView：目前網址對應的頁面會顯示在這裡 -->
       <RouterView />
     </main>

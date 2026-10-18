@@ -8,6 +8,8 @@ import AnnouncementFormView from '@/views/committee/AnnouncementFormView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
 import EquipmentDetailView from '@/views/staff/EquipmentDetailView.vue'
 import EquipmentListView from '@/views/staff/EquipmentListView.vue'
+import QuickSaveDetailView from '@/views/committee/QuickSaveDetailView.vue'
+import QuickSaveView from '@/views/committee/QuickSaveView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TaskReportView from '@/views/committee/TaskReportView.vue'
 import FilesView from '@/views/staff/FilesView.vue'
@@ -39,6 +41,8 @@ export default {
     'cases/:id/complete': CaseCompleteView,
     'tasks/:id': TaskDetailView,
     'tasks/:id/report': TaskReportView, // 交辦詳情的「回報完成」（沒有關聯案件的交辦）
+    'quick-saves/new': QuickSaveView, // 「＋」選單的「快速留存」
+    'quick-saves/:id': QuickSaveDetailView, // 待辦「需補資料」的留存
     // 「＋」選單：和管委會端同一頁（2026-10-18）
     'cases/new': NewRepairView,
     'announcements/new': AnnouncementFormView,
