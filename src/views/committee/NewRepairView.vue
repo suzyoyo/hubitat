@@ -3,6 +3,7 @@
 //   1 選地點（上面多了「通報住戶」，可以代某一戶登記）→ 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出
 // 中間每一步的畫面和住戶端共用（src/components/report/Report…Step），完成頁用管理端的說法，寫在這個檔案裡
 // 步驟記在網址上（/committee/cases/new?step=2），寫法和住戶端的 NewReportView.vue 一樣
+// 管理人員端「＋」選單的「新增通報」也用這一頁（/staff/cases/new，2026-10-18）
 import { BellIcon } from '@lucide/vue'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -25,6 +26,7 @@ import mascotUrl from '@/assets/mascot/happy.png' // 開心奔跑的好彼管家
 
 const route = useRoute()
 const router = useRouter()
+const base = `/${route.meta.roleId}` // 目前在哪一端：/committee 或 /staff
 
 // ── 通報住戶的選項 ─────────────────────────────────
 // 社區是 3 棟 120 戶：每棟 10 層、每層 4 戶。戶號的寫法和假資料一樣（'8樓之1'）
@@ -74,7 +76,7 @@ const areas = ref([])
 
 onMounted(async () => {
   if (step.value !== 1) router.replace({ query: {} })
-  const [user, areaList] = await Promise.all([getCurrentUser('committee'), getAreas()])
+  const [user, areaList] = await Promise.all([getCurrentUser(route.meta.roleId), getAreas()])
   userId.value = user.id
   areas.value = areaList
   loading.value = false
@@ -177,7 +179,7 @@ async function submit() {
     description: summary.value.description,
     photos: summary.value.photos,
     unit: unit.value ?? undefined,
-  })
+  }, route.meta.roleId)
   onBehalfText.value = unit.value ? `已收到通報！代 ${unit.value.building} 棟 ${unit.value.unit} 登記通報` : ''
   submitting.value = false
   await router.replace({ query: { step: 'submitted' } })
@@ -318,12 +320,12 @@ async function submit() {
     </BottomCta>
     <!-- 兩個完成頁：replace，離開之後按返回不會再回到完成頁 -->
     <BottomCta v-else-if="step === 'submitted'" vertical>
-      <Button @click="router.replace(`/committee/cases/${createdCase.id}`)">查看案件</Button>
-      <Button variant="outline" @click="router.replace('/committee/home')">回到首頁</Button>
+      <Button @click="router.replace(`${base}/cases/${createdCase.id}`)">查看案件</Button>
+      <Button variant="outline" @click="router.replace(`${base}/home`)">回到首頁</Button>
     </BottomCta>
     <BottomCta v-else-if="step === 'supported'" vertical>
-      <Button @click="router.replace(`/committee/cases/${supportedReport.id}`)">查看案件</Button>
-      <Button variant="outline" @click="router.replace('/committee/home')">回到首頁</Button>
+      <Button @click="router.replace(`${base}/cases/${supportedReport.id}`)">查看案件</Button>
+      <Button variant="outline" @click="router.replace(`${base}/home`)">回到首頁</Button>
     </BottomCta>
   </div>
 </template>

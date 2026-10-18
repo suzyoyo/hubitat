@@ -2,6 +2,7 @@
 // 管委會端・發布公告／修改公告：同一個表單，網址不一樣
 //   /committee/announcements/new       發布公告（空白表單）
 //   /committee/announcements/:id/edit  修改公告（先填好原本的內容）
+//   /staff/announcements/new           管理人員端「＋」選單的發布公告（2026-10-18；管理人員端沒有公告詳情，發布後回首頁）
 // 欄位照設計稿，三種表單不一樣（施工維護 1134:15770、活動 1134:14426、其他 1134:17972）
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -35,6 +36,7 @@ import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好�
 
 const route = useRoute()
 const router = useRouter()
+const base = `/${route.meta.roleId}` // 目前在哪一端：/committee 或 /staff
 
 // 網址有 :id 就是修改，沒有就是發布
 const editId = route.params.id
@@ -108,7 +110,7 @@ function fillForm(item) {
 }
 
 onMounted(async () => {
-  const user = await getCurrentUser('committee')
+  const user = await getCurrentUser(route.meta.roleId)
   userId.value = user.id
   const [areaList, caseList, equipmentList, item] = await Promise.all([
     getAreas(),
@@ -258,15 +260,16 @@ async function submit() {
   }
   toast.success(result.status === 'pending' ? '已送出審核' : '公告已發布')
   // replace：換掉表單這一頁，按返回不會回到填好的表單
-  router.replace(`/committee/announcements/${result.id}`)
+  // 管理人員端還沒有公告詳情頁，回首頁
+  router.replace(route.meta.roleId === 'staff' ? `${base}/home` : `${base}/announcements/${result.id}`)
 }
 
-// 取消：回到上一頁；直接打網址進來的沒有上一頁，就回管委會首頁
+// 取消：回到上一頁；直接打網址進來的沒有上一頁，就回目前這一端的首頁
 function cancel() {
   if (window.history.state?.back) {
     router.back()
   } else {
-    router.replace('/committee/home')
+    router.replace(`${base}/home`)
   }
 }
 </script>
@@ -291,7 +294,7 @@ function cancel() {
         {{ isEdit ? '可能已經結束、已撤回、還在審核中，或你不是發布者。' : '只有主委、副主委和管理人員可以發布公告。' }}
       </EmptyDescription>
       <Button as-child class="mt-4">
-        <RouterLink to="/committee/home">回到首頁</RouterLink>
+        <RouterLink :to="`${base}/home`">回到首頁</RouterLink>
       </Button>
     </Empty>
 
