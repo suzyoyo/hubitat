@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:help": "vite --config help/vite.config.js",
+    "build:help": "vite build --config help/vite.config.js",
+    "preview:help": "vite preview --config help/vite.config.js",
+    "check:help": "node help/scripts/check-content.js",
+    "test:help": "node help/scripts/test-site.js"
   },
   "dependencies": {
     "@lucide/vue": "^1.49.0",
@@ -25,6 +30,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.8",
+    "playwright": "^1.57.0",
     "vite": "^8.3.0",
     "vite-plugin-pwa": "1.3.0"
   }

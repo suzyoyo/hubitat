@@ -12,6 +12,13 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "preview", "--", "--host", "--port", "4173"],
       "port": 4173
+    },
+    {
+      "name": "help",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "npx vite --config help/vite.config.js --port ${PORT:-5180} --strictPort"],
+      "port": 5180,
+      "autoPort": true
     }
   ]
 }
