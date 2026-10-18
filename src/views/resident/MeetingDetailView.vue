@@ -240,7 +240,7 @@ function download() {
     <Empty v-else-if="!meeting" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="330" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">找不到這份會議紀錄</EmptyTitle>
       <EmptyDescription class="type-body">可能還沒公開，或是網址不正確。</EmptyDescription>
@@ -352,7 +352,7 @@ function download() {
           <!-- 搜尋中、沒找到 -->
           <Empty v-else-if="searchWord" class="gap-1 pt-6">
             <EmptyMedia>
-              <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+              <img :src="mascotUrl" alt="" width="233" height="330" class="h-[120px] w-auto" />
             </EmptyMedia>
             <EmptyTitle class="type-greeting">找不到「{{ searchWord }}」相關內容</EmptyTitle>
             <EmptyDescription class="type-body">請換個關鍵字，例如：電梯、防水</EmptyDescription>
