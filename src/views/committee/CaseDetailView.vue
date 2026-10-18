@@ -395,7 +395,7 @@ const basicRows = computed(() => {
               <!-- 備註小字（例如住戶修改通報時，改完的內容）：和住戶端的處理進度一樣（ReportRecord），
                    type-note 14px 灰色；whitespace-pre-line 讓兩項都改時一項一行 -->
               <p v-if="log.note" class="type-note whitespace-pre-line text-muted-foreground">{{ log.note }}</p>
-              <!-- 附上留存的照片（快速留存歸到這件案件時，2026-10-19） -->
+              <!-- 附上留存的照片（快速留存歸到這件案件時，2026-10-18） -->
               <CaseFileGrid v-if="log.files?.length" :files="log.files" :title="log.label" class="pt-2" />
             </div>
           </div>

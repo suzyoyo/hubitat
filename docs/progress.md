@@ -146,12 +146,12 @@
   - 設計稿沒畫，照管委會的頁面（013 的，#100）做一份管理人員版，不動她的檔案；之後可以和 013 討論合成一份、用 `route.meta.roleId` 分辨哪一端
   - 和管委會版的差別：假 API 傳 `'staff'`，維修史沒有費用；管理人員端沒有廠商詳細、合約詳情，所以「負責廠商」不能點、不顯示合約提醒，維修史只有從案件來的可以點（到案件詳情），例行保養不能點
   - 案件詳情（兩端共用、013 的檔案）的「查看設備」改成管理人員端也有、連到 `/staff/equipment/:id`；這個改動放在另一個分支 `shared/case-equipment-link`，要等 013 同意才合併。「查看廠商」管理人員端還是不放
-- ✅ 管委會端、管理人員端共用「快速留存」頁（2026-10-19，分支 `committee/quick-save`，013 做的）：`src/views/committee/QuickSaveView.vue`，網址 `/committee/quick-saves/new`、`/staff/quick-saves/new`（「＋」選單的「快速留存」），設計稿 1134:19280
+- ✅ 管委會端、管理人員端共用「快速留存」頁（2026-10-18，分支 `committee/quick-save`，013 做的）：`src/views/committee/QuickSaveView.vue`，網址 `/committee/quick-saves/new`、`/staff/quick-saves/new`（「＋」選單的「快速留存」），設計稿 1134:19280
   - 照片、名稱、備註都是選填，三樣都沒填時「留存」按不了；留存後回上一頁，自己的待辦多一張「需補資料」（假 API `addQuickSave`，分支 `shared/quick-save`）
   - 照片用 `case/CaseAttachmentList`（最多 5 個），所以和設計稿有兩處不同：按鈕寫「新增」不是「拍照或上傳」；說明是「支援照片、影片與 PDF」，不是「支援 JPG、PNG，大小不超過 10MB」
   - 底部說明設計稿是「留存後將存至代辦事項」，改成「留存後會放進你的待辦，之後再補齊資料」（「代辦」是錯字）
   - 「＋」選單的快速留存圖示改成 Kit 的 `clipboard-pen-line`（`roles.js`，在 `shared/quick-save`）
-  - 留存詳情（2026-10-19，同一個分支）：`src/views/committee/QuickSaveDetailView.vue`，網址 `/committee/quick-saves/:id`、`/staff/quick-saves/:id`（待辦「需補資料」點進來）。設計稿沒有這一頁
+  - 留存詳情（2026-10-18，同一個分支）：`src/views/committee/QuickSaveDetailView.vue`，網址 `/committee/quick-saves/:id`、`/staff/quick-saves/:id`（待辦「需補資料」點進來）。設計稿沒有這一頁
     - 照片（`case/CaseFileGrid`，點了全螢幕）、名稱、備註、留存時間；還沒補齊的底部選一件處理中的案件 →「歸到這件案件」→ 跳到那件案件的詳情，接著可以完工驗收
     - 案件詳情的處理紀錄多一筆「附上留存」，照片顯示在那一筆下面（`log.files`）。設備不在這裡選，到案件詳情的「關聯設備」選
     - 已補齊的顯示「已歸到案件／設備」，可以點過去
