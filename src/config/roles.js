@@ -1,7 +1,7 @@
 // 三端使用者的設定：每一端有哪些底部分頁、右下角的「＋」按鈕做什麼
 // 路由（src/router/index.js）和外框（src/layouts/AppShell.vue）都讀這份設定
 import {
-  BookmarkIcon,
+  ClipboardPenLineIcon,
   FileTextIcon,
   FolderOpenIcon,
   HouseIcon,
@@ -29,7 +29,7 @@ const managementMenu = [
   { path: 'cases/new', label: '新增通報', icon: PencilIcon },
   { path: 'announcements/new', label: '發布公告', icon: MegaphoneIcon, permission: 'publish' },
   { path: 'files/upload', label: '上傳文件', icon: FileTextIcon },
-  { path: 'quick-saves/new', label: '快速留存', icon: BookmarkIcon },
+  { path: 'quick-saves/new', label: '快速留存', icon: ClipboardPenLineIcon },
 ]
 
 // 這個人看不看得到選單的這一項（規則見 docs/data-model.md 的交辦、公告）

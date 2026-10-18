@@ -14,6 +14,8 @@ import { REPORT_VIDEO_MAX_MB } from '@/lib/report'
 const props = defineProps({
   // 最多幾個檔案；頁面標題旁的「2/5」也用同一個數字
   max: { type: Number, default: 5 },
+  // 「新增」按鈕的樣式（ui/button 的 variant），快速留存用 secondary
+  addVariant: { type: String, default: 'outline' },
 })
 
 // 目前加入的檔名，頁面用 v-model 綁定
@@ -84,11 +86,12 @@ function remove(index) {
         <component :is="iconOf(name)" v-else class="size-5 shrink-0 text-foreground" />
         <p class="min-w-0 flex-1 truncate type-body text-foreground">{{ name }}</p>
         <!-- 用文字按鈕，不用叉叉：長輩比較看得懂（和住戶端的照片格一樣）。aria-label 給螢幕閱讀器念 -->
-        <Button variant="outline" class="shrink-0" :aria-label="`刪除 ${name}`" @click="remove(index)">刪除</Button>
+        <!-- type="button"：放在 <form> 裡時，按了才不會被當成送出表單（新增也是） -->
+        <Button type="button" variant="outline" class="shrink-0" :aria-label="`刪除 ${name}`" @click="remove(index)">刪除</Button>
       </li>
     </ul>
     <!-- 還沒滿才能新增 -->
-    <Button v-if="files.length < max" variant="outline" class="w-full" @click="openPicker">
+    <Button v-if="files.length < max" type="button" :variant="addVariant" class="w-full" @click="openPicker">
       <PlusIcon />新增
     </Button>
     <!-- hidden：藏起來的檔案選擇；accept 限制只能選圖片、影片或 PDF；multiple 可以一次選好幾個 -->

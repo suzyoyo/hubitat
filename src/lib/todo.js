@@ -4,10 +4,12 @@
 //   新通報（待受理的案件）→ 紅「尚未受理」：已經出問題（dev-guide 第 5 節）。它的到期日是通報時間，只用來排序，不顯示逾期
 //   逾期、今天到期 → 紅（destructive）：已經出問題
 //   還沒到期       → 橘（secondary）：輪到你處理
+//   沒有期限的需補資料（快速留存）→ 橘「待補資料」：輪到你處理（2026-10-18，原本沒有徽章）
 //   todo 是 getMyTodos() 回傳的 items 其中一筆
 export function todoDeadlineBadge(todo) {
   if (todo.kind === 'new_case') return { text: '尚未受理', variant: 'destructive' }
   const days = todo.daysLeft
+  if (days === null && todo.kind === 'incomplete') return { text: '待補資料', variant: 'secondary' }
   if (days === null) return null
   if (days < 0) return { text: `逾期 ${-days} 天`, variant: 'destructive' }
   if (days === 0) return { text: '今日到期', variant: 'destructive' }
