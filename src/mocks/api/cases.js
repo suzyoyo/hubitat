@@ -79,8 +79,8 @@ function handlerIdOf(item) {
 export function caseHint(item) {
   if (item.status === 'pending') {
     const when = formatRelativeTime(item.reportedAt, MOCK_NOW) // 「2 小時前」「昨天 09:00」「9/25」
-    // 「2 小時前」後面直接接「通報」；日期、時間後面空一格比較好讀
-    const gap = when.endsWith('前') ? '' : ' '
+    // 「2 小時前」「剛剛」後面直接接「通報」；日期、時間後面空一格比較好讀
+    const gap = when.endsWith('前') || when === '剛剛' ? '' : ' '
     return `${reporterLabel(item)}・${when}${gap}通報`
   }
   const name = vendorNameOf(item)
