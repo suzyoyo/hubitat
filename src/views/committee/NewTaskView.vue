@@ -153,7 +153,7 @@ function cancel() {
     <Empty v-else-if="!canAssign || caseProblem" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="330" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">{{ canAssign ? '沒辦法交辦' : '只有主委、副主委可以交辦' }}</EmptyTitle>
       <EmptyDescription v-if="caseProblem" class="type-body">{{ caseProblem }}</EmptyDescription>

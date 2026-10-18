@@ -67,7 +67,7 @@ const pendingCount = computed(() => tabs.value[1].comments.length)
       <Empty v-else-if="tab.comments.length === 0" class="gap-3 pt-10">
         <EmptyMedia>
           <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-          <img :src="mascotUrl" alt="" width="279" height="240" class="h-[94px] w-auto" />
+          <img :src="mascotUrl" alt="" width="233" height="330" class="h-[94px] w-auto" />
         </EmptyMedia>
         <!-- 結尾的 ! 是「一定要用這個」：ui/empty 本身有 text-sm 的預設字級，不加會被蓋掉變成 14px -->
         <EmptyTitle class="type-card-title! text-heading">{{ tab.emptyTitle }}</EmptyTitle>
