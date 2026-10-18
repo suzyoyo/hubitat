@@ -2,6 +2,7 @@
 // 身分專區：/resident、/committee、/staff
 // 依分類列出這個身分用得到的教學；每個分類有自己的 #錨點（例如 /committee#case），可以直接連過來
 import { computed, watch } from 'vue'
+import waving from '@/assets/mascot/waving.png'
 import ArticleCard from '@/components/ArticleCard.vue'
 import FaqList from '@/components/FaqList.vue'
 import { FAQS } from '@/content/faqs'
@@ -26,21 +27,25 @@ watch(() => props.roleId, setCurrentRole, { immediate: true })
 
 <template>
   <section class="border-b border-brand-100 bg-gradient-to-b from-brand-50 to-page" aria-labelledby="role-title">
-    <div class="page-container py-10 md:py-12">
-      <p class="font-bold text-brand-800">{{ role.label }}使用指南</p>
-      <h1 id="role-title" class="mt-1 text-[28px] font-bold leading-tight text-brand-950 md:text-[36px]">{{ role.entry }}</h1>
-      <p class="lead-text">{{ role.description }}</p>
+    <!-- 右邊放揮手的好彼管家（手機版不顯示，和首頁一樣） -->
+    <div class="page-container grid items-center gap-6 py-10 md:grid-cols-[minmax(0,1fr)_200px] md:py-12">
+      <div class="min-w-0">
+        <p class="font-bold text-brand-800">{{ role.label }}使用指南</p>
+        <h1 id="role-title" class="mt-1 text-[28px] font-bold leading-tight text-brand-950 md:text-[36px]">{{ role.entry }}</h1>
+        <p class="lead-text">{{ role.description }}</p>
 
-      <!-- 分類捷徑 -->
-      <nav aria-label="本頁分類" class="mt-6">
-        <ul class="flex flex-wrap gap-2">
-          <li v-for="category in categories" :key="category.id">
-            <a :href="`#${category.id}`" class="inline-flex min-h-11 items-center rounded-full border border-brand-100 bg-white px-4 font-medium text-brand-900 hover:bg-brand-50">
-              {{ category.title }}
-            </a>
-          </li>
-        </ul>
-      </nav>
+        <!-- 分類捷徑 -->
+        <nav aria-label="本頁分類" class="mt-6">
+          <ul class="flex flex-wrap gap-2">
+            <li v-for="category in categories" :key="category.id">
+              <a :href="`#${category.id}`" class="inline-flex min-h-11 items-center rounded-full border border-brand-100 bg-white px-4 font-medium text-brand-900 hover:bg-brand-50">
+                {{ category.title }}
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <img :src="waving" alt="" class="hidden h-52 w-auto justify-self-center md:block" width="147" height="208" />
     </div>
   </section>
 
