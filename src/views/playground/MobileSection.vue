@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 // 跳出通知（Toast）；畫面上要有 <Toaster />，放在 App.vue
 function showSuccessToast() {
-  toast.success('報修已送出', {
+  toast.success('通報已送出', {
     description: '好彼管家已通知管委會，會盡快處理！',
   })
 }
@@ -44,11 +44,11 @@ function showErrorToast() {
       <Drawer>
         <!-- as-child：不額外包一層，直接把觸發功能交給裡面的 Button -->
         <DrawerTrigger as-child>
-          <Button variant="outline">選擇報修類別</Button>
+          <Button variant="outline">選擇通報類別</Button>
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>報修類別</DrawerTitle>
+            <DrawerTitle>通報類別</DrawerTitle>
             <DrawerDescription>請選擇最接近的問題類型</DrawerDescription>
           </DrawerHeader>
           <div class="grid gap-2 px-4">
@@ -76,7 +76,7 @@ function showErrorToast() {
           <SheetContent>
             <SheetHeader>
               <SheetTitle>篩選條件</SheetTitle>
-              <SheetDescription>依狀態、廠商、日期篩選報修單</SheetDescription>
+              <SheetDescription>依狀態、廠商、日期篩選通報</SheetDescription>
             </SheetHeader>
           </SheetContent>
         </Sheet>
@@ -86,7 +86,7 @@ function showErrorToast() {
           </SheetTrigger>
           <SheetContent side="bottom">
             <SheetHeader>
-              <SheetTitle>分享報修進度</SheetTitle>
+              <SheetTitle>分享通報進度</SheetTitle>
               <SheetDescription>把進度傳給家人或鄰居</SheetDescription>
             </SheetHeader>
           </SheetContent>
@@ -111,8 +111,8 @@ function showErrorToast() {
           <TabsTrigger value="ongoing">進行中</TabsTrigger>
           <TabsTrigger value="done">已完成</TabsTrigger>
         </TabsList>
-        <TabsContent value="ongoing" class="text-sm">目前有 3 件報修正在處理。</TabsContent>
-        <TabsContent value="done" class="text-sm">本月已完成 12 件報修。</TabsContent>
+        <TabsContent value="ongoing" class="text-sm">目前有 3 件通報正在處理。</TabsContent>
+        <TabsContent value="done" class="text-sm">本月已完成 12 件通報。</TabsContent>
       </Tabs>
       <Tabs default-value="resident">
         <!-- variant="line"：底線樣式 -->

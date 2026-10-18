@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button'
 </script>
 
 <template>
-  <Button>送出報修</Button>
+  <Button>送出通報</Button>
 </template>
 ```
 
@@ -50,16 +50,16 @@ import { Button } from '@/components/ui/button'
 - 核心 token：background、card、popover、primary、secondary、muted、accent、destructive、border、input、ring、chart-1~5、sidebar-*
 - `--radius` 是圓角基準值，改一個數字整套圓角一起變
 - 深色模式：在 `.dark` 選擇器覆寫同一組 token
-- 新增自訂 token（例如報修狀態色 `--warning`）：在 `:root` 與 `.dark` 定義，再用 `@theme inline` 對應到 `--color-*`
+- 新增自訂 token（例如通報狀態色 `--warning`）：在 `:root` 與 `.dark` 定義，再用 `@theme inline` 對應到 `--color-*`
 - 可用 https://www.shadcn-vue.com/create 視覺化調色再產生 preset
 
 ## 元件候選（對應好彼社區）
 | 情境 | 候選元件 |
 |---|---|
 | 手機底部彈出面板 | Drawer、Sheet |
-| 送出報修後回饋、通知 | Sonner（Toast） |
-| 報修進度 | Stepper、Progress |
-| 報修單與評價表單 | Field、Form、Textarea、Radio Group、Slider |
+| 送出通報後回饋、通知 | Sonner（Toast） |
+| 通報進度 | Stepper、Progress |
+| 通報表單 | Field、Form、Textarea、Radio Group、Slider |
 | 廠商名冊、施工日誌列表 | Item、Card、Avatar、Badge |
 | 管委會查找資料 | Command（桌機版不做，Data Table、Sidebar 暫不使用） |
 | 分類切換 | Tabs |

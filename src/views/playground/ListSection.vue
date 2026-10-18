@@ -18,9 +18,9 @@ import {
 
 // 假資料：之後 Step 9 會改成 src/mocks/ 裡的資料
 const vendors = [
-  { id: 1, name: '永安電梯', category: '電梯保養', rating: 4.6 },
-  { id: 2, name: '大同水電', category: '水電維修', rating: 4.2 },
-  { id: 3, name: '清新清潔', category: '環境清潔', rating: 3.8 },
+  { id: 1, name: '永安電梯', category: '電梯保養', cases: 12 },
+  { id: 2, name: '大同水電', category: '水電維修', cases: 8 },
+  { id: 3, name: '清新清潔', category: '環境清潔', cases: 3 },
 ]
 </script>
 
@@ -58,7 +58,7 @@ const vendors = [
             </ItemMedia>
             <ItemContent>
               <ItemTitle>{{ vendor.name }}</ItemTitle>
-              <ItemDescription>{{ vendor.category }} · ★ {{ vendor.rating }}</ItemDescription>
+              <ItemDescription>{{ vendor.category }} · 處理 {{ vendor.cases }} 件</ItemDescription>
             </ItemContent>
             <ItemActions>
               <Button variant="ghost" size="icon" aria-label="查看廠商">

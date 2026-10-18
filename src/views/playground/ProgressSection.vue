@@ -14,12 +14,12 @@ import {
   StepperTrigger,
 } from '@/components/ui/stepper'
 
-// 報修閉環的四個階段
+// 通報閉環的四個階段（管理端看到的案件狀態，docs/case-flow.md 第 2 節；住戶端只有三段：已收到、處理中、已完成）
 const steps = [
-  { step: 1, title: '已送出', description: '住戶提交報修' },
-  { step: 2, title: '已派工', description: '管委會指派廠商' },
-  { step: 3, title: '施工中', description: '廠商到場處理' },
-  { step: 4, title: '已完成', description: '住戶確認結案' },
+  { step: 1, title: '待受理', description: '住戶送出通報' },
+  { step: 2, title: '處理中', description: '受理、交辦、派廠商' },
+  { step: 3, title: '待結案', description: '完工驗收，等主委或副主委確認' },
+  { step: 4, title: '已結案', description: '記進設備的維修史' },
 ]
 const currentStep = ref(2)
 
@@ -35,9 +35,9 @@ function addProgress() {
   <section id="progress" class="scroll-mt-40 space-y-6">
     <h2 class="text-lg font-bold">進度</h2>
 
-    <!-- Stepper：直向排列，適合手機顯示報修進度 -->
+    <!-- Stepper：直向排列，適合手機顯示通報進度 -->
     <div class="space-y-2">
-      <h3 class="text-sm font-medium text-muted-foreground">Stepper（報修進度）</h3>
+      <h3 class="text-sm font-medium text-muted-foreground">Stepper（通報進度）</h3>
       <Stepper v-model="currentStep" orientation="vertical" class="flex-col">
         <StepperItem
           v-for="item in steps"
