@@ -6,13 +6,14 @@
 //   底部：更新進度＋完工驗收（到回報完成頁）並排；受理（按了就受理）、交辦（到新增交辦頁）、
 //   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
 //   沒有「撤回通報」：2026-10-15 和 013 決定拿掉撤回，不需要處理的通報由處理的人完工驗收時寫明原因結案
-import { ChevronRightIcon, ImageIcon, VideoIcon } from '@lucide/vue'
+import { ChevronRightIcon } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { caseStatusBadge } from '@/components/admin/caseStatusBadge'
 import BottomCta from '@/components/app/BottomCta.vue'
 import CaseEquipmentPicker from '@/components/case/CaseEquipmentPicker.vue'
+import CaseFileGrid from '@/components/case/CaseFileGrid.vue'
 import CaseLogForm from '@/components/case/CaseLogForm.vue'
 import CaseVendorPicker from '@/components/case/CaseVendorPicker.vue'
 import { Badge } from '@/components/ui/badge'
@@ -260,10 +261,6 @@ const basicRows = computed(() => {
   ]
 })
 
-// 看副檔名判斷是不是影片，例如 .mp4、.mov（和通報的照片格同一個規則）
-function isVideo(name) {
-  return /\.(mp4|mov|m4v|webm|avi)$/i.test(name)
-}
 </script>
 
 <template>
@@ -311,19 +308,10 @@ function isVideo(name) {
         <p class="type-body text-muted-foreground">{{ item.description ? `「${item.description}」` : '沒有填寫' }}</p>
       </section>
 
-      <!-- 現場照片／影片：假資料只有檔名，先顯示圖示和檔名 -->
+      <!-- 現場照片／影片：一格一個（case/CaseFileGrid）；假資料只有檔名的顯示圖示和檔名 -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">現場照片／影片</h2>
-        <div v-if="item.photos.length" class="grid grid-cols-2 gap-3">
-          <div
-            v-for="name in item.photos"
-            :key="name"
-            class="flex h-[100px] flex-col items-center justify-center gap-1.5 rounded-lg bg-muted px-2"
-          >
-            <component :is="isVideo(name) ? VideoIcon : ImageIcon" class="size-7 text-muted-foreground" />
-            <p class="w-full truncate text-center type-date text-muted-foreground">{{ name }}</p>
-          </div>
-        </div>
+        <CaseFileGrid v-if="item.photos.length" :files="item.photos" title="現場照片" />
         <p v-else class="type-body text-muted-foreground">沒有照片或影片</p>
       </section>
 
@@ -405,9 +393,8 @@ function isVideo(name) {
         <h2 class="type-card-title text-foreground">完工紀錄</h2>
         <p class="type-date text-muted-foreground">{{ dateTimeText(item.completion.at) }}</p>
         <p class="type-body text-foreground">{{ item.completion.note }}</p>
-        <p v-if="item.completion.photos.length" class="type-date text-muted-foreground">
-          附 {{ item.completion.photos.length }} 個檔案
-        </p>
+        <!-- 附件直接顯示（2026-10-18 013）：和現場照片一樣一格一個，有照片的點了全螢幕看 -->
+        <CaseFileGrid v-if="item.completion.photos.length" :files="item.completion.photos" title="完工紀錄" />
       </section>
 
 
