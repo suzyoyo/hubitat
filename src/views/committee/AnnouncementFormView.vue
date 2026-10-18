@@ -264,7 +264,7 @@ async function submit() {
   router.replace(route.meta.roleId === 'staff' ? `${base}/home` : `${base}/announcements/${result.id}`)
 }
 
-// 取消：回到上一頁；直接打網址進來的沒有上一頁，就回管委會首頁
+// 取消：回到上一頁；直接打網址進來的沒有上一頁，就回目前這一端的首頁
 function cancel() {
   if (window.history.state?.back) {
     router.back()
