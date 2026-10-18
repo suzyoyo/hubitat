@@ -61,7 +61,7 @@
 
   /* 陰影：帶一點藍色調，來自彩色版首頁 */
   --shadow-card: 0 1px 2px 0 rgb(27 67 84 / 0.4);
-  --shadow-nav: 0 1px 5px 0 rgb(0 0 0 / 0.35);
+  --shadow-nav: 0 4px 16px 0 rgb(0 0 0 / 0.08); /* 2026-10-18 改淡：Apple 官網導覽列沒有陰影，我們的分頁列是浮起來的膠囊，留一層很淡的影子（原本 0 1px 5px 黑 35%） */
   --shadow-nav-active: 0 1px 1.9px 0 rgb(48 96 119 / 0.62);
   --shadow-fab: 0 1px 2.5px 0 rgb(0 0 0 / 0.35);
 
