@@ -1,20 +1,38 @@
 <script setup>
 // 搜尋頁：/search?q=關鍵字&role=身分
 // 邊打邊搜尋；可以只看某個身分的教學；搜尋字會寫進網址，可以分享
+//   沒選身分：結果依身分分組，「我的身分」（側邊選單記住的那個）排第一組，不會混在一起
+//   有選身分：只列這個身分用得到的，只給這個身分的文章排前面
+//   標題、介紹裡符合搜尋字的地方用黃色底標出來
+import { CheckIcon } from '@lucide/vue'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ArticleCard from '@/components/ArticleCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import { ROLES } from '@/content/roles'
-import { searchArticles } from '@/lib/content'
+import { appliesTo, searchArticles, searchWords } from '@/lib/content'
+import { currentRole } from '@/lib/role'
 
 const route = useRoute()
 const router = useRouter()
 
 const query = computed(() => String(route.query.q ?? ''))
+const words = computed(() => searchWords(query.value))
 const roleFilter = computed(() => (ROLES.some((r) => r.id === route.query.role) ? route.query.role : null))
 const results = computed(() => searchArticles(query.value, roleFilter.value))
+
+// 沒選身分時的分組：每篇放進「第一個用得到它的身分」，順序是我的身分在前
+const groups = computed(() => {
+  if (roleFilter.value) return []
+  const order = [currentRole.value, ...ROLES.map((r) => r.id).filter((id) => id !== currentRole.value)]
+  return order
+    .map((roleId) => ({
+      role: ROLES.find((r) => r.id === roleId),
+      articles: results.value.filter((article) => order.find((id) => appliesTo(article, id)) === roleId),
+    }))
+    .filter((group) => group.articles.length > 0)
+})
 
 const filters = [{ id: null, label: '全部身分' }, ...ROLES.map((r) => ({ id: r.id, label: r.label }))]
 const suggestions = ['通報', '進度', '公告', '廠商', '結案']
@@ -36,17 +54,22 @@ function update(changes) {
       @update:model-value="(value) => update({ q: value || undefined })"
     />
 
-    <!-- 身分篩選 -->
+    <!-- 身分篩選：選到的那個是深藍底＋勾勾，不只靠顏色；aria-pressed 讓螢幕閱讀器念出「已按下」 -->
     <div role="group" aria-label="依身分篩選" class="mt-4 flex flex-wrap gap-2">
       <button
         v-for="filter in filters"
         :key="filter.label"
         type="button"
-        class="min-h-11 rounded-full px-4 font-medium"
-        :class="roleFilter === filter.id ? 'bg-brand-800 font-bold text-white' : 'bg-white text-brand-900 shadow-[inset_0_0_0_1px_var(--color-line)] hover:bg-brand-50'"
+        class="flex min-h-11 items-center gap-1.5 rounded-full px-4 font-medium"
+        :class="
+          roleFilter === filter.id
+            ? 'bg-brand-800 font-bold text-white'
+            : 'bg-white text-brand-900 shadow-[inset_0_0_0_1px_var(--color-line)] hover:bg-brand-50'
+        "
         :aria-pressed="roleFilter === filter.id"
         @click="update({ role: filter.id || undefined })"
       >
+        <CheckIcon v-if="roleFilter === filter.id" class="size-4" aria-hidden="true" />
         {{ filter.label }}
       </button>
     </div>
@@ -65,11 +88,29 @@ function update(changes) {
       <p class="mt-8 font-medium text-ink-soft" aria-live="polite">
         「{{ query.trim() }}」找到 {{ results.length }} 篇教學
       </p>
-      <ul v-if="results.length" class="mt-4 space-y-3">
+
+      <!-- 有選身分：一個清單 -->
+      <ul v-if="results.length && roleFilter" class="mt-4 space-y-3">
         <li v-for="article in results" :key="article.id">
-          <ArticleCard :article="article" heading-level="h2" />
+          <ArticleCard :article="article" heading-level="h2" :highlight="words" show-all-roles />
         </li>
       </ul>
+
+      <!-- 沒選身分：依身分分組 -->
+      <template v-else-if="results.length">
+        <section v-for="group in groups" :key="group.role.id" class="mt-8" :aria-labelledby="`result-${group.role.id}`">
+          <h2 :id="`result-${group.role.id}`" class="text-xl font-bold text-brand-950">
+            {{ group.role.label }}的教學
+            <span class="ml-1 text-base font-medium text-muted">{{ group.articles.length }} 篇</span>
+          </h2>
+          <ul class="mt-3 space-y-3">
+            <li v-for="article in group.articles" :key="article.id">
+              <ArticleCard :article="article" :highlight="words" show-all-roles />
+            </li>
+          </ul>
+        </section>
+      </template>
+
       <EmptyState
         v-else
         class="mt-4"

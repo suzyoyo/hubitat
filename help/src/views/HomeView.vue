@@ -90,14 +90,24 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
       >
         <h3 class="text-lg font-bold text-brand-900">{{ topic.title }}</h3>
         <p class="mt-1 text-[15px] text-muted">{{ topic.description }}</p>
+        <!-- 手機只列前 3 篇、平板以上列前 5 篇，其餘看「看全部」，首頁不會太長 -->
         <ul class="mt-3 flex-1 space-y-0.5">
-          <li v-for="article in topic.articles.slice(0, 5)" :key="article.id">
+          <li
+            v-for="(article, index) in topic.articles.slice(0, 5)"
+            :key="article.id"
+            :class="index >= 3 && 'max-md:hidden'"
+          >
             <RouterLink :to="`/articles/${article.id}`" class="flex min-h-11 items-center text-ink hover:text-brand-900 hover:underline">
               {{ article.title }}
             </RouterLink>
           </li>
         </ul>
-        <RouterLink v-if="topic.articles.length > 5" :to="topic.link" class="mt-2 inline-flex min-h-11 items-center text-link">
+        <RouterLink
+          v-if="topic.articles.length > 3"
+          :to="topic.link"
+          class="mt-2 inline-flex min-h-11 items-center text-link"
+          :class="topic.articles.length <= 5 && 'md:hidden'"
+        >
           看全部 {{ topic.articles.length }} 篇
         </RouterLink>
       </li>

@@ -29,13 +29,19 @@ function goTo(index) {
     <!-- 逐步教學的切換開關 -->
     <div v-if="walkthrough" class="mb-5 flex flex-wrap items-center justify-between gap-2">
       <p class="font-medium text-ink-soft">共 {{ steps.length }} 個步驟</p>
-      <button
-        type="button"
-        class="min-h-11 rounded-lg px-3 font-bold text-brand-800 underline-offset-4 hover:bg-brand-50 hover:underline"
-        @click="showAll = !showAll"
-      >
-        {{ showAll ? '改成一步一步看' : '一次看全部步驟' }}
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- 目前的閱讀模式；切換時螢幕閱讀器會念出新的模式（aria-live） -->
+        <p class="rounded-full bg-brand-50 px-3 py-1 text-[15px] font-medium text-brand-900" aria-live="polite">
+          目前：{{ showAll ? '完整步驟' : '逐步閱讀' }}
+        </p>
+        <button
+          type="button"
+          class="min-h-11 rounded-lg px-3 font-bold text-brand-800 underline-offset-4 hover:bg-brand-50 hover:underline"
+          @click="showAll = !showAll"
+        >
+          {{ showAll ? '改成一步一步看' : '一次看全部步驟' }}
+        </button>
+      </div>
     </div>
 
     <!-- 全部列出 -->

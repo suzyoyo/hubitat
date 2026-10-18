@@ -125,6 +125,27 @@ await kb.waitForSelector('[role="dialog"]')
 await kb.keyboard.press('Escape')
 await kb.waitForTimeout(400)
 if (await kb.$('[role="dialog"]')) fail('鍵盤：抽屜按 Esc 沒有關掉')
+// 抽屜：名稱是「主要導覽」、aria-modal、Tab 不會跑到背後、關掉後焦點回到「打開選單」
+await kb.focus('button[aria-label="打開選單"]')
+await kb.keyboard.press('Enter')
+await kb.waitForSelector('[role="dialog"]')
+const dialog = await kb.$eval('[role="dialog"]', (d) => ({
+  name: document.getElementById(d.getAttribute('aria-labelledby'))?.textContent.trim(),
+  modal: d.getAttribute('aria-modal'),
+}))
+if (dialog.name !== '主要導覽' || dialog.modal !== 'true') fail(`抽屜：名稱「${dialog.name}」、aria-modal=${dialog.modal}`)
+for (let i = 0; i < 30; i++) await kb.keyboard.press('Tab')
+if (!(await kb.evaluate(() => !!document.activeElement.closest('[role="dialog"]')))) fail('抽屜：按 Tab 跑到背後的頁面')
+await kb.keyboard.press('Escape')
+await kb.waitForTimeout(400)
+if ((await kb.evaluate(() => document.activeElement.getAttribute('aria-label'))) !== '打開選單') fail('抽屜：關掉後焦點沒有回到「打開選單」')
+
+// 首頁：手機每個分類只顯示 3 篇
+const visiblePerTopic = await kb.$$eval('#topics-title + ul > li', (cards) =>
+  cards.map((card) => [...card.querySelectorAll('ul li')].filter((li) => li.offsetParent !== null).length),
+)
+if (visiblePerTopic.some((n) => n > 3)) fail(`首頁手機版：分類顯示超過 3 篇（${visiblePerTopic.join('、')}）`)
+
 // 常見問題：Enter 展開
 await kb.goto(base + '/faq')
 await kb.waitForSelector('main h1')
@@ -138,11 +159,16 @@ if ((await trigger.getAttribute('aria-expanded')) !== 'false') fail('鍵盤：�
 // ── 4. 搜尋、身分篩選、逐步教學 ──
 await kb.goto(base + '/search?q=結案')
 await kb.waitForSelector('main h1')
-const all = await kb.locator('main li h2').count()
+const all = await kb.locator('main li a[href^="/articles/"]').count()
 await kb.getByRole('button', { name: '住戶', exact: true }).click()
 await kb.waitForTimeout(100)
-const residentOnly = await kb.locator('main li h2').count()
+const residentOnly = await kb.locator('main li a[href^="/articles/"]').count()
 if (!(all > 0 && residentOnly < all)) fail(`搜尋「結案」：全部 ${all} 篇，只看住戶 ${residentOnly} 篇，篩選沒有作用`)
+if ((await kb.getByRole('button', { name: '住戶', exact: true }).getAttribute('aria-pressed')) !== 'true') fail('搜尋：選到的身分沒有 aria-pressed')
+await kb.goto(base + '/search?q=通報')
+await kb.waitForSelector('main h1')
+if ((await kb.locator('main section h2').count()) < 2) fail('搜尋「通報」：沒有依身分分組')
+if (!(await kb.locator('main mark').count())) fail('搜尋：結果裡沒有標示搜尋字')
 await kb.goto(base + '/search?q=找不到的字xyz')
 await kb.waitForSelector('main h1')
 if (!(await kb.getByText('好彼管家找不到相關的教學').count())) fail('搜尋不到時沒有顯示好彼管家的提示')
@@ -151,7 +177,9 @@ await kb.goto(base + '/articles/new-report')
 await kb.waitForSelector('main h1')
 await kb.getByRole('button', { name: '下一步' }).click()
 if (!(await kb.locator('section[aria-labelledby="steps"]').innerText()).includes('步驟 2')) fail('逐步教學：按「下一步」沒有到第 2 步')
+if (!(await kb.getByText('目前：逐步閱讀').count())) fail('逐步教學：沒有顯示目前模式')
 await kb.getByRole('button', { name: '一次看全部步驟' }).click()
+if (!(await kb.getByText('目前：完整步驟').count())) fail('逐步教學：切換後模式提示沒有更新')
 if ((await kb.locator('section[aria-labelledby="steps"] ol > li').count()) !== 5) fail('逐步教學：「一次看全部步驟」沒有列出 5 步')
 
 console.log(`寬度 ${WIDTHS.join('、')}px × ${PAGES.length} 頁、鍵盤、搜尋、逐步教學都檢查完了`)

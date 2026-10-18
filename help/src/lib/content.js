@@ -120,10 +120,16 @@ const searchIndex = published.map((article) => ({
   body: fullText(article),
 }))
 
+// 把搜尋字切成一個一個關鍵字（空白隔開）
+export function searchWords(query) {
+  return query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+}
+
 // 搜尋文章：可以用空白隔開多個關鍵字，每個都要找得到
 // 標題符合的排最前面，再來是關鍵字、介紹、內文
+// 有選身分（roleId）時，只給這個身分看的文章再往前排（比三種身分共用的文章更貼近）
 export function searchArticles(query, roleId = null) {
-  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  const words = searchWords(query)
   if (words.length === 0) return []
 
   return searchIndex
@@ -139,6 +145,7 @@ export function searchArticles(query, roleId = null) {
         if (wordScore === 0) return { item, score: 0 } // 有一個字找不到就不算
         score += wordScore
       }
+      if (roleId && item.article.applicableRoles.length === 1) score += 4
       return { item, score }
     })
     .filter((result) => result.score > 0)
