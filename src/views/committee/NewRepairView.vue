@@ -291,7 +291,7 @@ async function submit() {
       <div v-else-if="step === 'submitted'" class="space-y-4 pt-8 text-center">
         <div class="space-y-3">
           <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-          <img :src="mascotUrl" alt="" width="233" height="330" class="mx-auto h-[131px] w-auto" />
+          <img :src="mascotUrl" alt="" width="214" height="255" class="mx-auto h-[131px] w-auto" />
           <h2 class="type-title text-foreground">已收到你的通報！</h2>
         </div>
         <p class="type-body text-muted-foreground">感謝你為社區公共環境盡一份心力</p>

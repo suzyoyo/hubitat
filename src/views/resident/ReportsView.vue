@@ -71,7 +71,7 @@ const tabs = computed(() => [
         <EmptyMedia>
           <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
           <!-- width / height 寫圖檔尺寸，讓瀏覽器先算好比例；實際顯示高度由 h-[120px] 決定 -->
-          <img :src="mascotUrl" alt="" width="233" height="330" class="h-[120px] w-auto" />
+          <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
         </EmptyMedia>
         <EmptyTitle class="type-greeting">{{ tab.emptyText }}</EmptyTitle>
         <EmptyDescription class="type-body">發現社區有問題，隨時可以通報喔！</EmptyDescription>
