@@ -1,7 +1,7 @@
 <script setup>
 // 底部導覽：左邊是半透明白色膠囊分頁列，右邊是圓形「＋」按鈕
 // 顏色都來自 src/style.css 的變數（--nav、--nav-active、--fab …）
-import { PlusIcon } from '@lucide/vue'
+import { PlusIcon, XIcon } from '@lucide/vue'
 import { computed, ref } from 'vue'
 import MenuItem from '@/components/app/MenuItem.vue'
 import IconTile from '@/components/common/IconTile.vue'
@@ -58,11 +58,15 @@ const fabClass = computed(() => [
       </RouterLink>
     </nav>
 
-    <!-- 管委會、管理人員：按下去在按鈕上方跳出全域新增選單 -->
+    <!-- 選單打開時，後面的畫面蓋一層灰色（點灰色的地方也會關掉選單）
+         放在分頁列和「＋」中間：分頁列、頂部列會被蓋住，「＋」和選單在灰色上面 -->
+    <div v-if="menuOpen" class="fixed inset-0 bg-black/40" aria-hidden="true" @click="menuOpen = false" />
+
+    <!-- 管委會、管理人員：按下去在按鈕上方跳出全域新增選單；打開時「＋」變成叉叉，再按一次關掉 -->
     <Popover v-if="fab.menu" v-model:open="menuOpen">
       <PopoverTrigger as-child>
-        <button type="button" :aria-label="fab.title" :class="fabClass">
-          <PlusIcon :class="compact ? 'size-6' : 'size-[26px]'" />
+        <button type="button" :aria-label="fab.title" :class="[fabClass, 'relative']">
+          <component :is="menuOpen ? XIcon : PlusIcon" :class="compact ? 'size-6' : 'size-[26px]'" />
         </button>
       </PopoverTrigger>
       <!-- side="top" align="end"：出現在按鈕上方、靠右對齊 -->
