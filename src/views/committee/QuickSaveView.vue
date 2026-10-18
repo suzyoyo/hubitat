@@ -52,7 +52,7 @@ async function submit() {
         </p>
         <Badge variant="outline">{{ photos.length }}/{{ PHOTO_MAX }}</Badge>
       </div>
-      <CaseAttachmentList v-model="photos" :max="PHOTO_MAX" />
+      <CaseAttachmentList v-model="photos" :max="PHOTO_MAX" add-variant="secondary" />
     </div>
 
     <div class="space-y-2">
