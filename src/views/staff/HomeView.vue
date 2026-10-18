@@ -66,13 +66,15 @@ function staffTodoLink(todo) {
         <div class="flex items-center justify-between">
           <h2 class="type-title text-heading">我的待辦</h2>
           <!-- h-11 是 44px 的可點擊範圍；-my-1 讓這一列的高度維持 36px（和 SectionHeader 一樣） -->
+          <!-- 箭頭尖和卡片右邊對齊（2026-10-18）：-mr-2.5 抵掉按鈕左右各 10px 的點擊範圍，
+               箭頭的 -mr-1.5 抵掉 icon 本身右邊約 6px 的透明空白。只是往外推、沒有裁掉，外層不要加 overflow-hidden -->
           <RouterLink
             v-if="!loading && todos.total"
             to="/staff/todos"
-            class="-my-1 flex h-11 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
+            class="-my-1 -mr-2.5 flex h-11 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
           >
             查看 {{ todos.total }} 件待辦
-            <ChevronRightIcon class="size-4" />
+            <ChevronRightIcon class="-mr-1.5 size-4" />
           </RouterLink>
         </div>
         <template v-if="loading">
