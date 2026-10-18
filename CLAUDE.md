@@ -70,7 +70,7 @@
   - 住戶端：紅 `destructive`＝今天就會影響你（施工中、今天開始、緊急公告）；橘 `secondary`＝需要你動手做（待投票、請補充通報資料）；藍 `default`＝跟你有關但不用做什麼（與你相關、明天開始、已收到、處理中）；灰 `outline`＝已結束或只是分類（已完成、公告類型、一般日期）
   - 管理端：紅＝已經出問題（逾期、尚未受理）；橘＝輪到你處理或快到期；藍＝進行中、在等別人；灰＝已結束、正常或分類
   - 住戶端不顯示逾期天數、附議人數、處理人姓名
-  - 紅色色階 2026-10-19 換成 Kit 的 `rdx/colors` 紅 1～12（Radix），只有品牌輔色 `red-500`（`#ff5657`）留著。紅色徽章照 Kit：淺紅底 red-4（`#ffdbdc`）＋紅字 `text-destructive`（`#e7000b`，不在 1～12 裡，寫在 `--warning-strong`）；錯誤訊息、必填星號、destructive 按鈕的紅字也是它。紅字在 red-4 底上對比約 3.7，比 4.5 低，013 決定照 Kit
+  - 紅色色階 2026-10-18 換成 Kit 的 `rdx/colors` 紅 1～12（Radix），只有品牌輔色 `red-500`（`#ff5657`）留著。紅色徽章照 Kit：淺紅底 red-4（`#ffdbdc`）＋紅字 `text-destructive`（`#e7000b`，不在 1～12 裡，寫在 `--warning-strong`）；錯誤訊息、必填星號、destructive 按鈕的紅字也是它。紅字在 red-4 底上對比約 3.7，比 4.5 低，013 決定照 Kit
 - 表單：必填只用紅色星號，不寫「必填」；選填用灰色小字「選填」，不要底色
 - 按鈕（`src/components/ui/button/index.js`，對照 Kit 的 Button，2026-10-12）：`default` 品牌藍底＝主要動作；`outline` 灰底深藍字、**沒有外框**＝次要動作（登出帳號）；`secondary` 淺藍底（管委會端有用到，住戶端目前沒有）；`destructive` 淺紅底；`ghost`、`link` 沒有底色。有底色的四種底部有一條 1px 深色的線，用 `inset-shadow` 做（不用 `border-b`，圓角會斷開），已寫在元件裡，不用自己加。完整說明在 `docs/dev-guide.md` 第 5 節
 - 外框顏色變數：`--nav`、`--nav-active`、`--fab` 等
