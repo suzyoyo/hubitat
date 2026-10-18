@@ -47,9 +47,26 @@ function onFileChange(event) {
   if (picked.filter((file) => !isTooLarge(file)).length > room) {
     toast.error(`最多 ${props.max} 個檔案`, { description: `只加了前 ${accepted.length} 個。` })
   }
-  accepted.forEach((file) => rememberPreview(file.name, file))
-  // 不直接改原本的陣列，做一個新的放回去，頁面才會收到通知
-  files.value = [...files.value, ...accepted.map((file) => file.name)]
+  // 同名的改名（iPhone 直接拍的照片常常都叫 image.jpg）：暫存的照片用檔名找，同名會互相蓋掉
+  const next = [...files.value] // 不直接改原本的陣列，做一個新的放回去，頁面才會收到通知
+  accepted.forEach((file) => {
+    const name = uniqueName(file.name, next) // 一個一個加，下一張才知道這個名字用過了
+    rememberPreview(name, file)
+    next.push(name)
+  })
+  files.value = next
+}
+
+// 名字已經在清單裡、或之前別的案件暫存過，就加上「 (2)」「 (3)」：image.jpg → image (2).jpg
+function uniqueName(name, taken) {
+  const isTaken = (candidate) => taken.includes(candidate) || previewUrl(candidate)
+  if (!isTaken(name)) return name
+  const dot = name.lastIndexOf('.')
+  const base = dot > 0 ? name.slice(0, dot) : name
+  const ext = dot > 0 ? name.slice(dot) : ''
+  let n = 2
+  while (isTaken(`${base} (${n})${ext}`)) n += 1
+  return `${base} (${n})${ext}`
 }
 
 // 刪掉第 index 個：filter 留下「不是第 index 個」的
