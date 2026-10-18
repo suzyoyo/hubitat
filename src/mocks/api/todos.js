@@ -235,7 +235,7 @@ function staffTodos(userId) {
   const items = [...assignedTasks(userId)]
 
   // 管理人員要處理的案件（規則見 docs/case-flow.md）：
-  //   待受理 → 新報修（誰都可以受理）
+  //   待受理 → 新通報（誰都可以受理）
   //   處理中 → 處理中；已受理、負責人是我（我受理、還沒派廠商）也算
   //   待結案不列入：那是等負責人（主委或副主委）結案，管理人員已經做完了
   for (const item of cases) {
@@ -245,7 +245,7 @@ function staffTodos(userId) {
     else if (item.status === 'accepted' && item.assigneeId === userId) kind = 'in_progress'
     if (!kind) continue
     const hint = caseHint(item)
-    // 新報修沒有期限，用通報時間排序；其他用處理期限
+    // 新通報沒有期限，用通報時間排序；其他用處理期限
     const dueAt = kind === 'new_case' ? item.reportedAt : (item.deadline ?? null)
     items.push(todo(kind, item.title, hint, item.reportedAt, dueAt, { type: 'case', id: item.id }))
   }
