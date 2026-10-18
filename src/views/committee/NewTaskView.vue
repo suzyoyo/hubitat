@@ -179,12 +179,14 @@ function cancel() {
           關聯案件<span class="type-date text-muted-foreground">選填</span>
         </Label>
         <Select v-model="pickedCaseId">
-          <SelectTrigger id="task-case" class="h-11 w-full bg-card type-body">
+          <!-- ui/select 本身寫了 data-[size=default]:h-8 和 text-sm，會蓋過 h-11、type-body（實際只有 32px、14px）：
+               高度用 data-[size=default]:h-11、字用 type-body!（! 是「一定要用這個」）才蓋得過，寫法照 case/CaseCategoryPicker（2026-10-18） -->
+          <SelectTrigger id="task-case" class="w-full bg-card type-body! data-[size=default]:h-11">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem :value="NONE" class="min-h-11 px-3 type-body">不關聯</SelectItem>
-            <SelectItem v-for="item in openCases" :key="item.id" :value="item.id" class="min-h-11 px-3 type-body">
+            <SelectItem :value="NONE" class="min-h-11 px-3 type-body!">不關聯</SelectItem>
+            <SelectItem v-for="item in openCases" :key="item.id" :value="item.id" class="min-h-11 px-3 type-body!">
               {{ item.title }}
             </SelectItem>
           </SelectContent>

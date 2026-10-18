@@ -216,16 +216,17 @@ async function submit() {
           <!-- 那一戶的住戶看得到這筆通報；保密的通報填成被檢舉的那一戶，對方就會看到內容（PR #37 suzy 提醒） -->
           <p class="type-date text-muted-foreground">選擇你要代為登記的那一戶，那一戶的住戶可以追蹤進度。</p>
           <div class="grid grid-cols-3 gap-2">
-            <!-- 三個下拉選單；看起來 40px 高，after 往上下各補 2px，可以點的範圍是 44px -->
+            <!-- 三個下拉選單；看起來 40px 高，after 往上下各補 2px，可以點的範圍是 44px
+                 ui/select 本身寫了 data-[size=default]:h-8 和 text-sm，所以高度用 data-[size=default]:h-10、字用 type-button! 才蓋得過（2026-10-18） -->
             <Select v-model="form.building">
               <SelectTrigger
                 aria-label="棟別"
-                class="relative h-10 w-full justify-center gap-1 rounded-full bg-card type-button after:absolute after:inset-x-0 after:-inset-y-0.5"
+                class="relative w-full justify-center gap-1 rounded-full bg-card type-button! after:absolute after:inset-x-0 after:-inset-y-0.5 data-[size=default]:h-10"
               >
                 <SelectValue placeholder="棟別" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="item in BUILDINGS" :key="item" :value="item" class="min-h-11 px-3 type-body">
+                <SelectItem v-for="item in BUILDINGS" :key="item" :value="item" class="min-h-11 px-3 type-body!">
                   {{ item }} 棟
                 </SelectItem>
               </SelectContent>
@@ -233,12 +234,12 @@ async function submit() {
             <Select v-model="form.floor">
               <SelectTrigger
                 aria-label="樓層"
-                class="relative h-10 w-full justify-center gap-1 rounded-full bg-card type-button after:absolute after:inset-x-0 after:-inset-y-0.5"
+                class="relative w-full justify-center gap-1 rounded-full bg-card type-button! after:absolute after:inset-x-0 after:-inset-y-0.5 data-[size=default]:h-10"
               >
                 <SelectValue placeholder="樓層" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="item in FLOORS" :key="item" :value="String(item)" class="min-h-11 px-3 type-body">
+                <SelectItem v-for="item in FLOORS" :key="item" :value="String(item)" class="min-h-11 px-3 type-body!">
                   {{ item }} 樓
                 </SelectItem>
               </SelectContent>
@@ -246,12 +247,12 @@ async function submit() {
             <Select v-model="form.unitNumber">
               <SelectTrigger
                 aria-label="戶號"
-                class="relative h-10 w-full justify-center gap-1 rounded-full bg-card type-button after:absolute after:inset-x-0 after:-inset-y-0.5"
+                class="relative w-full justify-center gap-1 rounded-full bg-card type-button! after:absolute after:inset-x-0 after:-inset-y-0.5 data-[size=default]:h-10"
               >
                 <SelectValue placeholder="戶號" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="item in UNIT_NUMBERS" :key="item" :value="String(item)" class="min-h-11 px-3 type-body">
+                <SelectItem v-for="item in UNIT_NUMBERS" :key="item" :value="String(item)" class="min-h-11 px-3 type-body!">
                   之{{ item }}
                 </SelectItem>
               </SelectContent>
