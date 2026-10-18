@@ -2,7 +2,7 @@
 // 管委會端・廠商（底部分頁）：廠商緊急聯絡、社區內部聯絡、鑰匙清單（設計稿 1134:15888）
 // 緊急聯絡：整列點了就撥號
 // 這一版只有「看」；「編輯」緊急聯絡和鑰匙清單之後再做
-import { ChevronRightIcon, PhoneCallIcon, SearchIcon } from '@lucide/vue'
+import { PhoneCallIcon, SearchIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import { Input } from '@/components/ui/input'
@@ -63,9 +63,9 @@ function telLink(phone) {
     </template>
 
     <template v-else>
-      <!-- 廠商緊急聯絡：最後一列連到廠商名冊 -->
+      <!-- 廠商緊急聯絡：標題右邊「查看所有廠商」連到廠商名冊（2026-10-18 從最後一列移上來） -->
       <section class="space-y-3">
-        <SectionHeader title="廠商緊急聯絡" />
+        <SectionHeader title="廠商緊急聯絡" to="/committee/vendors/list" link-text="查看所有廠商" />
         <div class="rounded-xl bg-card px-4 py-1 shadow-card">
           <template v-for="(item, index) in shownEmergency" :key="`${item.vendorId}-${item.phone}`">
             <Separator v-if="index > 0" />
@@ -86,11 +86,6 @@ function telLink(phone) {
             </a>
           </template>
           <p v-if="!shownEmergency.length" class="py-3 type-body text-muted-foreground">沒有符合的廠商</p>
-          <Separator />
-          <RouterLink to="/committee/vendors/list" class="flex min-h-12 items-center gap-3 py-3">
-            <span class="min-w-0 flex-1 type-body-strong text-foreground">廠商名冊</span>
-            <ChevronRightIcon class="size-5 shrink-0" />
-          </RouterLink>
         </div>
       </section>
 
