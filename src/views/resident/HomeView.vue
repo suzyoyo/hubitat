@@ -91,7 +91,7 @@ const greeting = computed(() => {
           :to="latestReport ? `/resident/reports/${latestReport.id}` : ''"
         />
         <!-- as-child：讓 Button 的外觀套在裡面的 RouterLink 上，按下去就是換頁 -->
-        <!-- 品牌輔色（紅 500，和右下角「通報」按鈕同色，2026-10-19 013）：只有這一顆，不另外做按鈕樣式 -->
+        <!-- 品牌輔色（紅 500，和右下角「通報」按鈕同色，2026-10-18 013）：只有這一顆，不另外做按鈕樣式 -->
         <Button as-child class="w-full bg-warning text-white inset-shadow-[0_-1px_0_var(--warning-strong)] [a]:hover:bg-warning/80">
           <RouterLink to="/resident/reports/new">新增通報</RouterLink>
         </Button>
