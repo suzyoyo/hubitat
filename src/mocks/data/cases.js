@@ -56,9 +56,10 @@ export const CASE_SOURCES = {
 }
 
 // 公開或保密（住戶通報時選的「問題類型」）
+//   label 和住戶新增通報用的 REPORT_TYPES（src/lib/report.js）同一組名稱（2026-10-18 統一，原本是「公共設施修繕／住戶違規」）
 export const CASE_VISIBILITY = {
-  public: { label: '公共設施修繕', note: '公共區域・公開顯示' },
-  private: { label: '住戶違規', note: '僅你本人與管委會可見' },
+  public: { label: '公共設施問題', note: '公共區域・公開顯示' },
+  private: { label: '涉及住戶行為', note: '僅你本人與管委會可見' },
 }
 
 export const cases = [
