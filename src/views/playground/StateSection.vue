@@ -1,5 +1,5 @@
 <script setup>
-// 狀態畫面：載入失敗、送出失敗、離線、找不到、同時操作、沒有權限、權限被拒、開啟通知提醒
+// 狀態畫面：載入失敗、送出失敗、離線、找不到、同時操作、沒有權限、權限被拒、開啟通知提醒、功能準備中
 // 最上面的開關可以讓所有假 API 故意失敗，用來看真的頁面失敗時的樣子
 import { onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
@@ -163,6 +163,19 @@ function openPermission(kind) {
       </p>
       <NotificationReminder preview />
       <Button variant="outline" class="w-full" @click="openPermission('notifications')">直接看「還沒開啟通知」彈窗</Button>
+    </div>
+
+    <div class="space-y-2">
+      <h3 class="type-card-title">9. 功能準備中</h3>
+      <p class="type-date text-muted-foreground">
+        還沒做的頁面都會顯示這個（佔位頁）。下面的灰色小字（頁面名稱、網址）只在 npm run dev 時出現，打包後看不到。
+      </p>
+      <div class="rounded-xl bg-background pb-6 shadow-card">
+        <FeedbackState kind="coming-soon" />
+      </div>
+      <Button as-child variant="outline" class="w-full">
+        <RouterLink to="/committee/meetings">看真的佔位頁（管委會・會議紀錄）</RouterLink>
+      </Button>
     </div>
   </section>
 </template>
