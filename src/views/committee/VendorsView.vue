@@ -63,7 +63,7 @@ function telLink(phone) {
     </template>
 
     <template v-else>
-      <!-- 廠商緊急聯絡：標題右邊「查看所有廠商」連到廠商名冊（2026-10-19 從最後一列移上來） -->
+      <!-- 廠商緊急聯絡：標題右邊「查看所有廠商」連到廠商名冊（2026-10-18 從最後一列移上來） -->
       <section class="space-y-3">
         <SectionHeader title="廠商緊急聯絡" to="/committee/vendors/list" link-text="查看所有廠商" />
         <div class="rounded-xl bg-card px-4 py-1 shadow-card">

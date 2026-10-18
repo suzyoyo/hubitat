@@ -6,7 +6,7 @@ defineProps({
   title: { type: String, required: true },
   // 「看全部」要連到哪一頁；不傳就不顯示連結
   to: { type: String, default: '' },
-  // 連結的文字，例如「查看所有廠商」（2026-10-19 加）
+  // 連結的文字，例如「查看所有廠商」（2026-10-18 加）
   linkText: { type: String, default: '看全部' },
 })
 </script>
