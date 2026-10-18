@@ -45,8 +45,10 @@ const fabClass = computed(() => [
     class="fixed inset-x-0 bottom-0 z-20 mx-auto flex max-w-md items-center pt-2 pb-[max(20px,env(safe-area-inset-bottom))] pl-5"
     :class="compact ? 'gap-3 pr-5' : 'gap-6 pr-[27px]'"
   >
+    <!-- 毛玻璃（2026-10-18）：半透明底色＋把後面的畫面模糊（backdrop-blur），後面卡片的字才不會和分頁的字疊在一起；
+         backdrop-saturate 把模糊後變灰的顏色拉回來一點。不支援模糊的舊瀏覽器只會看到原本的半透明白 -->
     <nav
-      class="flex min-w-0 flex-1 items-stretch rounded-full border border-nav-border bg-nav p-1 text-nav-foreground shadow-nav"
+      class="flex min-w-0 flex-1 items-stretch rounded-full border border-nav-border bg-nav p-1 text-nav-foreground shadow-nav backdrop-blur-xl backdrop-saturate-150"
       :class="compact ? '' : 'h-[70px]'"
     >
       <!-- 一般分頁的文字顏色設在外層 nav 上；active-class 是「目前分頁」才會加上的 class -->
