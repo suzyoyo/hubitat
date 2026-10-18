@@ -151,4 +151,7 @@
   - 照片用 `case/CaseAttachmentList`（最多 5 個），所以和設計稿有兩處不同：按鈕寫「新增」不是「拍照或上傳」；說明是「支援照片、影片與 PDF」，不是「支援 JPG、PNG，大小不超過 10MB」
   - 底部說明設計稿是「留存後將存至代辦事項」，改成「留存後會放進你的待辦，之後再補齊資料」（「代辦」是錯字）
   - 「＋」選單的快速留存圖示改成 Kit 的 `clipboard-pen-line`（`roles.js`，在 `shared/quick-save`）
-  - 還沒做：留存詳情（待辦點進去，`quick-saves/:id`）還是佔位頁
+  - 留存詳情（2026-10-19，同一個分支）：`src/views/committee/QuickSaveDetailView.vue`，網址 `/committee/quick-saves/:id`、`/staff/quick-saves/:id`（待辦「需補資料」點進來）。設計稿沒有這一頁
+    - 照片（`case/CaseFileGrid`，點了全螢幕）、名稱、備註、留存時間；還沒補齊的底部選一件處理中的案件 →「歸到這件案件」→ 跳到那件案件的詳情，接著可以完工驗收
+    - 案件詳情的處理紀錄多一筆「附上留存」，照片顯示在那一筆下面（`log.files`）。設備不在這裡選，到案件詳情的「關聯設備」選
+    - 已補齊的顯示「已歸到案件／設備」，可以點過去

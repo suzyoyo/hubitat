@@ -7,6 +7,7 @@ import CaseDetailView from '@/views/committee/CaseDetailView.vue'
 import CasesView from '@/views/committee/CasesView.vue'
 import EquipmentDetailView from '@/views/staff/EquipmentDetailView.vue'
 import EquipmentListView from '@/views/staff/EquipmentListView.vue'
+import QuickSaveDetailView from '@/views/committee/QuickSaveDetailView.vue'
 import QuickSaveView from '@/views/committee/QuickSaveView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TaskReportView from '@/views/committee/TaskReportView.vue'
@@ -39,6 +40,7 @@ export default {
     'tasks/:id': TaskDetailView,
     'tasks/:id/report': TaskReportView, // 交辦詳情的「回報完成」（沒有關聯案件的交辦）
     'quick-saves/new': QuickSaveView, // 「＋」選單的「快速留存」
+    'quick-saves/:id': QuickSaveDetailView, // 待辦「需補資料」的留存
   },
 
   // 內頁：從別的頁面點進去的頁面（底部分頁、通知、「＋」按鈕不用寫在這裡）
