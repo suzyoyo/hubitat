@@ -392,13 +392,14 @@ const latestReport = computed(() => reports.value[0])
 
 ### 步驟 4：畫出三種狀態
 
-每個會拿資料的區塊都要處理三種狀態，缺一種畫面就會壞：
+每個會拿資料的區塊都要處理這幾種狀態，缺一種畫面就會壞（「載入失敗」2026-10-18 加，舊的頁面還沒補）：
 
 | 狀態 | 什麼時候 | 怎麼做 |
 |---|---|---|
 | 載入中 | `loading` 是 true | 用 `<Skeleton>` 放一個和內容差不多高的灰色方塊 |
 | 有資料 | 拿到一筆以上 | 用元件把資料畫出來 |
 | 沒資料 | 拿到空的清單 | 顯示設計稿的空狀態（例如「目前無通報」） |
+| 載入失敗 | 假 API 丟出錯誤（`try` / `catch` 接住） | `<FeedbackState kind="load-failed" @retry="重新拿資料的函式" />`。在 `/playground`「狀態畫面」打開「假 API 故意失敗」就看得到；用法見 `views/playground/MockSection.vue` |
 
 ```vue
 <Skeleton v-if="loading" class="h-[150px] rounded-xl" />

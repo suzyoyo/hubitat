@@ -57,8 +57,6 @@ const routes = [
   ...roleRoutes,
   // 用到時才載入（lazy load），不會拖慢正式頁面
   { path: '/playground', component: () => import('@/views/PlaygroundView.vue') },
-  // 狀態畫面的展示頁（暫時的，看好後搬進 /playground）
-  { path: '/states', component: () => import('@/views/StatesPreviewView.vue') },
   // 其他不存在的網址：沒有外框的「找不到頁面」
   { path: '/:pathMatch(.*)*', component: NotFoundView },
 ]

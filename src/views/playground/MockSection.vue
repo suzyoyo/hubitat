@@ -1,6 +1,7 @@
 <script setup>
 // 假資料：示範怎麼從假 API 取得資料並顯示（資料在 src/mocks/）
 import { onMounted, ref } from 'vue'
+import FeedbackState from '@/components/feedback/FeedbackState.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -38,6 +39,7 @@ import { VENDOR_STATUSES } from '@/mocks/data/vendors'
 
 // 畫面要用的資料，一開始都是空的
 const loading = ref(true)
+const loadFailed = ref(false) // 假 API 故意失敗時（「狀態畫面」的開關）
 const currentUsers = ref([])
 const committee = ref([])
 const staff = ref([])
@@ -69,8 +71,19 @@ function changeDemoResident(id) {
 }
 
 // async / await：等資料回來再繼續往下執行
+// try / catch：中間任何一個請求失敗，就跳到 catch，顯示「資料載入失敗」
 async function loadData() {
   loading.value = true
+  loadFailed.value = false
+  try {
+    await loadAll()
+  } catch {
+    loadFailed.value = true
+  }
+  loading.value = false
+}
+
+async function loadAll() {
   // Promise.all：多個請求同時送出，全部回來後一起拿結果（比一個一個等快）
   const [resident, committeeUser, staffUser, committeeList, staffList, vendorList, contractList, equipmentList] =
     await Promise.all([
@@ -123,7 +136,6 @@ async function loadData() {
   opinions.value = opinionList
   meetings.value = meetingList
   legalDocuments.value = documentList
-  loading.value = false
 }
 
 // onMounted：元件顯示到畫面上之後，自動執行一次
@@ -177,6 +189,9 @@ function dueText(item) {
       <Skeleton class="h-20 w-full" />
       <Skeleton class="h-20 w-full" />
     </div>
+
+    <!-- 載入失敗：按「重新整理」再拿一次 -->
+    <FeedbackState v-else-if="loadFailed" kind="load-failed" @retry="loadData" />
 
     <!-- 載入完成 -->
     <template v-else>

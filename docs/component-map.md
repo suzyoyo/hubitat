@@ -132,6 +132,11 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 |---|---|---|---|
 | `Feedback/Empty State` | `feedback/FeedbackEmptyState.vue` | ⬜ | 空狀態：圖示＋標題＋說明＋按鈕。變體 Container：Plain／Card。可以用基礎元件 `ui/empty` 當底。住戶端「我的通報」（Plain）和「社區公告」（Card）的空狀態先直接用 `ui/empty`＋吉祥物寫在頁面裡，做這個元件時再換過來 |
 | `Feedback/Haobi Tip` | `feedback/FeedbackHaobiTip.vue` | 🟡 | 好彼管家提示框：頭像＋「好彼管家」＋主訊息（`title`）＋補充說明（`description`，選填）。頭像是思考的好彼管家（`assets/mascot/thinking.png`，原圖 1）。Kit 的「可加 Badge」還沒做 |
+| （Kit 沒有）狀態畫面 | `feedback/FeedbackState.vue` | 🟡 | 整頁的狀態（2026-10-18 013）：`kind` 選 `load-failed`（載入失敗＋「重新整理」，送出 `retry`）／`not-found`（找不到資料）／`page-not-found`（網址打錯，`NotFoundView` 在用）／`no-permission`（沒有權限），後三種是「回首頁」（回目前這一端）。吉祥物都是拿放大鏡那隻，上方空白和住戶端通知的空狀態一樣。展示在 `/playground` 的「狀態畫面」，頁面還沒套上 |
+| （Kit 沒有）同時操作衝突 | `feedback/FeedbackConflictDialog.vue` | 🟡 | 「這筆資料剛剛有人改過了」彈窗：`description` 寫誰、什麼時候改了，只有「重新整理」（送出 `refresh`）。頁面還沒套上 |
+| （Kit 沒有）權限被拒 | `feedback/FeedbackPermissionDialog.vue` | 🟡 | 相機（多一顆「改從相簿選照片」，送出 `use-photos`）、相簿、通知被拒時，教使用者到手機「設定」打開，iPhone、Android 各一行 |
+| （Kit 沒有）開啟通知提醒 | `feedback/NotificationReminder.vue` | 🟡 | 三端首頁最上面，還沒開通知就一直出現、不擋（2026-10-18 013）。「先不要」藏到這次關掉 App（sessionStorage）；拒絕過或 iPhone 沒加入主畫面時，按「開啟通知」跳出權限被拒的彈窗 |
+| （Kit 沒有）離線橫幅 | `app/OfflineBanner.vue` | ✅ | 沒有網路時，頂部列下面一條深灰色橫幅，已經接在 `AppShell`，每一頁都有 |
 | `Feedback/Toast` | ➖ | ➖ | 用基礎元件 `ui/sonner`（`toast('訊息')`）。樣式和 Kit 不同時調整 sonner，不另外做元件 |
 | `Feedback/Dialog Header` | ➖ | ➖ | 用基礎元件 dialog 的標題（`DialogTitle`）。用法見 `notice/NoticeDetailDialog.vue` |
 | `Feedback/Dialog Actions` | ➖ | ➖ | 用基礎元件 dialog 的按鈕區。關閉用的按鈕用 `DialogClose` 包起來 |
