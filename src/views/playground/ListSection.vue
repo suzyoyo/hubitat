@@ -1,5 +1,5 @@
 <script setup>
-// 清單元件：item（適合廠商名冊、施工日誌列表）、accordion（可以展開收合的清單）
+// 清單元件：item（適合廠商名冊、維修史列表）、accordion（可以展開收合的清單）
 import { ChevronRightIcon, WrenchIcon } from '@lucide/vue'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'

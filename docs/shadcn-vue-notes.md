@@ -60,7 +60,7 @@ import { Button } from '@/components/ui/button'
 | 送出通報後回饋、通知 | Sonner（Toast） |
 | 通報進度 | Stepper、Progress |
 | 通報表單 | Field、Form、Textarea、Radio Group、Slider |
-| 廠商名冊、施工日誌列表 | Item、Card、Avatar、Badge |
+| 廠商名冊、維修史列表 | Item、Card、Avatar、Badge |
 | 管委會查找資料 | Command（桌機版不做，Data Table、Sidebar 暫不使用） |
 | 分類切換 | Tabs |
 | 載入中、沒資料 | Skeleton、Spinner、Empty |
