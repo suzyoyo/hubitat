@@ -475,8 +475,10 @@ const latestReport = computed(() => reports.value[0])
 | `brand-subtle` / `brand-strong` | 淺藍底 / 深藍 |
 | `border` | 分隔線、邊框 |
 | `remind`（另有 `-strong`、`-subtle`） | 提醒（橘） |
-| `warning`（另有 `-strong`、`-subtle`） | 警告（紅） |
+| `warning`（另有 `-strong`、`-subtle`） | 警告（紅）：`warning` 是品牌輔色 red-500 `#ff5657`；`-subtle` 淺紅底 red-4、`-strong` 紅字 red-11 |
 | `progress` / `success` | 進行中 / 完成 |
+
+紅色色階（2026-10-19 改）：用 Kit 的 `rdx/colors` 紅 1～12（就是 Radix Colors 的紅），寫法是 `bg-red-4`、`text-red-11`；原本的 `red-50`～`950` 拿掉了，只留 `red-500`（品牌輔色）。需要紅色時先找上面的語意色，真的沒有才用色階。
 
 > **為什麼**：設計還在調整顏色。用語意色的話，之後只要改 `style.css` 的 `:root` 一行，整個 App 一起變；寫死色號就得一個一個檔案找。
 
