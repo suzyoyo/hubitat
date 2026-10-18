@@ -39,7 +39,7 @@ export default {
     'cases/:id/complete': CaseCompleteView,
     'tasks/:id': TaskDetailView,
     'tasks/:id/report': TaskReportView, // 交辦詳情的「回報完成」（沒有關聯案件的交辦）
-    // 「＋」選單：和管委會端同一頁（2026-10-19）
+    // 「＋」選單：和管委會端同一頁（2026-10-18）
     'cases/new': NewRepairView,
     'announcements/new': AnnouncementFormView,
   },

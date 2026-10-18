@@ -2,7 +2,7 @@
 // 管委會端・發布公告／修改公告：同一個表單，網址不一樣
 //   /committee/announcements/new       發布公告（空白表單）
 //   /committee/announcements/:id/edit  修改公告（先填好原本的內容）
-//   /staff/announcements/new           管理人員端「＋」選單的發布公告（2026-10-19；管理人員端沒有公告詳情，發布後回首頁）
+//   /staff/announcements/new           管理人員端「＋」選單的發布公告（2026-10-18；管理人員端沒有公告詳情，發布後回首頁）
 // 欄位照設計稿，三種表單不一樣（施工維護 1134:15770、活動 1134:14426、其他 1134:17972）
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

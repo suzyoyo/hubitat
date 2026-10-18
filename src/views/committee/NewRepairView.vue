@@ -3,7 +3,7 @@
 //   1 選地點（上面多了「通報住戶」，可以代某一戶登記）→ 2 確認是否重複 → 3 選類型 → 4 描述問題 → 5 確認送出
 // 中間每一步的畫面和住戶端共用（src/components/report/Report…Step），完成頁用管理端的說法，寫在這個檔案裡
 // 步驟記在網址上（/committee/cases/new?step=2），寫法和住戶端的 NewReportView.vue 一樣
-// 管理人員端「＋」選單的「新增通報」也用這一頁（/staff/cases/new，2026-10-19）
+// 管理人員端「＋」選單的「新增通報」也用這一頁（/staff/cases/new，2026-10-18）
 import { BellIcon } from '@lucide/vue'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
