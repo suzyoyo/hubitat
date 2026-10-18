@@ -18,7 +18,7 @@ export const badgeVariants = cva(
         secondary:
           "bg-orange-200 text-orange-900 [a]:hover:bg-orange-200/80",
         destructive:
-          "bg-warning-subtle text-red-800 [a]:hover:bg-warning-subtle/80",
+          "bg-warning-subtle text-warning-strong [a]:hover:bg-warning-subtle/80",
         outline:
           "bg-border text-foreground [a]:hover:bg-border/80",
         ghost:

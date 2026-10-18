@@ -27,17 +27,23 @@
   --color-blue-900: #1b4354;
   --color-blue-950: #062630;
 
-  --color-red-50: #f2e2e4;
-  --color-red-100: #f5c6c8;
-  --color-red-200: #f7aaac;
-  --color-red-300: #fa8e8f;
-  --color-red-400: #fc7273;
-  --color-red-500: #ff5657;
-  --color-red-600: #d64748;
-  --color-red-700: #ad3739;
-  --color-red-800: #85282a;
-  --color-red-900: #5c181b;
-  --color-red-950: #33090c;
+  /* 紅色（2026-10-19 換成 Kit 的 rdx/colors 紅 1～12，也就是 Radix Colors 的紅色）
+     只有 500 是品牌輔色 #ff5657，不在 1～12 裡，留著（＋ 按鈕、status/warning）
+     --color-red-*: initial 先清掉 Tailwind 內建的 red-50～950，免得 bg-red-100 這類舊寫法偷偷用到 Tailwind 的紅 */
+  --color-red-*: initial;
+  --color-red-1: #fffcfc;
+  --color-red-2: #fff7f7;
+  --color-red-3: #feebec;
+  --color-red-4: #ffdbdc; /* 淺紅底：紅色徽章、destructive 按鈕 */
+  --color-red-5: #ffcdce;
+  --color-red-6: #fdbdbe;
+  --color-red-7: #f4a9aa;
+  --color-red-8: #eb8e90;
+  --color-red-9: #e5484d;
+  --color-red-10: #dc3e42;
+  --color-red-11: #ce2c31;
+  --color-red-12: #641723;
+  --color-red-500: #ff5657; /* 品牌輔色 */
 
   /* orange：不覆蓋，直接用 Tailwind / shadcn 內建的橘色（orange-500 = #ff6900） */
 
@@ -99,8 +105,10 @@
   --remind-strong: var(--color-orange-600);
   --remind-subtle: var(--color-orange-100);
   --warning: var(--color-red-500); /* 警告 status/warning */
-  --warning-strong: var(--color-red-600);
-  --warning-subtle: var(--color-red-100);
+  /* 紅色的字（Kit 的 text-destructive，#e7000b 不在紅 1～12 裡，2026-10-19 013 指定）：
+     紅色徽章的字、錯誤訊息、必填星號、destructive 按鈕 */
+  --warning-strong: #e7000b;
+  --warning-subtle: var(--color-red-4);
   --progress: var(--color-blue-600); /* 進行中 status/progress */
   --success: var(--color-blue-800); /* 完成 status/success */
 
