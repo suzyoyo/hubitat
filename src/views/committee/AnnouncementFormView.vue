@@ -519,7 +519,7 @@ function cancel() {
             v-model="form.isUrgent"
             variant="outline"
             aria-labelledby="an-urgent-label"
-            class="relative h-8 min-w-16 rounded-full bg-card px-4 type-button after:absolute after:inset-x-0 after:-inset-y-1.5 data-[state=on]:border-warning data-[state=on]:bg-warning-subtle data-[state=on]:text-red-12"
+            class="relative h-8 min-w-16 rounded-full bg-card px-4 type-button after:absolute after:inset-x-0 after:-inset-y-1.5 data-[state=on]:border-warning data-[state=on]:bg-warning-subtle data-[state=on]:text-warning-strong"
           >
             {{ form.isUrgent ? '開啟' : '關閉' }}
           </Toggle>
