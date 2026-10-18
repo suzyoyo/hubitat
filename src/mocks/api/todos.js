@@ -11,7 +11,7 @@ import { quickSaves } from '../data/quickSaves'
 import { tasks } from '../data/tasks'
 import { COMMITTEE_TITLES } from '../data/users'
 import { vendors } from '../data/vendors'
-import { TO_CLOSE_TITLE, canCloseCases, reporterLabel } from './cases'
+import { TO_CLOSE_TITLE, canCloseCases, caseDeadlineOf, reporterLabel } from './cases'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
 import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
@@ -194,13 +194,13 @@ function committeeTodos(userId) {
     // 日期用完工驗收的時間；還沒看過的（「案件待結案」通知沒讀）排最前面，首頁才看得到（2026-10-16）
     const createdAt = item.completion?.at ?? item.reportedAt
     const isNew = isUnseen(userId, TO_CLOSE_TITLE, item.id)
-    items.push(todo('to_close', item.title, hint, createdAt, item.deadline ?? null, { type: 'case', id: item.id }, isNew))
+    items.push(todo('to_close', item.title, hint, createdAt, caseDeadlineOf(item) || null, { type: 'case', id: item.id }, isNew))
   }
 
   // 我負責、還在處理的案件（待結案的在上面）
   for (const item of cases) {
     if (item.assigneeId === userId && !['closed', 'to_verify'].includes(item.status)) {
-      items.push(todo('my_case', item.title, caseHint(item), item.reportedAt, item.deadline ?? null, { type: 'case', id: item.id }))
+      items.push(todo('my_case', item.title, caseHint(item), item.reportedAt, caseDeadlineOf(item) || null, { type: 'case', id: item.id }))
     }
   }
 
@@ -245,8 +245,8 @@ function staffTodos(userId) {
     else if (item.status === 'accepted' && item.assigneeId === userId) kind = 'in_progress'
     if (!kind) continue
     const hint = caseHint(item)
-    // 新通報沒有期限，用通報時間排序；其他用處理期限
-    const dueAt = kind === 'new_case' ? item.reportedAt : (item.deadline ?? null)
+    // 新通報沒有期限，用通報時間排序；其他用處理期限（交辦的完成期限）
+    const dueAt = kind === 'new_case' ? item.reportedAt : (caseDeadlineOf(item) || null)
     items.push(todo(kind, item.title, hint, item.reportedAt, dueAt, { type: 'case', id: item.id }))
   }
 

@@ -15,7 +15,7 @@
 //   description 通報人寫的問題描述
 //   photos      照片或影片的檔名（欄位名稱沿用 photos，影片也放這裡，例如 '異音.mp4'）
 //   status      狀態，見下方 CASE_STATUSES
-//   deadline    處理期限（要在哪天前處理完；受理後選填，沒有就不寫）。「逾期」是用今天的日期算出來的
+//   （處理期限不存在案件上：用交辦的完成期限，由假 API 算，見 api/cases.js 的 caseDeadlineOf，2026-10-18）
 //   scheduledAt 廠商預約到場的時間（派廠商、改期時選填，沒有就不寫）
 //   firstVisitAt 廠商第一次到場的時間（假 API 依 scheduledAt 自動記，不用自己填）。這天起關聯設備算「維修中」
 //   assigneeId  負責人（還沒指派就不寫）
@@ -100,7 +100,6 @@ export const cases = [
       '昨晚大雨後 B2 車道轉角入口處嚴重積水約 5 公分，排水溝孔蓋卡滿大量枯枝落葉，機車下坡轉彎時輪胎打滑十分危險。',
     photos: ['車道積水.jpg', '排水孔.jpg'],
     status: 'accepted',
-    deadline: '2026-09-28',
     assigneeId: 'u-c04',
     supporters: ['u-r04', 'u-c03', 'u-c05'],
     logs: [
@@ -114,7 +113,7 @@ export const cases = [
         at: '2026-09-26T09:30',
         actorId: 'u-c04',
         label: '已受理',
-        text: '李主委受理並設定處理期限',
+        text: '李主委受理',
         residentText: '管委會已受理。',
       },
       {
@@ -124,7 +123,7 @@ export const cases = [
         text: '已聯絡通管廠商（順達環保、安欣工程）安排現場查勘估價，現正等待報價單。',
         residentText: '已聯絡廠商安排現場查勘。',
       },
-      { at: '2026-09-29T00:00', label: '逾期', text: '超過處理期限，已通知主責委員' },
+      { at: '2026-09-29T00:00', label: '逾期', text: '超過交辦的完成期限，已通知主責委員' },
     ],
   },
   {
@@ -141,7 +140,6 @@ export const cases = [
     description: 'C 棟電梯上下樓時有明顯的金屬摩擦聲，到 4 樓附近特別大聲。',
     photos: [],
     status: 'to_verify',
-    deadline: '2026-10-02',
     assigneeId: 'u-c02',
     vendorId: 'v-001',
     equipmentId: 'e-003',
@@ -192,7 +190,6 @@ export const cases = [
     description: '巡查發現 B 棟頂樓防水層多處龜裂，雨後 10 樓梯間天花板有水漬。',
     photos: ['頂樓龜裂.jpg', '梯間水漬.jpg'],
     status: 'in_progress',
-    deadline: '2026-10-01',
     assigneeId: 'u-c04',
     vendorId: 'v-008',
     supporters: [],
@@ -241,7 +238,6 @@ export const cases = [
     description: '樓下住戶連續幾晚半夜拖動家具、大聲播放音樂。',
     photos: [],
     status: 'accepted',
-    deadline: '2026-10-04',
     assigneeId: 'u-c02',
     supporters: [],
     logs: [
@@ -276,7 +272,6 @@ export const cases = [
     description: '進入大廳時，感應門偶爾不會自動開啟，需要用力推才會動，已持續約三天。',
     photos: ['門框.jpg'],
     status: 'accepted',
-    deadline: '2026-10-05',
     assigneeId: 'u-s01',
     vendorId: 'v-005',
     supporters: ['u-r02'],
@@ -366,7 +361,6 @@ export const cases = [
     description: '頂樓花園東側的灑水噴頭一直滴水，地面有積水。',
     photos: ['噴頭.jpg'],
     status: 'accepted',
-    deadline: '2026-10-06',
     assigneeId: 'u-s01',
     vendorId: 'v-003',
     supporters: [],
@@ -402,7 +396,6 @@ export const cases = [
     description: '深夜 11 點後隔壁仍在裝潢施工，連續三晚影響睡眠。',
     photos: [],
     status: 'closed',
-    deadline: '2026-09-15',
     assigneeId: 'u-c02',
     supporters: [],
     logs: [

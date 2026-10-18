@@ -195,7 +195,7 @@ async function sendBack() {
   toast.success('已退回', { description: `已通知${result.handlerLabel || '管理人員'}再處理` })
 }
 
-// 受理：按了就受理，受理的人是負責人（分類受理後在「問題分類」卡片改；處理期限還在討論要不要給案件填）
+// 受理：按了就受理，受理的人是負責人（分類受理後在「問題分類」卡片改；處理期限不用填，用交辦的完成期限）
 async function accept() {
   pending.value = true
   const result = await acceptCase(item.value.id, userId.value)
@@ -251,6 +251,7 @@ function dateTimeText(value) {
 // 第一張卡下面的資訊列：label 是左邊的標籤，value 是右邊的內容
 const basicRows = computed(() => {
   const data = item.value
+  // 處理期限：交辦的完成期限（假 API 算好的，2026-10-18）；沒有交辦就是「尚未設定」，也不會逾期
   let deadline = '尚未設定'
   if (data.deadline) {
     deadline = formatFullDate(data.deadline)
