@@ -6,6 +6,8 @@ defineProps({
   title: { type: String, required: true },
   // 「看全部」要連到哪一頁；不傳就不顯示連結
   to: { type: String, default: '' },
+  // 連結的文字，例如「查看所有廠商」（2026-10-19 加）
+  linkText: { type: String, default: '看全部' },
 })
 </script>
 
@@ -18,7 +20,7 @@ defineProps({
       :to="to"
       class="-my-1 flex h-11 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
     >
-      看全部
+      {{ linkText }}
       <ChevronRightIcon class="size-4" />
     </RouterLink>
   </div>
