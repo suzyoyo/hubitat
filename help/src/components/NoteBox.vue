@@ -3,8 +3,8 @@
 //   tone：'tip' 小提示（藍）、'warning' 注意（橘）、'done' 完成（藍）
 //   mascot：要不要放好彼管家（只用在複雜操作的注意事項、完成提示，不要每個框都放）
 import { CircleCheckIcon, LightbulbIcon, TriangleAlertIcon } from '@lucide/vue'
-import happy from '@app/assets/mascot/happy.png'
-import thinking from '@app/assets/mascot/thinking.png'
+import happy from '@/assets/mascot/happy.png'
+import thinking from '@/assets/mascot/thinking.png'
 
 defineProps({
   tone: { type: String, default: 'tip' },

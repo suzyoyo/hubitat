@@ -1,6 +1,6 @@
 <script setup>
 // 常見問題：依主題分組；最後是「疑難排解」
-import surprised from '@/assets/mascot-surprised.png'
+import surprised from '@/assets/mascot/surprised.png'
 import FaqList from '@/components/FaqList.vue'
 import { FAQ_GROUPS, FAQS } from '@/content/faqs'
 

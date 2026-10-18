@@ -1,6 +1,6 @@
 <script setup>
 // 找不到東西時：拿放大鏡的好彼管家＋一句話（＋按鈕放在 slot）
-import searching from '@app/assets/mascot/searching.png'
+import searching from '@/assets/mascot/searching.png'
 
 defineProps({
   title: { type: String, required: true },

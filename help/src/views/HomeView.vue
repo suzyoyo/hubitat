@@ -2,7 +2,7 @@
 // 使用手冊首頁：以「快速找到教學」為核心
 //   歡迎區 → 三種身分入口（搜尋在頂部列） → 熱門教學 → 依功能分類 → 常見問題 → 聯絡支援
 import { ArrowRightIcon, HouseIcon, UserCogIcon, UsersIcon } from '@lucide/vue'
-import pointing from '@app/assets/mascot/pointing.png'
+import pointing from '@/assets/mascot/pointing.png'
 import ArticleCard from '@/components/ArticleCard.vue'
 import FaqList from '@/components/FaqList.vue'
 import { FAQS } from '@/content/faqs'
