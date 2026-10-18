@@ -18,6 +18,7 @@ import NewRepairView from '@/views/committee/NewRepairView.vue'
 import NewTaskView from '@/views/committee/NewTaskView.vue'
 import NotificationsView from '@/views/committee/NotificationsView.vue'
 import ProposalsView from '@/views/committee/ProposalsView.vue'
+import QuickSaveView from '@/views/committee/QuickSaveView.vue'
 import TaskDetailView from '@/views/committee/TaskDetailView.vue'
 import TaskReportView from '@/views/committee/TaskReportView.vue'
 import TasksView from '@/views/committee/TasksView.vue'
@@ -58,6 +59,7 @@ export default {
     'tasks/:id': TaskDetailView,
     'tasks/:id/report': TaskReportView, // 交辦詳情的「回報完成」（沒有關聯案件的交辦）
     'cases/new': NewRepairView,
+    'quick-saves/new': QuickSaveView, // 「＋」選單的「快速留存」，管理人員端也用
     'me/urgent-log': UrgentLogView,
   },
 
