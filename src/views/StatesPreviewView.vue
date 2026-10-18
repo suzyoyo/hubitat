@@ -105,12 +105,11 @@ function openPermission(kind) {
     </section>
 
     <section class="space-y-2">
-      <h2 class="type-card-title">7. 相機、相簿、通知權限被拒</h2>
+      <h2 class="type-card-title">7. 相機、相簿權限被拒</h2>
       <p class="type-date text-muted-foreground">之前按了「不允許」，網頁不能再問一次，只能教使用者自己打開。</p>
-      <div class="grid grid-cols-3 gap-2">
+      <div class="grid grid-cols-2 gap-2">
         <Button variant="outline" @click="openPermission('camera')">相機</Button>
         <Button variant="outline" @click="openPermission('photos')">相簿</Button>
-        <Button variant="outline" @click="openPermission('notifications')">通知</Button>
       </div>
       <FeedbackPermissionDialog
         v-model:open="permissionOpen"

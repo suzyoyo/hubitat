@@ -6,9 +6,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import searchingUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
-import surprisedUrl from '@/assets/mascot/surprised.png' // 驚訝坐著的好彼管家
-import thinkingUrl from '@/assets/mascot/thinking.png' // 托著下巴思考的好彼管家
+import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家（每一種都用這隻）
 
 const props = defineProps({
   // load-failed：載入失敗 / not-found：找不到資料 / page-not-found：網址打錯 / no-permission：沒有權限
@@ -23,22 +21,18 @@ const emit = defineEmits(['retry'])
 // 每一種的預設長相
 const KINDS = {
   'load-failed': {
-    mascot: surprisedUrl,
     title: '資料載入失敗',
-    description: '可能是網路不穩，請再試一次。',
+    description: '網路不穩，請再試一次。',
   },
   'not-found': {
-    mascot: searchingUrl,
     title: '找不到這筆資料',
     description: '可能已經刪除或撤回了。',
   },
   'page-not-found': {
-    mascot: searchingUrl,
     title: '找不到這個頁面',
     description: '網址可能打錯了，或是這個頁面已經不在了。',
   },
   'no-permission': {
-    mascot: thinkingUrl,
     title: '你沒有權限看這個頁面',
     description: '如果需要，請聯絡主委或副主委。',
   },
@@ -52,10 +46,11 @@ const homeTo = computed(() => (route.meta.roleId ? `/${route.meta.roleId}/home` 
 </script>
 
 <template>
-  <Empty class="gap-1 px-5 pt-10">
+  <!-- pt-20：上方空白和住戶端通知的空狀態一樣（外層 pt-4 ＋ 空狀態 pt-16） -->
+  <Empty class="gap-1 px-5 pt-20">
     <EmptyMedia>
       <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-      <img :src="preset.mascot" alt="" class="h-[120px] w-auto" />
+      <img :src="mascotUrl" alt="" class="h-[120px] w-auto" />
     </EmptyMedia>
     <EmptyTitle class="type-greeting">{{ title || preset.title }}</EmptyTitle>
     <EmptyDescription class="type-body">{{ description || preset.description }}</EmptyDescription>
