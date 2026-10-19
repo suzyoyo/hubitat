@@ -56,9 +56,10 @@ function goBack() {
   </header>
 
   <!-- Brand：logo＋通知鈴鐺 -->
+  <!-- 填色：由上往下白 #ffffff → 淺藍 #eaf4f9（2026-10-19 照設計稿 Header 1143:8722），接上下面問候列的漸層 -->
   <header
     v-else
-    class="sticky top-0 z-10 flex items-center justify-between bg-background pr-5 pb-2.5 pl-5 pt-[max(10px,env(safe-area-inset-top))]"
+    class="sticky top-0 z-10 flex items-center justify-between bg-linear-to-b from-white to-[#eaf4f9] pr-5 pb-2.5 pl-5 pt-[max(10px,env(safe-area-inset-top))]"
   >
     <!-- width / height 寫原圖尺寸，讓瀏覽器先算好比例；實際顯示高度由 h-[26px] 決定 -->
     <img :src="logoUrl" alt="好彼社區" width="303" height="67" class="h-[26px] w-auto" />
