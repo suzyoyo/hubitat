@@ -255,7 +255,8 @@ const recordRows = computed(() => {
         <Button :disabled="pending" @click="confirm">確認完成</Button>
       </BottomCta>
       <BottomCta v-else-if="canWithdraw">
-        <Button variant="outline" :disabled="pending" @click="openDialog('withdraw')">撤回交辦</Button>
+        <!-- 撤回做了就回不去，用紅色（2026-10-19 按鈕規則） -->
+        <Button variant="destructive" :disabled="pending" @click="openDialog('withdraw')">撤回交辦</Button>
       </BottomCta>
       <BottomCta v-else-if="canReport">
         <Button as-child>

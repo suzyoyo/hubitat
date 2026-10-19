@@ -117,7 +117,7 @@ const actions = computed(() => {
   if (['accepted', 'in_progress'].includes(data.status) && canHandle.value && !delegated) {
     list.push({ key: 'complete', label: '完工驗收', main: true })
   }
-  if (delegated && openTask.value.assignerId === userId.value) list.push({ key: 'withdraw', label: '撤回交辦' })
+  if (delegated && openTask.value.assignerId === userId.value) list.push({ key: 'withdraw', label: '撤回交辦', danger: true })
   // 待結案：主委、副主委都可以審核，不管是誰受理的（2026-10-15 改，原本只有負責人）
   //   左「退回」跳彈窗寫原因；右「確認結案」到結案頁填費用、結案說明（2026-10-16）
   if (isReviewing.value) {
@@ -419,7 +419,8 @@ const basicRows = computed(() => {
          設計稿上面那排原本是「發布社區公告」，2026-10-15 改成更新現況、再改名叫更新進度） -->
     <BottomCta v-if="hasBottom" vertical>
       <!-- 上面一排：交辦（主委、副主委、還沒交辦時才有） -->
-      <Button v-for="action in topActions" :key="action.key" variant="outline" @click="runAction(action)">
+      <!-- 獨自一排的按鈕用淺藍（2026-10-19 按鈕規則：底部三顆時，自己一排的那顆是 secondary） -->
+      <Button v-for="action in topActions" :key="action.key" variant="secondary" @click="runAction(action)">
         {{ action.label }}
       </Button>
       <!-- 下面一排：動作（完工驗收、結案…）在左、更新進度在右（2026-10-15 013 改）
@@ -428,7 +429,7 @@ const basicRows = computed(() => {
         <Button
           v-for="action in mainActions"
           :key="action.key"
-          :variant="canUpdate || !action.main ? 'outline' : 'default'"
+          :variant="action.danger ? 'destructive' : canUpdate || !action.main ? 'outline' : 'default'"
           :disabled="pending"
           @click="runAction(action)"
         >

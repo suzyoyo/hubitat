@@ -1,6 +1,7 @@
 <script setup>
 // 確認送出頁的一列（對應 Figma 的 Report/Review Row）：欄位名稱＋填的內容＋右邊的「修改」按鈕
 // 列和列之間的分隔線由外面的容器畫（divide-y），這個元件自己不畫
+import { PencilLineIcon } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 
 defineProps({
@@ -21,7 +22,11 @@ defineEmits(['edit'])
       <!-- whitespace-pre-line：內容裡有換行的話照樣換行（補充說明可能打了好幾行） -->
       <p class="type-body whitespace-pre-line text-muted-foreground">{{ value }}</p>
     </div>
-    <!-- aria-label：螢幕閱讀器會念「修改地點」，才知道是改哪一項 -->
-    <Button variant="ghost" class="shrink-0" :aria-label="`修改${label}`" @click="$emit('edit')">修改</Button>
+    <!-- aria-label：螢幕閱讀器會念「修改地點」，才知道是改哪一項
+         -my-2.5：按鈕高 44px、標題一行 24px，往上下各收 10px，「修改」這兩個字才會和標題對齊在同一行
+         -mr-3：抵掉 ghost 按鈕右邊的空白，和內容的右邊切齊 -->
+    <Button variant="ghost" class="-my-2.5 -mr-3 shrink-0" :aria-label="`修改${label}`" @click="$emit('edit')">
+      <PencilLineIcon />修改
+    </Button>
   </div>
 </template>
