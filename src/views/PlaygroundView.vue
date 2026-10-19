@@ -1,6 +1,7 @@
 <script setup>
 // 元件盤點頁：把 shadcn-vue 元件依類別陳列，方便看外觀與用法
 // 每個類別拆成一個檔案，放在 ./playground/ 資料夾
+import { ArrowLeftIcon } from '@lucide/vue'
 import BasicSection from './playground/BasicSection.vue'
 import MobileSection from './playground/MobileSection.vue'
 import FormSection from './playground/FormSection.vue'
@@ -28,7 +29,18 @@ const categories = [
   <div class="mx-auto min-h-screen max-w-md bg-background">
     <!-- 頂部：標題 + 分類跳轉（sticky 讓它捲動時固定在上方） -->
     <header class="sticky top-0 z-10 border-b bg-background/95 px-4 pt-4 backdrop-blur">
-      <h1 class="text-xl font-bold">元件盤點</h1>
+      <!-- 返回按鈕＋標題；手機上沒有瀏覽器的上一頁，靠這顆回角色選擇頁 -->
+      <div class="flex items-center gap-1">
+        <!-- 44px 是可點擊範圍；-ml-3 讓箭頭對齊下面的文字 -->
+        <RouterLink
+          to="/"
+          aria-label="返回角色選擇"
+          class="-ml-3 flex size-11 shrink-0 items-center justify-center rounded-full hover:bg-muted"
+        >
+          <ArrowLeftIcon class="size-5" />
+        </RouterLink>
+        <h1 class="text-xl font-bold">元件盤點</h1>
+      </div>
       <p class="text-sm text-muted-foreground">好彼社區 · shadcn-vue 首批元件</p>
       <!-- overflow-x-auto：手機寬度不夠時可以左右滑動 -->
       <nav class="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-3">
