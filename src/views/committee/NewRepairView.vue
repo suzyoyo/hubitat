@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { REPORT_TYPES } from '@/lib/report'
-import { createRepair, getAreas, getCurrentUser, getSimilarReports, supportReport } from '@/mocks/api'
+import { createRepair, getAreas, getCurrentUser, getSimilarReports, supportReport, takeDraft } from '@/mocks/api'
 import ReportConfirmStep from '@/components/report/ReportConfirmStep.vue'
 import ReportDescribeStep from '@/components/report/ReportDescribeStep.vue'
 import ReportPlaceStep from '@/components/report/ReportPlaceStep.vue'
@@ -81,6 +81,7 @@ onMounted(async () => {
   userId.value = user.id
   areas.value = areaList
   loading.value = false
+  await restoreDraft(user.id, route.path, (data) => Object.assign(form, data))
 })
 
 // ── 通報住戶 ───────────────────────────────────
@@ -191,6 +192,14 @@ async function submit() {
 const isDirty = computed(
   () => inFlow.value && Boolean(form.subject || form.description || form.photos.length || form.building),
 )
+
+// 之前「存成草稿」的話，把內容帶回來（拿回來就刪掉；沒送出又要離開時可以再存一次）
+async function restoreDraft(userIdValue, path, apply) {
+  const data = await takeDraft(userIdValue, path)
+  if (!data) return
+  apply(data)
+  toast.info('已帶回上次存的草稿')
+}
 </script>
 
 <template>
@@ -334,6 +343,6 @@ const isDirty = computed(
       <Button variant="outline" @click="router.replace(`${base}/home`)">回到首頁</Button>
     </BottomCta>
     <!-- 填到一半想離開時先問一次 -->
-    <LeaveConfirmDialog :dirty="isDirty" />
+    <LeaveConfirmDialog :dirty="isDirty" draft-title="新增通報（代住戶登記）" :draft-data="{ ...form }" :draft-path="route.path" />
   </div>
 </template>

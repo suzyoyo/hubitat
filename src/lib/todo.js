@@ -16,6 +16,7 @@ const NO_DEADLINE_BADGES = {
   review: { text: '待審核', variant: 'secondary' },
   expiring: { text: '即將到期', variant: 'secondary' },
   my_case: { text: '處理中', variant: 'default' },
+  draft: { text: '未送出', variant: 'secondary' }, // 存成草稿的表單（2026-10-19）；種類名稱已經是「草稿」，徽章寫狀態
 }
 
 export function todoDeadlineBadge(todo) {
@@ -47,6 +48,8 @@ const TODO_LINK_PATHS = {
 }
 
 // 一筆待辦點了要去哪裡（管委會端），例如 { type: 'case', id: 'CASE-1' } → '/committee/cases/CASE-1'
+// 草稿的 link 直接帶表單的網址（link.path）
 export function todoLink(todo) {
+  if (todo.link.path) return todo.link.path
   return `/committee/${TODO_LINK_PATHS[todo.link.type]}/${todo.link.id}`
 }
