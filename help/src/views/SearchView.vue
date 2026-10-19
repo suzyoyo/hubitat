@@ -11,6 +11,7 @@ import ArticleCard from '@/components/ArticleCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import { ROLES } from '@/content/roles'
+import { SEARCH_SUGGESTIONS as suggestions } from '@/content/search'
 import { searchArticles, searchWords } from '@/lib/content'
 import { currentRole } from '@/lib/role'
 
@@ -38,7 +39,6 @@ const groups = computed(() => {
 })
 
 const filters = [{ id: null, label: '全部身分' }, ...ROLES.map((r) => ({ id: r.id, label: r.label }))]
-const suggestions = ['通報', '進度', '公告', '廠商', '結案']
 
 function update(changes) {
   const next = { q: query.value || undefined, role: roleFilter.value || undefined, ...changes }
