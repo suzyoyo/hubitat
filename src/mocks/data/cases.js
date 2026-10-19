@@ -260,6 +260,42 @@ export const cases = [
     ],
   },
 
+  // 展示「我也遇到了」用（2026-10-19 013）：示範故事第 1 步陳先生選「B 棟・電梯／電梯口」時，會先看到這一件
+  // 地點要和新增通報選的一模一樣（電梯／電梯口）才找得到；不關聯設備，B 棟電梯的狀態才不會變
+  // 交給張副主委：不是示範故事裡的人，不會多出李主委、張管理員的待辦
+  {
+    id: 'CASE-20260929-001',
+    place: '電梯／電梯口',
+    subject: '照明一閃一閃',
+    title: 'B 棟電梯內照明閃爍',
+    areaId: 'area-b',
+    category: 'lighting',
+    source: 'resident',
+    isPrivate: false,
+    reporterId: 'u-r05',
+    reportedAt: '2026-09-29T19:10',
+    description: '電梯裡的燈一直閃，晚上搭有點不舒服。',
+    photos: [],
+    status: 'accepted',
+    assigneeId: 'u-c02',
+    supporters: ['u-r03'],
+    logs: [
+      {
+        at: '2026-09-29T19:10',
+        label: '住戶通報',
+        text: '林小姐（B 棟 6 樓）通報',
+        residentText: '已收到，好彼管家已通知管理人員。',
+      },
+      {
+        at: '2026-09-30T09:30',
+        actorId: 'u-c02',
+        label: '已受理',
+        text: '張副主委受理，請管理室先檢查燈管',
+        residentText: '管委會已受理。',
+      },
+    ],
+  },
+
   // ── 原本是李先生自己通報的（2026-10-16 前三件改給鄰居，李先生只剩已結案的；展示時住戶首頁一開始是空狀態）─────
   {
     id: 'CASE-20260920-001',
