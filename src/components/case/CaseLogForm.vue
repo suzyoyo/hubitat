@@ -50,20 +50,17 @@ watch(draft, (value) => {
       <Label for="log-resident" class="text-base">
         給住戶看的說明<span class="type-date text-muted-foreground">選填</span>
       </Label>
-      <!-- 住戶看不到下面的處理內容（可能有廠商名稱、報價），要給住戶看的寫在這一句 -->
-      <Input id="log-resident" v-model="residentText" maxlength="50" placeholder="一句話，例：廠商將於 10/5 再次到場處理。" />
-      <p class="type-date text-muted-foreground">住戶看得到這一句，沒寫就不顯示給住戶。</p>
+      <!-- 住戶看不到下面的處理內容（內部紀錄，可能有廠商名稱、報價；2026-10-19 寫在 placeholder），要給住戶看的寫在這一句 -->
+      <Input id="log-resident" v-model="residentText" maxlength="50" placeholder="例：廠商 10/5 再來處理" />
+      <p class="type-date text-muted-foreground">沒寫就不給住戶看</p>
     </div>
     <div class="space-y-2">
-      <!-- 處理內容是內部紀錄（2026-10-19 加註記）：住戶看不到，像管委會和管理人員之間的溝通 -->
-      <Label for="log-text" class="text-base">
-        處理內容<span class="type-date text-muted-foreground">只有管委會和管理人員看得到</span>
-      </Label>
+      <Label for="log-text" class="text-base">處理內容</Label>
       <Textarea
         id="log-text"
         :model-value="text"
         maxlength="200"
-        placeholder="例：大同電梯更換零件需調貨（可以在這裡補充給管委會看的細節）"
+        placeholder="只有管委會和管理人員看得到，例：零件調貨中"
         class="min-h-[88px]"
         @update:model-value="onTextInput"
       />
