@@ -1,0 +1,50 @@
+# 自動部署到 GitHub Pages（https://suzyoyo.github.io/hubitat/）
+# 每次 push 到 main 就會自動打包、放上網；也可以在 GitHub 的 Actions 頁面手動按 Run workflow
+# 第一次用之前，要到 repo 的 Settings → Pages，把 Source 改成「GitHub Actions」
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 部署到 Pages 需要的權限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時有好幾次 push 時，只留最新的那次部署
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # npm ci：照 package-lock.json 安裝，版本和本機一模一樣
+      - run: npm ci
+      # 網站放在 /hubitat/ 底下，要告訴 Vite，打包出來的檔案路徑才會對
+      - run: npx vite build --base=/hubitat/
+      # GitHub Pages 不認得 Vue Router 的網址，直接打開內頁會找不到檔案（404）
+      # 複製一份 index.html 當 404 頁，讓 Vue 接手顯示正確的頁面
+      - run: cp dist/index.html dist/404.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -62,7 +62,8 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  // BASE_URL：網站放在哪個資料夾底下。本機是 '/'；放上 GitHub Pages 時是 '/hubitat/'（打包時用 --base 指定）
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   // 換頁後回到頁面頂端
   scrollBehavior() {
