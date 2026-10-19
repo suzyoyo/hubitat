@@ -17,19 +17,20 @@ export default defineConfig({
       // 有新版本時自動更新，不用跳提示問使用者
       registerType: 'autoUpdate',
       // App 的名稱、顏色、圖示（圖示在 public/icon/，從 app-icon-1024.png 縮出來的）
+      // 圖示路徑不加開頭的 /，從 manifest 所在的資料夾找，放到 /hubitat/ 底下也找得到
       manifest: {
         name: '好彼社區',
         short_name: '好彼社區',
         lang: 'zh-Hant',
-        start_url: '/',
+        // 不寫 start_url、scope：外掛會自動用網站所在的資料夾（本機是 '/'，GitHub Pages 是 '/hubitat/'）
         display: 'standalone', // 打開時沒有瀏覽器的網址列
         background_color: '#f8fafc', // 開啟時的底色，和頁面背景 --background 一樣
         theme_color: '#f8fafc', // 手機上方狀態列的顏色
         icons: [
-          { src: '/icon/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icon/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icon/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icon/icon-512.png', sizes: '512x512', type: 'image/png' },
           // Android 會把圖示裁成圓形等形狀：另外一張四周多留白的，logo 縮在中間的圓裡，裁了也不會切到（2026-10-16）
-          { src: '/icon/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'icon/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
     }),
