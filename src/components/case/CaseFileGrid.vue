@@ -16,6 +16,10 @@ const props = defineProps({
   files: { type: Array, required: true },
   // 全螢幕上方的標題，例如「完工紀錄」
   title: { type: String, default: '' },
+  // 滑動時要不要伸到卡片邊緣（2026-10-19，suzy 在 #156 提的）：
+  //   預設開，外層是卡片（p-4，16px 內距）時，照片可以滑到卡片邊緣；
+  //   外層沒有剛好 16px 內距的（例如處理紀錄裡、日期欄右邊的照片）要關掉，不然會蓋到旁邊
+  bleed: { type: Boolean, default: true },
 })
 
 // 看副檔名決定圖示：影片用攝影機、PDF 用文件，其他當作照片
@@ -58,8 +62,8 @@ function go(index) {
 </script>
 
 <template>
-  <!-- 一排、超過寬度就左右滑；-mx-4 px-4 讓滑動時可以滑到卡片邊緣，第一格還是和文字對齊 -->
-  <div class="-mx-4 flex snap-x gap-2.5 overflow-x-auto px-4 pb-1">
+  <!-- 一排、超過寬度就左右滑；bleed 時 -mx-4 px-4 讓滑動時可以滑到卡片邊緣，第一格還是和文字對齊 -->
+  <div class="flex snap-x gap-2.5 overflow-x-auto pb-1" :class="{ '-mx-4 px-4': bleed }">
     <template v-for="tile in tiles" :key="tile.name">
       <!-- 有照片或影片：縮圖，點了全螢幕 -->
       <button

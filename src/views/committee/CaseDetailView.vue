@@ -400,7 +400,8 @@ const basicRows = computed(() => {
                    type-note 14px 灰色；whitespace-pre-line 讓兩項都改時一項一行 -->
               <p v-if="log.note" class="type-note whitespace-pre-line text-muted-foreground">{{ log.note }}</p>
               <!-- 附上留存的照片（快速留存歸到這件案件時，2026-10-18） -->
-              <CaseFileGrid v-if="log.files?.length" :files="log.files" :title="log.label" class="pt-2" />
+              <!-- :bleed="false"：在日期欄右邊，不往外伸，才不會蓋到日期 -->
+              <CaseFileGrid v-if="log.files?.length" :files="log.files" :title="log.label" :bleed="false" class="pt-2" />
             </div>
           </div>
         </template>
