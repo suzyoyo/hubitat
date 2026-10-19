@@ -286,7 +286,15 @@ const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.
         <Label for="task-deadline" class="text-base">
           完成期限<span class="type-date text-muted-foreground">選填</span>
         </Label>
-        <DatePicker id="task-deadline" v-model="form.deadline" placeholder="選擇完成期限" :min="MOCK_TODAY" />
+        <!-- 白底淺藍字，和「我的」的登出按鈕一樣（2026-10-19 013） -->
+        <DatePicker
+          id="task-deadline"
+          v-model="form.deadline"
+          placeholder="選擇完成期限"
+          :min="MOCK_TODAY"
+          variant="secondary"
+          class="bg-card hover:bg-muted"
+        />
       </div>
 
       <BottomCta vertical>
