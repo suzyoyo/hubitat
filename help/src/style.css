@@ -1,0 +1,163 @@
+/* 使用手冊網站的設計 Token 與基本樣式
+   顏色沿用 App（src/style.css）的品牌色階，但「放文字、做按鈕」改用比較深的藍，
+   讓文字對比度至少 4.5 : 1（WCAG AA）。品牌藍 #6fb7e2 在白底上只有 2.2 : 1，只拿來當裝飾 */
+
+/* 字型：和 App 一樣用 Noto Sans TC */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+
+/* source('../')：Tailwind 只掃描 help/ 裡的檔案，不掃 App 的程式 */
+@import 'tailwindcss' source('../');
+
+@theme {
+  /* 斷點：手機 < 768px（md 以下）、平板 768～1199px、桌機 ≥ 1200px（xl） */
+  --breakpoint-xl: 75rem;
+
+  --font-sans: 'Noto Sans TC', system-ui, sans-serif;
+
+  /* 品牌藍色階（和 App 的 blue 相同） */
+  --color-brand-50: #e4eff4; /* 淺藍底 */
+  --color-brand-100: #cde4f0;
+  --color-brand-200: #b5d9ed;
+  --color-brand-500: #6fb7e2; /* 品牌主色：只當裝飾，不放白字、不當文字色 */
+  --color-brand-700: #457d9b;
+  --color-brand-800: #306077; /* 連結、主要按鈕底色（白字 6.9 : 1） */
+  --color-brand-900: #1b4354; /* 標題、淺藍底上的字（10.6 : 1） */
+  --color-brand-950: #062630;
+
+  /* 文字與底色 */
+  --color-ink: #252727; /* 主要文字 */
+  --color-ink-soft: #545656; /* 內文第二層（7.4 : 1） */
+  --color-muted: #6c6d6e; /* 說明、日期（淡灰底上 5 : 1） */
+  --color-line: #e1e2e4; /* 分隔線 */
+  --color-page: #f8fafc; /* 頁面背景 */
+
+  /* 紅色：#ff5657 只當圓點、圖示；紅色的字用 danger（6.2 : 1） */
+  --color-accent: #ff5657;
+  --color-danger: #ad3739;
+  --color-danger-subtle: #f9e6e7;
+
+  /* 卡片 */
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px 0 rgb(27 67 84 / 0.25), 0 4px 16px -8px rgb(27 67 84 / 0.18);
+}
+
+/* 基本樣式 */
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+  /* 跳到段落時，避開固定在上方的頂部列 */
+  scroll-padding-top: 5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden; /* 保險：任何寬度都不出現水平捲軸 */
+  /* 中文標點一律全形寬度，不自動擠緊（2026-10-19）
+     Chrome 預設會把相鄰的標點擠成半形（例如「」：），但同樣的寫法有時擠、有時不擠，間距看起來不一樣；
+     iPhone 的 Safari 本來就不擠，這樣各瀏覽器看起來都一樣 */
+  text-spacing-trim: space-all;
+}
+
+/* 標題：加一點點字距（2026-10-19）。內文是 0.05em，標題字比較大，拉 0.03em 就夠，看起來不會太擠 */
+h1,
+h2,
+h3 {
+  letter-spacing: 0.03em;
+}
+
+/* 鍵盤操作時看得到焦點在哪裡：深藍外框＋淺藍光暈 */
+:focus-visible {
+  outline: 3px solid var(--color-brand-800);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 文章內文：17px、行高 1.7，適合長篇閱讀 */
+.article-body {
+  font-size: 17px;
+  line-height: 1.75;
+  letter-spacing: 0.05em; /* 和頁面說明文字（.lead-text）一樣的字距，2026-10-18 加 */
+  color: var(--color-ink);
+}
+
+/* 文章裡用「」框起來的按鈕名稱：中等粗細＋深藍，和一般文字分得出來，但不要太搶眼
+   （2026-10-18 從粗體 700、更深的藍 brand-900 改輕；brand-800 在白底上對比 6.9 : 1） */
+.ui-label {
+  font-weight: 500;
+  color: var(--color-brand-800);
+}
+
+/* 共用的按鈕與版面寬度（高度至少 44px，長輩好按） */
+@layer components {
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] px-5 font-bold;
+  }
+  .btn-primary {
+    @apply bg-brand-800 text-white hover:bg-brand-900;
+  }
+  .btn-secondary {
+    @apply bg-brand-50 text-brand-900 hover:bg-brand-100;
+  }
+  /* 首頁頁首的漸層底（只有首頁用，其他頁 2026-10-19 拿掉了）：左上角的品牌藍（#6fb7e2 混 35%）往右下散開、淡到頁面底色
+     （2026-10-19 從 brand-50 改來，原本偏灰、看起來暗；同一天把上下直拉改成從左上散開）。
+     用放射狀而不是斜線，下緣和右緣都會淡到底色，拿掉分隔線後不會有一條明顯的邊。
+     最深處上的深藍字、灰字對比仍有 5 : 1 以上 */
+  .hero-gradient {
+    background: radial-gradient(
+      ellipse at top left,
+      color-mix(in srgb, var(--color-brand-500) 35%, var(--color-page)),
+      var(--color-page) 75%
+    );
+  }
+  /* 段落大標題：文字前面一條直的品牌紅短線，純裝飾（紅色不放在文字上，對比不夠；2026-10-19 加）
+     用 padding 留位置、線用 absolute 放在左邊，標題換行時第二行也會和第一行對齊 */
+  .section-title {
+    position: relative;
+    padding-left: 0.875rem;
+  }
+  .section-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.2em;
+    bottom: 0.2em;
+    width: 4px;
+    border-radius: 9999px;
+    background: var(--color-accent);
+  }
+  .page-container {
+    @apply mx-auto w-full max-w-[1200px] px-4 md:px-6;
+  }
+  /* 頁面標題下面的說明文字：全站統一（2026-10-18，行高 2、字距 0.05em，讀起來比較不擠） */
+  .lead-text {
+    @apply mt-4 max-w-2xl text-lg leading-loose tracking-wider text-ink-soft;
+  }
+  .text-link {
+    @apply font-bold text-brand-800 underline underline-offset-4 hover:text-brand-900;
+  }
+}
+
+/* 只給螢幕閱讀器念的文字 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
