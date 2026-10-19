@@ -50,7 +50,7 @@ watch(draft, (value) => {
       <Label for="log-resident" class="text-base">
         給住戶看的說明<span class="type-date text-muted-foreground">選填</span>
       </Label>
-      <!-- 住戶看不到下面的處理內容（內部紀錄，可能有廠商名稱、報價；2026-10-19 寫在 placeholder），要給住戶看的寫在這一句 -->
+      <!-- 住戶看不到下面的處理內容（內部紀錄，可能有廠商名稱、報價），要給住戶看的寫在這一句 -->
       <Input id="log-resident" v-model="residentText" maxlength="50" placeholder="例：廠商 10/5 再來處理" />
       <p class="type-date text-muted-foreground">未填就不會顯示給住戶</p>
     </div>
@@ -60,10 +60,12 @@ watch(draft, (value) => {
         id="log-text"
         :model-value="text"
         maxlength="200"
-        placeholder="只有管委會和管理人員看得到，例：零件調貨中"
+        placeholder="例：零件調貨中"
         class="min-h-[88px]"
         @update:model-value="onTextInput"
       />
+      <!-- 處理內容是內部紀錄，住戶看不到；寫在框下面，和上面給住戶看的說明同一個位置 -->
+      <p class="type-date text-muted-foreground">只有管委會和管理人員看得到</p>
     </div>
   </div>
 </template>
