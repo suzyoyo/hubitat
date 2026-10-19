@@ -400,7 +400,7 @@ async function restoreDraft(userIdValue, path, apply) {
         <div class="grid grid-cols-2 gap-2">
           <Button
             type="button"
-            :variant="form.dateMode === 'single' ? 'default' : 'outline'"
+            :variant="form.dateMode === 'single' ? 'secondary' : 'outline'"
             :aria-pressed="form.dateMode === 'single'"
             @click="form.dateMode = 'single'"
           >
@@ -408,7 +408,7 @@ async function restoreDraft(userIdValue, path, apply) {
           </Button>
           <Button
             type="button"
-            :variant="form.dateMode === 'multi' ? 'default' : 'outline'"
+            :variant="form.dateMode === 'multi' ? 'secondary' : 'outline'"
             :aria-pressed="form.dateMode === 'multi'"
             @click="form.dateMode = 'multi'"
           >

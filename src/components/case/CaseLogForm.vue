@@ -1,5 +1,5 @@
 <script setup>
-// 案件詳情「處理進度與留痕」卡片最下面的新增處理紀錄：欄位一直顯示（2026-10-15 改，原本要先按「＋ 新增處理紀錄」、再按「確定」）
+// 案件詳情「處理進度與留痕」卡片最上面的新增處理紀錄（2026-10-19 從最下面搬上來）：欄位一直顯示（2026-10-15 改，原本要先按「＋ 新增處理紀錄」、再按「確定」）
 //   給住戶看的一句（選填，沒寫就不給住戶看）在上、處理內容（管理端看的）在下（2026-10-18 013 調換）
 //   在「給住戶看的說明」打字時，處理內容會同步出現一樣的字，管理人員不用打兩次；
 //   自己動過處理內容（例如補一句給主委看的）之後就不再同步，免得蓋掉補的字；把處理內容刪光會恢復同步
@@ -50,9 +50,9 @@ watch(draft, (value) => {
       <Label for="log-resident" class="text-base">
         給住戶看的說明<span class="type-date text-muted-foreground">選填</span>
       </Label>
-      <!-- 住戶看不到下面的處理內容（可能有廠商名稱、報價），要給住戶看的寫在這一句 -->
-      <Input id="log-resident" v-model="residentText" maxlength="50" placeholder="一句話，例：廠商將於 10/5 再次到場處理。" />
-      <p class="type-date text-muted-foreground">住戶會看到這一句，也會自動帶到下面的處理內容。沒寫的話，住戶看不到這筆紀錄。</p>
+      <!-- 住戶看不到下面的處理內容（內部紀錄，可能有廠商名稱、報價），要給住戶看的寫在這一句 -->
+      <Input id="log-resident" v-model="residentText" maxlength="50" placeholder="例：廠商 10/5 再來處理" />
+      <p class="type-date text-muted-foreground">未填就不會顯示給住戶</p>
     </div>
     <div class="space-y-2">
       <Label for="log-text" class="text-base">處理內容</Label>
@@ -60,10 +60,12 @@ watch(draft, (value) => {
         id="log-text"
         :model-value="text"
         maxlength="200"
-        placeholder="例：大同電梯更換零件需調貨（可以在這裡補充給管委會看的細節）"
+        placeholder="例：零件調貨中"
         class="min-h-[88px]"
         @update:model-value="onTextInput"
       />
+      <!-- 處理內容是內部紀錄，住戶看不到；寫在框下面，和上面給住戶看的說明同一個位置 -->
+      <p class="type-date text-muted-foreground">只有管委會和管理人員看得到</p>
     </div>
   </div>
 </template>

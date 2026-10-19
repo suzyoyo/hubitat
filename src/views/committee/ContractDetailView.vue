@@ -160,7 +160,7 @@ function download() {
           </button>
         </div>
         <p v-else class="type-body text-muted-foreground">還沒有上傳合約檔案</p>
-        <Button v-if="pages.length" variant="outline" class="w-full" @click="download">
+        <Button v-if="pages.length" variant="secondary" class="w-full" @click="download">
           <DownloadIcon />
           下載 PDF
         </Button>

@@ -9,6 +9,7 @@
 //   todo 是 getMyTodos() 回傳的 items 其中一筆
 const NO_DEADLINE_BADGES = {
   incomplete: { text: '待補資料', variant: 'secondary' },
+  in_progress: { text: '處理中', variant: 'default' }, // 管理人員端負責的案件（suzy 在 #159 提醒補上）
   to_close: { text: '待結案', variant: 'secondary' },
   confirm: { text: '待確認', variant: 'secondary' },
   assigned: { text: '待處理', variant: 'secondary' },

@@ -9,10 +9,10 @@ import { computed, onMounted, ref } from 'vue'
 import ArchiveHistoryRecord from '@/components/archive/ArchiveHistoryRecord.vue'
 import FilterSelect from '@/components/common/FilterSelect.vue'
 import { Badge } from '@/components/ui/badge'
+import BottomCta from '@/components/app/BottomCta.vue'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate } from '@/lib/date'
 import { getEquipmentList } from '@/mocks/api'
@@ -102,7 +102,8 @@ const tiles = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-4 px-5 pt-4 pb-5">
+  <!-- pb-28：底部有固定的按鈕區，留空間給它 -->
+  <div class="space-y-4 px-5 pt-4 pb-28">
     <div class="relative">
       <SearchIcon class="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground" />
       <Input v-model="keyword" type="search" aria-label="搜尋設備" placeholder="搜尋設備名稱或關鍵字" class="pl-10" />
@@ -195,13 +196,15 @@ const tiles = computed(() => {
             <ChevronRightIcon class="size-4" />
           </button>
         </div>
-
-        <Separator />
-        <!-- 設備有問題就去通報：網址帶設備編號，新增通報會先填好地點、類型和設備名稱 -->
-        <Button as-child variant="outline" class="w-full">
-          <RouterLink :to="`/resident/reports/new?equipment=${device.id}`">通報問題</RouterLink>
-        </Button>
       </section>
+
+      <!-- 設備有問題就去通報：網址帶設備編號，新增通報會先填好地點、類型和設備名稱
+           2026-10-19 從卡片裡的淺藍按鈕改成底部固定的主要按鈕 -->
+      <BottomCta>
+        <Button as-child>
+          <RouterLink :to="`/resident/reports/new?equipment=${device.id}`">新增通報</RouterLink>
+        </Button>
+      </BottomCta>
     </template>
   </div>
 </template>
