@@ -792,7 +792,7 @@ export async function createReport(userId, input) {
 }
 
 // 有新的住戶通報：通知能受理的人（主委、副主委用管委會身分收、管理人員用管理人員身分收）
-// 通報的人自己也收（例如李伯伯用住戶身分通報，切到主委身分一樣會收到，2026-10-15 決定）
+// 通報的人自己也收（例如李先生用住戶身分通報，切到主委身分一樣會收到，2026-10-15 決定）
 function notifyNewReport(item) {
   for (const user of users) {
     let role = ''

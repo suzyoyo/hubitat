@@ -97,7 +97,7 @@ export const cases = [
     category: 'leak',
     source: 'resident',
     isPrivate: false,
-    reporterId: 'u-r03', // 2026-10-16 從陳先生改成周太太（展示用：陳先生一開始沒有進行中的通報）
+    reporterId: 'u-r03', // 2026-10-16 從陳先生改成周小姐（展示用：陳先生一開始沒有進行中的通報）
     reportedAt: '2026-09-25T10:12',
     description:
       '昨晚大雨後 B2 車道轉角入口處嚴重積水約 5 公分，排水溝孔蓋卡滿大量枯枝落葉，機車下坡轉彎時輪胎打滑十分危險。',
@@ -109,7 +109,7 @@ export const cases = [
       {
         at: '2026-09-25T10:12',
         label: '住戶通報',
-        text: '周太太（A 棟 5 樓）通報，附 2 張照片',
+        text: '周小姐（A 棟 5 樓）通報，附 2 張照片',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
       {
@@ -222,7 +222,7 @@ export const cases = [
       {
         at: '2026-09-30T20:15',
         label: '住戶通報',
-        text: '周太太（A 棟 5 樓）通報，附 1 張照片',
+        text: '周小姐（A 棟 5 樓）通報，附 1 張照片',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
     ],
@@ -260,7 +260,7 @@ export const cases = [
     ],
   },
 
-  // ── 原本是李伯伯自己通報的（2026-10-16 前三件改給鄰居，李伯伯只剩已結案的；展示時住戶首頁一開始是空狀態）─────
+  // ── 原本是李先生自己通報的（2026-10-16 前三件改給鄰居，李先生只剩已結案的；展示時住戶首頁一開始是空狀態）─────
   {
     id: 'CASE-20260920-001',
     place: '1F 大廳',
@@ -270,7 +270,7 @@ export const cases = [
     category: 'door',
     source: 'resident',
     isPrivate: false,
-    reporterId: 'u-r03', // 2026-10-16 從李伯伯改過來：展示時李伯伯的住戶首頁一開始是空狀態
+    reporterId: 'u-r03', // 2026-10-16 從李先生改過來：展示時李先生的住戶首頁一開始是空狀態
     reportedAt: '2026-09-20T10:15',
     description: '進入大廳時，感應門偶爾不會自動開啟，需要用力推才會動，已持續約三天。',
     photos: ['門框.jpg'],
@@ -282,7 +282,7 @@ export const cases = [
       {
         at: '2026-09-20T10:15',
         label: '住戶通報',
-        text: '周太太（A 棟 5 樓）通報，附 1 張照片',
+        text: '周小姐（A 棟 5 樓）通報，附 1 張照片',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
       {
@@ -320,7 +320,7 @@ export const cases = [
       {
         at: '2026-09-26T18:20',
         label: '住戶通報',
-        text: '周太太（A 棟 5 樓）通報',
+        text: '周小姐（A 棟 5 樓）通報',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
     ],
@@ -334,7 +334,7 @@ export const cases = [
     category: 'lighting',
     source: 'resident',
     isPrivate: false,
-    reporterId: 'u-r02', // 2026-10-16 從李伯伯改過來：展示時李伯伯的住戶首頁一開始是空狀態
+    reporterId: 'u-r02', // 2026-10-16 從李先生改過來：展示時李先生的住戶首頁一開始是空狀態
     reportedAt: '2026-09-25T08:40',
     description: 'B2 電梯口靠車道側的燈不亮，晚上取車時很暗。',
     photos: [],
@@ -359,7 +359,7 @@ export const cases = [
     category: 'leak',
     source: 'resident',
     isPrivate: false,
-    reporterId: 'u-r04', // 2026-10-16 從李伯伯改過來：展示時李伯伯的住戶首頁一開始是空狀態
+    reporterId: 'u-r04', // 2026-10-16 從李先生改過來：展示時李先生的住戶首頁一開始是空狀態
     reportedAt: '2026-09-23T16:05',
     description: '頂樓花園東側的灑水噴頭一直滴水，地面有積水。',
     photos: ['噴頭.jpg'],
@@ -405,7 +405,7 @@ export const cases = [
       {
         at: '2026-09-08T23:20',
         label: '住戶通報',
-        text: '李伯伯（A 棟 8 樓）通報',
+        text: '李先生（A 棟 8 樓）通報',
         residentText: '已收到通報，好彼管家已轉交管委會。',
       },
       { at: '2026-09-09T10:00', actorId: 'u-c02', label: '已受理', text: '張副主委受理', residentText: '管委會已受理。' },
@@ -446,7 +446,7 @@ export const cases = [
       {
         at: '2026-09-02T18:30',
         label: '住戶通報',
-        text: '李伯伯（A 棟 8 樓）通報',
+        text: '李先生（A 棟 8 樓）通報',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
       {

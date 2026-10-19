@@ -10,7 +10,7 @@ import {
 import { delay } from './helpers'
 
 // 依「目前用哪個身分看」決定要顯示的名稱與職稱
-// 例如李伯伯：住戶身分是「李伯伯」，管委會身分是「李主委」「主委」
+// 例如李先生：住戶身分是「李先生」，管委會身分是「李主委」「主委」
 // displayName 和 userLabel 同一套叫法（姓＋職稱，2026-10-16 跟著 userLabel 改）
 export function describeUser(user, role) {
   if (role === 'committee' && user.committeeTitle) {
@@ -53,7 +53,7 @@ export function userLabel(id) {
   return user.name
 }
 
-// 住戶端的示範住戶：預設是李伯伯，可以在 /playground 切換成不是委員的陳先生
+// 住戶端的示範住戶：預設是李先生，可以在 /playground 切換成不是委員的陳先生
 // 選了誰記在瀏覽器的 localStorage，重新整理網頁也還在；只影響這台裝置
 const DEMO_RESIDENT_KEY = 'hubitat-demo-resident'
 
