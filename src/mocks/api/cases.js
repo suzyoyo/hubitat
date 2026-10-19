@@ -288,7 +288,7 @@ function addLog(item, userId, label, text, residentText = '') {
 }
 
 // 關聯設備的狀態跟著案件變（沒有關聯設備就不做）
-//   'needs_repair' 待維修（受理時）/ 'normal' 正常使用中（結案時）
+//   'needs_repair' 待維修（選了關聯設備時）/ 'normal' 正常使用中（結案時）
 //   「維修中」不存在資料裡：廠商到場那天才算，由設備的假 API 用日期算（equipmentDisplayStatus）
 function setEquipmentStatus(item, status) {
   const device = equipment.find((entry) => entry.id === item.equipmentId)

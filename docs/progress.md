@@ -21,9 +21,9 @@
 - ✅ 住戶端「通報詳情」頁（`src/views/resident/ReportDetailView.vue`）分兩個 PR 做完：
   - ✅ 第一部分「看」（分支 `resident/report-detail`）：通報摘要卡 `ReportSummary`、處理進度卡 `ReportProgressCard`（裡面是 `ReportStepper`、`ReportRecord`），載入中與找不到通報的畫面
   - ✅ 第二部分「改」（2026-10-13，分支 `resident/report-edit`）：補充說明（200 字）、照片（最多 3 張）、確認修改
-    - **撤回通報拿掉了**（2026-10-15 和 013 決定，分支 `shared/remove-withdraw`）：`withdrawReport`、`canWithdraw`、`report/ReportWithdrawDialog`、`cancelled` 狀態都刪了。住戶修改時處理紀錄多一筆「住戶補充」留存，住戶的處理進度看到「你修改了補充說明。」，下面用灰色的備註小字（`type-note`，14px）記下改完的內容（`report/ReportRecord` 多了 `note`），管理端看到是誰改了什麼；這筆不算管委會的回覆。這次只改住戶端和假 API，管委會端的頁面沒動（013 正在改案件詳情）。Figma 的通報詳情要跟著拿掉「撤回通報」按鈕和撤回確認彈窗
+    - **撤回通報拿掉了**（2026-10-15 和 013 決定，分支 `shared/remove-withdraw`）：`withdrawReport`、`canWithdraw`、`report/ReportWithdrawDialog`、`cancelled` 狀態都刪了。住戶修改時處理紀錄多一筆「住戶補充」留存，住戶的處理進度看到「你修改了補充說明。」（#157 之後是「你補充了說明。」），下面用灰色的備註小字（`type-note`，14px）記下改完的內容（`report/ReportRecord` 多了 `note`），管理端看到是誰改了什麼；這筆不算管委會的回覆。這次只改住戶端和假 API，管委會端的頁面沒動（013 正在改案件詳情）。Figma 的通報詳情要跟著拿掉「撤回通報」按鈕和撤回確認彈窗
     - 只有自己通報、還沒結案的才能改，假 API 用 `canEdit` 告訴畫面；已完成的、只是按「我也遇到了」的都只能看
-    - 「補充說明」就是原本的問題描述（`description`），地點和主旨不能改
+    - 「補充說明」原本就是問題描述（`description`）；2026-10-19 起（#157）改成**每次都是空的、送出是新的一段**（`updateReport` 的 `supplement`，處理紀錄多一筆「住戶補充」，住戶看到「你補充了說明。」），原本的描述不能改，顯示在摘要卡的「你的描述」（代人登記的寫「通報描述」）。地點和主旨一樣不能改
     - 假 API 新增 `updateReport`，只改記憶體，重新整理網頁會變回原本的假資料
     - 新元件：`app/BottomCta`（固定在底部的按鈕區）
     - 照片區後來和新增通報統一了，見下面「新增通報」的說明
@@ -33,7 +33,7 @@
 - ✅ 住戶端「社區公告」頁（2026-10-12，分支 `resident/announcements`）：`src/views/resident/AnnouncementsView.vue`
   - 由上到下：社區行事曆 `CalendarCard`（`calendar/`，兩週日期＋圓點，不能點）、「與我有關／社區公告」分頁、公告卡 `NoticeCard`；載入中、空狀態（卡片樣式＋吉祥物）都做了
   - 分頁上的數字是「還沒看過的則數」，打開那個分頁就算看過、數字消失。已讀紀錄在假 API 的記憶體裡（`isRead`、`markAnnouncementsRead`），重新整理網頁會清空。從首頁彈窗看公告目前不算已讀
-  - 公告詳情彈窗 `NoticeDetailDialog`（`notice/`）首頁和公告頁共用；兩種公告卡都是整張可點、送出 `detail` 事件。設計稿的「留言給管委會」按鈕還沒放，等留言功能
+  - 公告詳情彈窗 `NoticeDetailDialog`（`notice/`）首頁和公告頁共用；兩種公告卡都是整張可點、送出 `detail` 事件。設計稿的「留言給管委會」按鈕不做（2026-10-19 決定公告不開放留言，住戶留言只在會議紀錄）
   - 公告卡和彈窗共用的規則放在 `src/lib/notice.js`（日期文字、主辦／負責）
   - 公告卡的徽章（2026-10-12 決定）：列表的 `NoticeCard` 只有類型、範圍兩個徽章，不放日期徽章（覺得太多，日期看內文）；首頁的 `NoticeHomeCard` 保留右上角的狀態徽章（施工中、今天開始＝紅；明天開始＝藍；N 天後開始＝灰）。Kit 的 `Notice/Card` 還有日期徽章，要跟著拿掉。活動的內容說明叫「活動說明」，其他叫「注意事項」
   - 公告沒有 `impact`（影響範圍說明）這個欄位了（2026-10-13 和 013 決定，PR #13 的討論）：發布公告的表單沒有地方填。首頁卡顯示「影響範圍：地點」＋內容說明前兩行（灰色）；列表卡顯示「注意事項：內容說明」前兩行；完整內容在彈窗的「注意事項」。首頁會議卡的重點決議內容也改成灰色
