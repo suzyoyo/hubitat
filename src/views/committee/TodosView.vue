@@ -40,7 +40,7 @@ onMounted(async () => {
 const TYPE_FILTERS = [
   { value: 'all', label: '全部', kinds: [] },
   { value: 'case', label: '案件', kinds: ['new_case', 'my_case', 'to_close'] }, // 新通報（待受理）、待我結案也算案件
-  { value: 'task', label: '交辦', kinds: ['assigned', 'confirm'] },
+  { value: 'task', label: '交辦', kinds: ['assigned', 'confirm', 'waiting'] },
   { value: 'incomplete', label: '需補資料', kinds: ['incomplete'] },
   { value: 'expiring', label: '快到期文件', kinds: ['expiring'] },
   { value: 'sign', label: '待簽核', kinds: ['sign', 'review'] },

@@ -53,7 +53,8 @@ const dateLine = computed(() => {
     </div>
     <!-- 只是提示「可以點」，整張卡本身就是連結 -->
     <p class="flex items-center justify-end gap-1 type-link text-foreground">
-      {{ isDone ? '查看詳情' : '前往完成' }}
+      <!-- 已完成、在等別人的（waiting）不用我做事，寫「查看詳情」 -->
+      {{ isDone || todo.kind === 'waiting' ? '查看詳情' : '前往完成' }}
       <ChevronRightIcon class="size-4" />
     </p>
   </RouterLink>

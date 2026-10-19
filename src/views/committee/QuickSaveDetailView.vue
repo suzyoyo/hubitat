@@ -40,6 +40,11 @@ async function load() {
     getCases(),
   ])
   userId.value = user.id
+  // 已經歸到案件的，直接換到那件案件的詳情（2026-10-19）：要看的是案件，留存只是附在處理紀錄裡
+  if (save?.linked?.type === 'case') {
+    router.replace(`/${route.meta.roleId}/cases/${save.linked.id}`)
+    return
+  }
   item.value = save
   // 只列處理中的案件（已受理、處理中）：還沒受理的先去受理，待結案的已經完工了
   openCases.value = caseList.filter((entry) => ['accepted', 'in_progress'].includes(entry.status))

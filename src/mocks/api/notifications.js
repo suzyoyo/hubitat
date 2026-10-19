@@ -13,7 +13,8 @@ export async function getNotifications(userId, role, unreadOnly = false) {
   return notifications
     .filter((item) => item.userId === userId && item.role === role)
     .filter((item) => !unreadOnly || !item.read)
-    .toSorted((a, b) => b.at.localeCompare(a.at))
+    // 新的在前；同一個時間（假資料的「現在」都一樣）的，後來才加的排前面（2026-10-19：原本受理排在結案上面）
+    .toSorted((a, b) => b.at.localeCompare(a.at) || notifications.indexOf(b) - notifications.indexOf(a))
     .map((item) => {
       const daysAgo = diffDays(item.at.split('T')[0], MOCK_TODAY)
       let group = 'earlier'

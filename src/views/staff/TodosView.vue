@@ -42,8 +42,8 @@ onMounted(async () => {
 //   選項固定，不管有沒有這類待辦都列出來（dev-guide 第 5 節「篩選」）
 const TYPE_FILTERS = [
   { value: 'all', label: '全部', kinds: [] },
-  { value: 'case', label: '案件', kinds: ['new_case', 'in_progress', 'to_verify'] },
-  { value: 'task', label: '交辦給我的', kinds: ['assigned'] },
+  { value: 'case', label: '案件', kinds: ['new_case', 'in_progress', 'to_verify', 'waiting'] },
+  { value: 'task', label: '交辦給我的', kinds: ['assigned', 'waiting'] },
   { value: 'incomplete', label: '需補資料', kinds: ['incomplete'] },
 ]
 const type = ref('all')
