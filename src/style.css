@@ -286,14 +286,11 @@
   letter-spacing: 0.6px;
 }
 
-/* 首頁問候列的漸層：由下方的淺藍漸變到上方的白色 */
+/* 首頁問候列的漸層：由上往下 #eaf4f9 → 淺藍 blue-100
+   上方接頂部列漸層的最後一個顏色（AppHeader，白 → #eaf4f9），兩塊才會無縫接起來（2026-10-19）
+   原本是斜的（-6.8deg，上方接近白色），和頂部列交界會看到一條線 */
 @utility bg-header-panel {
-  background-image: linear-gradient(
-    -6.8deg,
-    var(--color-blue-100) 12.5%,
-    #e6f1f7 80.6%,
-    #ffffff 148.7%
-  );
+  background-image: linear-gradient(to bottom, #eaf4f9, var(--color-blue-100));
 }
 
 /* 頁面背景的光暈：從畫面左下角往上散開的淡藍色 */
