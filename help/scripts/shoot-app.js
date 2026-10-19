@@ -221,6 +221,15 @@ const SHOTS = [
       await page.getByRole('dialog').locator('textarea, input').first().fill('門把還是會鬆，請再確認一次')
     },
   },
+  // 快速留存（2026-10-19 加）
+  {
+    file: 'quick-save-form', path: '/committee/quick-saves/new',
+    run: async (page) => {
+      await page.locator('#quick-save-name').fill('電梯保養單 10/01')
+      await page.locator('#quick-save-note').fill('保養廠商現場給的單據，之後歸到電梯的案件')
+    },
+  },
+  { file: 'quick-save-detail', path: '/committee/quick-saves/qs-003' }, // 李主委還沒補齊的「中庭植栽報價單」
   { file: 'committee-contract-detail', path: '/committee/contracts/ct-001', clip: (page) => clipAbove(page, '下載 PDF') },
   { file: 'committee-task-detail', path: '/committee/tasks/TASK-104' }, // 對方已回報、待我確認
   { file: 'resident-report-progress', path: '/resident/reports/CASE-20260925-003', stage: stageResident, run: (page) => scrollTo(page, '處理進度', 70) },
@@ -307,6 +316,19 @@ const SHOTS = [
     file: 'done-case-closed', path: '/committee/cases/CASE-20260922-002/close',
     run: async (page) => {
       await tap(page, '結案')
+      await wait(page, 1200)
+    },
+  },
+  {
+    // 從首頁按「＋」進來，留存後才會回到首頁（直接打網址進來也會回首頁，這樣比較像真的操作）
+    file: 'done-quick-save', path: '/committee/home',
+    run: async (page) => {
+      await page.getByRole('button', { name: /新增/ }).last().click()
+      await wait(page)
+      await page.getByText('快速留存', { exact: true }).click()
+      await wait(page, 900)
+      await page.locator('#quick-save-name').fill('電梯保養單 10/01')
+      await tap(page, '留存')
       await wait(page, 1200)
     },
   },

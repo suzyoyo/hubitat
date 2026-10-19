@@ -22,7 +22,7 @@ export default {
     {
       heading: '右下角的「＋」',
       blocks: [
-        { type: 'p', text: '按右下角的「＋」，可以快速新增通報；主委、副主委還可以新增交辦、發布公告。' },
+        { type: 'p', text: '按右下角的「＋」，可以新增通報、快速留存單據照片；主委、副主委還可以新增交辦、發布公告。' },
         { type: 'image', screenshot: { file: 'committee-fab-menu.jpg', alt: '按「＋」後跳出的新增選單' } },
       ],
     },

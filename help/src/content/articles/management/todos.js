@@ -32,6 +32,8 @@ export default {
       heading: '看懂待辦卡片',
       blocks: [
         { type: 'p', text: '卡片第二行會告訴你是誰、什麼時候、做到哪裡，例如「吳小姐（A 棟 2 樓）・2 小時前通報」。' },
+        // 快速留存、存成草稿的卡片（App #141、#160，2026-10-19 加）
+        { type: 'p', text: '「待補資料」是你快速留存、還沒歸到案件的單據照片；「未送出」是你存成草稿、還沒送出的表單，點了就能繼續填。' },
         {
           type: 'badges',
           items: [
@@ -44,5 +46,5 @@ export default {
       ],
     },
   ],
-  relatedArticles: ['case-accept', 'case-close', 'task-report'],
+  relatedArticles: ['case-accept', 'case-close', 'task-report', 'quick-save'],
 }
