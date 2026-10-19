@@ -49,6 +49,7 @@ help/
    │  │  ├─ resident/              住戶
    │  │  └─ management/            管委會、管理人員
    │  ├─ about.js                  「認識我們」頁的服務介紹、好彼管家比比
+   │  ├─ home-tour.js              三種身分首頁的導覽輪播（「認識 App 首頁」和「認識○○首頁」共用）
    │  ├─ categories.js             文章分類
    │  ├─ roles.js                  三種身分
    │  ├─ faqs.js                   常見問題
@@ -124,7 +125,7 @@ sections: [
       { type: 'tip', title: '小提示', text: '…' },
       { type: 'warning', title: '請注意', text: '…' },
       { type: 'image', screenshot: { file: '檔名.jpg', alt: '圖上有什麼' } },
-      { type: 'tour', slides: [{ role: 'resident', file: '檔名.jpg', alt: '圖上有什麼', marks: [{ boxes: [[x, y, 寬, 高]], zone: 'top', align: 'right', text: '說明' }] }] }, // tab 切身分、每個身分一組輪播，一張亮一個地方，見 ScreenTour.vue
+      { type: 'tour', slides: [{ role: 'resident', file: '檔名.jpg', alt: '圖上有什麼', marks: [{ boxes: [[x, y, 寬, 高]], zone: 'top', align: 'right', text: '說明' }] }] }, // tab 切身分、每個身分一組輪播，一張亮一個地方，見 ScreenTour.vue；只有一組時不顯示 tab
     ],
   },
 ]
@@ -154,7 +155,7 @@ sections: [
 - 「開啟通知」提醒卡：設成這次已按過「先不要」，不會出現在截圖裡
 - 示範資料刻意讓李先生一開始沒有通報、通知全部已讀（現場展示用）。截住戶的通報和通知畫面前，腳本會暫時把兩筆案件改成李先生通報的、兩則通知改成未讀（只改那次打開的網頁，不會改到 App 的程式）
 - 不拍字體大小設定、QR Code、下載按鈕：用裁切或捲動避開
-- 「認識 App 首頁」亮起來的地方和說明是網頁畫在截圖上的（`ScreenTour.vue`），截圖本身是乾淨的。亮的位置寫在文章的 `boxes`，App 的鈴鐺、導覽列位置改了要跟著改
+- 「認識 App 首頁」和「認識住戶／管委會／管理人員首頁」的輪播：亮起來的地方和說明是網頁畫在截圖上的（`ScreenTour.vue`），截圖本身是乾淨的。資料都在 `src/content/home-tour.js`，改一次四篇一起更新；亮的位置寫在 `boxes`，App 的鈴鐺、待辦、按鈕位置改了要跟著改
 
 ## 認識我們、常見問題、聯絡支援
 

@@ -8,7 +8,7 @@ export const ROLES = [
     label: '住戶',
     entry: '我是住戶',
     description: '通報社區問題、查看處理進度，閱讀公告與會議紀錄。',
-    quickStart: ['app-screen', 'new-report', 'report-progress'],
+    quickStart: ['resident-home', 'new-report', 'report-progress'],
   },
   {
     id: 'committee',

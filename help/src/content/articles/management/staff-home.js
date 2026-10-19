@@ -1,3 +1,5 @@
+import { homeTourOf } from '../../home-tour.js'
+
 export default {
   id: 'staff-home',
   title: '認識管理人員首頁',
@@ -11,14 +13,10 @@ export default {
     {
       heading: '首頁有什麼',
       blocks: [
-        { type: 'image', screenshot: { file: 'staff-home.jpg', alt: '管理人員首頁，有問候語、我的待辦、公告與動態' } },
-        {
-          type: 'list',
-          items: [
-            '「我的待辦」：最新要處理的事，例如住戶剛通報的問題、交給你的工作。按「查看 N 件待辦」看全部。',
-            '「公告與動態」：社區最新的公告。',
-          ],
-        },
+        // 輪播的資料和「認識 App 首頁」共用（content/home-tour.js），2026-10-19 從「截圖＋清單」改來
+        { type: 'tour', slides: homeTourOf('staff') },
+        // 輪播沒介紹到的，用一句話補上
+        { type: 'p', text: '往下滑還有「公告與動態」，是社區最新的公告。' },
       ],
     },
     {

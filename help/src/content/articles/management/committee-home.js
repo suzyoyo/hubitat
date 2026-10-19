@@ -1,3 +1,5 @@
+import { homeTourOf } from '../../home-tour.js'
+
 export default {
   id: 'committee-home',
   title: '認識管委會首頁',
@@ -11,16 +13,10 @@ export default {
     {
       heading: '首頁有什麼',
       blocks: [
-        { type: 'image', screenshot: { file: 'committee-home.jpg', alt: '管委會首頁，由上到下是問候語、我的待辦、捷徑、住戶意見、公告與動態' } },
-        {
-          type: 'list',
-          items: [
-            '「我的待辦」：最新要處理的事。按「查看 N 件待辦」看全部。',
-            '「交辦進度」：你交給管理人員的工作做到哪裡。',
-            '「住戶意見」：住戶在會議紀錄裡的留言。',
-            '「公告與動態」：社區的公告，點一下就能看內容。',
-          ],
-        },
+        // 輪播的資料和「認識 App 首頁」共用（content/home-tour.js），2026-10-19 從「截圖＋清單」改來
+        { type: 'tour', slides: homeTourOf('committee') },
+        // 輪播沒介紹到的，用一句話補上
+        { type: 'p', text: '往下滑還有「住戶意見」，是住戶在會議紀錄裡的留言；以及「公告與動態」，點一下就能看公告內容。' },
       ],
     },
     {
@@ -28,6 +24,21 @@ export default {
       blocks: [
         { type: 'p', text: '按右下角的「＋」，可以快速新增通報；主委、副主委還可以新增交辦、發布公告。' },
         { type: 'image', screenshot: { file: 'committee-fab-menu.jpg', alt: '按「＋」後跳出的新增選單' } },
+      ],
+    },
+    {
+      // 只寫已經做好的功能（2026-10-19 加，參考管理人員首頁的寫法）
+      heading: '底部的分頁',
+      blocks: [
+        {
+          type: 'list',
+          items: [
+            '「案件」：住戶通報的所有問題。',
+            '「廠商」：廠商的緊急聯絡電話、鑰匙放在哪裡，還有廠商名冊。',
+            '「社區」：廠商合約、設備清冊。',
+            '「我的」：切換到住戶、查看緊急標示使用紀錄。',
+          ],
+        },
       ],
     },
   ],

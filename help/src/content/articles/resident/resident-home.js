@@ -1,3 +1,5 @@
+import { homeTourOf } from '../../home-tour.js'
+
 export default {
   id: 'resident-home',
   title: '認識住戶首頁',
@@ -11,23 +13,24 @@ export default {
     {
       heading: '首頁有什麼',
       blocks: [
-        {
-          type: 'image',
-          screenshot: { file: 'resident-home.jpg', alt: '住戶首頁，由上到下是問候語、我的通報、公告與動態、會議紀錄' },
-        },
-        {
-          type: 'list',
-          items: [
-            '「我的通報」：你還在處理中的通報。想通報新問題，按「新增通報」。',
-            '「公告與動態」：和你有關的公告，例如停水、施工。點一下就能看內容。',
-            '會議紀錄：管委會最近一次開會的紀錄。',
-          ],
-        },
+        // 輪播的資料和「認識 App 首頁」共用（content/home-tour.js），2026-10-19 從「截圖＋清單」改來
+        { type: 'tour', slides: homeTourOf('resident') },
+        // 輪播沒介紹到的，用一句話補上（「發現問題時」那一段和輪播的通報那張重複，拿掉了）
+        { type: 'p', text: '「我的通報」會列出你還在處理中的通報；往下滑還有「會議紀錄」，是管委會最近一次開會的紀錄。' },
       ],
     },
     {
-      heading: '發現問題時',
-      blocks: [{ type: 'p', text: '畫面右下角紅色的「通報」按鈕隨時都在，發現社區有問題，按它就能通報。' }],
+      // 只寫已經做好的功能（2026-10-19 加，參考管理人員首頁的寫法）
+      heading: '底部的分頁',
+      blocks: [
+        {
+          type: 'list',
+          items: [
+            '「社區」：社區設備的維修紀錄。',
+            '「我的」：看你的留言、加入管委會。同時是委員的人，也在這裡切換到管委會。',
+          ],
+        },
+      ],
     },
   ],
   relatedArticles: ['new-report', 'my-reports', 'announcements', 'app-screen'],

@@ -11,7 +11,8 @@ export default {
   steps: [
     {
       title: '到「我的」頁',
-      body: '按下方的「我的」。',
+      body: '按導覽列「我的」分頁。',
+      screenshot: { file: 'resident-home.jpg', alt: '住戶首頁，最下面的導覽列有「我的」' },
     },
     {
       title: '按切換按鈕',

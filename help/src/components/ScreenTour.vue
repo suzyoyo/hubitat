@@ -10,11 +10,10 @@
 //       zone：說明框放上半部（'top'）還是下半部（'bottom'）
 //       top（選填）：說明框的上緣放在截圖的哪個高度（px），有寫就不看 zone；用來貼在亮的地方下面
 //       align：靠左（'left'）、靠右（'right'）或置中（'center'）
-//   一開始顯示「現在看哪個身分」那一組
+//   一開始一律顯示第一組（住戶）（2026-10-19 從「現在看哪個身分」改來）
 import { ChevronLeftIcon, ChevronRightIcon } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import { ROLES } from '@/content/roles'
-import { currentRole } from '@/lib/role'
 import { screenshotUrl } from '@/lib/screenshots'
 
 const props = defineProps({
@@ -32,7 +31,7 @@ const list = computed(() =>
 )
 
 // ── 身分 tab ──
-const roleIndex = ref(Math.max(0, list.value.findIndex((slide) => slide.role === currentRole.value)))
+const roleIndex = ref(0)
 const role = computed(() => list.value[roleIndex.value])
 
 // ── 輪播 ──
@@ -92,8 +91,8 @@ function goTo(index) {
 
 <template>
   <div v-if="list.length" class="space-y-4">
-    <!-- 身分 tab：靠左 -->
-    <div class="flex gap-2" role="group" aria-label="選擇身分">
+    <!-- 身分 tab：靠左；只有一個身分（「認識○○首頁」）時不顯示 -->
+    <div v-if="list.length > 1" class="flex gap-2" role="group" aria-label="選擇身分">
       <button
         v-for="(slide, index) in list"
         :key="slide.role"
