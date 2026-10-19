@@ -89,8 +89,9 @@ const buttonText = computed(() => {
 <template>
   <Popover v-model:open="open">
     <PopoverTrigger as-child>
-      <!-- $attrs：頁面傳的 id、aria-invalid 會放在這顆按鈕上，<Label for="..."> 才對得到 -->
-      <Button v-bind="$attrs" type="button" variant="outline" class="w-full">
+      <!-- $attrs：頁面傳的 id、aria-invalid 會放在這顆按鈕上，<Label for="..."> 才對得到
+           v-bind 放在後面：頁面傳 variant、class 可以蓋過預設的樣子 -->
+      <Button type="button" variant="outline" class="w-full" v-bind="$attrs">
         <CalendarIcon />
         {{ buttonText }}
       </Button>

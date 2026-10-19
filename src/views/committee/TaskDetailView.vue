@@ -7,6 +7,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import BottomCta from '@/components/app/BottomCta.vue'
+import CaseFileGrid from '@/components/case/CaseFileGrid.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
@@ -165,8 +166,8 @@ const recordRows = computed(() => {
   const rows = []
   if (item.report) {
     const note = item.report.note ? `\n${item.report.note}` : ''
-    const files = item.report.files?.length ? `\n附件：${item.report.files.join('、')}` : ''
-    rows.push({ label: '回報完成', at: item.report.at, value: `${dateText(item.report.at)}${note}${files}` })
+    // 附件不寫檔名，在下面排成一排照片（2026-10-19 013）
+    rows.push({ label: '回報完成', at: item.report.at, value: `${dateText(item.report.at)}${note}`, files: item.report.files ?? [] })
   }
   if (item.returnNote) {
     const { at, note } = item.returnNote
@@ -243,10 +244,14 @@ const recordRows = computed(() => {
       <!-- 還沒有任何回報、退回、確認、撤回時，整張不顯示 -->
       <section v-if="recordRows.length" class="space-y-3.5 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">處理紀錄</h2>
-        <div v-for="row in recordRows" :key="row.label" class="flex items-baseline gap-3">
-          <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
-          <!-- whitespace-pre-line：值裡的 \n 會換行 -->
-          <p class="min-w-0 flex-1 text-right whitespace-pre-line type-body-strong text-foreground">{{ row.value }}</p>
+        <div v-for="row in recordRows" :key="row.label" class="space-y-3">
+          <div class="flex items-baseline gap-3">
+            <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
+            <!-- whitespace-pre-line：值裡的 \n 會換行 -->
+            <p class="min-w-0 flex-1 text-right whitespace-pre-line type-body-strong text-foreground">{{ row.value }}</p>
+          </div>
+          <!-- 回報的附件：和案件詳情一樣一排、可以左右滑，點了全螢幕看 -->
+          <CaseFileGrid v-if="row.files?.length" :files="row.files" :title="row.label" />
         </div>
       </section>
 
