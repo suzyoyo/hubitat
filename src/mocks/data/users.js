@@ -1,7 +1,7 @@
 // 成員假資料：住戶、委員、管理人員
 // 欄位說明：
 //   id             唯一編號（u-c 開頭是委員、u-s 是管理人員、u-r 是一般住戶）
-//   name           住戶身分顯示的名稱
+//   name           住戶身分顯示的名稱：一律是姓＋先生／小姐，照生理性別分（不用伯伯、太太，2026-10-18）
 //   surname        姓。委員身分會顯示成「姓 + 委員」，例如「李委員」
 //   roles          這個人有哪些身分，可以不只一個：
 //                  'resident' 住戶 / 'committee' 管委會 / 'staff' 管理人員
@@ -35,10 +35,10 @@ export const STAFF_TITLES = {
 }
 
 export const users = [
-  // 示範用的主角：李伯伯是住戶，同時也是主委（管委會端顯示「李委員」）
+  // 示範用的主角：李先生是住戶，同時也是主委（管委會端顯示「李委員」）
   {
     id: 'u-c04',
-    name: '李伯伯',
+    name: '李先生',
     surname: '李',
     roles: ['resident', 'committee'],
     building: 'A',
@@ -58,7 +58,7 @@ export const users = [
   },
   {
     id: 'u-c02',
-    name: '張太太',
+    name: '張小姐',
     surname: '張',
     roles: ['resident', 'committee'],
     building: 'B',
@@ -92,7 +92,7 @@ export const users = [
   // 一般住戶（通報人、留言人會用到）
   { id: 'u-r01', name: '陳先生', surname: '陳', roles: ['resident'], building: 'B', unit: '8樓之2' },
   { id: 'u-r02', name: '吳小姐', surname: '吳', roles: ['resident'], building: 'A', unit: '2樓之1' },
-  { id: 'u-r03', name: '周太太', surname: '周', roles: ['resident'], building: 'A', unit: '5樓之2' },
+  { id: 'u-r03', name: '周小姐', surname: '周', roles: ['resident'], building: 'A', unit: '5樓之2' },
   { id: 'u-r04', name: '許先生', surname: '許', roles: ['resident'], building: 'C', unit: '4樓之1' },
   // 2026-10-16 加：B 棟 5 樓噪音的通報人（樓下吵，所以住 6 樓）。原本是陳先生，
   //   改掉是為了讓示範住戶陳先生一開始沒有進行中的通報（展示最後「我的通報」是空狀態）
@@ -105,7 +105,7 @@ export const DEMO_RESIDENT_IDS = ['u-c04', 'u-r01']
 
 // 還沒有登入功能：先固定每個角色「目前登入」的是誰
 export const CURRENT_USER_IDS = {
-  resident: 'u-c04', // 李伯伯
+  resident: 'u-c04', // 李先生
   committee: 'u-c04', // 李委員（同一個人，切換到管委會身分）
   staff: 'u-s02', // 張管理員
 }

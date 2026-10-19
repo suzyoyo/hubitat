@@ -108,7 +108,7 @@ function download() {
     <Empty v-else-if="!contract" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">找不到這份合約</EmptyTitle>
       <EmptyDescription class="type-body">可能已經刪除，或是網址不正確。</EmptyDescription>
@@ -160,7 +160,7 @@ function download() {
           </button>
         </div>
         <p v-else class="type-body text-muted-foreground">還沒有上傳合約檔案</p>
-        <Button v-if="pages.length" variant="outline" class="w-full" @click="download">
+        <Button v-if="pages.length" variant="secondary" class="w-full" @click="download">
           <DownloadIcon />
           下載 PDF
         </Button>

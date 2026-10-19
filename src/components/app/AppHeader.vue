@@ -58,11 +58,12 @@ function goBack() {
   <!-- Brand：logo＋通知鈴鐺 -->
   <header
     v-else
-    class="sticky top-0 z-10 flex items-center justify-between bg-background pr-3 pb-2.5 pl-5 pt-[max(10px,env(safe-area-inset-top))]"
+    class="sticky top-0 z-10 flex items-center justify-between bg-background pr-5 pb-2.5 pl-5 pt-[max(10px,env(safe-area-inset-top))]"
   >
     <!-- width / height 寫原圖尺寸，讓瀏覽器先算好比例；實際顯示高度由 h-[26px] 決定 -->
     <img :src="logoUrl" alt="好彼社區" width="303" height="67" class="h-[26px] w-auto" />
-    <!-- 外層 44px 是可點擊範圍（長輩好按），裡面的藍色圓形是設計稿的 40px -->
+    <!-- 外層 44px 是可以點的範圍（長輩好按），裡面的藍色圓形是設計稿的 40px；鈴鐺 20px（2026-10-19 從設計稿的 16px 放大，原本太小看不清楚） -->
+    <!-- 右邊距 pr-5 和內容一樣是 20px；-mr-0.5 抵掉 44px 和 40px 差的 2px，藍色圓形的右邊才會和卡片對齊 -->
     <RouterLink
       :to="notificationsTo"
       :aria-label="hasUnread ? '通知，有未讀' : '通知'"
@@ -70,7 +71,7 @@ function goBack() {
     >
       <!-- relative：讓紅點對齊藍色圓形的右上角 -->
       <span class="relative flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-        <BellIcon class="size-4" />
+        <BellIcon class="size-5" />
         <!-- 未讀紅點：和通知頁每一則的未讀紅點同一個顏色；白色外圈讓它在藍色上看得清楚 -->
         <span
           v-if="hasUnread"

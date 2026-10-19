@@ -6,6 +6,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import LeaveConfirmDialog from '@/components/feedback/LeaveConfirmDialog.vue'
 import BottomCta from '@/components/app/BottomCta.vue'
 import CaseAttachmentList from '@/components/case/CaseAttachmentList.vue'
 import { Badge } from '@/components/ui/badge'
@@ -15,6 +16,7 @@ import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { formatFullDate } from '@/lib/date'
+import { restoreDraft } from '@/lib/draft'
 import { getCurrentUser, getTaskById, reportTask } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
@@ -40,6 +42,10 @@ async function load() {
   userId.value = user.id
   task.value = await getTaskById(route.params.id)
   loading.value = false
+  await restoreDraft(user.id, route.fullPath, (data) => {
+    files.value = data.files
+    note.value = data.note
+  })
 }
 watch(() => route.params.id, load, { immediate: true })
 
@@ -73,11 +79,16 @@ async function submit() {
     return
   }
   confirmOpen.value = false
+  saved.value = true // 送出成功，換頁時不用再問
   toast.success('已回報完成', { description: `等待${task.value.assignerLabel}確認` })
   // 從交辦詳情來的就回上一頁；直接打開這一頁的（沒有上一頁）就換到交辦詳情
   if (window.history.state?.back === detailPath.value) router.back()
   else router.replace(detailPath.value)
 }
+
+// 有沒有填東西（離開前確認用）；送出成功後 saved 變 true，換頁不用再問
+const saved = ref(false)
+const isDirty = computed(() => !saved.value && Boolean(files.value.length || note.value.trim()))
 </script>
 
 <template>
@@ -92,7 +103,7 @@ async function submit() {
     <Empty v-else-if="!task || !canReport" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">{{ task ? '這件交辦現在不能回報完成' : '找不到這件交辦' }}</EmptyTitle>
       <EmptyDescription class="type-body">
@@ -158,5 +169,7 @@ async function submit() {
         </div>
       </DialogContent>
     </Dialog>
+    <!-- 填到一半想離開時先問一次 -->
+    <LeaveConfirmDialog :dirty="isDirty" :draft-title="`交辦回報：${task?.title ?? ''}`" :draft-data="{ files, note }" />
   </div>
 </template>

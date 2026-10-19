@@ -169,7 +169,8 @@ const supportItems = [
     </section>
 
     <!-- 還沒有登入功能，登出先回到角色選擇頁 -->
-    <Button as-child variant="outline" class="w-full">
+    <!-- 淺藍按鈕的字和底線，底色改白色（2026-10-19 013：放在淺色頁面上比較清楚）；按鈕規則的例外，只有登出這顆 -->
+    <Button as-child variant="secondary" class="w-full bg-card hover:bg-muted">
       <RouterLink to="/">登出帳號</RouterLink>
     </Button>
 

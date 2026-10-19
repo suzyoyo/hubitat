@@ -6,6 +6,8 @@ defineProps({
   title: { type: String, required: true },
   // 「看全部」要連到哪一頁；不傳就不顯示連結
   to: { type: String, default: '' },
+  // 連結的文字，例如「查看所有廠商」（2026-10-18 加）
+  linkText: { type: String, default: '看全部' },
 })
 </script>
 
@@ -13,13 +15,15 @@ defineProps({
   <div class="flex items-center justify-between">
     <h2 class="type-title text-heading">{{ title }}</h2>
     <!-- h-11 是 44px 的可點擊範圍；-my-1 讓這一列的高度維持設計稿的 36px -->
+    <!-- 箭頭尖和卡片右邊對齊（2026-10-18）：-mr-2.5 抵掉按鈕左右各 10px 的點擊範圍，
+         箭頭的 -mr-1.5 抵掉 icon 本身右邊約 6px 的透明空白。只是往外推、沒有裁掉，外層不要加 overflow-hidden -->
     <RouterLink
       v-if="to"
       :to="to"
-      class="-my-1 flex h-11 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
+      class="-my-1 -mr-2.5 flex h-11 items-center gap-1 rounded-lg px-2.5 type-link tracking-[0.4px] text-heading"
     >
-      看全部
-      <ChevronRightIcon class="size-4" />
+      {{ linkText }}
+      <ChevronRightIcon class="-mr-1.5 size-4" />
     </RouterLink>
   </div>
 </template>

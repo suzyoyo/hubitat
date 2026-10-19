@@ -6,7 +6,7 @@
 //   底部：更新進度＋完工驗收（到回報完成頁）並排；受理（按了就受理）、交辦（到新增交辦頁）、
 //   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
 //   沒有「撤回通報」：2026-10-15 和 013 決定拿掉撤回，不需要處理的通報由處理的人完工驗收時寫明原因結案
-import { ChevronRightIcon, ImageIcon, VideoIcon } from '@lucide/vue'
+import { ChevronRightIcon } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
@@ -14,6 +14,7 @@ import { caseStatusBadge } from '@/components/admin/caseStatusBadge'
 import BottomCta from '@/components/app/BottomCta.vue'
 import CaseCategoryPicker from '@/components/case/CaseCategoryPicker.vue'
 import CaseEquipmentPicker from '@/components/case/CaseEquipmentPicker.vue'
+import CaseFileGrid from '@/components/case/CaseFileGrid.vue'
 import CaseLogForm from '@/components/case/CaseLogForm.vue'
 import CaseVendorPicker from '@/components/case/CaseVendorPicker.vue'
 import { Badge } from '@/components/ui/badge'
@@ -98,6 +99,9 @@ const canPickVendor = computed(() => canHandle.value && ['accepted', 'in_progres
 // 主委、副主委看待結案的案件：只做審核（退回或確認結案），不寫處理紀錄（2026-10-16）
 const isReviewing = computed(() => item.value?.status === 'to_verify' && canCloseCases(userId.value))
 // 受理之後、結案之前都能寫處理紀錄（審核中的主委、副主委除外）
+// 處理紀錄由新到舊（假資料存的是由舊到新，toReversed 不會改到原本的陣列）
+const logsNewestFirst = computed(() => item.value?.logs.toReversed() ?? [])
+
 const canAddLog = computed(
   () => canHandle.value && !isReviewing.value && ['accepted', 'in_progress', 'to_verify'].includes(item.value?.status),
 )
@@ -116,7 +120,7 @@ const actions = computed(() => {
   if (['accepted', 'in_progress'].includes(data.status) && canHandle.value && !delegated) {
     list.push({ key: 'complete', label: '完工驗收', main: true })
   }
-  if (delegated && openTask.value.assignerId === userId.value) list.push({ key: 'withdraw', label: '撤回交辦' })
+  if (delegated && openTask.value.assignerId === userId.value) list.push({ key: 'withdraw', label: '撤回交辦', danger: true })
   // 待結案：主委、副主委都可以審核，不管是誰受理的（2026-10-15 改，原本只有負責人）
   //   左「退回」跳彈窗寫原因；右「確認結案」到結案頁填費用、結案說明（2026-10-16）
   if (isReviewing.value) {
@@ -195,7 +199,7 @@ async function sendBack() {
   toast.success('已退回', { description: `已通知${result.handlerLabel || '管理人員'}再處理` })
 }
 
-// 受理：按了就受理，受理的人是負責人（分類受理後在「問題分類」卡片改；處理期限還在討論要不要給案件填）
+// 受理：按了就受理，受理的人是負責人（分類受理後在「問題分類」卡片改；處理期限不用填，用交辦的完成期限）
 async function accept() {
   pending.value = true
   const result = await acceptCase(item.value.id, userId.value)
@@ -251,6 +255,7 @@ function dateTimeText(value) {
 // 第一張卡下面的資訊列：label 是左邊的標籤，value 是右邊的內容
 const basicRows = computed(() => {
   const data = item.value
+  // 處理期限：交辦的完成期限（假 API 算好的，2026-10-18）；沒有交辦就是「尚未設定」，也不會逾期
   let deadline = '尚未設定'
   if (data.deadline) {
     deadline = formatFullDate(data.deadline)
@@ -265,10 +270,6 @@ const basicRows = computed(() => {
   ]
 })
 
-// 看副檔名判斷是不是影片，例如 .mp4、.mov（和通報的照片格同一個規則）
-function isVideo(name) {
-  return /\.(mp4|mov|m4v|webm|avi)$/i.test(name)
-}
 </script>
 
 <template>
@@ -284,7 +285,7 @@ function isVideo(name) {
     <Empty v-else-if="!item" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">找不到這件案件</EmptyTitle>
       <EmptyDescription class="type-body">可能已經刪除，或是網址不正確。</EmptyDescription>
@@ -310,26 +311,13 @@ function isVideo(name) {
         </div>
       </section>
 
-      <!-- 通報人寫的描述 -->
+      <!-- 住戶通報：描述＋現場照片／影片合成一張卡（2026-10-19，原本兩張卡，處理進度被擠到太下面）
+           照片排成一排、可以左右滑（case/CaseFileGrid） -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
-        <h2 class="type-card-title text-foreground">住戶通報描述</h2>
-        <p class="type-body text-muted-foreground">{{ item.description ? `「${item.description}」` : '沒有填寫' }}</p>
-      </section>
-
-      <!-- 現場照片／影片：假資料只有檔名，先顯示圖示和檔名 -->
-      <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
-        <h2 class="type-card-title text-foreground">現場照片／影片</h2>
-        <div v-if="item.photos.length" class="grid grid-cols-2 gap-3">
-          <div
-            v-for="name in item.photos"
-            :key="name"
-            class="flex h-[100px] flex-col items-center justify-center gap-1.5 rounded-lg bg-muted px-2"
-          >
-            <component :is="isVideo(name) ? VideoIcon : ImageIcon" class="size-7 text-muted-foreground" />
-            <p class="w-full truncate text-center type-date text-muted-foreground">{{ name }}</p>
-          </div>
-        </div>
-        <p v-else class="type-body text-muted-foreground">沒有照片或影片</p>
+        <h2 class="type-card-title text-foreground">住戶通報</h2>
+        <p class="type-body text-muted-foreground">{{ item.description ? `「${item.description}」` : '沒有填寫描述' }}</p>
+        <CaseFileGrid v-if="item.photos.length" :files="item.photos" title="現場照片" />
+        <p v-else class="type-date text-muted-foreground">沒有照片或影片</p>
       </section>
 
       <!-- 問題分類：可以選廠商的時候（已受理、處理中）才出現，2026-10-17 加
@@ -392,10 +380,15 @@ function isVideo(name) {
         </div>
       </section>
 
-      <!-- 處理進度與留痕：由舊到新 -->
+      <!-- 處理進度與留痕：新增的欄位在最上面，紀錄由新到舊（2026-10-19 改，原本欄位在最下面、紀錄由舊到新，
+           紀錄一多，不管要看最新的還是要新增，都要滑到最下面） -->
       <section class="space-y-3.5 rounded-xl bg-card p-4 shadow-card">
         <h2 class="type-card-title text-foreground">處理進度與留痕</h2>
-        <template v-for="(log, index) in item.logs" :key="`${log.at}-${index}`">
+        <template v-if="canAddLog">
+          <CaseLogForm v-model:draft="logDraft" />
+          <Separator />
+        </template>
+        <template v-for="(log, index) in logsNewestFirst" :key="`${log.at}-${index}`">
           <Separator v-if="index > 0" />
           <div class="flex gap-3">
             <p class="w-[88px] shrink-0 type-date text-muted-foreground">{{ dateTimeText(log.at) }}</p>
@@ -406,10 +399,12 @@ function isVideo(name) {
               <!-- 備註小字（例如住戶修改通報時，改完的內容）：和住戶端的處理進度一樣（ReportRecord），
                    type-note 14px 灰色；whitespace-pre-line 讓兩項都改時一項一行 -->
               <p v-if="log.note" class="type-note whitespace-pre-line text-muted-foreground">{{ log.note }}</p>
+              <!-- 附上留存的照片（快速留存歸到這件案件時，2026-10-18） -->
+              <!-- :bleed="false"：在日期欄右邊，不往外伸，才不會蓋到日期 -->
+              <CaseFileGrid v-if="log.files?.length" :files="log.files" :title="log.label" :bleed="false" class="pt-2" />
             </div>
           </div>
         </template>
-        <CaseLogForm v-if="canAddLog" v-model:draft="logDraft" />
       </section>
 
       <!-- 完工紀錄：完工了才有 -->
@@ -417,9 +412,8 @@ function isVideo(name) {
         <h2 class="type-card-title text-foreground">完工紀錄</h2>
         <p class="type-date text-muted-foreground">{{ dateTimeText(item.completion.at) }}</p>
         <p class="type-body text-foreground">{{ item.completion.note }}</p>
-        <p v-if="item.completion.photos.length" class="type-date text-muted-foreground">
-          附 {{ item.completion.photos.length }} 個檔案
-        </p>
+        <!-- 附件直接顯示（2026-10-18 013）：和現場照片一樣一格一個，有照片的點了全螢幕看 -->
+        <CaseFileGrid v-if="item.completion.photos.length" :files="item.completion.photos" title="完工紀錄" />
       </section>
 
 
@@ -429,16 +423,17 @@ function isVideo(name) {
          設計稿上面那排原本是「發布社區公告」，2026-10-15 改成更新現況、再改名叫更新進度） -->
     <BottomCta v-if="hasBottom" vertical>
       <!-- 上面一排：交辦（主委、副主委、還沒交辦時才有） -->
-      <Button v-for="action in topActions" :key="action.key" variant="outline" @click="runAction(action)">
+      <!-- 獨自一排的按鈕用淺藍（2026-10-19 按鈕規則：底部三顆時，自己一排的那顆是 secondary） -->
+      <Button v-for="action in topActions" :key="action.key" variant="secondary" @click="runAction(action)">
         {{ action.label }}
       </Button>
       <!-- 下面一排：動作（完工驗收、結案…）在左、更新進度在右（2026-10-15 013 改）
-           顏色不跟著換：右邊那顆是主要的藍色；有更新進度時，左邊的動作用次要的淺藍 -->
+           顏色不跟著換：右邊那顆是主要的藍色；有更新進度時，左邊的動作是並排的次要按鈕（灰白，2026-10-19 按鈕規則） -->
       <div v-if="canUpdate || mainActions.length" class="flex gap-3 *:flex-1">
         <Button
           v-for="action in mainActions"
           :key="action.key"
-          :variant="canUpdate ? 'secondary' : action.main ? 'default' : 'outline'"
+          :variant="action.danger ? 'destructive' : canUpdate || !action.main ? 'outline' : 'default'"
           :disabled="pending"
           @click="runAction(action)"
         >

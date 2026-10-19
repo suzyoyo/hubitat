@@ -7,6 +7,7 @@ import FormSection from './playground/FormSection.vue'
 import ProgressSection from './playground/ProgressSection.vue'
 import ListSection from './playground/ListSection.vue'
 import MockSection from './playground/MockSection.vue'
+import StateSection from './playground/StateSection.vue'
 import TokenSection from './playground/TokenSection.vue'
 
 // 頂部快速跳轉用的清單；id 要和各 section 的 id 一致
@@ -17,6 +18,7 @@ const categories = [
   { id: 'form', label: '表單' },
   { id: 'progress', label: '進度' },
   { id: 'list', label: '清單' },
+  { id: 'state', label: '狀態畫面' },
   { id: 'mock', label: '假資料' },
 ]
 </script>
@@ -48,6 +50,7 @@ const categories = [
       <FormSection />
       <ProgressSection />
       <ListSection />
+      <StateSection />
       <MockSection />
     </main>
   </div>

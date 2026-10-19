@@ -1,6 +1,6 @@
 <script setup>
 // 住戶端・我的：個人資料、身分、我的紀錄、顯示設定、系統與支援、登出、版本
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import {
   ArrowLeftRightIcon,
   BellIcon,
@@ -19,6 +19,7 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatFullDate } from '@/lib/date'
+import { FONT_SIZES as fontSizes, fontSize } from '@/lib/fontSize'
 import { getCommunity, getCurrentUser, getMyAcceptedInvite, getMyTodos } from '@/mocks/api'
 // 版本號直接讀專案最外層的 package.json，改版時只要改那裡
 import { version } from '../../../package.json'
@@ -35,19 +36,7 @@ const isCommittee = computed(() => user.value?.roles.includes('committee'))
 // 「切換至管委會」下面的說明；沒有待辦就不顯示
 const switchHint = computed(() => (todoTotal.value ? `有 ${todoTotal.value} 件事等你處理` : ''))
 
-// 字體大小：目前只有外觀，選了會記住，但不會真的改變文字大小
-const fontSizes = [
-  { value: 'small', label: '小' },
-  { value: 'medium', label: '中' },
-  { value: 'large', label: '大' },
-]
-// localStorage：瀏覽器幫每個網站留的小抽屜，重新整理或關掉網頁後東西還在
-// 一開始先看抽屜裡有沒有上次選的；沒有（或放了看不懂的值）就用「中」
-const FONT_SIZE_KEY = 'hubitat-font-size'
-const savedFontSize = localStorage.getItem(FONT_SIZE_KEY)
-const fontSize = ref(fontSizes.some((item) => item.value === savedFontSize) ? savedFontSize : 'medium')
-// watch：fontSize 一改變，就把新的值存進抽屜
-watch(fontSize, (value) => localStorage.setItem(FONT_SIZE_KEY, value))
+// 字體大小：選「大」是 WCAG 大字（展示用，只有首頁、社區、我的三頁會變），規則在 src/lib/fontSize.js
 
 // 「系統與支援」的三列；to 是點了要去的頁面（都還是佔位頁）
 const supportItems = [
@@ -171,7 +160,6 @@ onMounted(async () => {
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <p class="type-date text-muted-foreground">調整後，所有頁面的文字大小會一起改變。</p>
       </div>
     </section>
 
@@ -189,7 +177,8 @@ onMounted(async () => {
 
     <!-- 還沒有登入功能，登出先回到角色選擇頁 -->
     <!-- as-child：讓 Button 的外觀套在裡面的 RouterLink 上，按下去就是換頁 -->
-    <Button as-child variant="outline" class="w-full">
+    <!-- 淺藍按鈕的字和底線，底色改白色（2026-10-19 013：放在淺色頁面上比較清楚）；按鈕規則的例外，只有登出這顆 -->
+    <Button as-child variant="secondary" class="w-full bg-card hover:bg-muted">
       <RouterLink to="/">登出帳號</RouterLink>
     </Button>
 

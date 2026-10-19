@@ -15,7 +15,7 @@
 //   description 通報人寫的問題描述
 //   photos      照片或影片的檔名（欄位名稱沿用 photos，影片也放這裡，例如 '異音.mp4'）
 //   status      狀態，見下方 CASE_STATUSES
-//   deadline    處理期限（要在哪天前處理完；受理後選填，沒有就不寫）。「逾期」是用今天的日期算出來的
+//   （處理期限不存在案件上：用交辦的完成期限，由假 API 算，見 api/cases.js 的 caseDeadlineOf，2026-10-18）
 //   scheduledAt 廠商預約到場的時間（派廠商、改期時選填，沒有就不寫）
 //   firstVisitAt 廠商第一次到場的時間（假 API 依 scheduledAt 自動記，不用自己填）。這天起關聯設備算「維修中」
 //   assigneeId  負責人（還沒指派就不寫）
@@ -27,6 +27,8 @@
 //                 at 時間 / actorId 誰做的（不寫代表系統，畫面顯示「好彼管家」）
 //                 label 這一步的名稱 / text 管理端看到的說明
 //                 residentText 住戶端看到的說明（不寫代表這一筆不給住戶看）
+//                 note 備註小字（選填，例如住戶修改的內容、附上留存的備註）
+//                 files 附上的照片、檔案的檔名（選填，例如快速留存歸到案件時，2026-10-18）
 //   completion  完工紀錄：at 時間 / note 備註 / photos 照片（還沒完工就不寫）
 //   rating      廠商評分：score 1～5 分 / comment 評語（還沒評就不寫）
 //   closedAt    結案時間（還沒結案就不寫）
@@ -54,9 +56,10 @@ export const CASE_SOURCES = {
 }
 
 // 公開或保密（住戶通報時選的「問題類型」）
+//   label 和住戶新增通報用的 REPORT_TYPES（src/lib/report.js）同一組名稱（2026-10-18 統一，原本是「公共設施修繕／住戶違規」）
 export const CASE_VISIBILITY = {
-  public: { label: '公共設施修繕', note: '公共區域・公開顯示' },
-  private: { label: '住戶違規', note: '僅你本人與管委會可見' },
+  public: { label: '公共設施問題', note: '公共區域・公開顯示' },
+  private: { label: '涉及住戶行為', note: '僅你本人與管委會可見' },
 }
 
 export const cases = [
@@ -94,27 +97,26 @@ export const cases = [
     category: 'leak',
     source: 'resident',
     isPrivate: false,
-    reporterId: 'u-r03', // 2026-10-16 從陳先生改成周太太（展示用：陳先生一開始沒有進行中的通報）
+    reporterId: 'u-r03', // 2026-10-16 從陳先生改成周小姐（展示用：陳先生一開始沒有進行中的通報）
     reportedAt: '2026-09-25T10:12',
     description:
       '昨晚大雨後 B2 車道轉角入口處嚴重積水約 5 公分，排水溝孔蓋卡滿大量枯枝落葉，機車下坡轉彎時輪胎打滑十分危險。',
     photos: ['車道積水.jpg', '排水孔.jpg'],
     status: 'accepted',
-    deadline: '2026-09-28',
     assigneeId: 'u-c04',
     supporters: ['u-r04', 'u-c03', 'u-c05'],
     logs: [
       {
         at: '2026-09-25T10:12',
         label: '住戶通報',
-        text: '周太太（A 棟 5 樓）通報，附 2 張照片',
+        text: '周小姐（A 棟 5 樓）通報，附 2 張照片',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
       {
         at: '2026-09-26T09:30',
         actorId: 'u-c04',
         label: '已受理',
-        text: '李主委受理並設定處理期限',
+        text: '李主委受理',
         residentText: '管委會已受理。',
       },
       {
@@ -124,7 +126,7 @@ export const cases = [
         text: '已聯絡通管廠商（順達環保、安欣工程）安排現場查勘估價，現正等待報價單。',
         residentText: '已聯絡廠商安排現場查勘。',
       },
-      { at: '2026-09-29T00:00', label: '逾期', text: '超過處理期限，已通知主責委員' },
+      { at: '2026-09-29T00:00', label: '逾期', text: '超過交辦的完成期限，已通知主責委員' },
     ],
   },
   {
@@ -141,7 +143,6 @@ export const cases = [
     description: 'C 棟電梯上下樓時有明顯的金屬摩擦聲，到 4 樓附近特別大聲。',
     photos: [],
     status: 'to_verify',
-    deadline: '2026-10-02',
     assigneeId: 'u-c02',
     vendorId: 'v-001',
     equipmentId: 'e-003',
@@ -192,7 +193,6 @@ export const cases = [
     description: '巡查發現 B 棟頂樓防水層多處龜裂，雨後 10 樓梯間天花板有水漬。',
     photos: ['頂樓龜裂.jpg', '梯間水漬.jpg'],
     status: 'in_progress',
-    deadline: '2026-10-01',
     assigneeId: 'u-c04',
     vendorId: 'v-008',
     supporters: [],
@@ -222,7 +222,7 @@ export const cases = [
       {
         at: '2026-09-30T20:15',
         label: '住戶通報',
-        text: '周太太（A 棟 5 樓）通報，附 1 張照片',
+        text: '周小姐（A 棟 5 樓）通報，附 1 張照片',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
     ],
@@ -241,7 +241,6 @@ export const cases = [
     description: '樓下住戶連續幾晚半夜拖動家具、大聲播放音樂。',
     photos: [],
     status: 'accepted',
-    deadline: '2026-10-04',
     assigneeId: 'u-c02',
     supporters: [],
     logs: [
@@ -261,7 +260,7 @@ export const cases = [
     ],
   },
 
-  // ── 原本是李伯伯自己通報的（2026-10-16 前三件改給鄰居，李伯伯只剩已結案的；展示時住戶首頁一開始是空狀態）─────
+  // ── 原本是李先生自己通報的（2026-10-16 前三件改給鄰居，李先生只剩已結案的；展示時住戶首頁一開始是空狀態）─────
   {
     id: 'CASE-20260920-001',
     place: '1F 大廳',
@@ -271,12 +270,11 @@ export const cases = [
     category: 'door',
     source: 'resident',
     isPrivate: false,
-    reporterId: 'u-r03', // 2026-10-16 從李伯伯改過來：展示時李伯伯的住戶首頁一開始是空狀態
+    reporterId: 'u-r03', // 2026-10-16 從李先生改過來：展示時李先生的住戶首頁一開始是空狀態
     reportedAt: '2026-09-20T10:15',
     description: '進入大廳時，感應門偶爾不會自動開啟，需要用力推才會動，已持續約三天。',
     photos: ['門框.jpg'],
     status: 'accepted',
-    deadline: '2026-10-05',
     assigneeId: 'u-s01',
     vendorId: 'v-005',
     supporters: ['u-r02'],
@@ -284,7 +282,7 @@ export const cases = [
       {
         at: '2026-09-20T10:15',
         label: '住戶通報',
-        text: '周太太（A 棟 5 樓）通報，附 1 張照片',
+        text: '周小姐（A 棟 5 樓）通報，附 1 張照片',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
       {
@@ -322,7 +320,7 @@ export const cases = [
       {
         at: '2026-09-26T18:20',
         label: '住戶通報',
-        text: '周太太（A 棟 5 樓）通報',
+        text: '周小姐（A 棟 5 樓）通報',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
     ],
@@ -336,7 +334,7 @@ export const cases = [
     category: 'lighting',
     source: 'resident',
     isPrivate: false,
-    reporterId: 'u-r02', // 2026-10-16 從李伯伯改過來：展示時李伯伯的住戶首頁一開始是空狀態
+    reporterId: 'u-r02', // 2026-10-16 從李先生改過來：展示時李先生的住戶首頁一開始是空狀態
     reportedAt: '2026-09-25T08:40',
     description: 'B2 電梯口靠車道側的燈不亮，晚上取車時很暗。',
     photos: [],
@@ -361,12 +359,11 @@ export const cases = [
     category: 'leak',
     source: 'resident',
     isPrivate: false,
-    reporterId: 'u-r04', // 2026-10-16 從李伯伯改過來：展示時李伯伯的住戶首頁一開始是空狀態
+    reporterId: 'u-r04', // 2026-10-16 從李先生改過來：展示時李先生的住戶首頁一開始是空狀態
     reportedAt: '2026-09-23T16:05',
     description: '頂樓花園東側的灑水噴頭一直滴水，地面有積水。',
     photos: ['噴頭.jpg'],
     status: 'accepted',
-    deadline: '2026-10-06',
     assigneeId: 'u-s01',
     vendorId: 'v-003',
     supporters: [],
@@ -402,14 +399,13 @@ export const cases = [
     description: '深夜 11 點後隔壁仍在裝潢施工，連續三晚影響睡眠。',
     photos: [],
     status: 'closed',
-    deadline: '2026-09-15',
     assigneeId: 'u-c02',
     supporters: [],
     logs: [
       {
         at: '2026-09-08T23:20',
         label: '住戶通報',
-        text: '李伯伯（A 棟 8 樓）通報',
+        text: '李先生（A 棟 8 樓）通報',
         residentText: '已收到通報，好彼管家已轉交管委會。',
       },
       { at: '2026-09-09T10:00', actorId: 'u-c02', label: '已受理', text: '張副主委受理', residentText: '管委會已受理。' },
@@ -450,7 +446,7 @@ export const cases = [
       {
         at: '2026-09-02T18:30',
         label: '住戶通報',
-        text: '李伯伯（A 棟 8 樓）通報',
+        text: '李先生（A 棟 8 樓）通報',
         residentText: '已收到，好彼管家已通知管理人員。',
       },
       {

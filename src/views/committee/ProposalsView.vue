@@ -5,6 +5,7 @@ import { ChevronRightIcon, InfoIcon, PlusIcon } from '@lucide/vue'
 import FilterChips from '@/components/common/FilterChips.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import BottomCta from '@/components/app/BottomCta.vue'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate } from '@/lib/date'
@@ -85,19 +86,13 @@ function rows(item) {
 </script>
 
 <template>
-  <div class="space-y-4 px-5 pt-4 pb-5">
+  <!-- pb-28：底部有固定的按鈕區，留空間給它，內容才不會被蓋住 -->
+  <div class="space-y-4 px-5 pt-4 pb-28">
     <Alert>
       <InfoIcon />
       <AlertTitle>法定效力說明</AlertTitle>
       <AlertDescription>逐一簽核僅為委員意見紀錄，不等於開會表決。需執行之提案仍送管委會決議。</AlertDescription>
     </Alert>
-
-    <Button as-child class="w-full">
-      <RouterLink to="/committee/proposals/new">
-        <PlusIcon />
-        新增提案
-      </RouterLink>
-    </Button>
 
     <FilterChips v-model="filter" :options="FILTERS" />
 
@@ -128,5 +123,12 @@ function rows(item) {
         <ChevronRightIcon class="size-4" />
       </p>
     </RouterLink>
+
+    <!-- 主要動作固定在畫面底部（2026-10-19，和其他頁一樣用 BottomCta） -->
+    <BottomCta>
+      <Button as-child>
+        <RouterLink to="/committee/proposals/new"><PlusIcon />新增提案</RouterLink>
+      </Button>
+    </BottomCta>
   </div>
 </template>

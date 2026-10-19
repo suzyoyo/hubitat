@@ -45,7 +45,7 @@ const tabs = computed(() => [
   <!-- v-model：分頁切換時，currentTab 會跟著變 -->
   <Tabs v-model="currentTab" class="gap-4 px-5 pt-4">
     <!-- 整列高 44px（設計稿 33px），長輩比較好按 -->
-    <TabsList class="h-11! w-full rounded-xl bg-background p-1">
+    <TabsList class="h-11! w-full rounded-xl border border-border bg-background p-1">
       <!-- TabsTrigger 與 TabsContent 用相同的 value 配對 -->
       <!-- before:…：按鈕看起來大約 35px 高，用看不見的 before 往上下各補 8px，可以點的範圍超過 44px（dev-guide 第 5 節「可以點的範圍」） -->
       <TabsTrigger
@@ -71,7 +71,7 @@ const tabs = computed(() => [
         <EmptyMedia>
           <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
           <!-- width / height 寫圖檔尺寸，讓瀏覽器先算好比例；實際顯示高度由 h-[120px] 決定 -->
-          <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+          <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
         </EmptyMedia>
         <EmptyTitle class="type-greeting">{{ tab.emptyText }}</EmptyTitle>
         <EmptyDescription class="type-body">發現社區有問題，隨時可以通報喔！</EmptyDescription>

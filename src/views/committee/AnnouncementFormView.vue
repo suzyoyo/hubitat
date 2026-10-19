@@ -2,10 +2,12 @@
 // 管委會端・發布公告／修改公告：同一個表單，網址不一樣
 //   /committee/announcements/new       發布公告（空白表單）
 //   /committee/announcements/:id/edit  修改公告（先填好原本的內容）
+//   /staff/announcements/new           管理人員端「＋」選單的發布公告（2026-10-18；管理人員端沒有公告詳情，發布後回首頁）
 // 欄位照設計稿，三種表單不一樣（施工維護 1134:15770、活動 1134:14426、其他 1134:17972）
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import LeaveConfirmDialog from '@/components/feedback/LeaveConfirmDialog.vue'
 import BottomCta from '@/components/app/BottomCta.vue'
 import DatePicker from '@/components/common/DatePicker.vue'
 import TimePicker from '@/components/common/TimePicker.vue'
@@ -20,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { restoreDraft } from '@/lib/draft'
 import {
   canPublishAnnouncement,
   createAnnouncement,
@@ -35,6 +38,7 @@ import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好�
 
 const route = useRoute()
 const router = useRouter()
+const base = `/${route.meta.roleId}` // 目前在哪一端：/committee 或 /staff
 
 // 網址有 :id 就是修改，沒有就是發布
 const editId = route.params.id
@@ -108,7 +112,7 @@ function fillForm(item) {
 }
 
 onMounted(async () => {
-  const user = await getCurrentUser('committee')
+  const user = await getCurrentUser(route.meta.roleId)
   userId.value = user.id
   const [areaList, caseList, equipmentList, item] = await Promise.all([
     getAreas(),
@@ -129,6 +133,8 @@ onMounted(async () => {
     allowed.value = canPublishAnnouncement(user.id)
   }
   loading.value = false
+  initialForm.value = JSON.stringify(form) // 記下剛載入時的樣子，之後比較有沒有改過
+  await restoreDraft(user.id, route.fullPath, (data) => Object.assign(form, data))
 })
 
 // ── 依類型決定有哪些欄位（照設計稿） ─────────────────────
@@ -247,6 +253,7 @@ async function submit() {
     toast.error(isEdit ? '修改失敗' : '發布失敗', { description: '這則公告的狀態已經變了，請重新整理。' })
     return
   }
+  saved.value = true // 送出成功，換頁時不用再問
   if (isEdit) {
     toast.success('公告已更新')
     // 修改是從詳情頁點進來的：回到那一頁（不要再開一頁，瀏覽紀錄才不會有兩個一樣的詳情頁）
@@ -258,17 +265,23 @@ async function submit() {
   }
   toast.success(result.status === 'pending' ? '已送出審核' : '公告已發布')
   // replace：換掉表單這一頁，按返回不會回到填好的表單
-  router.replace(`/committee/announcements/${result.id}`)
+  // 管理人員端還沒有公告詳情頁，回首頁
+  router.replace(route.meta.roleId === 'staff' ? `${base}/home` : `${base}/announcements/${result.id}`)
 }
 
-// 取消：回到上一頁；直接打網址進來的沒有上一頁，就回管委會首頁
+// 取消：回到上一頁；直接打網址進來的沒有上一頁，就回目前這一端的首頁
 function cancel() {
   if (window.history.state?.back) {
     router.back()
   } else {
-    router.replace('/committee/home')
+    router.replace(`${base}/home`)
   }
 }
+
+// 有沒有填東西（離開前確認用）：和剛載入時的表單比（修改公告時是原本的內容），有改過就算；送出成功後 saved 變 true
+const initialForm = ref('')
+const saved = ref(false)
+const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.stringify(form) !== initialForm.value)
 </script>
 
 <template>
@@ -284,14 +297,14 @@ function cancel() {
     <Empty v-else-if="!allowed" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">{{ isEdit ? '這則公告不能修改' : '你沒有發布公告的權限' }}</EmptyTitle>
       <EmptyDescription class="type-body">
         {{ isEdit ? '可能已經結束、已撤回、還在審核中，或你不是發布者。' : '只有主委、副主委和管理人員可以發布公告。' }}
       </EmptyDescription>
       <Button as-child class="mt-4">
-        <RouterLink to="/committee/home">回到首頁</RouterLink>
+        <RouterLink :to="`${base}/home`">回到首頁</RouterLink>
       </Button>
     </Empty>
 
@@ -379,7 +392,7 @@ function cancel() {
         <div class="grid grid-cols-2 gap-2">
           <Button
             type="button"
-            :variant="form.dateMode === 'single' ? 'default' : 'outline'"
+            :variant="form.dateMode === 'single' ? 'secondary' : 'outline'"
             :aria-pressed="form.dateMode === 'single'"
             @click="form.dateMode = 'single'"
           >
@@ -387,7 +400,7 @@ function cancel() {
           </Button>
           <Button
             type="button"
-            :variant="form.dateMode === 'multi' ? 'default' : 'outline'"
+            :variant="form.dateMode === 'multi' ? 'secondary' : 'outline'"
             :aria-pressed="form.dateMode === 'multi'"
             @click="form.dateMode = 'multi'"
           >
@@ -519,7 +532,7 @@ function cancel() {
             v-model="form.isUrgent"
             variant="outline"
             aria-labelledby="an-urgent-label"
-            class="relative h-8 min-w-16 rounded-full bg-card px-4 type-button after:absolute after:inset-x-0 after:-inset-y-1.5 data-[state=on]:border-warning data-[state=on]:bg-warning-subtle data-[state=on]:text-red-800"
+            class="relative h-8 min-w-16 rounded-full bg-card px-4 type-button after:absolute after:inset-x-0 after:-inset-y-1.5 data-[state=on]:border-warning data-[state=on]:bg-warning-subtle data-[state=on]:text-warning-strong"
           >
             {{ form.isUrgent ? '開啟' : '關閉' }}
           </Toggle>
@@ -550,5 +563,7 @@ function cancel() {
         <Button type="button" variant="outline" @click="cancel">取消</Button>
       </BottomCta>
     </form>
+    <!-- 填到一半想離開時先問一次 -->
+    <LeaveConfirmDialog :dirty="isDirty" :draft-title="isEdit ? '修改公告' : '發布公告'" :draft-data="{ ...form }" />
   </div>
 </template>

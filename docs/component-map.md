@@ -69,7 +69,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/Nav Item` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/FAB` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/Greeting` | `app/AppGreeting.vue` | ✅ | |
-| `App/Section Header` | `app/SectionHeader.vue` | ✅ | 沒傳 `to` 就不顯示「看全部」 |
+| `App/Section Header` | `app/SectionHeader.vue` | ✅ | 沒傳 `to` 就不顯示「看全部」；文字可以用 `link-text` 換，例如廠商分頁的「查看所有廠商」（2026-10-18） |
 | `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字；加上 `vertical` 按鈕改成上下排（完成頁用）。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
 | `App/Drawer Content` | `app/DrawerContent.vue` | ⬜ | 從底部滑出的面板內容。外層用基礎元件 `ui/drawer` |
@@ -84,7 +84,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
 | `Report/Card` | `report/ReportCard.vue` | ✅ | 變體 Type 三種都做了：**Compact**（首頁摘要）、**Full**（我的通報列表：送出日期＋管委會回覆＋編輯按鈕）、**Empty**（目前無通報）。用 `type` prop 切換 Compact／Full，不傳 `report` 就是 Empty。Full 的編輯按鈕由 `editTo` 決定要不要顯示 |
-| `Report/Summary` | `report/ReportSummary.vue` | ✅ | 通報摘要卡：標題＋狀態徽章＋送出日期＋公開狀態。沒有另外做 Visibility 的 prop，依傳進來的 `report.visibility` 自動切換：Public 是地球圖示「公共區域・公開顯示」，Private 是鎖頭圖示「僅你本人與管委會可見」（文字來自假 API 的 `visibilityLabel`） |
+| `Report/Summary` | `report/ReportSummary.vue` | ✅ | 通報摘要卡：標題＋狀態徽章＋送出日期＋公開狀態。沒有另外做 Visibility 的 prop，依傳進來的 `report.visibility` 自動切換：Public 是地球圖示「公共區域・公開顯示」，Private 是鎖頭圖示「僅你本人與管委會可見」（文字來自假 API 的 `visibilityLabel`）。最下面「你的描述」顯示住戶當初寫的描述（只能看，沒寫顯示「沒有填寫描述」，2026-10-19） |
 | `Report/Progress Card` | `report/ReportProgressCard.vue` | ✅ | 「處理進度」卡片，裡面用到下面三個。傳 `report` 進去，會用到 `steps` 和 `timeline` |
 | `Report/Stepper` | `report/ReportStepper.vue` | ✅ | 三步驟進度條。沒有 Current 的 prop，傳通報的 `steps`（三個階段的時間）進去，元件自己算走到第幾步；已完成時三步都打勾。還沒到的步驟下面不顯示日期（設計稿寫「尚未完成」）。沒有用 `ui/stepper`，那是給可以點的表單流程用的 |
 | `Report/Step` | ➖ | ➖ | 進度條的單一圓點（Done／Current／Todo）。寫在 `ReportStepper.vue` 裡面即可 |
@@ -92,8 +92,10 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Report/Similar Card` | `report/ReportSimilarCard.vue` | ✅ | 相似通報卡。傳 `getSimilarReports()` 的一筆 `report`。變體 Type 用 `type` prop 切換：`similar`（預設，有「我也遇到了」按鈕，按了送出 `support` 事件）／`joined`（完成頁用，沒有按鈕，多一行「原始通報內容」）。自己通報的、已經按過的不顯示按鈕，改顯示一句說明（設計稿沒畫） |
 | `Report/Flow Progress` | `report/ReportFlowProgress.vue` | ✅ | 新增通報流程頂部的進度：步驟名稱＋百分比＋進度條。傳 `step`（1～5），名稱和百分比元件自己算。進度條用基礎元件 `ui/progress` |
 | `Report/Review Row` | `report/ReportReviewRow.vue` | ✅ | 確認送出頁的一列：欄位名稱（`label`）＋內容（`value`）＋「修改」按鈕，按了送出 `edit` 事件。分隔線由外面的容器用 `divide-y` 畫，沒有做成 prop |
-| `Report/Photo Tile` | `report/ReportPhotoTile.vue` | ✅ | 照片格，新增通報和通報詳情共用。`type` 有兩種：`thumbnail`（預設，傳 `name` 檔名，下面一顆「刪除」文字按鈕，按了送出 `remove`）／`add`（虛線框的「新增」，選好檔案送出 `pick`，帶檔名）。照片和影片都可以選，影片（看副檔名）用攝影機圖示，超過 50MB 不收並跳提示。假資料只有檔名，所以只顯示圖示＋檔名。**和 Kit 不一樣**：沒有大張的 Preview 和「更換」（2026-10-13 決定兩頁統一用小張＋「刪除」，長輩比較看得懂文字；要換就先刪除再新增） |
+| `Report/Photo Tile` | `report/ReportPhotoTile.vue` | ✅ | 照片格，**所有上傳照片的地方都用它**（2026-10-19 統一：新增通報、通報詳情、快速留存、回報完成、交辦回報）。`type` 有兩種：`thumbnail`（預設，傳 `name` 檔名，格子裡**直接顯示照片、不顯示檔名**，影片顯示第一個畫面＋攝影機圖示；假資料沒有內容的只放圖示；**PDF 放文件圖示＋檔名**（沒有縮圖分不出是哪份）。下面一顆「刪除」文字按鈕，送出 `remove`）／`add`（虛線框的「新增」，**可以一次選好幾個**，送出 `pick` 帶檔案的陣列；`accept` 決定能選什麼，預設照片或影片）。加入檔案、影片 50MB 上限、超過上限的提示、同名改名都在 `lib/filePreview.js` 的 `addPickedFiles`。**和 Kit 不一樣**：沒有大張的 Preview 和「更換」（2026-10-13 決定兩頁統一用小張＋「刪除」，長輩比較看得懂文字；要換就先刪除再新增） |
 | （Kit 沒有元件） | `report/ReportPhotoGrid.vue` | ✅ | 照片／影片那一區：一排三格的 `ReportPhotoTile`＋下面一行說明（最多 3 個、影片 50MB 以內）。用 `v-model` 綁檔名的陣列。新增通報和通報詳情共用，兩頁才會長得一樣 |
+| （Kit 沒有元件） | `case/CaseAttachmentList.vue` | ✅ | 附件那一區：和 `ReportPhotoGrid` 一樣是一排三格的 `ReportPhotoTile`（2026-10-19 從一列一個檔案改過來），多了 PDF、上限由頁面傳 `max`。快速留存、回報完成、交辦回報用 |
+| （Kit 沒有元件） | `case/CaseFileGrid.vue` | ✅ | 案件詳情、留存詳情**看**照片的地方：**排成一排、可以左右滑**的 96px 小方格（2026-10-19 從一排兩格改過來，省空間）。示範時剛選的照片、影片顯示縮圖，點了全螢幕，左右滑換張，**影片可以播放**（`<video controls>`，換張時自動暫停）；假資料只放圖示。不顯示檔名，只有 PDF 留檔名 |
 
 ### C. 公告與會議
 
@@ -132,6 +134,13 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 |---|---|---|---|
 | `Feedback/Empty State` | `feedback/FeedbackEmptyState.vue` | ⬜ | 空狀態：圖示＋標題＋說明＋按鈕。變體 Container：Plain／Card。可以用基礎元件 `ui/empty` 當底。住戶端「我的通報」（Plain）和「社區公告」（Card）的空狀態先直接用 `ui/empty`＋吉祥物寫在頁面裡，做這個元件時再換過來 |
 | `Feedback/Haobi Tip` | `feedback/FeedbackHaobiTip.vue` | 🟡 | 好彼管家提示框：頭像＋「好彼管家」＋主訊息（`title`）＋補充說明（`description`，選填）。頭像是思考的好彼管家（`assets/mascot/thinking.png`，原圖 1）。Kit 的「可加 Badge」還沒做 |
+| （Kit 沒有）狀態畫面 | `feedback/FeedbackState.vue` | 🟡 | 整頁的狀態（2026-10-18 013）：`kind` 選 `load-failed`（載入失敗＋「重新整理」，送出 `retry`）／`not-found`（找不到資料）／`page-not-found`（網址打錯，`NotFoundView` 在用）／`no-permission`（沒有權限）／`coming-soon`（功能準備中，佔位頁 `PlaceholderView` 在用），除了載入失敗都是「回首頁」（回目前這一端）。吉祥物是拿放大鏡那隻，功能準備中是開心那隻（`happy.png`），上方空白和住戶端通知的空狀態一樣。展示在 `/playground` 的「狀態畫面」，頁面還沒套上 |
+| （Kit 沒有）同時操作衝突 | `feedback/FeedbackConflictDialog.vue` | 🟡 | 「這筆資料剛剛有人改過了」彈窗：`description` 寫誰、什麼時候改了，只有「重新整理」（送出 `refresh`）。頁面還沒套上 |
+| （Kit 沒有）權限被拒 | `feedback/FeedbackPermissionDialog.vue` | 🟡 | 相機（多一顆「改從相簿選照片」，送出 `use-photos`）、相簿、通知被拒時，教使用者到手機「設定」打開，iPhone、Android 各一行。`add-to-home` 教使用者加入主畫面 |
+| （Kit 沒有）開啟通知提醒 | `feedback/NotificationReminder.vue` | 🟡 | 三端首頁最上面，還沒開通知就一直出現、不擋（2026-10-18 013）。「先不要」藏到這次關掉 App（sessionStorage）；拒絕過時，按「開啟通知」跳出權限被拒的彈窗。iPhone 用 Safari 開（沒有通知功能）時，改成「加入主畫面，才收得到通知」＋「怎麼加入」（2026-10-19，suzy 在 #144 提的） |
+| （Kit 沒有）離開前確認 | `feedback/LeaveConfirmDialog.vue` | ✅ | 表單填到一半要離開時的彈窗：「直接離開｜繼續填寫」左右排，下面 ghost「存成草稿，晚點再填」。傳 `dirty`，沒填東西就不問；傳 `draft-title`、`draft-data` 才有存草稿；重新整理、關分頁用瀏覽器的提醒（2026-10-19）。用法見 dev-guide 第 5 節「表單」 |
+| （Kit 沒有）測試模式橫幅 | `app/MockFailBanner.vue` | ✅ | `/playground`「狀態畫面」的「模擬連線失敗」開著時，頂部列下面一條橘色橫幅「測試模式：正在模擬連線失敗，點這裡關閉」，點了回 playground 關掉（2026-10-19，suzy 在 #144 提的），接在 `AppShell` |
+| （Kit 沒有）離線橫幅 | `app/OfflineBanner.vue` | ✅ | 沒有網路時，頂部列下面一條深灰色橫幅，已經接在 `AppShell`，每一頁都有 |
 | `Feedback/Toast` | ➖ | ➖ | 用基礎元件 `ui/sonner`（`toast('訊息')`）。樣式和 Kit 不同時調整 sonner，不另外做元件 |
 | `Feedback/Dialog Header` | ➖ | ➖ | 用基礎元件 dialog 的標題（`DialogTitle`）。用法見 `notice/NoticeDetailDialog.vue` |
 | `Feedback/Dialog Actions` | ➖ | ➖ | 用基礎元件 dialog 的按鈕區。關閉用的按鈕用 `DialogClose` 包起來 |
@@ -152,7 +161,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `Admin/Action Card` | `admin/AdminActionCard.vue` | 🟡 | 「我的待辦」的卡片，傳 `getMyTodos()` 的一筆 `todo`；也可以傳 `getMyDoneTodos()` 的一筆（有 `doneAt`），會變成灰色「已完成」、寫完成時間、右下角「查看詳情」。變體 Footer 只做了「連結」：整張卡可以點，右下角「前往完成 ›」只是提示（2026-10-13 從滿版藍色按鈕改過來，卡片變短，也不會整頁都是主要按鈕）；「按鈕」「文字」還沒做，有頁面用到再加。期限徽章和 `AdminTodoCard` 一樣（沒有緊急底色），規則在 `src/lib/todo.js` |
 | `Admin/Meeting Card` | `admin/AdminMeetingCard.vue` | ⬜ | 變體 State：待整理／待發布／已發布 |
 | `Admin/Vendor Card` | `admin/AdminVendorCard.vue` | ✅ | 廠商卡：名稱＋合約徽章＋›、處理項目的小標籤。整張卡可以點。合約徽章：無合約紅；即將到期橘；尚未生效藍；合約內灰。管委會端「廠商名冊」在用 |
-| `Admin/Case Card` | `admin/AdminCaseCard.vue` | ✅ | 案件卡：標題＋狀態徽章＋›、地點徽章、負責人｜廠商（2026-10-14 照 Kit 改版）。整張卡可以點。狀態徽章：逾期、尚未受理紅；待結案橘；處理中（已受理、處理中）藍；已結案、已取消灰（規則在 `admin/caseStatusBadge.js`，案件詳情頁共用）。prop 叫 `item`（`case` 是 JavaScript 的保留字）。管委會端「案件」分頁在用 |
+| `Admin/Case Card` | `admin/AdminCaseCard.vue` | ✅ | 案件卡：標題＋狀態徽章＋›、地點徽章、一行說明（2026-10-14 照 Kit 改版；2026-10-16 第三行從「負責人｜廠商」改成和待辦卡同一套的一句說明，假 API 算好的 `hint`，規則在 `docs/data-model.md`「我的待辦」）。整張卡可以點。狀態徽章：逾期、尚未受理紅；待結案橘；處理中（已受理、處理中）藍；已結案、已取消灰（規則在 `admin/caseStatusBadge.js`，案件詳情頁共用）。prop 叫 `item`（`case` 是 JavaScript 的保留字）。管委會端「案件」分頁在用 |
 | `Admin/Contract Card` | `admin/AdminContractCard.vue` | ✅ | 合約卡（2026-10-16）：廠商名稱＋狀態徽章、合約期間、合約金額、負責窗口，右下「查看詳情 ›」，整張卡可以點。傳 `getContracts()` 的一筆 `item`、`contactName`、`to`。合約金額只有管委會看得到，沒有 `amount` 時那一列不顯示（管理人員端可以直接用）。狀態徽章的規則在 `admin/contractBadge.js`（即將到期橘、尚未生效藍、合約內和已到期灰），合約詳情、廠商詳細共用。管委會端「廠商合約」在用 |
 | `Admin/Doc Card` | `admin/AdminDocCard.vue` | ⬜ | 文件卡 |
 | `Admin/Notification Item` | `admin/AdminNotificationItem.vue` | ⬜ | 通知的一筆。做之前先看能不能和 `Notification/Item` 共用 |

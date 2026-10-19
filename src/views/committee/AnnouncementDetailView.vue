@@ -202,7 +202,7 @@ const publishRows = computed(() => {
     <Empty v-else-if="!announcement" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">找不到這則公告</EmptyTitle>
       <EmptyDescription class="type-body">可能已經刪除，或是網址不正確。</EmptyDescription>
@@ -247,7 +247,7 @@ const publishRows = computed(() => {
         <Button as-child>
           <RouterLink :to="editLink">修改公告</RouterLink>
         </Button>
-        <Button variant="outline" :disabled="pending" @click="openWithdraw">撤回公告</Button>
+        <Button variant="destructive" :disabled="pending" @click="openWithdraw">撤回公告</Button>
       </BottomCta>
 
       <!-- 撤回確認彈窗：平常看不到，withdrawOpen 變成 true 才會出現（長相和撤回通報的彈窗一樣） -->

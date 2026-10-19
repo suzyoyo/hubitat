@@ -116,12 +116,12 @@ watch(currentTab, markCurrentTabRead)
         <EmptyMedia>
           <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
           <!-- width / height 寫圖檔尺寸，讓瀏覽器先算好比例；實際顯示高度由 h-[84px] 決定 -->
-          <img :src="mascotUrl" alt="" width="279" height="240" class="h-[84px] w-auto" />
+          <img :src="mascotUrl" alt="" width="233" height="229" class="h-[84px] w-auto" />
         </EmptyMedia>
         <EmptyTitle class="type-card-title text-heading">{{ tab.emptyTitle }}</EmptyTitle>
         <EmptyDescription class="type-body">有新公告時好彼管家會通知你。</EmptyDescription>
         <!-- 「與我有關」沒有公告時，帶住戶去看全部的公告 -->
-        <Button v-if="tab.value === 'related'" variant="outline" @click="currentTab = 'all'">
+        <Button v-if="tab.value === 'related'" variant="secondary" @click="currentTab = 'all'">
           查看社區公告
         </Button>
       </Empty>

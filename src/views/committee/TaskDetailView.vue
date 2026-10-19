@@ -196,7 +196,7 @@ const recordRows = computed(() => {
     <Empty v-else-if="!task" class="gap-1 pt-10">
       <EmptyMedia>
         <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
-        <img :src="mascotUrl" alt="" width="279" height="240" class="h-[120px] w-auto" />
+        <img :src="mascotUrl" alt="" width="233" height="229" class="h-[120px] w-auto" />
       </EmptyMedia>
       <EmptyTitle class="type-greeting">找不到這件交辦</EmptyTitle>
       <EmptyDescription class="type-body">可能已經刪除，或是網址不正確。</EmptyDescription>
@@ -255,10 +255,20 @@ const recordRows = computed(() => {
         <Button :disabled="pending" @click="confirm">確認完成</Button>
       </BottomCta>
       <BottomCta v-else-if="canWithdraw">
-        <Button variant="outline" :disabled="pending" @click="openDialog('withdraw')">撤回交辦</Button>
+        <!-- 撤回做了就回不去，用紅色（2026-10-19 按鈕規則） -->
+        <Button variant="destructive" :disabled="pending" @click="openDialog('withdraw')">撤回交辦</Button>
       </BottomCta>
+      <!-- 有關聯案件的：主要按鈕是「前往案件詳情」（在案件裡更新進度、派廠商），回報完成是並排的次要按鈕（2026-10-19） -->
       <BottomCta v-else-if="canReport">
-        <Button as-child>
+        <template v-if="task.caseId">
+          <Button as-child variant="outline">
+            <RouterLink :to="reportPath">回報完成</RouterLink>
+          </Button>
+          <Button as-child>
+            <RouterLink :to="`/${route.meta.roleId}/cases/${task.caseId}`">前往案件詳情</RouterLink>
+          </Button>
+        </template>
+        <Button v-else as-child>
           <RouterLink :to="reportPath">回報完成</RouterLink>
         </Button>
       </BottomCta>

@@ -15,7 +15,7 @@ defineProps({
     <div class="space-y-3">
       <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
       <!-- width / height 寫圖檔尺寸，讓瀏覽器先算好比例；實際顯示高度由 h-[131px] 決定 -->
-      <img :src="mascotUrl" alt="" width="233" height="330" class="mx-auto h-[131px] w-auto" />
+      <img :src="mascotUrl" alt="" width="214" height="255" class="mx-auto h-[131px] w-auto" />
       <h2 class="type-title text-foreground">已接受邀請！</h2>
     </div>
     <p class="type-body text-muted-foreground">

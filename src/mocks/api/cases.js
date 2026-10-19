@@ -2,7 +2,7 @@
 // 同一份案件資料，管理端和住戶端要看的內容不同，所以分成兩種整理方式：
 //   presentForManagement：管委會、管理人員看的（完整）
 //   presentForResident：  住戶看的（簡化的狀態、只給住戶看的進度說明）
-import { diffDays, formatDate, formatDateTime } from '@/lib/date'
+import { diffDays, formatDate, formatDateTime, formatRelativeTime } from '@/lib/date'
 import { CASE_SOURCES, CASE_STATUSES, CASE_VISIBILITY, cases } from '../data/cases'
 import { ISSUE_CATEGORIES } from '../data/community'
 import { equipment } from '../data/equipment'
@@ -31,11 +31,25 @@ function isMyHousehold(item, userId) {
   return user?.building === item.reporterUnit.building && user?.unit === item.reporterUnit.unit
 }
 
+// 案件的處理期限：案件自己不填期限，用交辦的完成期限（2026-10-18 和 013 定，PR #122）
+//   有還沒完成的交辦（進行中或待確認）→ 那筆交辦的期限
+//   沒有的話，用最後一筆已完成的交辦（已結案的案件也看得到當初的期限）
+//   沒有交辦、交辦被撤回、交辦沒填期限 → 空字串（畫面寫「尚未設定」，也不會逾期）
+//   回傳的是交辦的格式，例如 '2026-10-08T18:00'
+export function caseDeadlineOf(item) {
+  const caseTasks = tasks.filter((task) => task.caseId === item.id)
+  const task =
+    caseTasks.find((entry) => ['in_progress', 'reported'].includes(entry.status)) ??
+    caseTasks.findLast((entry) => entry.status === 'done')
+  return task?.deadline ?? ''
+}
+
 // 逾期幾天；沒逾期回傳 0
-// 有設定期限、還沒結案、而且期限已經過了，才算逾期
+// 有處理期限、還沒結案、而且期限那天已經過了，才算逾期
 export function caseOverdueDays(item) {
-  if (!item.deadline || !isOpen(item)) return 0
-  const days = diffDays(item.deadline, MOCK_TODAY)
+  const deadline = caseDeadlineOf(item)
+  if (!deadline || !isOpen(item)) return 0
+  const days = diffDays(deadline.split('T')[0], MOCK_TODAY)
   return days > 0 ? days : 0
 }
 
@@ -69,6 +83,48 @@ function handlerIdOf(item) {
   return task ? task.assigneeId : item.assigneeId
 }
 
+// 案件卡、待辦卡第二行的一句說明（2026-10-15 定，2026-10-16 案件列表的卡片也用）
+//   放卡片上其他地方看不到的「誰、什麼時候、做到哪裡」，不重複徽章（狀態）和標題；畫面上只顯示一行
+//   待受理         → 誰通報、多久以前：「陳先生（B 棟 8 樓）・2 小時前通報」
+//   已派廠商       → 廠商＋預約到場時間：「大同電梯・10/3 14:00 到場」
+//   受理了、沒廠商 → 誰受理：「張管理員受理・尚未派廠商」
+//                    有交辦出去的寫交辦對象：「交辦給張管理員・尚未派廠商」（2026-10-18，PR #121 013 的意見）
+// 待結案、已結案的寫法只有案件卡用，在 caseCardHint
+export function caseHint(item) {
+  if (item.status === 'pending') {
+    const when = formatRelativeTime(item.reportedAt, MOCK_NOW) // 「2 小時前」「昨天 09:00」「9/25」
+    // 「2 小時前」「剛剛」後面直接接「通報」；日期、時間後面空一格比較好讀
+    const gap = when.endsWith('前') || when === '剛剛' ? '' : ' '
+    return `${reporterLabel(item)}・${when}${gap}通報`
+  }
+  const name = vendorNameOf(item)
+  if (name) return item.scheduledAt ? `${name}・${formatDateTime(item.scheduledAt)} 到場` : `${name}・尚未約到場時間`
+  const handlerId = handlerIdOf(item)
+  if (handlerId !== item.assigneeId) return `交辦給${userLabel(handlerId)}・尚未派廠商`
+  return `${userLabel(item.assigneeId)}受理・尚未派廠商`
+}
+
+// 案件卡第三行的說明：除了 caseHint 的三種，再加上
+//   待結案 → 誰、哪天完工驗收：「張管理員・9/25 完工驗收」（「待結案」徽章已經有了，不重複寫）
+//   已結案 → 廠商（沒有廠商就寫負責人）＋結案日期：「大同電梯・9/12 結案」
+function caseCardHint(item) {
+  if (item.status === 'to_verify') {
+    const who = userLabel(handlerIdOf(item))
+    return item.completion?.at ? `${who}・${formatDate(item.completion.at)} 完工驗收` : `${who}已完工驗收`
+  }
+  if (item.status === 'closed') {
+    const who = vendorNameOf(item) || userLabel(handlerIdOf(item))
+    return item.closedAt ? `${who}・${formatDate(item.closedAt)} 結案` : `${who}・已結案`
+  }
+  return caseHint(item)
+}
+
+// 廠商名稱：名冊裡的用名冊的名字；自己打的（名冊裡沒有）存在案件的 vendorName
+function vendorNameOf(item) {
+  const vendor = vendors.find((entry) => entry.id === item.vendorId)
+  return vendor ? vendor.name : (item.vendorName ?? '')
+}
+
 // 管理端看的案件
 function presentForManagement(item) {
   const vendor = vendors.find((entry) => entry.id === item.vendorId)
@@ -86,6 +142,7 @@ function presentForManagement(item) {
     // 畫面上的「負責人」：實際處理的人（見 handlerIdOf）；案件詳情、案件卡片都顯示這個
     handlerId: handlerId ?? '',
     handlerLabel: handlerId ? userLabel(handlerId) : '',
+    hint: caseCardHint(item), // 案件卡第三行的一句說明
     // 名冊裡的廠商用名冊的名字；自己打的（名冊裡沒有）存在案件的 vendorName
     vendorName: vendor ? vendor.name : (item.vendorName ?? ''),
     equipmentName: device ? device.name : '',
@@ -93,6 +150,7 @@ function presentForManagement(item) {
     supporterCount: item.supporters.length, // 附議戶數
     // 還沒完成的交辦（進行中或待確認）的編號；沒有就是空字串。有的話不能再交辦
     openTaskId: tasks.find((task) => task.caseId === item.id && ['in_progress', 'reported'].includes(task.status))?.id ?? '',
+    deadline: caseDeadlineOf(item), // 處理期限（交辦的完成期限，見 caseDeadlineOf）；沒有是空字串
     isOverdue: overdueDays > 0,
     overdueDays,
     // 每筆紀錄補上「是誰做的」；沒有 actorId 的是系統自動產生的
@@ -107,7 +165,7 @@ function presentForManagement(item) {
 // 只挑住戶需要的欄位，不會把負責人、廠商、內部紀錄給住戶
 function presentForResident(item, userId) {
   // 只留有 residentText 的紀錄，並改用給住戶看的說明
-  //   isEdit：是住戶自己修改的紀錄（「你修改了補充說明。」），不算管委會的回覆
+  //   isEdit：是住戶自己補充的紀錄（「你補充了說明。」），不算管委會的回覆
   const timeline = item.logs
     .filter((log) => log.residentText)
     .map((log) => ({
@@ -238,8 +296,7 @@ function setEquipmentStatus(item, status) {
 }
 
 // 受理：待受理 → 已受理，受理的人就是負責人
-//   options 都是選填：
-//     deadline    處理期限，例如 '2026-10-08'
+//   options 都是選填（處理期限不在這裡填，用交辦的完成期限，見 caseDeadlineOf）：
 //     category    問題分類，例如 'equipment'（住戶通報時先歸「其他」，這時改成正確的）
 //     equipmentId 關聯設備，例如 'e-001'（有選的話設備變「待維修」，結案時進維修歷史）
 export async function acceptCase(id, userId, options = {}) {
@@ -248,12 +305,11 @@ export async function acceptCase(id, userId, options = {}) {
   if (!item) return undefined
   item.status = 'accepted'
   item.assigneeId = userId
-  if (options.deadline) item.deadline = options.deadline
   if (options.category) item.category = options.category
   if (options.equipmentId) item.equipmentId = options.equipmentId
   setEquipmentStatus(item, 'needs_repair')
-  const deadlineText = item.deadline ? `，預計 ${formatDate(item.deadline)} 前完成` : ''
-  addLog(item, userId, '已受理', `${userLabel(userId)}受理${deadlineText}`, `${handlerWord(userId)}已受理。`)
+  addLog(item, userId, '已受理', `${userLabel(userId)}受理`, `${handlerWord(userId)}已受理。`)
+  notifyResidents(item, 'accepted')
   return presentForManagement(item)
 }
 
@@ -289,6 +345,9 @@ function applyVendor(item, { vendorId = '', vendorName = '', scheduledAt = '' })
   const listed = vendors.find((entry) => entry.id === vendorId)
   const name = listed ? listed.name : vendorName.trim()
   if (!name) return undefined
+  // 同一家廠商、原本有約、只改時間＝改期（2026-10-18 suzy 在 #132 提的：住戶不會只在通知看到，要寫進處理進度）
+  const sameVendor = listed ? item.vendorId === listed.id : !item.vendorId && item.vendorName === name
+  const isReschedule = sameVendor && Boolean(item.scheduledAt) && Boolean(scheduledAt) && scheduledAt !== item.scheduledAt
   item.status = 'in_progress'
   if (listed) {
     item.vendorId = listed.id
@@ -300,6 +359,13 @@ function applyVendor(item, { vendorId = '', vendorName = '', scheduledAt = '' })
   if (scheduledAt) item.scheduledAt = scheduledAt
   else delete item.scheduledAt // 換廠商又沒填時間，就不要留著上一家的預約
   setFirstVisit(item, scheduledAt)
+  if (isReschedule) {
+    return {
+      text: `${name} 改期，預約 ${formatDateTime(scheduledAt)} 到場`,
+      lines: [`廠商改期：${formatDateTime(scheduledAt)} 到場`],
+      residentText: rescheduleText(scheduledAt),
+    }
+  }
   return {
     text: scheduledAt ? `指派 ${name}，預約 ${formatDateTime(scheduledAt)} 到場` : `指派 ${name}`,
     lines: scheduledAt ? [`廠商：${name}`, `到場：${formatDateTime(scheduledAt)}`] : [`廠商：${name}`],
@@ -307,12 +373,20 @@ function applyVendor(item, { vendorId = '', vendorName = '', scheduledAt = '' })
   }
 }
 
+// 改期時給住戶看的一句（住戶不會收到通知，靠處理進度看到新的日期，case-flow 第 5 節）
+function rescheduleText(scheduledAt) {
+  return `廠商改期，預計 ${formatDate(scheduledAt)} 到場。`
+}
+
 // 處理紀錄：改期時同時更新預約到場時間
+//   改期了、但沒寫給住戶看的說明 → 自動補「廠商改期，預計 10/5 到場。」，住戶的處理進度才看得到新日期
 function applyLog(item, { text, residentText = '', scheduledAt = '' }) {
   if (!text?.trim()) return undefined
   if (scheduledAt) {
+    const changed = scheduledAt !== item.scheduledAt
     item.scheduledAt = scheduledAt
     setFirstVisit(item, scheduledAt)
+    if (changed && !residentText.trim()) residentText = rescheduleText(scheduledAt)
   }
   // 「更新進度」的紀錄多一行「給住戶：…」，管理端才看得到這次給住戶看了什麼（有寫才有）
   const lines = residentText.trim() ? [text.trim(), `給住戶：${residentText.trim()}`] : [text.trim()]
@@ -436,24 +510,31 @@ function closeItem(item, userId, cost, note = '') {
   // 有結案說明的話多一行，例如「李主委結案」下面一行「費用已付清」
   const text = note ? `${userLabel(userId)}結案\n${note}` : `${userLabel(userId)}結案`
   addLog(item, userId, '已結案', text, '已完成維修，感謝你的通報。')
-  notifyResidentsClosed(item)
+  notifyResidents(item, 'closed')
 }
 
-// 結案：通知住戶（2026-10-16，case-flow 第 5 節）
-//   通報的人：「你通報的『電梯／電梯口運轉有異音』已結案，點擊查看處理結果」
-//   按過「我也遇到了」的人：「你也遇到的『…』已結案，…」
+// 受理、結案時通知住戶（結案 2026-10-16、受理 2026-10-18，case-flow 第 5 節）
+//   通報的人：「你通報的『電梯／電梯口運轉有異音』已受理，點擊查看處理進度」
+//   按過「我也遇到了」的人：「你也遇到的『…』已受理，…」
 //   管委會、管理人員登記的通報（不是住戶通報的）不通知通報人
-function notifyResidentsClosed(item) {
+//   type：'accepted' 受理 / 'closed' 結案
+const RESIDENT_NOTICES = {
+  accepted: { title: '通報已受理', body: '已受理，點擊查看處理進度' },
+  closed: { title: '通報已結案', body: '已結案，點擊查看處理結果' },
+}
+
+function notifyResidents(item, type) {
+  const notice = RESIDENT_NOTICES[type]
   const targets = item.source === 'resident' ? [{ id: item.reporterId, lead: '你通報的' }] : []
   for (const id of item.supporters) targets.push({ id, lead: '你也遇到的' })
   for (const { id, lead } of targets) {
     if (!findUser(id)?.roles.includes('resident')) continue
     notifications.push({
-      id: `n-${item.id}-closed-${id}`,
+      id: `n-${item.id}-${type}-${id}`,
       userId: id,
       role: 'resident',
-      title: '通報已結案',
-      body: `${lead}「${item.title}」已結案，點擊查看處理結果`,
+      title: notice.title,
+      body: `${lead}「${item.title}」${notice.body}`,
       at: MOCK_NOW,
       read: false,
       link: { type: 'case', id: item.id },
@@ -629,35 +710,36 @@ function findEditableCase(id, userId) {
 // 住戶修改通報的紀錄名稱；住戶端看到這個名稱的紀錄，就知道是自己改的
 const RESIDENT_EDIT_LABEL = '住戶補充'
 
-// 修改通報（住戶用）：只能改補充說明和照片，地點和主旨送出後就不能改
-//   changes 可以傳 description（補充說明）、photos（照片或影片檔名的清單），沒傳的不會動
-// 有改到東西的話，處理紀錄多一筆「住戶補充」，留下修改的紀錄：
-//   管理端看到「陳先生（B 棟 8 樓）修改了補充說明」，住戶自己的處理進度看到「你修改了補充說明。」
-//   紀錄的 note 存改完之後的內容（補充說明的全文、照片的檔名），住戶的處理進度用小字顯示在下面
+// 補充通報（住戶用）：可以加一段補充說明、改照片；地點、主旨、原本的描述送出後就不能改
+//   changes 可以傳 supplement（這次新加的補充說明，2026-10-19 改：不再改掉原本的描述，每次都是新的一段）、
+//   photos（照片或影片檔名的清單），沒傳的不會動
+// 有東西的話，處理紀錄多一筆「住戶補充」：
+//   管理端看到「陳先生（B 棟 8 樓）補充了說明」，住戶自己的處理進度看到「你補充了說明。」
+//   紀錄的 note 存補充的內容（照片有改就加上照片的檔名），住戶的處理進度用小字顯示在下面
 // 回傳修改後的通報；不能改的話（不是自己的、已經結案）回傳 undefined
 // 修改只存在記憶體，重新整理網頁會變回原本的假資料
 export async function updateReport(id, userId, changes) {
   await delay()
   const item = findEditableCase(id, userId)
   if (!item) return undefined
-  const changed = [] // 改了哪些，例如 ['補充說明', '照片／影片']
-  const notes = [] // 改完之後的內容，和 changed 一一對應
-  if (changes.description !== undefined && changes.description !== item.description) {
-    item.description = changes.description
-    changed.push('補充說明')
-    notes.push(item.description ? `「${item.description}」` : '已清空')
+  const changed = [] // 做了哪些，例如 ['補充了說明', '修改了照片／影片']
+  const notes = [] // 內容，和 changed 一一對應
+  const supplement = changes.supplement?.trim()
+  if (supplement) {
+    changed.push('補充了說明')
+    notes.push(`「${supplement}」`)
   }
   if (changes.photos !== undefined && changes.photos.join('|') !== item.photos.join('|')) {
     item.photos = [...changes.photos]
-    changed.push('照片／影片')
+    changed.push('修改了照片／影片')
     notes.push(item.photos.length ? item.photos.join('、') : '已全部刪除')
   }
   if (changed.length) {
-    const what = changed.join('、')
-    addLog(item, userId, RESIDENT_EDIT_LABEL, `${reporterLabel(item)}修改了${what}`, `你修改了${what}。`)
-    // 剛加的那一筆，多記改完的內容。只改一項時，上一行已經說了改哪一項，不用再寫一次；兩項都改才在前面標名稱
+    const what = changed.join('，')
+    addLog(item, userId, RESIDENT_EDIT_LABEL, `${reporterLabel(item)}${what}`, `你${what}。`)
+    // 剛加的那一筆，多記內容。只有一項時，上一行已經說了是哪一項；兩項都有才在前面標名稱
     item.logs.at(-1).note =
-      changed.length === 1 ? notes[0] : changed.map((name, i) => `${name}：${notes[i]}`).join('\n')
+      changed.length === 1 ? notes[0] : [`說明：${notes[0]}`, `照片／影片：${notes[1]}`].join('\n')
   }
   return presentForResident(item, userId)
 }
@@ -711,7 +793,7 @@ export async function createReport(userId, input) {
 }
 
 // 有新的住戶通報：通知能受理的人（主委、副主委用管委會身分收、管理人員用管理人員身分收）
-// 通報的人自己也收（例如李伯伯用住戶身分通報，切到主委身分一樣會收到，2026-10-15 決定）
+// 通報的人自己也收（例如李先生用住戶身分通報，切到主委身分一樣會收到，2026-10-15 決定）
 function notifyNewReport(item) {
   for (const user of users) {
     let role = ''

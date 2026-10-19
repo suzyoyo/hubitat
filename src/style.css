@@ -27,21 +27,28 @@
   --color-blue-900: #1b4354;
   --color-blue-950: #062630;
 
-  --color-red-50: #f2e2e4;
-  --color-red-100: #f5c6c8;
-  --color-red-200: #f7aaac;
-  --color-red-300: #fa8e8f;
-  --color-red-400: #fc7273;
-  --color-red-500: #ff5657;
-  --color-red-600: #d64748;
-  --color-red-700: #ad3739;
-  --color-red-800: #85282a;
-  --color-red-900: #5c181b;
-  --color-red-950: #33090c;
+  /* 紅色（2026-10-18 換成 Kit 的 rdx/colors 紅 1～12，也就是 Radix Colors 的紅色）
+     只有 500 是品牌輔色 #ff5657，不在 1～12 裡，留著（＋ 按鈕、status/warning）
+     --color-red-*: initial 先清掉 Tailwind 內建的 red-50～950，免得 bg-red-100 這類舊寫法偷偷用到 Tailwind 的紅 */
+  --color-red-*: initial;
+  --color-red-1: #fffcfc;
+  --color-red-2: #fff7f7;
+  --color-red-3: #feebec;
+  --color-red-4: #ffdbdc; /* 淺紅底：紅色徽章、destructive 按鈕 */
+  --color-red-5: #ffcdce;
+  --color-red-6: #fdbdbe;
+  --color-red-7: #f4a9aa;
+  --color-red-8: #eb8e90;
+  --color-red-9: #e5484d;
+  --color-red-10: #dc3e42;
+  --color-red-11: #ce2c31;
+  --color-red-12: #641723;
+  --color-red-500: #ff5657; /* 品牌輔色 */
 
   /* orange：不覆蓋，直接用 Tailwind / shadcn 內建的橘色（orange-500 = #ff6900） */
 
   --color-gray-50: #f8fafc;
+  --color-gray-75: #f0f0f0; /* Kit 的 gray/3，次要按鈕的底色（2026-10-19 加） */
   --color-gray-100: #e1e2e4;
   --color-gray-200: #c9cbcd;
   --color-gray-300: #b2b3b5;
@@ -55,7 +62,7 @@
 
   /* 陰影：帶一點藍色調，來自彩色版首頁 */
   --shadow-card: 0 1px 2px 0 rgb(27 67 84 / 0.4);
-  --shadow-nav: 0 1px 5px 0 rgb(0 0 0 / 0.35);
+  --shadow-nav: 0 4px 16px 0 rgb(0 0 0 / 0.08); /* 2026-10-18 改淡：Apple 官網導覽列沒有陰影，我們的分頁列是浮起來的膠囊，留一層很淡的影子（原本 0 1px 5px 黑 35%） */
   --shadow-nav-active: 0 1px 1.9px 0 rgb(48 96 119 / 0.62);
   --shadow-fab: 0 1px 2.5px 0 rgb(0 0 0 / 0.35);
 
@@ -81,6 +88,7 @@
   --secondary: var(--color-blue-50); /* brand/primary-subtle */
   --secondary-foreground: var(--color-blue-900);
   --muted: var(--color-gray-100);
+  --button-outline: var(--color-gray-75); /* 次要按鈕（outline）的底色（2026-10-19：原本用頁面背景，在白色卡片上會被吃掉） */
   --muted-foreground: var(--color-gray-600); /* 次要說明文字 text/muted */
   --accent: var(--color-blue-50);
   --accent-foreground: var(--color-blue-900);
@@ -99,13 +107,15 @@
   --remind-strong: var(--color-orange-600);
   --remind-subtle: var(--color-orange-100);
   --warning: var(--color-red-500); /* 警告 status/warning */
-  --warning-strong: var(--color-red-600);
-  --warning-subtle: var(--color-red-100);
+  /* 紅色的字（Kit 的 text-destructive，#e7000b 不在紅 1～12 裡，2026-10-18 013 指定）：
+     紅色徽章的字、錯誤訊息、必填星號、destructive 按鈕 */
+  --warning-strong: #e7000b;
+  --warning-subtle: var(--color-red-4);
   --progress: var(--color-blue-600); /* 進行中 status/progress */
   --success: var(--color-blue-800); /* 完成 status/success */
 
   /* 外框（底部導覽、＋ 按鈕）；數字是不透明度 */
-  --nav: rgb(255 255 255 / 0.72); /* 導覽列底色 */
+  --nav: rgb(255 255 255 / 0.6); /* 導覽列底色（2026-10-18：模糊、飽和度照 Apple 官網導覽列，底色比 Apple 的 80% 透一點） */
   --nav-foreground: var(--color-gray-900); /* 一般分頁的字和圖示 */
   --nav-border: #e9e9e9;
   --nav-active: rgb(111 183 226 / 0.74); /* 目前分頁的底色（藍 500） */
@@ -148,6 +158,7 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
+  --color-button-outline: var(--button-outline);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
@@ -306,4 +317,37 @@
   body {
     @apply bg-background font-sans text-foreground;
   }
+}
+
+/* ───────────────────────────────────────────────────────────
+   大字（2026-10-18，展示用）：住戶「我的 → 顯示設定」選「大」時，外框在 <main> 加上 .large-text
+   照 WCAG（網頁無障礙標準）的「大字」：一般字 24px 以上，或粗體 19px 以上
+   目前只套在住戶端的三個底部分頁（src/lib/fontSize.js）；底部 tab 不在 <main> 裡，不會變
+   ─────────────────────────────────────────────────────────── */
+.large-text .type-body,
+.large-text .type-body-strong,
+.large-text .type-date,
+.large-text .type-note,
+.large-text .type-link {
+  font-size: 24px;
+  line-height: 34px;
+}
+.large-text .type-card-title,
+.large-text .type-greeting {
+  font-size: 26px;
+  line-height: 36px;
+}
+.large-text .type-title {
+  font-size: 30px;
+  line-height: 40px;
+}
+.large-text .type-button,
+.large-text [data-slot='badge'] {
+  font-size: 19px;
+  line-height: 26px;
+  font-weight: 700;
+}
+.large-text [data-slot='badge'] {
+  height: auto;
+  padding: 2px 10px;
 }
