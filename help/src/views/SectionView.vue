@@ -14,7 +14,7 @@ const articles = computed(() => getArticles().filter((a) => a.category === props
 </script>
 
 <template>
-  <section class="hero-gradient" aria-labelledby="section-title">
+  <section aria-labelledby="section-title">
     <div class="page-container flex items-center gap-6 py-10 md:py-12">
       <div class="min-w-0 flex-1">
         <h1 id="section-title" class="text-[28px] font-bold leading-tight text-brand-950 md:text-[36px]">{{ category.title }}</h1>

@@ -14,31 +14,36 @@ export const ABOUT_INTRO = {
 export const ABOUT_NAME = '「好彼」取自英文名稱 Hubitat 前兩個音節的諧音，意思是「美好彼此」。Hubitat 是 Hub（資訊集中的地方）加上 Habitat（居住的環境）。'
 
 // 我們的服務：一個服務一個區塊，桌機左右交替排列
-//   mascot：src/assets/mascot/ 的檔名（不含 .png）
+//   screenshots：區塊旁邊的 App 截圖（src/assets/screenshots/ 的檔名＋替代文字），放進假手機裡、只露出上半截
+//     放一張就是一支手機；放三張就是三支小手機並排（2026-10-19 從好彼管家的圖換成截圖）
 //   links：區塊下面的按鈕，to 是網站裡的網址
 export const ABOUT_SERVICES = [
   {
     title: '通報進度看得到',
     body: '住戶發現電梯異音、走道漏水，用手機就能通報。管委會受理、交辦給管理人員，管理人員聯絡廠商處理，完工後結案，每一步都看得到，也會收到通知。',
-    mascot: 'waving',
+    screenshots: [{ file: 'resident-report-detail.jpg', alt: '通報詳情頁，上方是通報摘要，下方是處理進度' }],
     links: [{ to: '/articles/new-report', label: '看怎麼通報' }],
   },
   {
     title: '公告與會議紀錄集中在一起',
     body: '停水施工、社區活動、管委會的會議紀錄都在 App 裡，不怕錯過公告欄。對會議紀錄有疑問，也可以直接留言給管委會。',
-    mascot: 'pointing',
+    screenshots: [{ file: 'resident-announcements.jpg', alt: '社區公告頁，上方是兩週的行事曆，下面是「與我有關」「社區公告」兩個分頁' }],
     links: [{ to: '/articles/announcements', label: '看怎麼查看公告' }],
   },
   {
     title: '廠商與設備有紀錄可以查',
     body: '社區的廠商、合約和設備都有清冊。每一次維修都會記進設備的維修紀錄，管委會可以看廠商過去的施工表現，作為續約的參考。',
-    mascot: 'searching',
+    screenshots: [{ file: 'committee-vendor-detail.jpg', alt: '廠商詳細頁，有施工表現和聯絡窗口' }],
     links: [{ to: '/articles/equipment', label: '看設備與維修紀錄' }],
   },
   {
     title: '三種身分，各有各的畫面',
     body: '住戶、管委會、管理人員打開 App 看到的內容不一樣，只會看到自己用得到的功能。選你的身分，看你用得到的教學。',
-    mascot: 'thinking',
+    screenshots: [
+      { file: 'resident-home.jpg', alt: '住戶首頁' },
+      { file: 'committee-home.jpg', alt: '管委會首頁' },
+      { file: 'staff-home.jpg', alt: '管理人員首頁' },
+    ],
     links: [
       { to: '/resident', label: '我是住戶' },
       { to: '/committee', label: '我是管委會委員' },

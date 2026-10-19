@@ -5,13 +5,14 @@
 import { ArrowRightIcon } from '@lucide/vue'
 import ContentBlock from '@/components/ContentBlock.vue'
 import DownloadPanel from '@/components/DownloadPanel.vue'
+import PhoneMockup from '@/components/PhoneMockup.vue'
 import RichText from '@/components/RichText.vue'
 import { ABOUT_INTRO, ABOUT_MASCOT, ABOUT_NAME, ABOUT_SERVICES } from '@/content/about'
 import { MASCOTS } from '@/lib/mascots'
 </script>
 
 <template>
-  <section class="hero-gradient" aria-labelledby="about-title">
+  <section aria-labelledby="about-title">
     <div class="page-container py-10 md:py-14">
       <h1 id="about-title" class="text-[28px] font-bold leading-tight text-brand-950 md:text-[38px]">{{ ABOUT_INTRO.title }}</h1>
       <p class="lead-text">{{ ABOUT_INTRO.lead }}</p>
@@ -29,11 +30,22 @@ import { MASCOTS } from '@/lib/mascots'
         class="grid items-center gap-5 md:grid-cols-2 md:gap-10"
       >
         <!-- 圖：手機放在文字上面；桌機第 1、3 個放右邊，第 2、4 個放左邊（左右交替） -->
+        <!--   淺藍底的框裡放假手機，手機從框的上方露出來、下半截被框的底邊切掉（和首頁的手機一樣） -->
+        <!--   一張截圖：一支手機；三張：三支小手機並排，中間那支高一點 -->
+        <!--   手機版的三支小手機整支都放得下，框的高度跟著手機、不切（切掉一點反而怪）；桌機才固定高度切掉下半截 -->
         <div
-          class="order-first grid place-items-center rounded-[var(--radius-card)] bg-brand-50 py-6 md:py-10"
-          :class="index % 2 === 0 && 'md:order-last'"
+          class="order-first flex items-start justify-center gap-3 overflow-hidden rounded-[var(--radius-card)] bg-brand-50 px-4 pt-8 md:h-80 md:pb-0 md:pt-10"
+          :class="[index % 2 === 0 && 'md:order-last', service.screenshots.length > 1 ? 'pb-8' : 'h-64']"
         >
-          <img :src="MASCOTS[service.mascot]" alt="" class="h-28 w-auto md:h-40" />
+          <!-- 寬度設在外面這層（PhoneMockup 本身是撐滿 100%） -->
+          <div
+            v-for="(shot, shotIndex) in service.screenshots"
+            :key="shot.file"
+            class="shrink-0"
+            :class="service.screenshots.length > 1 ? ['w-[30%] max-w-[150px]', shotIndex !== 1 && 'mt-6'] : 'w-[200px] md:w-[230px]'"
+          >
+            <PhoneMockup :file="shot.file" :alt="shot.alt" />
+          </div>
         </div>
         <div class="min-w-0">
           <h3 class="text-xl font-bold text-brand-900 md:text-2xl">{{ service.title }}</h3>

@@ -26,7 +26,7 @@ watch(() => props.roleId, setCurrentRole, { immediate: true })
 </script>
 
 <template>
-  <section class="hero-gradient" aria-labelledby="role-title">
+  <section aria-labelledby="role-title">
     <!-- 右邊放揮手的好彼管家；手機版縮小、放在標題右邊（和首頁一樣，2026-10-19 起手機也顯示） -->
     <div class="page-container grid items-center gap-6 py-10 md:grid-cols-[minmax(0,1fr)_200px] md:py-12">
       <div class="min-w-0">
