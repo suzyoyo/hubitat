@@ -81,7 +81,7 @@ function onFileChange(event) {
     </div>
     <!-- 用文字按鈕，不用叉叉圖示：長輩比較看得懂。按鈕高 44px -->
     <!-- type="button"：放在 <form> 裡時，按了才不會被當成送出表單 -->
-    <Button type="button" variant="outline" class="w-full px-0" :aria-label="`刪除 ${name}`" @click="emit('remove')">
+    <Button type="button" variant="ghost" class="w-full px-0" :aria-label="`刪除 ${name}`" @click="emit('remove')">
       刪除
     </Button>
   </div>

@@ -91,7 +91,7 @@ const shownCases = computed(() =>
       </EmptyMedia>
       <EmptyTitle class="type-greeting">這個條件下沒有案件</EmptyTitle>
       <EmptyDescription class="type-body">換個條件看看，或直接新增一個案件</EmptyDescription>
-      <Button variant="outline" class="mt-4" @click="clearFilters">清除篩選</Button>
+      <Button variant="secondary" class="mt-4" @click="clearFilters">清除篩選</Button>
     </Empty>
 
     <template v-else>

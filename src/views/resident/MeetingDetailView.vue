@@ -253,7 +253,7 @@ function download() {
     <template v-else>
       <div class="space-y-4">
         <MeetingHead :meeting="meeting" />
-        <Button variant="outline" class="w-full" @click="download">
+        <Button variant="secondary" class="w-full" @click="download">
           <DownloadIcon />
           下載會議紀錄（PDF）
         </Button>
@@ -356,7 +356,7 @@ function download() {
             </EmptyMedia>
             <EmptyTitle class="type-greeting">找不到「{{ searchWord }}」相關內容</EmptyTitle>
             <EmptyDescription class="type-body">請換個關鍵字，例如：電梯、防水</EmptyDescription>
-            <Button variant="outline" class="mt-4" @click="clearSearch">清除搜尋</Button>
+            <Button variant="secondary" class="mt-4" @click="clearSearch">清除搜尋</Button>
           </Empty>
 
           <!-- 目錄標籤：捲動時固定在頂部列下面（top-15 是頂部列的高度 60px）。太多時可以左右滑 -->
