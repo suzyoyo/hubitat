@@ -1,11 +1,12 @@
 <script setup>
 // 管委會端・廠商名冊：依合作狀態列出廠商，可以搜尋遇到的問題或廠商名稱（設計稿 1134:16003）
-// 這一版只有「看」；「新增廠商」先連到佔位頁
+// 這一版只有「看」；底部的「新增廠商」先連到佔位頁
 import { PlusIcon, SearchIcon } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
 import AdminVendorCard from '@/components/admin/AdminVendorCard.vue'
 import FilterChips from '@/components/common/FilterChips.vue'
 import SortSelect from '@/components/common/SortSelect.vue'
+import BottomCta from '@/components/app/BottomCta.vue'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
@@ -48,7 +49,8 @@ const shownVendors = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-4 px-5 pt-4 pb-5">
+  <!-- pb-28：底部有固定的按鈕區，留空間給它，內容才不會被蓋住 -->
+  <div class="space-y-4 px-5 pt-4 pb-28">
     <div class="relative">
       <SearchIcon class="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground" />
       <Input
@@ -59,13 +61,6 @@ const shownVendors = computed(() => {
         class="pl-10"
       />
     </div>
-
-    <Button as-child class="w-full">
-      <RouterLink to="/committee/vendors/new">
-        <PlusIcon />
-        新增廠商
-      </RouterLink>
-    </Button>
 
     <FilterChips v-model="status" :options="STATUS_FILTERS" />
     <!-- 同一行：左邊件數、右邊排序（灰色小字） -->
@@ -95,5 +90,12 @@ const shownVendors = computed(() => {
         :to="`/committee/vendors/${vendor.id}`"
       />
     </template>
+
+    <!-- 主要動作固定在畫面底部（2026-10-19，和其他頁一樣用 BottomCta） -->
+    <BottomCta>
+      <Button as-child>
+        <RouterLink to="/committee/vendors/new"><PlusIcon />新增廠商</RouterLink>
+      </Button>
+    </BottomCta>
   </div>
 </template>

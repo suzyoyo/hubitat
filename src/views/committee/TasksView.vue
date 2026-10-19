@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from 'vue'
 import { ChevronRightIcon, PlusIcon } from '@lucide/vue'
 import FilterSelect from '@/components/common/FilterSelect.vue'
 import { Badge } from '@/components/ui/badge'
+import BottomCta from '@/components/app/BottomCta.vue'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatFullDate, formatTime } from '@/lib/date'
@@ -52,11 +53,8 @@ function dateText(value) {
 </script>
 
 <template>
-  <div class="space-y-3 px-5 pt-4 pb-5">
-    <!-- 新增交辦的頁面還沒做，先連到佔位頁 -->
-    <Button as-child class="w-full">
-      <RouterLink to="/committee/tasks/new"><PlusIcon />新增交辦</RouterLink>
-    </Button>
+  <!-- pb-28：底部有固定的按鈕區，留空間給它，內容才不會被蓋住 -->
+  <div class="space-y-3 px-5 pt-4 pb-28">
     <FilterSelect v-model="status" label="狀態" :options="STATUS_FILTERS" />
 
     <template v-if="loading">
@@ -101,5 +99,12 @@ function dateText(value) {
         </RouterLink>
       </template>
     </template>
+
+    <!-- 主要動作固定在畫面底部（2026-10-19，和其他頁一樣用 BottomCta） -->
+    <BottomCta>
+      <Button as-child>
+        <RouterLink to="/committee/tasks/new"><PlusIcon />新增交辦</RouterLink>
+      </Button>
+    </BottomCta>
   </div>
 </template>
