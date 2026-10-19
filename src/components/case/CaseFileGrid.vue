@@ -2,7 +2,7 @@
 // 案件的照片、影片、檔案，一格一個（案件詳情的「現場照片／影片」「完工紀錄」用，2026-10-18）
 //   有暫存照片的（示範時剛選的，見 src/lib/filePreview.js）顯示縮圖，點了全螢幕看，左右滑換張；
 //   暫存的影片顯示第一個畫面（不能點）；假資料只有檔名的，只顯示圖示（不能點）
-//   都不顯示檔名（2026-10-19，和照片格 report/ReportPhotoTile 一樣）
+//   都不顯示檔名（2026-10-19，和照片格 report/ReportPhotoTile 一樣）；只有 PDF 留檔名，不然分不出是哪份
 // 全螢幕的寫法和合約詳情的預覽一樣（views/committee/ContractDetailView.vue）
 import { ChevronLeftIcon, ChevronRightIcon, FileTextIcon, ImageIcon, VideoIcon, XIcon } from '@lucide/vue'
 import { computed, nextTick, ref } from 'vue'
@@ -69,9 +69,10 @@ function go(index) {
         <video :src="`${tile.src}#t=0.1`" muted playsinline preload="metadata" class="size-full object-cover" />
         <VideoIcon class="absolute bottom-1.5 left-1.5 size-4 text-white drop-shadow" />
       </div>
-      <!-- 只有檔名（假資料）：只放圖示，檔名給螢幕閱讀器念 -->
-      <div v-else class="flex h-[100px] items-center justify-center rounded-lg bg-muted" role="img" :aria-label="tile.name">
+      <!-- 只有檔名（假資料、PDF）：放圖示，檔名給螢幕閱讀器念；PDF 分不出是哪份，下面留檔名 -->
+      <div v-else class="flex h-[100px] flex-col items-center justify-center gap-1 rounded-lg bg-muted px-2" role="img" :aria-label="tile.name">
         <component :is="iconOf(tile.name)" class="size-7 text-muted-foreground" />
+        <p v-if="isPdfName(tile.name)" class="w-full truncate text-center type-date text-muted-foreground" aria-hidden="true">{{ tile.name }}</p>
       </div>
     </template>
   </div>

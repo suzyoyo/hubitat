@@ -2,7 +2,7 @@
 // 照片格（對應 Figma 的 Report/Photo Tile）。所有上傳照片的地方都用它（2026-10-19 統一）：
 //   新增通報、通報詳情（ReportPhotoGrid），快速留存、回報完成、交辦回報（case/CaseAttachmentList）
 // 有兩種：
-//   thumbnail：一個已經加入的檔案，格子裡直接顯示照片（不顯示檔名），下面有「刪除」按鈕
+//   thumbnail：一個已經加入的檔案，格子裡直接顯示照片（不顯示檔名；PDF 沒有縮圖，例外留檔名），下面有「刪除」按鈕
 //   add：      虛線框的「新增」，按了可以選檔案（手機上會問要拍照、錄影還是從相簿選），可以一次選好幾個
 // 沒有「更換」：要換的話先刪除再新增
 // 假資料只記檔名：示範時剛選的照片、影片暫存在瀏覽器（src/lib/filePreview.js），看得到真的內容；
@@ -27,10 +27,11 @@ const emit = defineEmits(['pick', 'remove'])
 
 const src = computed(() => previewUrl(props.name))
 const isVideo = computed(() => isVideoName(props.name))
+const isPdf = computed(() => isPdfName(props.name))
 // 沒有內容可以顯示時用的圖示
 const icon = computed(() => {
   if (isVideo.value) return VideoIcon
-  if (isPdfName(props.name)) return FileTextIcon
+  if (isPdf.value) return FileTextIcon
   return ImageIcon
 })
 
@@ -72,8 +73,11 @@ function onFileChange(event) {
       </template>
       <!-- 照片：object-cover 把照片裁成格子的大小，不會變形 -->
       <img v-else-if="src" :src="src" :alt="name" class="size-full object-cover" />
-      <!-- 沒有內容（假資料、PDF）：只放圖示 -->
-      <component :is="icon" v-else class="size-7" :aria-label="name" />
+      <!-- 沒有內容（假資料、PDF）：放圖示；PDF 沒有縮圖分不出是哪份，下面留檔名（2026-10-19，suzy 在 #153 提的） -->
+      <div v-else class="flex w-full flex-col items-center gap-1 px-1" role="img" :aria-label="name">
+        <component :is="icon" class="size-7" />
+        <p v-if="isPdf" class="w-full truncate text-center type-date" aria-hidden="true">{{ name }}</p>
+      </div>
     </div>
     <!-- 用文字按鈕，不用叉叉圖示：長輩比較看得懂。按鈕高 44px -->
     <!-- type="button"：放在 <form> 裡時，按了才不會被當成送出表單 -->
