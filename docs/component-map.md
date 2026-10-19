@@ -84,7 +84,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | Kit 元件 | 程式檔案 | 狀態 | 備註 |
 |---|---|---|---|
 | `Report/Card` | `report/ReportCard.vue` | ✅ | 變體 Type 三種都做了：**Compact**（首頁摘要）、**Full**（我的通報列表：送出日期＋管委會回覆＋編輯按鈕）、**Empty**（目前無通報）。用 `type` prop 切換 Compact／Full，不傳 `report` 就是 Empty。Full 的編輯按鈕由 `editTo` 決定要不要顯示 |
-| `Report/Summary` | `report/ReportSummary.vue` | ✅ | 通報摘要卡：標題＋狀態徽章＋送出日期＋公開狀態。沒有另外做 Visibility 的 prop，依傳進來的 `report.visibility` 自動切換：Public 是地球圖示「公共區域・公開顯示」，Private 是鎖頭圖示「僅你本人與管委會可見」（文字來自假 API 的 `visibilityLabel`） |
+| `Report/Summary` | `report/ReportSummary.vue` | ✅ | 通報摘要卡：標題＋狀態徽章＋送出日期＋公開狀態。沒有另外做 Visibility 的 prop，依傳進來的 `report.visibility` 自動切換：Public 是地球圖示「公共區域・公開顯示」，Private 是鎖頭圖示「僅你本人與管委會可見」（文字來自假 API 的 `visibilityLabel`）。最下面「你的描述」顯示住戶當初寫的描述（只能看，沒寫顯示「沒有填寫描述」，2026-10-19） |
 | `Report/Progress Card` | `report/ReportProgressCard.vue` | ✅ | 「處理進度」卡片，裡面用到下面三個。傳 `report` 進去，會用到 `steps` 和 `timeline` |
 | `Report/Stepper` | `report/ReportStepper.vue` | ✅ | 三步驟進度條。沒有 Current 的 prop，傳通報的 `steps`（三個階段的時間）進去，元件自己算走到第幾步；已完成時三步都打勾。還沒到的步驟下面不顯示日期（設計稿寫「尚未完成」）。沒有用 `ui/stepper`，那是給可以點的表單流程用的 |
 | `Report/Step` | ➖ | ➖ | 進度條的單一圓點（Done／Current／Todo）。寫在 `ReportStepper.vue` 裡面即可 |
