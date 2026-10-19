@@ -43,12 +43,13 @@ const categories = [
       </div>
       <p class="text-sm text-muted-foreground">好彼社區 · shadcn-vue 首批元件</p>
       <!-- overflow-x-auto：手機寬度不夠時可以左右滑動 -->
+      <!-- active:bg-muted：手機上沒有 hover，按下去時也要有顏色 -->
       <nav class="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-3">
         <a
           v-for="category in categories"
           :key="category.id"
           :href="`#${category.id}`"
-          class="shrink-0 rounded-full border bg-card px-4 py-2.5 text-sm hover:bg-muted"
+          class="shrink-0 rounded-full border bg-card px-4 py-2.5 text-sm hover:bg-muted active:bg-muted"
         >
           {{ category.label }}
         </a>
