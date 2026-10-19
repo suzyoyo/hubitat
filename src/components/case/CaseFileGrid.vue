@@ -1,7 +1,8 @@
 <script setup>
-// 案件的照片、影片、檔案，一格一個（案件詳情的「現場照片／影片」「完工紀錄」用，2026-10-18）
-//   有暫存照片的（示範時剛選的，見 src/lib/filePreview.js）顯示縮圖，點了全螢幕看，左右滑換張；
-//   暫存的影片顯示第一個畫面（不能點）；假資料只有檔名的，只顯示圖示（不能點）
+// 案件的照片、影片、檔案，排成一排、可以左右滑（案件詳情的「住戶通報」「完工紀錄」、留存詳情用；
+//   2026-10-19 從一排兩格改成一排滑動的小方格，比較省空間）
+//   有暫存照片、影片的（示範時剛選的，見 src/lib/filePreview.js）顯示縮圖，點了全螢幕看，左右滑換張，影片可以播放；
+//   假資料只有檔名的，只顯示圖示（不能點）
 //   都不顯示檔名（2026-10-19，和照片格 report/ReportPhotoTile 一樣）；只有 PDF 留檔名，不然分不出是哪份
 // 全螢幕的寫法和合約詳情的預覽一樣（views/committee/ContractDetailView.vue）
 import { ChevronLeftIcon, ChevronRightIcon, FileTextIcon, ImageIcon, VideoIcon, XIcon } from '@lucide/vue'
@@ -25,8 +26,8 @@ function iconOf(name) {
 }
 
 const tiles = computed(() => props.files.map((name) => ({ name, src: previewUrl(name), isVideo: isVideoName(name) })))
-// 看得到的照片（全螢幕只放這些，影片不放）
-const photos = computed(() => tiles.value.filter((tile) => tile.src && !tile.isVideo))
+// 看得到的照片和影片（全螢幕只放這些）
+const photos = computed(() => tiles.value.filter((tile) => tile.src))
 
 // ── 全螢幕 ─────────────────────────────────
 const viewerOpen = ref(false)
@@ -40,10 +41,15 @@ async function openViewer(name) {
   requestAnimationFrame(() => track.value?.scrollTo({ left: current.value * track.value.clientWidth }))
 }
 
-// 滑動時，用捲了多遠算出現在是第幾張
+// 滑動時，用捲了多遠算出現在是第幾張；換張時把其他正在播的影片暫停
 function onScroll() {
   const el = track.value
-  if (el) current.value = Math.round(el.scrollLeft / el.clientWidth)
+  if (!el) return
+  current.value = Math.round(el.scrollLeft / el.clientWidth)
+  // el.children：每一張是一格；不是現在這張的影片就暫停
+  Array.from(el.children).forEach((slide, index) => {
+    if (index !== current.value) slide.querySelector('video')?.pause()
+  })
 }
 
 function go(index) {
@@ -52,25 +58,31 @@ function go(index) {
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-3">
+  <!-- 一排、超過寬度就左右滑；-mx-4 px-4 讓滑動時可以滑到卡片邊緣，第一格還是和文字對齊 -->
+  <div class="-mx-4 flex snap-x gap-2.5 overflow-x-auto px-4 pb-1">
     <template v-for="tile in tiles" :key="tile.name">
-      <!-- 有照片：縮圖，點了全螢幕 -->
+      <!-- 有照片或影片：縮圖，點了全螢幕 -->
       <button
-        v-if="tile.src && !tile.isVideo"
+        v-if="tile.src"
         type="button"
-        class="h-[100px] overflow-hidden rounded-lg bg-muted"
+        class="relative size-24 shrink-0 snap-start overflow-hidden rounded-lg bg-muted"
         :aria-label="`看 ${tile.name}`"
         @click="openViewer(tile.name)"
       >
-        <img :src="tile.src" alt="" class="size-full object-cover" />
+        <!-- 影片：顯示第 0.1 秒的畫面＋左下角攝影機圖示 -->
+        <template v-if="tile.isVideo">
+          <video :src="`${tile.src}#t=0.1`" muted playsinline preload="metadata" class="size-full object-cover" />
+          <VideoIcon class="absolute bottom-1.5 left-1.5 size-4 text-white drop-shadow" />
+        </template>
+        <img v-else :src="tile.src" alt="" class="size-full object-cover" />
       </button>
-      <!-- 暫存的影片：顯示第 0.1 秒的畫面＋左下角攝影機圖示 -->
-      <div v-else-if="tile.src" class="relative h-[100px] overflow-hidden rounded-lg bg-muted">
-        <video :src="`${tile.src}#t=0.1`" muted playsinline preload="metadata" class="size-full object-cover" />
-        <VideoIcon class="absolute bottom-1.5 left-1.5 size-4 text-white drop-shadow" />
-      </div>
       <!-- 只有檔名（假資料、PDF）：放圖示，檔名給螢幕閱讀器念；PDF 分不出是哪份，下面留檔名 -->
-      <div v-else class="flex h-[100px] flex-col items-center justify-center gap-1 rounded-lg bg-muted px-2" role="img" :aria-label="tile.name">
+      <div
+        v-else
+        class="flex size-24 shrink-0 snap-start flex-col items-center justify-center gap-1 rounded-lg bg-muted px-2"
+        role="img"
+        :aria-label="tile.name"
+      >
         <component :is="iconOf(tile.name)" class="size-7 text-muted-foreground" />
         <p v-if="isPdfName(tile.name)" class="w-full truncate text-center type-date text-muted-foreground" aria-hidden="true">{{ tile.name }}</p>
       </div>
@@ -97,7 +109,9 @@ function go(index) {
       </div>
       <div ref="track" class="flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto" @scroll.passive="onScroll">
         <div v-for="photo in photos" :key="photo.name" class="flex w-full shrink-0 snap-center items-center justify-center p-4">
-          <img :src="photo.src" :alt="photo.name" class="max-h-full max-w-full rounded" />
+          <!-- 影片：controls 有播放、暫停、進度條；playsinline 讓 iPhone 在這裡播，不會自己跳全螢幕 -->
+          <video v-if="photo.isVideo" :src="photo.src" controls playsinline class="max-h-full max-w-full rounded" />
+          <img v-else :src="photo.src" :alt="photo.name" class="max-h-full max-w-full rounded" />
         </div>
       </div>
       <div class="flex items-center justify-between px-3 py-3">
