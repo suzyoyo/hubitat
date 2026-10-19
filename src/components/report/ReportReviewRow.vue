@@ -22,6 +22,6 @@ defineEmits(['edit'])
       <p class="type-body whitespace-pre-line text-muted-foreground">{{ value }}</p>
     </div>
     <!-- aria-label：螢幕閱讀器會念「修改地點」，才知道是改哪一項 -->
-    <Button variant="outline" class="shrink-0" :aria-label="`修改${label}`" @click="$emit('edit')">修改</Button>
+    <Button variant="ghost" class="shrink-0" :aria-label="`修改${label}`" @click="$emit('edit')">修改</Button>
   </div>
 </template>

@@ -247,7 +247,7 @@ const publishRows = computed(() => {
         <Button as-child>
           <RouterLink :to="editLink">修改公告</RouterLink>
         </Button>
-        <Button variant="outline" :disabled="pending" @click="openWithdraw">撤回公告</Button>
+        <Button variant="destructive" :disabled="pending" @click="openWithdraw">撤回公告</Button>
       </BottomCta>
 
       <!-- 撤回確認彈窗：平常看不到，withdrawOpen 變成 true 才會出現（長相和撤回通報的彈窗一樣） -->

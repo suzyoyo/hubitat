@@ -423,12 +423,12 @@ const basicRows = computed(() => {
         {{ action.label }}
       </Button>
       <!-- 下面一排：動作（完工驗收、結案…）在左、更新進度在右（2026-10-15 013 改）
-           顏色不跟著換：右邊那顆是主要的藍色；有更新進度時，左邊的動作用次要的淺藍 -->
+           顏色不跟著換：右邊那顆是主要的藍色；有更新進度時，左邊的動作是並排的次要按鈕（灰白，2026-10-19 按鈕規則） -->
       <div v-if="canUpdate || mainActions.length" class="flex gap-3 *:flex-1">
         <Button
           v-for="action in mainActions"
           :key="action.key"
-          :variant="canUpdate ? 'secondary' : action.main ? 'default' : 'outline'"
+          :variant="canUpdate || !action.main ? 'outline' : 'default'"
           :disabled="pending"
           @click="runAction(action)"
         >

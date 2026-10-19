@@ -54,7 +54,7 @@ const compactClass = 'block rounded-r-xl border-l-[5px] border-warning bg-card p
     </div>
     <div class="flex items-center">
       <!-- relative z-10：讓按鈕疊在標題連結的可點擊範圍上面，才按得到 -->
-      <Button v-if="editTo" as-child variant="outline" class="relative z-10 px-3 font-medium">
+      <Button v-if="editTo" as-child variant="secondary" class="relative z-10 px-3 font-medium">
         <RouterLink :to="editTo">
           <PencilLineIcon />
           編輯通報 / 補充

@@ -198,7 +198,7 @@ const tiles = computed(() => {
 
         <Separator />
         <!-- 設備有問題就去通報：網址帶設備編號，新增通報會先填好地點、類型和設備名稱 -->
-        <Button as-child variant="outline" class="w-full">
+        <Button as-child variant="secondary" class="w-full">
           <RouterLink :to="`/resident/reports/new?equipment=${device.id}`">通報問題</RouterLink>
         </Button>
       </section>
