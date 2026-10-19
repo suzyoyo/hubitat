@@ -20,7 +20,7 @@ export default {
     {
       title: '點設備看詳細資料',
       body: '可以看到設備資料、下次什麼時候保養，以及以前的維修紀錄。點一筆維修紀錄，可以看當時的案件。',
-      screenshot: { file: 'committee-equipment-detail.jpg', alt: '設備詳情頁，下方是維修紀錄' },
+      screenshot: { file: 'committee-equipment-detail.jpg', alt: '設備詳情頁，有保養資訊，下面是維修史' },
     },
   ],
   notes: ['維修費用只有管委會看得到。'],

@@ -15,7 +15,7 @@ export default {
     {
       title: '用問題或名稱找廠商',
       body: '在搜尋框打遇到的問題，例如「漏水」，或直接打廠商名稱。',
-      screenshot: { file: 'committee-vendor-list.jpg', alt: '廠商名冊，上方有搜尋框和排序' },
+      screenshot: { file: 'committee-vendor-list.jpg', alt: '廠商名冊，上方有搜尋框、合作中／候選／停用篩選和排序' },
     },
     {
       title: '點廠商看詳細資料',

@@ -27,7 +27,7 @@ export default {
     {
       title: '安排廠商、記下處理狀況',
       body: '在案件裡選廠商、約好到場時間，寫下處理的情況，也可以寫一句話讓住戶知道進度。寫好按「更新進度」。',
-      screenshot: { file: 'case-processing.jpg', alt: '處理中的案件詳情，有問題分類、關聯設備、廠商、處理內容欄位' },
+      screenshot: { file: 'case-processing.jpg', alt: '處理中的案件詳情，底部有「撤回交辦」和「更新進度」' },
     },
     {
       title: '修好後按「完工驗收」',

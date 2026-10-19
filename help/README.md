@@ -37,7 +37,8 @@ help/
 ├─ public/                         原封不動複製的檔案（favicon）
 ├─ scripts/
 │  ├─ check-content.js             檢查文章資料、列出待補截圖
-│  └─ test-site.js                 Playwright 自動檢查
+│  ├─ test-site.js                 Playwright 自動檢查
+│  └─ shoot-app.js                 幫手冊截 App 的畫面
 └─ src/
    ├─ main.js、App.vue、router.js  進入點、外框、網址
    ├─ style.css                    設計 Token（顏色、字型、按鈕）
@@ -52,7 +53,7 @@ help/
    │  ├─ roles.js                  三種身分
    │  ├─ faqs.js                   常見問題
    │  └─ contact.js                聯絡支援（目前是測試資料）
-   ├─ assets/screenshots/          App 截圖（目前是空的，見下面「截圖」）
+   ├─ assets/screenshots/          App 截圖（見下面「截圖」）
    ├─ lib/                         從文章資料算出導覽、目錄、搜尋
    ├─ components/                  共用元件
    └─ views/                       頁面
@@ -136,14 +137,21 @@ sections: [
 
 ## 截圖
 
-**目前先不放截圖**（2026-10-18 決定：App 的最終畫面還要再確認）。文章裡已經寫好每一步要放哪張圖（`screenshot.file` 和 `alt`），檔案還沒放進來的圖片網站上不會顯示，也不會留下空白。
+截圖在 `src/assets/screenshots/`，2026-10-19 用腳本從 App 截好（50 張，手機 375×812、2 倍解析度、`.jpg`）。文章裡寫了 `screenshot.file` 但檔案不存在的圖，網站上不會顯示，也不會留下空白。
 
-畫面定案後：
+**App 畫面改了、要重截時**：
 
-1. `npm run check:help` 看「待補截圖清單」（檔名、圖上要有什麼、用在哪幾篇）
-2. 用 App 截圖：手機尺寸 375×812、2 倍解析度，存成 `.jpg`（檔案比較小）。截之前到 App 的 `/playground` 選好示範住戶，截完切回李先生；中途不要重新整理
-3. 照清單的檔名放進 `src/assets/screenshots/`，網站就會自動顯示，點了可以放大
-4. 截圖不要拍到佔位頁（「這一頁還沒製作」）、字體大小設定、下載按鈕
+1. `npm run shoot:help` 全部重截；只截幾張就加檔名：`npm run shoot:help -- resident-home case-pending`
+2. 腳本在 `scripts/shoot-app.js`，每張圖要開哪一頁、點哪裡都寫在 `SHOTS` 清單裡。按鈕文字改了，腳本會顯示「❌ 某張 … Timeout」，到清單裡改那一張的動作
+3. 截完要**一張一張看過**，並對照文章文字有沒有跟著改（按鈕名稱、步驟順序）
+4. 新增文章要用新圖時：文章寫好 `screenshot`，在 `SHOTS` 加一筆同檔名的，`npm run check:help` 會列出還缺哪幾張
+
+腳本會自動處理這些事，不用手動：
+
+- 「開啟通知」提醒卡：設成這次已按過「先不要」，不會出現在截圖裡
+- 示範資料刻意讓李先生一開始沒有通報、通知全部已讀（現場展示用）。截住戶的通報和通知畫面前，腳本會暫時把兩筆案件改成李先生通報的、兩則通知改成未讀（只改那次打開的網頁，不會改到 App 的程式）
+- 不拍字體大小設定、QR Code、下載按鈕：用裁切或捲動避開
+- 「認識 App 畫面」那張圖的橘色圈圈是腳本畫上去的
 
 ## 認識我們、常見問題、聯絡支援
 

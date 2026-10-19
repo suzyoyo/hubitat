@@ -16,7 +16,7 @@ export default {
     {
       title: '選類型、寫標題和內容',
       body: '先選公告類型：施工、維護、活動或其他，再寫標題和內容。',
-      screenshot: { file: 'committee-announcement-form.jpg', alt: '發布公告表單的上半部，有公告類型、標題、內容' },
+      screenshot: { file: 'committee-announcement-form.jpg', alt: '發布公告表單的上半部，有公告類型、公告標題、影響範圍' },
     },
     {
       title: '選影響範圍和日期',

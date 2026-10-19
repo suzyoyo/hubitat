@@ -14,8 +14,8 @@ export default {
     },
     {
       title: '點具體的地點',
-      body: '例如「1F 大廳」「電梯／電梯口」。選到的地點會有藍色外框。',
-      screenshot: { file: 'report-step1.jpg', alt: '展開 B 棟後，選了「電梯／電梯口」' },
+      body: '例如「1F 大廳」「電梯／電梯口」。選到的地點會變成藍色。',
+      screenshot: { file: 'report-step1.jpg', alt: '展開 A 棟後，選了「1F 大廳」' },
     },
     {
       title: '找不到地點，就點「其他」',

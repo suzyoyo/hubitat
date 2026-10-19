@@ -11,7 +11,7 @@ export default {
     {
       title: '按底部的「廠商」',
       body: '會看到廠商的緊急聯絡電話、社區內部的聯絡電話，以及鑰匙清單。',
-      screenshot: { file: 'committee-vendors.jpg', alt: '廠商分頁，有廠商緊急聯絡、社區內部聯絡、鑰匙清單' },
+      screenshot: { file: 'committee-vendors.jpg', alt: '廠商分頁，有廠商緊急聯絡和社區內部聯絡的電話' },
     },
     {
       title: '找到要聯絡的人',

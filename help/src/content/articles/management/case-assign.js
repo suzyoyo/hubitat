@@ -17,7 +17,7 @@ export default {
     {
       title: '寫下要做什麼',
       body: '填「交辦標題」，例如「聯繫電梯廠商檢修 B 棟電梯」；需要的話，在「交辦內容」寫得更詳細。',
-      screenshot: { file: 'case-assign.jpg', alt: '新增交辦頁，有交辦標題、交辦內容、交辦對象、完成期限' },
+      screenshot: { file: 'case-assign.jpg', alt: '新增交辦頁，關聯案件已鎖定，下面是交辦標題、交辦內容、交辦對象' },
     },
     {
       title: '選交給誰、什麼時候前完成',

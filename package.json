@@ -11,6 +11,7 @@
     "build:help": "vite build --config help/vite.config.js",
     "preview:help": "vite preview --config help/vite.config.js",
     "check:help": "node help/scripts/check-content.js",
+    "shoot:help": "node help/scripts/shoot-app.js",
     "test:help": "node help/scripts/test-site.js"
   },
   "dependencies": {
