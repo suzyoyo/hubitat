@@ -86,7 +86,8 @@ watch(
 
       <header class="mt-1">
         <h1 class="text-[28px] font-bold leading-tight text-brand-950 md:text-[34px]">{{ article.title }}</h1>
-        <p class="lead-text">{{ article.description }}</p>
+        <!-- hideDescription：文章頁不顯示這句介紹（卡片、搜尋結果還是會顯示） -->
+        <p v-if="!article.hideDescription" class="lead-text">{{ article.description }}</p>
         <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
           <RolePills :roles="article.applicableRoles" />
           <p v-if="article.audienceNote" class="text-[15px] text-muted">
@@ -133,11 +134,12 @@ watch(
       <!-- 其他段落 -->
       <section
         v-for="(section, index) in sections"
-        :key="section.heading"
+        :key="index"
         class="mt-10"
-        :aria-labelledby="sectionId(index)"
+        :aria-labelledby="section.heading ? sectionId(index) : undefined"
       >
-        <h2 :id="sectionId(index)" class="scroll-mt-24 text-2xl font-bold text-brand-950">{{ section.heading }}</h2>
+        <!-- 段落標題可以不寫：不寫就不顯示，也不會出現在頁內目錄 -->
+        <h2 v-if="section.heading" :id="sectionId(index)" class="scroll-mt-24 text-2xl font-bold text-brand-950">{{ section.heading }}</h2>
         <!-- 段落有設 mascot 的放好彼管家（圖只是裝飾，alt 留空）：
                平板、桌機：右下角一隻，底部和段落最後一行對齊
                手機：放在文字下面排成一列（有 mascotRow 就排那幾隻），不擠到文字 -->

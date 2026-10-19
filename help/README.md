@@ -82,6 +82,7 @@ help/
 | `keywords` | ✓ | 搜尋用的關鍵字，放使用者可能會打的說法（例如「報修」「壞掉」） |
 | `published` | ✓ | `true` 才會出現在網站上；還沒寫完的設 `false`，網站上完全看不到 |
 | `audienceNote` | | 身分底下的補充，例如「只有主委、副主委可以交辦。」 |
+| `hideDescription` | | `true` 的話，文章頁的標題下面不顯示 `description`（卡片、搜尋結果還是會顯示） |
 | `popular` | | `true` 會出現在首頁「新手教學」（建議維持 6～8 篇） |
 | `complex` | | `true` 表示比較複雜的流程，「注意事項」旁邊會放好彼管家（步驟一律一步一步看，不用另外設定） |
 | `before` | | 「開始前要知道」，字串陣列 |
@@ -112,7 +113,7 @@ steps: [
 ```js
 sections: [
   {
-    heading: '段落標題',
+    heading: '段落標題', // 選填：不寫就不顯示標題，也不會列進頁內目錄
     mascot: 'waving', // 選填：段落右下角放好彼管家，填 src/assets/mascot/ 的檔名（不含 .png）
     mascotRow: ['pointing', 'happy'], // 選填：手機版改在文字下面排成一列的幾隻；沒填就只放 mascot 那一隻
     blocks: [
@@ -123,6 +124,7 @@ sections: [
       { type: 'tip', title: '小提示', text: '…' },
       { type: 'warning', title: '請注意', text: '…' },
       { type: 'image', screenshot: { file: '檔名.jpg', alt: '圖上有什麼' } },
+      { type: 'tour', slides: [{ role: 'resident', file: '檔名.jpg', alt: '圖上有什麼', marks: [{ boxes: [[x, y, 寬, 高]], zone: 'top', align: 'right', text: '說明' }] }] }, // tab 切身分、每個身分一組輪播，一張亮一個地方，見 ScreenTour.vue
     ],
   },
 ]
@@ -138,7 +140,7 @@ sections: [
 
 ## 截圖
 
-截圖在 `src/assets/screenshots/`，2026-10-19 用腳本從 App 截好（66 張，其中 `done-` 開頭的 9 張是文章「完成了！」那一頁用的；手機 375×812、2 倍解析度、`.jpg`）。文章裡寫了 `screenshot.file` 但檔案不存在的圖，網站上不會顯示，也不會留下空白。
+截圖在 `src/assets/screenshots/`，2026-10-19 用腳本從 App 截好（65 張，其中 `done-` 開頭的 9 張是文章「完成了！」那一頁用的；手機 375×812、2 倍解析度、`.jpg`）。文章裡寫了 `screenshot.file` 但檔案不存在的圖，網站上不會顯示，也不會留下空白。
 
 **App 畫面改了、要重截時**：
 
@@ -152,7 +154,7 @@ sections: [
 - 「開啟通知」提醒卡：設成這次已按過「先不要」，不會出現在截圖裡
 - 示範資料刻意讓李先生一開始沒有通報、通知全部已讀（現場展示用）。截住戶的通報和通知畫面前，腳本會暫時把兩筆案件改成李先生通報的、兩則通知改成未讀（只改那次打開的網頁，不會改到 App 的程式）
 - 不拍字體大小設定、QR Code、下載按鈕：用裁切或捲動避開
-- 「認識 App 畫面」那張圖的橘色圈圈是腳本畫上去的
+- 「認識 App 首頁」亮起來的地方和說明是網頁畫在截圖上的（`ScreenTour.vue`），截圖本身是乾淨的。亮的位置寫在文章的 `boxes`，App 的鈴鐺、導覽列位置改了要跟著改
 
 ## 認識我們、常見問題、聯絡支援
 

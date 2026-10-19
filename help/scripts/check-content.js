@@ -65,6 +65,7 @@ for (const a of articles.filter((x) => x.published)) {
     ...(a.steps ?? []).filter((s) => s.screenshot).map((s) => s.screenshot),
     ...(a.resultScreenshot ? [a.resultScreenshot] : []),
     ...(a.sections ?? []).flatMap((s) => s.blocks).filter((b) => b.type === 'image').map((b) => b.screenshot),
+    ...(a.sections ?? []).flatMap((s) => s.blocks).filter((b) => b.type === 'tour').flatMap((b) => b.slides),
   ]
   for (const shot of list) {
     if (!shots.has(shot.file)) shots.set(shot.file, { alt: shot.alt, articles: [] })

@@ -7,9 +7,11 @@
 //   tip      小提示框            { type: 'tip', title, text }
 //   warning  注意框              { type: 'warning', title, text }
 //   image    截圖                { type: 'image', screenshot: { file, alt, caption } }
+//   tour     說明壓在截圖上、左右滑動換身分  { type: 'tour', slides: [] }，欄位見 ScreenTour.vue
 import NoteBox from './NoteBox.vue'
 import RichText from './RichText.vue'
 import ScreenshotImage from './ScreenshotImage.vue'
+import ScreenTour from './ScreenTour.vue'
 
 defineProps({
   block: { type: Object, required: true },
@@ -74,4 +76,6 @@ const badgeColors = {
   </NoteBox>
 
   <ScreenshotImage v-else-if="block.type === 'image'" :shot="block.screenshot" />
+
+  <ScreenTour v-else-if="block.type === 'tour'" :slides="block.slides" />
 </template>

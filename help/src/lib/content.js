@@ -74,7 +74,7 @@ export function getToc(article) {
   if (article.before?.length) toc.push({ id: 'before', title: '開始前要知道' })
   if (article.steps?.length) toc.push({ id: 'steps', title: '操作步驟' })
   getSections(article).forEach((section, index) => {
-    toc.push({ id: sectionId(index), title: section.heading })
+    if (section.heading) toc.push({ id: sectionId(index), title: section.heading }) // 沒有標題的段落不列
   })
   if (article.notes?.length) toc.push({ id: 'notes', title: '注意事項' })
   if (getRelatedArticles(article).length) toc.push({ id: 'related', title: '相關教學' })
@@ -98,7 +98,12 @@ function fullText(article) {
     ...(article.steps ?? []).flatMap((step) => [step.title, step.body, ...(step.tips ?? [])]),
     ...(article.sections ?? []).flatMap((section) => [
       section.heading,
-      ...section.blocks.flatMap((block) => [block.text, ...(block.items ?? []), ...(block.rows ?? []).flat()]),
+      ...section.blocks.flatMap((block) => [
+        block.text,
+        ...(block.items ?? []),
+        ...(block.rows ?? []).flat(),
+        ...(block.slides ?? []).flatMap((slide) => slide.marks.map((mark) => mark.text)), // 導覽輪播的說明
+      ]),
     ]),
     article.result,
     ...(article.notes ?? []),

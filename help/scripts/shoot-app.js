@@ -46,20 +46,13 @@ async function stageResident(page) {
   })
 }
 
-// 在畫面上圈出幾個地方（「認識 App 畫面」那一篇用）
-async function markElements(page, locators) {
-  const boxes = []
-  for (const loc of locators) boxes.push(await loc.boundingBox())
-  await page.evaluate((list) => {
-    for (const b of list) {
-      const ring = document.createElement('div')
-      Object.assign(ring.style, {
-        position: 'fixed', left: b.x - 5 + 'px', top: b.y - 5 + 'px', width: b.width + 10 + 'px', height: b.height + 10 + 'px',
-        border: '3px solid #F97316', borderRadius: '18px', zIndex: 9999, pointerEvents: 'none',
-      })
-      document.body.append(ring)
-    }
-  }, boxes)
+// 管委會、管理人員也一樣：通知假資料全部已讀，首頁的鈴鐺沒有紅點
+// 「認識 App 首頁」要介紹紅點，所以各改一則成未讀（2026-10-19 加）
+async function stageUnread(page) {
+  await page.evaluate(async () => {
+    const { notifications } = await import('/src/mocks/data/notifications.js')
+    for (const id of ['n-106', 'n-201']) notifications.find((n) => n.id === id).read = false
+  })
 }
 
 // 新增通報：一路做到第 step 步（A 棟 → 1F 大廳，這裡有別人通報過的問題）
@@ -91,10 +84,6 @@ async function reportUntil(page, step) {
 const SHOTS = [
   // 住戶
   { file: 'resident-home', path: '/resident/home', stage: stageResident },
-  {
-    file: 'resident-home-marked', path: '/resident/home', stage: stageResident,
-    run: (page) => markElements(page, [page.getByRole('link', { name: '通知' }).first(), page.locator('nav').first(), page.getByRole('link', { name: '通報' }).last()]),
-  },
   { file: 'resident-reports', path: '/resident/reports', stage: stageResident },
   { file: 'resident-report-detail', path: '/resident/reports/CASE-20260925-003', stage: stageResident },
   {
@@ -167,7 +156,7 @@ const SHOTS = [
     },
   },
   // 管委會
-  { file: 'committee-home', path: '/committee/home' },
+  { file: 'committee-home', path: '/committee/home', stage: stageUnread },
   {
     file: 'committee-fab-menu', path: '/committee/home',
     run: (page) => page.getByRole('button', { name: /新增/ }).last().click(),
@@ -236,7 +225,7 @@ const SHOTS = [
   { file: 'committee-task-detail', path: '/committee/tasks/TASK-104' }, // 對方已回報、待我確認
   { file: 'resident-report-progress', path: '/resident/reports/CASE-20260925-003', stage: stageResident, run: (page) => scrollTo(page, '處理進度', 70) },
   // 管理人員
-  { file: 'staff-home', path: '/staff/home' },
+  { file: 'staff-home', path: '/staff/home', stage: stageUnread },
   { file: 'staff-task-detail', path: '/staff/tasks/TASK-099' },
   {
     file: 'staff-task-report', path: '/staff/tasks/TASK-099/report',
