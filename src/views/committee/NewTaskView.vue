@@ -9,6 +9,7 @@ import { LockIcon, SearchIcon, XIcon } from '@lucide/vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import LeaveConfirmDialog from '@/components/feedback/LeaveConfirmDialog.vue'
 import BottomCta from '@/components/app/BottomCta.vue'
 import DatePicker from '@/components/common/DatePicker.vue'
 import { Badge } from '@/components/ui/badge'
@@ -62,6 +63,7 @@ onMounted(async () => {
   // 可以交辦的案件：和案件詳情的「交辦」按鈕同一個規則（已受理、處理中，還沒有沒完成的交辦）
   openCases.value = caseList.filter((item) => ['accepted', 'in_progress'].includes(item.status) && !item.openTaskId)
   loading.value = false
+  initialForm.value = JSON.stringify(form) // 記下剛載入時的樣子，之後比較有沒有改過
 })
 
 // 從案件進來，但這件案件不能交辦：找不到、已經結案或取消、還有沒完成的交辦
@@ -130,6 +132,7 @@ async function submit() {
     toast.error('沒有交辦成功', { description: '這件案件可能已經交辦了，請重新整理後再試一次' })
     return
   }
+  saved.value = true // 送出成功，換頁時不用再問
   toast.success('已交辦', { description: `已通知${task.assigneeLabel}` })
   // 從案件來的回到案件詳情（看得到「交辦」那一筆紀錄），其他的到這件交辦的詳情（下拉選了案件的也是）
   router.replace(relatedCase.value ? `/committee/cases/${relatedCase.value.id}` : `/committee/tasks/${task.id}`)
@@ -140,6 +143,11 @@ function cancel() {
   if (window.history.state?.back) router.back()
   else router.replace('/committee/home')
 }
+
+// 有沒有填東西（離開前確認用）：和剛載入時的表單比，有改過就算；送出成功後 saved 變 true，換頁不用再問
+const initialForm = ref('')
+const saved = ref(false)
+const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.stringify(form) !== initialForm.value)
 </script>
 
 <template>
@@ -284,5 +292,7 @@ function cancel() {
         <Button type="button" variant="outline" @click="cancel">取消</Button>
       </BottomCta>
     </form>
+    <!-- 填到一半想離開時先問一次 -->
+    <LeaveConfirmDialog :dirty="isDirty" />
   </div>
 </template>

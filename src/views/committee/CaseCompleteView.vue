@@ -9,6 +9,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import LeaveConfirmDialog from '@/components/feedback/LeaveConfirmDialog.vue'
 import BottomCta from '@/components/app/BottomCta.vue'
 import CaseAttachmentList from '@/components/case/CaseAttachmentList.vue'
 import { Badge } from '@/components/ui/badge'
@@ -86,6 +87,7 @@ async function submit() {
     toast.error('沒有回報成功', { description: '案件的狀態可能已經改變，請重新整理' })
     return
   }
+  saved.value = true // 送出成功，換頁時不用再問
   confirmOpen.value = false
   // 直接結案的：有關聯設備才會記進維修紀錄（4-7）
   if (result.status === 'closed') {
@@ -96,6 +98,10 @@ async function submit() {
   if (window.history.state?.back === detailPath.value) router.back()
   else router.replace(detailPath.value)
 }
+
+// 有沒有填東西（離開前確認用）；送出成功後 saved 變 true，換頁不用再問
+const saved = ref(false)
+const isDirty = computed(() => !saved.value && Boolean(files.value.length || note.value.trim() || cost.value))
 </script>
 
 <template>
@@ -195,5 +201,7 @@ async function submit() {
         </div>
       </DialogContent>
     </Dialog>
+    <!-- 填到一半想離開時先問一次 -->
+    <LeaveConfirmDialog :dirty="isDirty" />
   </div>
 </template>

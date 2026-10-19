@@ -6,6 +6,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import LeaveConfirmDialog from '@/components/feedback/LeaveConfirmDialog.vue'
 import BottomCta from '@/components/app/BottomCta.vue'
 import CaseAttachmentList from '@/components/case/CaseAttachmentList.vue'
 import { Badge } from '@/components/ui/badge'
@@ -73,11 +74,16 @@ async function submit() {
     return
   }
   confirmOpen.value = false
+  saved.value = true // 送出成功，換頁時不用再問
   toast.success('已回報完成', { description: `等待${task.value.assignerLabel}確認` })
   // 從交辦詳情來的就回上一頁；直接打開這一頁的（沒有上一頁）就換到交辦詳情
   if (window.history.state?.back === detailPath.value) router.back()
   else router.replace(detailPath.value)
 }
+
+// 有沒有填東西（離開前確認用）；送出成功後 saved 變 true，換頁不用再問
+const saved = ref(false)
+const isDirty = computed(() => !saved.value && Boolean(files.value.length || note.value.trim()))
 </script>
 
 <template>
@@ -158,5 +164,7 @@ async function submit() {
         </div>
       </DialogContent>
     </Dialog>
+    <!-- 填到一半想離開時先問一次 -->
+    <LeaveConfirmDialog :dirty="isDirty" />
   </div>
 </template>

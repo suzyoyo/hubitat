@@ -5,6 +5,7 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import LeaveConfirmDialog from '@/components/feedback/LeaveConfirmDialog.vue'
 import BottomCta from '@/components/app/BottomCta.vue'
 import CaseAttachmentList from '@/components/case/CaseAttachmentList.vue'
 import { Badge } from '@/components/ui/badge'
@@ -35,11 +36,16 @@ async function submit() {
   const user = await getCurrentUser(route.meta.roleId)
   await addQuickSave(user.id, { name: name.value.trim(), note: note.value.trim(), photos: photos.value })
   pending.value = false
+  saved.value = true // 送出成功，換頁時不用再問
   toast.success('已留存', { description: '已加到你的待辦，之後再補齊資料' })
   // 回到上一頁；直接打網址進來的沒有上一頁，就回首頁
   if (window.history.state?.back) router.back()
   else router.replace(`/${route.meta.roleId}/home`)
 }
+
+// 有沒有填東西（離開前確認用）；留存成功後 saved 變 true，換頁不用再問
+const saved = ref(false)
+const isDirty = computed(() => !saved.value && Boolean(photos.value.length || name.value.trim() || note.value.trim()))
 </script>
 
 <template>
@@ -79,5 +85,7 @@ async function submit() {
     <BottomCta note="留存後會放進你的待辦，之後再補齊資料">
       <Button type="submit" :disabled="isEmpty || pending">留存</Button>
     </BottomCta>
+    <!-- 填到一半想離開時先問一次 -->
+    <LeaveConfirmDialog :dirty="isDirty" />
   </form>
 </template>

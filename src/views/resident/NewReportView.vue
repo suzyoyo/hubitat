@@ -9,6 +9,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import LeaveConfirmDialog from '@/components/feedback/LeaveConfirmDialog.vue'
 import BottomCta from '@/components/app/BottomCta.vue'
 import ReportFlowProgress from '@/components/report/ReportFlowProgress.vue'
 import { Button } from '@/components/ui/button'
@@ -204,6 +205,9 @@ async function submit() {
   await router.replace({ query: { step: 'submitted' } })
   resetForm()
 }
+
+// 有沒有填東西（離開前確認用）：在流程裡、寫了通報問題、補充說明或加了照片
+const isDirty = computed(() => inFlow.value && Boolean(form.subject || form.description || form.photos.length))
 </script>
 
 <template>
@@ -271,5 +275,7 @@ async function submit() {
       <Button @click="router.replace(`/resident/reports/${supportedReport.id}`)">查看這件通報</Button>
       <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
     </BottomCta>
+    <!-- 填到一半想離開時先問一次 -->
+    <LeaveConfirmDialog :dirty="isDirty" />
   </div>
 </template>
