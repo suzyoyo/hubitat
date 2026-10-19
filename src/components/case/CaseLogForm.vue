@@ -52,7 +52,7 @@ watch(draft, (value) => {
       </Label>
       <!-- 住戶看不到下面的處理內容（內部紀錄，可能有廠商名稱、報價；2026-10-19 寫在 placeholder），要給住戶看的寫在這一句 -->
       <Input id="log-resident" v-model="residentText" maxlength="50" placeholder="例：廠商 10/5 再來處理" />
-      <p class="type-date text-muted-foreground">沒寫就不給住戶看</p>
+      <p class="type-date text-muted-foreground">未填就不會顯示給住戶</p>
     </div>
     <div class="space-y-2">
       <Label for="log-text" class="text-base">處理內容</Label>
