@@ -6,11 +6,14 @@ import { XIcon } from '@lucide/vue'
 import { DialogClose, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
 import { useRoute } from 'vue-router'
 import ArticleNav from './ArticleNav.vue'
-import { MAIN_LINKS } from './links'
+import { NAV_ITEMS } from './links'
 import RoleSwitcher from './RoleSwitcher.vue'
 
 const open = defineModel('open', { type: Boolean, default: false })
 const route = useRoute()
+
+// 上面的連結不放三種身分：下面已經有「我的身分」可以切換（2026-10-19 拿掉）
+const links = NAV_ITEMS.filter((item) => !item.children)
 </script>
 
 <template>
@@ -37,7 +40,7 @@ const route = useRoute()
         <div class="flex-1 overflow-y-auto overscroll-contain px-4 pb-8 pt-4">
           <nav aria-label="網站頁面">
             <ul class="grid grid-cols-2 gap-2">
-              <li v-for="link in MAIN_LINKS" :key="link.to">
+              <li v-for="link in links" :key="link.to">
                 <RouterLink
                   :to="link.to"
                   class="flex min-h-11 items-center rounded-lg bg-page px-3 font-medium text-brand-900 hover:bg-brand-50"

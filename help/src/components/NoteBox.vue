@@ -22,7 +22,7 @@ const styles = {
 <template>
   <!-- items-center：文字只有一兩行時，和好彼管家上下置中，不會黏在上面 -->
   <div class="flex items-center gap-4 rounded-[var(--radius-card)] border p-4 md:p-5" :class="styles[tone].box">
-    <img v-if="mascot" :src="styles[tone].img" alt="" class="hidden h-24 w-auto shrink-0 sm:block" width="68" height="96" />
+    <img v-if="mascot" :src="styles[tone].img" alt="" class="h-16 w-auto shrink-0 sm:h-24" width="68" height="96" />
     <div class="min-w-0 flex-1">
       <p v-if="title" class="flex items-center gap-2 font-bold text-brand-950">
         <component :is="styles[tone].icon" class="size-5 shrink-0" :class="styles[tone].iconColor" aria-hidden="true" />

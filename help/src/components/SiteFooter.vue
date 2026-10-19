@@ -1,6 +1,9 @@
 <script setup>
-// 頁尾：連結置中
+// 頁尾：連結置中，最下面是版權聲明
 import { MAIN_LINKS } from './links'
+
+// 版權年份用今年，每年不用手動改
+const year = new Date().getFullYear()
 </script>
 
 <template>
@@ -16,6 +19,7 @@ import { MAIN_LINKS } from './links'
           </li>
         </ul>
       </nav>
+      <p class="mt-4 text-center text-sm text-muted">© {{ year }} 好彼社區 Hubitat. All rights reserved.</p>
     </div>
   </footer>
 </template>

@@ -110,6 +110,8 @@ steps: [
 sections: [
   {
     heading: '段落標題',
+    mascot: 'waving', // 選填：段落右下角放好彼管家，填 src/assets/mascot/ 的檔名（不含 .png）
+    mascotRow: ['pointing', 'happy'], // 選填：手機版改在文字下面排成一列的幾隻；沒填就只放 mascot 那一隻
     blocks: [
       { type: 'p', text: '一段文字' },
       { type: 'list', items: ['項目一', '項目二'] },

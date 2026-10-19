@@ -88,8 +88,9 @@ function update(changes) {
     </div>
 
     <template v-else>
-      <p class="mt-8 font-medium text-ink-soft" aria-live="polite">
-        「{{ query.trim() }}」找到 {{ results.length }} 篇教學
+      <!-- 不寫找到幾篇（2026-10-19 拿掉）；找不到時下面會顯示空狀態 -->
+      <p v-if="results.length" class="mt-8 font-medium text-ink-soft" aria-live="polite">
+        「{{ query.trim() }}」的搜尋結果
       </p>
 
       <!-- 有選身分：一個清單 -->
@@ -102,10 +103,7 @@ function update(changes) {
       <!-- 沒選身分：依身分分組 -->
       <template v-else-if="results.length">
         <section v-for="group in groups" :key="group.id" class="mt-8" :aria-labelledby="`result-${group.id}`">
-          <h2 :id="`result-${group.id}`" class="text-xl font-bold text-brand-950">
-            {{ group.title }}
-            <span class="ml-1 text-base font-medium text-muted">{{ group.articles.length }} 篇</span>
-          </h2>
+          <h2 :id="`result-${group.id}`" class="text-xl font-bold text-brand-950">{{ group.title }}</h2>
           <ul class="mt-3 space-y-3">
             <li v-for="article in group.articles" :key="article.id">
               <ArticleCard :article="article" :highlight="words" show-all-roles />

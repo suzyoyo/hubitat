@@ -13,6 +13,7 @@ import NoteBox from '@/components/NoteBox.vue'
 import RichText from '@/components/RichText.vue'
 import RolePills from '@/components/RolePills.vue'
 import { findCategory } from '@/content/categories'
+import { MASCOTS } from '@/lib/mascots'
 import { appliesTo, defaultRoleOf, getArticle, getRelatedArticles, getSections, getToc, sectionId } from '@/lib/content'
 import { currentRole, setCurrentRole } from '@/lib/role'
 import { setPageTitle } from '@/lib/title'
@@ -136,8 +137,17 @@ watch(
         :aria-labelledby="sectionId(index)"
       >
         <h2 :id="sectionId(index)" class="scroll-mt-24 text-2xl font-bold text-brand-950">{{ section.heading }}</h2>
-        <div class="mt-4 space-y-4">
-          <ContentBlock v-for="(block, blockIndex) in section.blocks" :key="blockIndex" :block="block" />
+        <!-- 段落有設 mascot 的放好彼管家（圖只是裝飾，alt 留空）：
+               平板、桌機：右下角一隻，底部和段落最後一行對齊
+               手機：放在文字下面排成一列（有 mascotRow 就排那幾隻），不擠到文字 -->
+        <div class="mt-4 flex items-end gap-4">
+          <div class="min-w-0 flex-1 space-y-4">
+            <ContentBlock v-for="(block, blockIndex) in section.blocks" :key="blockIndex" :block="block" />
+          </div>
+          <img v-if="section.mascot" :src="MASCOTS[section.mascot]" alt="" class="hidden h-24 w-auto shrink-0 md:block" />
+        </div>
+        <div v-if="section.mascot" class="mt-6 grid grid-cols-4 justify-items-center gap-2 md:hidden">
+          <img v-for="name in section.mascotRow ?? [section.mascot]" :key="name" :src="MASCOTS[name]" alt="" class="h-20 w-auto" />
         </div>
       </section>
 

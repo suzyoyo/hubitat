@@ -99,6 +99,17 @@ body {
   .btn-secondary {
     @apply bg-brand-50 text-brand-900 hover:bg-brand-100;
   }
+  /* 頁首的漸層底：從左上角的品牌藍（#6fb7e2 混 35%）往右下散開、淡到頁面底色
+     （2026-10-19 從 brand-50 改來，原本偏灰、看起來暗；同一天把上下直拉改成從左上散開）。
+     用放射狀而不是斜線，下緣和右緣都會淡到底色，拿掉分隔線後不會有一條明顯的邊。
+     最深處上的深藍字、灰字對比仍有 5 : 1 以上 */
+  .hero-gradient {
+    background: radial-gradient(
+      ellipse at top left,
+      color-mix(in srgb, var(--color-brand-500) 35%, var(--color-page)),
+      var(--color-page) 75%
+    );
+  }
   .page-container {
     @apply mx-auto w-full max-w-[1200px] px-4 md:px-6;
   }

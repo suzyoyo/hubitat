@@ -26,12 +26,18 @@ watch(() => props.roleId, setCurrentRole, { immediate: true })
 </script>
 
 <template>
-  <section class="border-b border-brand-100 bg-gradient-to-b from-brand-50 to-page" aria-labelledby="role-title">
-    <!-- 右邊放揮手的好彼管家（手機版不顯示，和首頁一樣） -->
+  <section class="hero-gradient" aria-labelledby="role-title">
+    <!-- 右邊放揮手的好彼管家；手機版縮小、放在標題右邊（和首頁一樣，2026-10-19 起手機也顯示） -->
     <div class="page-container grid items-center gap-6 py-10 md:grid-cols-[minmax(0,1fr)_200px] md:py-12">
       <div class="min-w-0">
-        <p class="font-bold text-brand-800">{{ role.label }}使用指南</p>
-        <h1 id="role-title" class="mt-1 text-[28px] font-bold leading-tight text-brand-950 md:text-[36px]">{{ role.entry }}</h1>
+        <!-- 手機版：好彼管家縮小，放在標題右邊 -->
+        <div class="flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <p class="font-bold text-brand-800">{{ role.label }}使用指南</p>
+            <h1 id="role-title" class="mt-1 text-[28px] font-bold leading-tight text-brand-950 md:text-[36px]">{{ role.entry }}</h1>
+          </div>
+          <img :src="waving" alt="" class="h-24 w-auto shrink-0 md:hidden" width="147" height="208" />
+        </div>
         <p class="lead-text">{{ role.description }}</p>
 
         <!-- 分類捷徑 -->

@@ -2,17 +2,26 @@
 // 頂部列：Logo、主要導覽、搜尋
 //   桌機（≥1200px）：左 Logo｜中間導覽（置中）｜右搜尋；「使用身分」是下拉選單
 //   平板、手機：左邊「☰」打開側邊抽屜；手機的搜尋是一個圖示，按了到搜尋頁
-import { ChevronDownIcon, MenuIcon, SearchIcon } from '@lucide/vue'
+//   在搜尋頁時，右邊改成「✕」，按了離開搜尋（2026-10-19 加）
+import { ChevronDownIcon, MenuIcon, SearchIcon, XIcon } from '@lucide/vue'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuRoot, DropdownMenuTrigger } from 'reka-ui'
 import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import logo from '@app/assets/logo/logo3.svg'
 import NavDrawer from './NavDrawer.vue'
 import SearchBox from './SearchBox.vue'
 import { NAV_ITEMS } from './links'
 
 const route = useRoute()
+const router = useRouter()
 const drawerOpen = ref(false)
+
+// 離開搜尋：回到上一頁；直接打開搜尋頁（沒有上一頁）就回首頁
+//   history.state.back 是 Vue Router 記的「上一頁網址」，沒有就是 null
+function closeSearch() {
+  if (window.history.state?.back) router.back()
+  else router.push('/')
+}
 
 // 換頁後自動關掉抽屜
 watch(
@@ -104,6 +113,15 @@ const activeClass = 'bg-brand-50 font-bold text-brand-900'
         >
           <SearchIcon class="size-6" aria-hidden="true" />
         </RouterLink>
+        <button
+          v-else
+          type="button"
+          class="grid size-11 place-items-center rounded-lg text-brand-900 hover:bg-brand-50"
+          aria-label="關閉搜尋"
+          @click="closeSearch"
+        >
+          <XIcon class="size-6" aria-hidden="true" />
+        </button>
       </div>
     </div>
   </header>

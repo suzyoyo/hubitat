@@ -29,6 +29,7 @@ defineProps({
       <p v-if="showDescription" class="mt-1 text-ink-soft"><HighlightText :text="article.description" :words="highlight" /></p>
       <RolePills v-if="showRoles" :roles="article.applicableRoles" :show-all="showAllRoles" class="mt-3" />
     </div>
-    <ChevronRightIcon class="mt-1 size-5 shrink-0 text-brand-800" aria-hidden="true" />
+    <!-- 箭頭一律放在右下角（2026-10-19，和首頁身分卡片一樣） -->
+    <ChevronRightIcon class="mb-0.5 size-5 shrink-0 self-end text-brand-800" aria-hidden="true" />
   </RouterLink>
 </template>

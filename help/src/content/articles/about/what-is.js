@@ -31,6 +31,8 @@ export default {
     },
     {
       heading: '認識好彼管家',
+      mascot: 'waving', // 平板、桌機：右下角放好彼管家
+      mascotRow: ['pointing', 'thinking', 'happy', 'searching'], // 手機：文字下面排四隻，順序和上面四點一樣
       blocks: [
         { type: 'p', text: '好彼管家是好彼社區的吉祥物，會在這些地方出現：' },
         {
@@ -42,7 +44,6 @@ export default {
             '沒有資料時，例如還沒有任何通報，會拿著放大鏡出現。',
           ],
         },
-        { type: 'p', text: '看到好彼管家說的話，照著做就可以了。' },
       ],
     },
   ],

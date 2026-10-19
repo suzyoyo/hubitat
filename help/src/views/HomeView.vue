@@ -8,7 +8,6 @@ import FaqList from '@/components/FaqList.vue'
 import { FAQS } from '@/content/faqs'
 import { ROLES } from '@/content/roles'
 import {
-  countRoleArticles,
   getArticles,
   getCategoriesForRole,
   getPopularArticles,
@@ -33,14 +32,20 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
 
 <template>
   <!-- 歡迎區 -->
-  <section class="border-b border-brand-100 bg-gradient-to-b from-brand-50 to-page" aria-labelledby="home-title">
+  <section class="hero-gradient" aria-labelledby="home-title">
     <div class="page-container grid items-center gap-6 py-10 md:grid-cols-[minmax(0,1fr)_200px] md:py-14">
       <div class="min-w-0">
-        <h1 id="home-title" class="text-[28px] font-bold leading-tight text-brand-950 md:text-[38px]">
-          歡迎來到好彼社區使用指南
-        </h1>
-        <p class="lead-text">有好彼管家陪你，社區大小事都能輕鬆上手！</p>
+        <!-- 手機版：好彼管家縮小，放在標題右邊 -->
+        <div class="flex items-center justify-between gap-4">
+          <h1 id="home-title" class="text-[28px] font-bold leading-tight text-brand-950 md:text-[38px]">
+            <!-- 分成兩段，換行時不會把「使用」拆開 -->
+            <span class="inline-block">歡迎來到好彼社區</span><span class="inline-block">使用指南</span>
+          </h1>
+          <img :src="pointing" alt="" class="h-24 w-auto shrink-0 md:hidden" width="150" height="208" />
+        </div>
+        <p class="lead-text"><span class="inline-block">有好彼管家陪你，</span><span class="inline-block">社區大小事都能輕鬆上手！</span></p>
       </div>
+      <!-- 平板、桌機版：好彼管家放在右邊 -->
       <img :src="pointing" alt="" class="hidden h-52 w-auto justify-self-center md:block" width="150" height="208" />
     </div>
   </section>
@@ -60,8 +65,8 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
           </span>
           <span class="mt-4 text-xl font-bold text-brand-900 group-hover:underline">{{ role.entry }}</span>
           <span class="mt-1 flex-1 text-ink-soft">{{ role.description }}</span>
-          <span class="mt-4 flex items-center justify-between font-bold text-brand-800">
-            {{ countRoleArticles(role.id) }} 篇教學
+          <!-- 右下角的箭頭（不寫教學篇數，2026-10-19 拿掉） -->
+          <span class="mt-4 flex justify-end text-brand-800">
             <ArrowRightIcon class="size-5" aria-hidden="true" />
           </span>
         </RouterLink>
@@ -108,7 +113,7 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
           class="mt-2 inline-flex min-h-11 items-center text-link"
           :class="topic.articles.length <= 5 && 'md:hidden'"
         >
-          看全部 {{ topic.articles.length }} 篇
+          看全部<span class="sr-only">{{ topic.title }}的教學</span>
         </RouterLink>
       </li>
     </ul>

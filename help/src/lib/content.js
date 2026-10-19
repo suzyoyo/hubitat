@@ -38,11 +38,6 @@ export function getCategoriesForRole(roleId) {
     .filter((category) => category.articles.length > 0)
 }
 
-// 某個身分專屬的文章數（不含三種身分共用的「認識好彼社區」「開始使用」）
-export function countRoleArticles(roleId) {
-  return published.filter((a) => appliesTo(a, roleId) && !findCategory(a.category)?.shared).length
-}
-
 // 首頁的熱門教學
 export function getPopularArticles() {
   return published.filter((article) => article.popular)
