@@ -2,6 +2,7 @@
 // 住戶端首頁：問候列、我的通報、公告與動態
 import { computed, onMounted, ref } from 'vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
+import NotificationReminder from '@/components/feedback/NotificationReminder.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import MeetingCard from '@/components/meeting/MeetingCard.vue'
 import NoticeDetailDialog from '@/components/notice/NoticeDetailDialog.vue'
@@ -81,6 +82,9 @@ const greeting = computed(() => {
     <Skeleton v-else class="h-[104px] rounded-t-none rounded-b-3xl" />
 
     <div class="space-y-8 px-5 pt-5">
+      <!-- 還沒開通知就一直提醒，但不擋（2026-10-18 013） -->
+      <NotificationReminder />
+
       <section class="space-y-3">
         <SectionHeader title="我的通報" to="/resident/reports" />
         <Skeleton v-if="loading" class="h-[150px] rounded-xl" />

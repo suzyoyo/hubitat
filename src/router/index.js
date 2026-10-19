@@ -4,6 +4,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { roles } from '@/config/roles'
 import AppShell from '@/layouts/AppShell.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
 import PlaceholderView from '@/views/PlaceholderView.vue'
 import RoleSelectView from '@/views/RoleSelectView.vue'
 import committee from './committee'
@@ -45,6 +46,8 @@ const roleRoutes = roles.map((role) => {
       // 右下角的「＋」按鈕：有自己一頁的才要路由（跳出選單的不用）
       ...(role.fab.path ? [page(role.fab.path, role.fab.title)] : []),
       ...innerPages.map((item) => page(item.path, item.title)), // 內頁
+      // 這一端裡不存在的網址（例如 /committee/abc）：有外框的「找不到頁面」
+      { ...page(':pathMatch(.*)*', '找不到頁面'), component: NotFoundView },
     ],
   }
 })
@@ -54,8 +57,8 @@ const routes = [
   ...roleRoutes,
   // 用到時才載入（lazy load），不會拖慢正式頁面
   { path: '/playground', component: () => import('@/views/PlaygroundView.vue') },
-  // 其他不存在的網址一律回到角色選擇頁
-  { path: '/:pathMatch(.*)*', redirect: '/' },
+  // 其他不存在的網址：沒有外框的「找不到頁面」
+  { path: '/:pathMatch(.*)*', component: NotFoundView },
 ]
 
 const router = createRouter({

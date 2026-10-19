@@ -106,7 +106,7 @@ npm run dev
 | `/staff` | 管理人員端 |
 | `/playground` | 元件盤點頁，只有開發時用，使用者看不到入口 |
 
-還沒做的頁面會顯示佔位頁，上面寫著頁面名稱和目前的網址。
+還沒做的頁面會顯示佔位頁（`PlaceholderView`）：開心的好彼管家＋「這個功能準備中」＋「回首頁」，給使用者、評審看起來像正式 App 的「即將推出」。頁面名稱和網址用灰色小字寫在下面，**只在 `npm run dev` 時出現**，打包後看不到（2026-10-18 改）。
 
 ### `/playground` 是什麼
 
@@ -392,13 +392,14 @@ const latestReport = computed(() => reports.value[0])
 
 ### 步驟 4：畫出三種狀態
 
-每個會拿資料的區塊都要處理三種狀態，缺一種畫面就會壞：
+每個會拿資料的區塊都要處理這幾種狀態，缺一種畫面就會壞（「載入失敗」2026-10-18 加，舊的頁面還沒補）：
 
 | 狀態 | 什麼時候 | 怎麼做 |
 |---|---|---|
 | 載入中 | `loading` 是 true | 用 `<Skeleton>` 放一個和內容差不多高的灰色方塊 |
 | 有資料 | 拿到一筆以上 | 用元件把資料畫出來 |
 | 沒資料 | 拿到空的清單 | 顯示設計稿的空狀態（例如「目前無通報」） |
+| 載入失敗 | 假 API 丟出錯誤（`try` / `catch` 接住） | `<FeedbackState kind="load-failed" @retry="重新拿資料的函式" />`。在 `/playground`「狀態畫面」打開「模擬連線失敗」就看得到；用法見 `views/playground/MockSection.vue` |
 
 ```vue
 <Skeleton v-if="loading" class="h-[150px] rounded-xl" />
