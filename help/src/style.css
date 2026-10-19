@@ -66,6 +66,13 @@ body {
   overflow-x: hidden; /* 保險：任何寬度都不出現水平捲軸 */
 }
 
+/* 標題：加一點點字距（2026-10-19）。內文是 0.05em，標題字比較大，拉 0.03em 就夠，看起來不會太擠 */
+h1,
+h2,
+h3 {
+  letter-spacing: 0.03em;
+}
+
 /* 鍵盤操作時看得到焦點在哪裡：深藍外框＋淺藍光暈 */
 :focus-visible {
   outline: 3px solid var(--color-brand-800);
