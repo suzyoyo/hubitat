@@ -12,6 +12,7 @@ import { tasks } from '../data/tasks'
 import { COMMITTEE_TITLES } from '../data/users'
 import { vendors } from '../data/vendors'
 import { TO_CLOSE_TITLE, canCloseCases, caseDeadlineOf, caseHint } from './cases'
+import { draftsOf } from './drafts'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
 import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
@@ -34,6 +35,8 @@ export const TODO_KINDS = {
   new_case: { label: '新通報' }, // 待受理的案件（2026-10-15 從「新報修」改，用詞統一叫「通報」）；管委會只有主委、副主委有
   in_progress: { label: '處理中' }, // 2026-10-15 從「施工中」改名（docs/case-flow.md）
   to_verify: { label: '待標記完成' }, // 2026-10-15 起不會出現在待辦（待結案是主委、副主委的事），只有「已完成」還用這個種類
+  // 兩端都有
+  draft: { label: '草稿' }, // 表單「存成草稿」的（2026-10-19，drafts.js）
 }
 
 // 建立一筆待辦
@@ -248,6 +251,10 @@ function staffTodos(userId) {
 export async function getMyTodos(userId, role) {
   await delay()
   const raw = role === 'staff' ? staffTodos(userId) : committeeTodos(userId)
+  // 存成草稿、還沒送出的表單：點了回到那個表單，內容會帶回來（link.path 是表單的網址）
+  for (const draft of draftsOf(userId, role)) {
+    raw.push(todo('draft', draft.title, '還沒送出，點了繼續填', draft.savedAt, null, { id: draft.path, path: draft.path }))
+  }
   const items = raw.toSorted((a, b) => {
     // 新交辦排前面：首頁只顯示前 2 張，不這樣排會被日期比較早的案件擋住（2026-10-15）
     if (a.isNew !== b.isNew) return a.isNew ? -1 : 1

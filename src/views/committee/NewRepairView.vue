@@ -8,6 +8,7 @@ import { BellIcon } from '@lucide/vue'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import LeaveConfirmDialog from '@/components/feedback/LeaveConfirmDialog.vue'
 import BottomCta from '@/components/app/BottomCta.vue'
 import ReportFlowProgress from '@/components/report/ReportFlowProgress.vue'
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { REPORT_TYPES } from '@/lib/report'
+import { restoreDraft } from '@/lib/draft'
 import { createRepair, getAreas, getCurrentUser, getSimilarReports, supportReport } from '@/mocks/api'
 import ReportConfirmStep from '@/components/report/ReportConfirmStep.vue'
 import ReportDescribeStep from '@/components/report/ReportDescribeStep.vue'
@@ -80,6 +82,7 @@ onMounted(async () => {
   userId.value = user.id
   areas.value = areaList
   loading.value = false
+  await restoreDraft(user.id, route.path, (data) => Object.assign(form, data))
 })
 
 // ── 通報住戶 ───────────────────────────────────
@@ -185,6 +188,11 @@ async function submit() {
   await router.replace({ query: { step: 'submitted' } })
   resetForm()
 }
+
+// 有沒有填東西（離開前確認用）：在流程裡、寫了通報問題、補充說明、加了照片或填了住戶
+const isDirty = computed(
+  () => inFlow.value && Boolean(form.subject || form.description || form.photos.length || form.building),
+)
 </script>
 
 <template>
@@ -327,5 +335,7 @@ async function submit() {
       <Button @click="router.replace(`${base}/cases/${supportedReport.id}`)">查看案件</Button>
       <Button variant="outline" @click="router.replace(`${base}/home`)">回到首頁</Button>
     </BottomCta>
+    <!-- 填到一半想離開時先問一次 -->
+    <LeaveConfirmDialog :dirty="isDirty" draft-title="新增通報（代住戶登記）" :draft-data="{ ...form }" :draft-path="route.path" />
   </div>
 </template>

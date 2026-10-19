@@ -7,6 +7,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
+import LeaveConfirmDialog from '@/components/feedback/LeaveConfirmDialog.vue'
 import BottomCta from '@/components/app/BottomCta.vue'
 import DatePicker from '@/components/common/DatePicker.vue'
 import TimePicker from '@/components/common/TimePicker.vue'
@@ -21,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { restoreDraft } from '@/lib/draft'
 import {
   canPublishAnnouncement,
   createAnnouncement,
@@ -131,6 +133,8 @@ onMounted(async () => {
     allowed.value = canPublishAnnouncement(user.id)
   }
   loading.value = false
+  initialForm.value = JSON.stringify(form) // 記下剛載入時的樣子，之後比較有沒有改過
+  await restoreDraft(user.id, route.fullPath, (data) => Object.assign(form, data))
 })
 
 // ── 依類型決定有哪些欄位（照設計稿） ─────────────────────
@@ -249,6 +253,7 @@ async function submit() {
     toast.error(isEdit ? '修改失敗' : '發布失敗', { description: '這則公告的狀態已經變了，請重新整理。' })
     return
   }
+  saved.value = true // 送出成功，換頁時不用再問
   if (isEdit) {
     toast.success('公告已更新')
     // 修改是從詳情頁點進來的：回到那一頁（不要再開一頁，瀏覽紀錄才不會有兩個一樣的詳情頁）
@@ -272,6 +277,11 @@ function cancel() {
     router.replace(`${base}/home`)
   }
 }
+
+// 有沒有填東西（離開前確認用）：和剛載入時的表單比（修改公告時是原本的內容），有改過就算；送出成功後 saved 變 true
+const initialForm = ref('')
+const saved = ref(false)
+const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.stringify(form) !== initialForm.value)
 </script>
 
 <template>
@@ -553,5 +563,7 @@ function cancel() {
         <Button type="button" variant="outline" @click="cancel">取消</Button>
       </BottomCta>
     </form>
+    <!-- 填到一半想離開時先問一次 -->
+    <LeaveConfirmDialog :dirty="isDirty" :draft-title="isEdit ? '修改公告' : '發布公告'" :draft-data="{ ...form }" />
   </div>
 </template>

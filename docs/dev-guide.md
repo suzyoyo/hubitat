@@ -707,6 +707,15 @@ const latestReport = computed(() => reports.value[0])
 
 - **必填**：欄位名稱後面加紅色星號，不要寫「必填」兩個字。
 - **選填**：欄位名稱後面用灰色小字寫「選填」，不要加底色。
+- **離開前確認**（2026-10-19）：會填很多東西的表單，放一個 `<LeaveConfirmDialog>`（`components/feedback/`）。填到一半按返回、點分頁時跳出「還沒送出，確定要離開嗎？」：左邊「直接離開」（次要）、右邊「繼續填寫」（主要），下面一顆 ghost「存成草稿，晚點再填」；重新整理、關掉分頁時跳瀏覽器自己的提醒。
+  ```vue
+  <LeaveConfirmDialog :dirty="isDirty" draft-title="快速留存" :draft-data="{ photos, name, note }" />
+  ```
+  - `dirty`：有沒有填東西。什麼都沒填就不會問。送出成功後要換頁的，先讓它變成 `false`（例如 `saved.value = true`），不然送出後又會問一次。
+  - `draft-title`、`draft-data`：待辦卡上的名稱、要存的內容；不傳就沒有「存成草稿」。網址會變的流程（新增通報的 `?step=`）再傳 `draft-path` 固定網址。
+  - 回到同一個表單時，用 `lib/draft.js` 的 `restoreDraft(userId, 網址, 填回去的函式)` 把內容拿回來（拿了就刪掉），跳提示「已帶回上次存的草稿」。寫法見 `views/committee/QuickSaveView.vue`。
+  - 管委會、管理人員的「我的待辦」會多一張草稿（種類「草稿」、徽章「未送出」），點了回到表單；住戶端沒有我的待辦，回到同一頁就會帶回來。
+  - 目前有：住戶新增通報、管委會新增通報、新增交辦、發布／修改公告、回報完成、交辦回報、快速留存。
 
 ### 間距
 
