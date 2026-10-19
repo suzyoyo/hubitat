@@ -7,7 +7,7 @@ export { default as Button } from "./Button.vue";
 //   2. 顏色對照好彼 Kit 的 Button。有底色的四種（default、outline、secondary、destructive）
 //      底部有一條深色的線，看起來像微微浮起來；ghost 和 link 沒有
 //        default     品牌藍底、白字：主要動作，一頁最多一顆，例如「送出」
-//        outline     接近白色的灰底、深藍字：和主要按鈕並排的次要動作，例如「取消」
+//        outline     淺灰底（#f0f0f0，Kit gray/3）、深藍字：和主要按鈕並排的次要動作，例如「取消」
 //                    （名稱沿用 shadcn 的 outline，但 Kit 已改成沒有外框）
 //        secondary   淺藍底、深藍字：內容裡的動作，例如「下載 PDF」「＋ 新增一筆紀錄」
 //        destructive 淺紅底、紅字：刪除、撤回這類做了就回不去的動作
@@ -24,7 +24,7 @@ export const buttonVariants = cva(
         default:
           "bg-primary text-primary-foreground inset-shadow-[0_-1px_0_var(--color-blue-600)] [a]:hover:bg-primary/80",
         outline:
-          "bg-background text-secondary-foreground inset-shadow-[0_-1px_0_var(--color-gray-200)] hover:bg-muted aria-expanded:bg-muted",
+          "bg-button-outline text-secondary-foreground inset-shadow-[0_-1px_0_var(--color-gray-200)] hover:bg-muted aria-expanded:bg-muted",
         secondary:
           "bg-secondary text-secondary-foreground inset-shadow-[0_-1px_0_var(--secondary-foreground)] hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
