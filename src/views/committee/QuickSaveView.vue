@@ -68,7 +68,10 @@ async function submit() {
 
 // 有沒有填東西（離開前確認用）；留存成功後 saved 變 true，換頁不用再問
 const saved = ref(false)
-const isDirty = computed(() => !saved.value && Boolean(photos.value.length || name.value.trim() || note.value.trim()))
+// 只選了關聯案件也算（suzy 在 #162 提的）
+const isDirty = computed(
+  () => !saved.value && Boolean(photos.value.length || name.value.trim() || note.value.trim() || caseId.value !== NONE),
+)
 </script>
 
 <template>
