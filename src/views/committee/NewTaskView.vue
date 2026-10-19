@@ -20,6 +20,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { restoreDraft } from '@/lib/draft'
 import {
   canAssignTasks,
   createTask,
@@ -28,7 +29,6 @@ import {
   getCurrentUser,
   getStaffMembers,
   MOCK_TODAY,
-  takeDraft,
 } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
@@ -150,14 +150,6 @@ function cancel() {
 const initialForm = ref('')
 const saved = ref(false)
 const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.stringify(form) !== initialForm.value)
-
-// 之前「存成草稿」的話，把內容帶回來（拿回來就刪掉；沒送出又要離開時可以再存一次）
-async function restoreDraft(userIdValue, path, apply) {
-  const data = await takeDraft(userIdValue, path)
-  if (!data) return
-  apply(data)
-  toast.info('已帶回上次存的草稿')
-}
 </script>
 
 <template>

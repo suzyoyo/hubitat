@@ -16,7 +16,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { REPORT_TYPES } from '@/lib/report'
-import { createRepair, getAreas, getCurrentUser, getSimilarReports, supportReport, takeDraft } from '@/mocks/api'
+import { restoreDraft } from '@/lib/draft'
+import { createRepair, getAreas, getCurrentUser, getSimilarReports, supportReport } from '@/mocks/api'
 import ReportConfirmStep from '@/components/report/ReportConfirmStep.vue'
 import ReportDescribeStep from '@/components/report/ReportDescribeStep.vue'
 import ReportPlaceStep from '@/components/report/ReportPlaceStep.vue'
@@ -192,14 +193,6 @@ async function submit() {
 const isDirty = computed(
   () => inFlow.value && Boolean(form.subject || form.description || form.photos.length || form.building),
 )
-
-// 之前「存成草稿」的話，把內容帶回來（拿回來就刪掉；沒送出又要離開時可以再存一次）
-async function restoreDraft(userIdValue, path, apply) {
-  const data = await takeDraft(userIdValue, path)
-  if (!data) return
-  apply(data)
-  toast.info('已帶回上次存的草稿')
-}
 </script>
 
 <template>

@@ -13,7 +13,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { addQuickSave, getCurrentUser, takeDraft } from '@/mocks/api'
+import { restoreDraft } from '@/lib/draft'
+import { addQuickSave, getCurrentUser } from '@/mocks/api'
 
 const PHOTO_MAX = 5 // 照片最多幾張（和回報完成的附件一樣）
 const NAME_MAX = 40 // 名稱最多幾個字
@@ -56,14 +57,6 @@ async function submit() {
 // 有沒有填東西（離開前確認用）；留存成功後 saved 變 true，換頁不用再問
 const saved = ref(false)
 const isDirty = computed(() => !saved.value && Boolean(photos.value.length || name.value.trim() || note.value.trim()))
-
-// 之前「存成草稿」的話，把內容帶回來（拿回來就刪掉；沒送出又要離開時可以再存一次）
-async function restoreDraft(userIdValue, path, apply) {
-  const data = await takeDraft(userIdValue, path)
-  if (!data) return
-  apply(data)
-  toast.info('已帶回上次存的草稿')
-}
 </script>
 
 <template>

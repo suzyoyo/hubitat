@@ -22,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { restoreDraft } from '@/lib/draft'
 import {
   canPublishAnnouncement,
   createAnnouncement,
@@ -30,7 +31,6 @@ import {
   getCases,
   getCurrentUser,
   getEquipmentList,
-  takeDraft,
   updateAnnouncement,
 } from '@/mocks/api'
 import { ANNOUNCEMENT_TYPES } from '@/mocks/data/announcements'
@@ -282,14 +282,6 @@ function cancel() {
 const initialForm = ref('')
 const saved = ref(false)
 const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.stringify(form) !== initialForm.value)
-
-// 之前「存成草稿」的話，把內容帶回來（拿回來就刪掉；沒送出又要離開時可以再存一次）
-async function restoreDraft(userIdValue, path, apply) {
-  const data = await takeDraft(userIdValue, path)
-  if (!data) return
-  apply(data)
-  toast.info('已帶回上次存的草稿')
-}
 </script>
 
 <template>

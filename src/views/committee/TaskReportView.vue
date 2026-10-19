@@ -16,7 +16,8 @@ import { Empty, EmptyDescription, EmptyMedia, EmptyTitle } from '@/components/ui
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { formatFullDate } from '@/lib/date'
-import { getCurrentUser, getTaskById, reportTask, takeDraft } from '@/mocks/api'
+import { restoreDraft } from '@/lib/draft'
+import { getCurrentUser, getTaskById, reportTask } from '@/mocks/api'
 import mascotUrl from '@/assets/mascot/searching.png' // 拿著放大鏡的好彼管家
 
 const ATTACHMENT_MAX = 5 // 附件最多幾個（和案件的回報完成頁一樣）
@@ -88,14 +89,6 @@ async function submit() {
 // 有沒有填東西（離開前確認用）；送出成功後 saved 變 true，換頁不用再問
 const saved = ref(false)
 const isDirty = computed(() => !saved.value && Boolean(files.value.length || note.value.trim()))
-
-// 之前「存成草稿」的話，把內容帶回來（拿回來就刪掉；沒送出又要離開時可以再存一次）
-async function restoreDraft(userIdValue, path, apply) {
-  const data = await takeDraft(userIdValue, path)
-  if (!data) return
-  apply(data)
-  toast.info('已帶回上次存的草稿')
-}
 </script>
 
 <template>

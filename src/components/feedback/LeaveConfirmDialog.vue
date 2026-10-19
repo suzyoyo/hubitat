@@ -3,7 +3,7 @@
 // 用法：放在表單頁裡，傳「有沒有填東西」；要能存草稿的，再傳待辦卡上的名稱和要存的內容
 //   <LeaveConfirmDialog :dirty="isDirty" draft-title="新增交辦" :draft-data="{ ...form }" />
 // 沒填東西就直接離開，不打擾；送出成功後要換頁的，要讓 isDirty 先變成 false（例如加一個 saved 旗子）
-// 回到同一個表單時，表單自己用 takeDraft 把內容拿回來（寫法見 views/committee/QuickSaveView.vue）
+// 回到同一個表單時，表單用 lib/draft.js 的 restoreDraft 把內容拿回來（寫法見 views/committee/QuickSaveView.vue）
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'

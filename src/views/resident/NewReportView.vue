@@ -15,7 +15,8 @@ import ReportFlowProgress from '@/components/report/ReportFlowProgress.vue'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { REPORT_TYPES } from '@/lib/report'
-import { createReport, getAreas, getCurrentUser, getEquipmentById, getSimilarReports, supportReport, takeDraft } from '@/mocks/api'
+import { restoreDraft } from '@/lib/draft'
+import { createReport, getAreas, getCurrentUser, getEquipmentById, getSimilarReports, supportReport } from '@/mocks/api'
 import ReportConfirmStep from '@/components/report/ReportConfirmStep.vue'
 import ReportDescribeStep from '@/components/report/ReportDescribeStep.vue'
 import ReportPlaceStep from '@/components/report/ReportPlaceStep.vue'
@@ -210,14 +211,6 @@ async function submit() {
 
 // 有沒有填東西（離開前確認用）：在流程裡、寫了通報問題、補充說明或加了照片
 const isDirty = computed(() => inFlow.value && Boolean(form.subject || form.description || form.photos.length))
-
-// 之前「存成草稿」的話，把內容帶回來（拿回來就刪掉；沒送出又要離開時可以再存一次）
-async function restoreDraft(userIdValue, path, apply) {
-  const data = await takeDraft(userIdValue, path)
-  if (!data) return
-  apply(data)
-  toast.info('已帶回上次存的草稿')
-}
 </script>
 
 <template>
