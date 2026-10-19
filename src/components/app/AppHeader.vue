@@ -62,20 +62,20 @@ function goBack() {
   >
     <!-- width / height 寫原圖尺寸，讓瀏覽器先算好比例；實際顯示高度由 h-[26px] 決定 -->
     <img :src="logoUrl" alt="好彼社區" width="303" height="67" class="h-[26px] w-auto" />
-    <!-- 外層 44px 是可點擊範圍（長輩好按），裡面的藍色圓形是設計稿的 40px -->
-    <!-- 右邊距 pr-5 和內容一樣是 20px；-mr-0.5 抵掉 44px 和 40px 差的 2px，藍色圓形的右邊才會和卡片對齊（2026-10-18） -->
+    <!-- 藍色圓形 44px＝可以點的範圍（長輩好按），鈴鐺 22px（2026-10-19 從設計稿的 40px 圓、16px 鈴鐺放大，原本太小看不清楚） -->
+    <!-- 右邊距 pr-5 和內容一樣是 20px，藍色圓形的右邊和卡片對齊 -->
     <RouterLink
       :to="notificationsTo"
       :aria-label="hasUnread ? '通知，有未讀' : '通知'"
-      class="-mr-0.5 flex size-11 items-center justify-center"
+      class="flex size-11 items-center justify-center"
     >
       <!-- relative：讓紅點對齊藍色圓形的右上角 -->
-      <span class="relative flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-        <BellIcon class="size-4" />
+      <span class="relative flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground">
+        <BellIcon class="size-[22px]" />
         <!-- 未讀紅點：和通知頁每一則的未讀紅點同一個顏色；白色外圈讓它在藍色上看得清楚 -->
         <span
           v-if="hasUnread"
-          class="absolute top-0.5 right-0.5 size-2.5 rounded-full bg-destructive ring-2 ring-background"
+          class="absolute top-0.5 right-0.5 size-3 rounded-full bg-destructive ring-2 ring-background"
         />
       </span>
     </RouterLink>
