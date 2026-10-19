@@ -58,7 +58,7 @@ watch(() => props.roleId, setCurrentRole, { immediate: true })
   <div class="page-container">
     <!-- 第一次使用？從這裡開始：依序看這三篇 -->
     <section v-if="quickStart.length" class="mt-10" aria-labelledby="quick-start">
-      <h2 id="quick-start" class="text-2xl font-bold text-brand-950">第一次使用？從這裡開始</h2>
+      <h2 id="quick-start" class="section-title text-2xl font-bold text-brand-950">第一次使用？從這裡開始</h2>
       <ol class="mt-5 grid gap-4 lg:grid-cols-3">
         <li v-for="(article, index) in quickStart" :key="article.id">
           <ArticleCard :article="article" :show-roles="false" :step="index + 1" />
@@ -67,7 +67,7 @@ watch(() => props.roleId, setCurrentRole, { immediate: true })
     </section>
 
     <section v-for="category in categories" :key="category.id" class="mt-12" :aria-labelledby="category.id">
-      <h2 :id="category.id" class="scroll-mt-24 text-2xl font-bold text-brand-950">{{ category.title }}</h2>
+      <h2 :id="category.id" class="section-title scroll-mt-24 text-2xl font-bold text-brand-950">{{ category.title }}</h2>
       <ul class="mt-5 grid gap-4 md:grid-cols-2">
         <li v-for="article in category.articles" :key="article.id">
           <ArticleCard :article="article" :show-roles="false" :show-description="false" />
@@ -76,7 +76,7 @@ watch(() => props.roleId, setCurrentRole, { immediate: true })
     </section>
 
     <section v-if="faqs.length" class="mt-14" aria-labelledby="role-faq">
-      <h2 id="role-faq" class="text-2xl font-bold text-brand-950">{{ role.label }}常問的問題</h2>
+      <h2 id="role-faq" class="section-title text-2xl font-bold text-brand-950">{{ role.label }}常問的問題</h2>
       <FaqList class="mt-5" :faqs="faqs" />
       <RouterLink to="/faq" class="mt-3 inline-flex min-h-11 items-center text-link">看全部常見問題</RouterLink>
     </section>

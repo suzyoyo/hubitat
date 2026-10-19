@@ -63,7 +63,7 @@ function goTo(index) {
         <StepItem :step="steps[current]" :number="current + 1" :total="steps.length" />
       </div>
 
-      <div class="flex items-center justify-between gap-3 border-t border-line px-3 py-3 md:px-5">
+      <div class="flex items-center justify-between gap-3 px-3 py-3 md:px-5">
         <button
           type="button"
           class="flex min-h-11 items-center gap-1 rounded-lg px-3 font-bold text-brand-800 hover:bg-brand-50 disabled:invisible"

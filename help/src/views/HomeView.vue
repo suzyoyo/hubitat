@@ -52,7 +52,7 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
 
   <!-- 三種身分入口 -->
   <section class="page-container mt-12" aria-labelledby="roles-title">
-    <h2 id="roles-title" class="text-2xl font-bold text-brand-950">你是哪一種身分？</h2>
+    <h2 id="roles-title" class="section-title text-2xl font-bold text-brand-950">你是哪一種身分？</h2>
     <p class="mt-1 text-ink-soft">選擇身分，只看你用得到的教學。</p>
     <ul class="mt-5 grid gap-4 md:grid-cols-3">
       <li v-for="role in ROLES" :key="role.id">
@@ -76,7 +76,7 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
 
   <!-- 熱門教學 -->
   <section class="page-container mt-14" aria-labelledby="popular-title">
-    <h2 id="popular-title" class="text-2xl font-bold text-brand-950">熱門教學</h2>
+    <h2 id="popular-title" class="section-title text-2xl font-bold text-brand-950">熱門教學</h2>
     <ul class="mt-5 grid gap-4 md:grid-cols-2">
       <li v-for="article in popular" :key="article.id">
         <ArticleCard :article="article" />
@@ -86,7 +86,7 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
 
   <!-- 依功能分類 -->
   <section class="page-container mt-14" aria-labelledby="topics-title">
-    <h2 id="topics-title" class="text-2xl font-bold text-brand-950">依功能找教學</h2>
+    <h2 id="topics-title" class="section-title text-2xl font-bold text-brand-950">依功能找教學</h2>
     <ul class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       <li
         v-for="topic in topics"
@@ -121,7 +121,7 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
 
   <!-- 常見問題：自己佔滿一整列 -->
   <section class="page-container mt-14" aria-labelledby="faq-title">
-    <h2 id="faq-title" class="text-2xl font-bold text-brand-950">常見問題</h2>
+    <h2 id="faq-title" class="section-title text-2xl font-bold text-brand-950">常見問題</h2>
     <FaqList class="mt-5" :faqs="featuredFaqs" />
     <RouterLink to="/faq" class="mt-3 inline-flex min-h-11 items-center gap-1 text-link">
       看全部常見問題

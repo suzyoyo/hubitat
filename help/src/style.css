@@ -99,7 +99,7 @@ body {
   .btn-secondary {
     @apply bg-brand-50 text-brand-900 hover:bg-brand-100;
   }
-  /* 頁首的漸層底：從左上角的品牌藍（#6fb7e2 混 35%）往右下散開、淡到頁面底色
+  /* 頁首的漸層底：左上角的品牌藍（#6fb7e2 混 35%）往右下散開、淡到頁面底色
      （2026-10-19 從 brand-50 改來，原本偏灰、看起來暗；同一天把上下直拉改成從左上散開）。
      用放射狀而不是斜線，下緣和右緣都會淡到底色，拿掉分隔線後不會有一條明顯的邊。
      最深處上的深藍字、灰字對比仍有 5 : 1 以上 */
@@ -109,6 +109,22 @@ body {
       color-mix(in srgb, var(--color-brand-500) 35%, var(--color-page)),
       var(--color-page) 75%
     );
+  }
+  /* 段落大標題：文字前面一條直的品牌紅短線，純裝飾（紅色不放在文字上，對比不夠；2026-10-19 加）
+     用 padding 留位置、線用 absolute 放在左邊，標題換行時第二行也會和第一行對齊 */
+  .section-title {
+    position: relative;
+    padding-left: 0.875rem;
+  }
+  .section-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.2em;
+    bottom: 0.2em;
+    width: 4px;
+    border-radius: 9999px;
+    background: var(--color-accent);
   }
   .page-container {
     @apply mx-auto w-full max-w-[1200px] px-4 md:px-6;

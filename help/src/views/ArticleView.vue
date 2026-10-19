@@ -174,7 +174,7 @@ watch(
 
       <!-- 相關教學 -->
       <section v-if="related.length" class="mt-12 border-t border-line pt-8" aria-labelledby="related">
-        <h2 id="related" class="scroll-mt-24 text-2xl font-bold text-brand-950">相關教學</h2>
+        <h2 id="related" class="section-title scroll-mt-24 text-2xl font-bold text-brand-950">相關教學</h2>
         <ul class="mt-4 grid gap-3 md:grid-cols-2">
           <li v-for="item in related" :key="item.id">
             <ArticleCard :article="item" :show-roles="false" />
