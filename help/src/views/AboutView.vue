@@ -1,7 +1,7 @@
 <script setup>
 // 認識我們（/about）：介紹好彼社區有哪些服務（2026-10-19 從一篇文章改成獨立的介紹頁，參考智生活首頁下半部）
 //   頁首（名稱的由來） → 我們的服務（一個服務一個區塊，桌機左右交替） → 認識好彼管家比比 → 從這裡開始
-//   文字都在 src/content/about.js
+//   文字都在 src/content/about.js；內文用 .article-body（17px、字距 0.05em），和文章內頁讀起來一樣
 import { ArrowRightIcon } from '@lucide/vue'
 import ContentBlock from '@/components/ContentBlock.vue'
 import RichText from '@/components/RichText.vue'
@@ -36,7 +36,7 @@ import { MASCOTS } from '@/lib/mascots'
         </div>
         <div class="min-w-0">
           <h3 class="text-xl font-bold text-brand-900 md:text-2xl">{{ service.title }}</h3>
-          <p class="mt-3 leading-loose"><RichText :text="service.body" /></p>
+          <p class="article-body mt-3"><RichText :text="service.body" /></p>
           <ul class="mt-4 flex flex-wrap gap-2">
             <li v-for="link in service.links" :key="link.to">
               <RouterLink
@@ -66,14 +66,14 @@ import { MASCOTS } from '@/lib/mascots'
           <span class="ml-2 text-base font-medium text-ink-soft">{{ ABOUT_MASCOT.title }}</span>
         </p>
         <!-- 比比的自我介紹：做成對話框（一般文字，「」不變成按鈕名稱的深藍粗體） -->
-        <p class="mt-3 rounded-2xl rounded-tl-sm border border-brand-100 bg-white p-5 text-lg leading-loose shadow-[var(--shadow-card)]">
+        <p class="mt-3 rounded-2xl rounded-tl-sm border border-brand-100 bg-white p-5 text-lg leading-loose tracking-[0.05em] shadow-[var(--shadow-card)]">
           {{ ABOUT_MASCOT.bio }}
         </p>
       </div>
     </div>
 
     <h3 class="mt-8 text-xl font-bold text-brand-900">{{ ABOUT_MASCOT.name }}會在這些地方出現</h3>
-    <ContentBlock class="mt-3" :block="{ type: 'list', items: ABOUT_MASCOT.appearances }" />
+    <ContentBlock class="article-body mt-3" :block="{ type: 'list', items: ABOUT_MASCOT.appearances }" />
   </section>
 
   <!-- 結尾：和首頁一樣的「從這裡開始」 -->
