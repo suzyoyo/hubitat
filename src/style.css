@@ -48,6 +48,7 @@
   /* orange：不覆蓋，直接用 Tailwind / shadcn 內建的橘色（orange-500 = #ff6900） */
 
   --color-gray-50: #f8fafc;
+  --color-gray-75: #f0f0f0; /* Kit 的 gray/3，次要按鈕的底色（2026-10-19 加） */
   --color-gray-100: #e1e2e4;
   --color-gray-200: #c9cbcd;
   --color-gray-300: #b2b3b5;
@@ -87,7 +88,7 @@
   --secondary: var(--color-blue-50); /* brand/primary-subtle */
   --secondary-foreground: var(--color-blue-900);
   --muted: var(--color-gray-100);
-  --button-outline: #f0f0f0; /* 次要按鈕（outline）的底色＝Kit 的 gray/3（2026-10-19：原本用頁面背景，在白色卡片上會被吃掉） */
+  --button-outline: var(--color-gray-75); /* 次要按鈕（outline）的底色（2026-10-19：原本用頁面背景，在白色卡片上會被吃掉） */
   --muted-foreground: var(--color-gray-600); /* 次要說明文字 text/muted */
   --accent: var(--color-blue-50);
   --accent-foreground: var(--color-blue-900);
