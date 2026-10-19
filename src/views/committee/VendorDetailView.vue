@@ -115,7 +115,8 @@ function telLink(phone) {
         <div class="space-y-1 rounded-lg bg-brand-subtle p-4">
           <!-- 小標用黑色內文（2026-10-19：原本灰色小字，太像 wireframe） -->
           <p class="type-body text-foreground">平均修復時間</p>
-          <p class="type-title text-foreground">
+          <!-- 數字是重點，放大到 40px（2026-10-19） -->
+          <p class="text-[40px] leading-[48px] font-bold text-foreground">
             {{ stats.averageRepairDays ?? '—' }}
             <span v-if="stats.averageRepairDays !== null" class="type-body-strong">天</span>
           </p>
@@ -176,15 +177,15 @@ function telLink(phone) {
             <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
             <p class="min-w-0 flex-1 text-right type-body-strong text-foreground">{{ row.value }}</p>
           </div>
-          <!-- 合約詳情還是佔位頁 -->
-          <RouterLink
-            v-if="filePages"
-            :to="`/committee/contracts/${contract.id}`"
-            class="flex min-h-11 items-center justify-end gap-1 type-link text-primary"
-          >
-            查看合約檔案（{{ filePages }} 頁）
-            <ChevronRightIcon class="size-4" />
-          </RouterLink>
+          <!-- ghost 按鈕（2026-10-19 按鈕規則：不強調的動作）；-mr-3 讓箭頭和卡片內容右邊切齊 -->
+          <div v-if="filePages" class="flex justify-end">
+            <Button as-child variant="ghost" class="-mr-3">
+              <RouterLink :to="`/committee/contracts/${contract.id}`">
+                查看合約檔案（{{ filePages }} 頁）
+                <ChevronRightIcon class="size-4" />
+              </RouterLink>
+            </Button>
+          </div>
         </template>
         <p v-else class="type-body text-muted-foreground">目前沒有生效中的合約</p>
       </section>
@@ -221,16 +222,13 @@ function telLink(phone) {
             </div>
           </div>
         </template>
-        <!-- 超過 4 筆才有「查看全部」 -->
-        <button
-          v-if="!showAllRecords && vendor.serviceRecords.length > SHOW_FIRST"
-          type="button"
-          class="flex min-h-11 w-full items-center justify-end gap-1 type-link text-primary"
-          @click="showAllRecords = true"
-        >
-          查看全部 {{ vendor.serviceRecords.length }} 筆紀錄
-          <ChevronRightIcon class="size-4" />
-        </button>
+        <!-- 超過 4 筆才有「查看全部」；ghost 按鈕（2026-10-19 按鈕規則） -->
+        <div v-if="!showAllRecords && vendor.serviceRecords.length > SHOW_FIRST" class="flex justify-end">
+          <Button type="button" variant="ghost" class="-mr-3" @click="showAllRecords = true">
+            查看全部 {{ vendor.serviceRecords.length }} 筆紀錄
+            <ChevronRightIcon class="size-4" />
+          </Button>
+        </div>
       </section>
     </template>
   </div>
