@@ -165,7 +165,7 @@ function presentForManagement(item) {
 // 只挑住戶需要的欄位，不會把負責人、廠商、內部紀錄給住戶
 function presentForResident(item, userId) {
   // 只留有 residentText 的紀錄，並改用給住戶看的說明
-  //   isEdit：是住戶自己修改的紀錄（「你修改了補充說明。」），不算管委會的回覆
+  //   isEdit：是住戶自己補充的紀錄（「你補充了說明。」），不算管委會的回覆
   const timeline = item.logs
     .filter((log) => log.residentText)
     .map((log) => ({
@@ -710,35 +710,36 @@ function findEditableCase(id, userId) {
 // 住戶修改通報的紀錄名稱；住戶端看到這個名稱的紀錄，就知道是自己改的
 const RESIDENT_EDIT_LABEL = '住戶補充'
 
-// 修改通報（住戶用）：只能改補充說明和照片，地點和主旨送出後就不能改
-//   changes 可以傳 description（補充說明）、photos（照片或影片檔名的清單），沒傳的不會動
-// 有改到東西的話，處理紀錄多一筆「住戶補充」，留下修改的紀錄：
-//   管理端看到「陳先生（B 棟 8 樓）修改了補充說明」，住戶自己的處理進度看到「你修改了補充說明。」
-//   紀錄的 note 存改完之後的內容（補充說明的全文、照片的檔名），住戶的處理進度用小字顯示在下面
+// 補充通報（住戶用）：可以加一段補充說明、改照片；地點、主旨、原本的描述送出後就不能改
+//   changes 可以傳 supplement（這次新加的補充說明，2026-10-19 改：不再改掉原本的描述，每次都是新的一段）、
+//   photos（照片或影片檔名的清單），沒傳的不會動
+// 有東西的話，處理紀錄多一筆「住戶補充」：
+//   管理端看到「陳先生（B 棟 8 樓）補充了說明」，住戶自己的處理進度看到「你補充了說明。」
+//   紀錄的 note 存補充的內容（照片有改就加上照片的檔名），住戶的處理進度用小字顯示在下面
 // 回傳修改後的通報；不能改的話（不是自己的、已經結案）回傳 undefined
 // 修改只存在記憶體，重新整理網頁會變回原本的假資料
 export async function updateReport(id, userId, changes) {
   await delay()
   const item = findEditableCase(id, userId)
   if (!item) return undefined
-  const changed = [] // 改了哪些，例如 ['補充說明', '照片／影片']
-  const notes = [] // 改完之後的內容，和 changed 一一對應
-  if (changes.description !== undefined && changes.description !== item.description) {
-    item.description = changes.description
-    changed.push('補充說明')
-    notes.push(item.description ? `「${item.description}」` : '已清空')
+  const changed = [] // 做了哪些，例如 ['補充了說明', '修改了照片／影片']
+  const notes = [] // 內容，和 changed 一一對應
+  const supplement = changes.supplement?.trim()
+  if (supplement) {
+    changed.push('補充了說明')
+    notes.push(`「${supplement}」`)
   }
   if (changes.photos !== undefined && changes.photos.join('|') !== item.photos.join('|')) {
     item.photos = [...changes.photos]
-    changed.push('照片／影片')
+    changed.push('修改了照片／影片')
     notes.push(item.photos.length ? item.photos.join('、') : '已全部刪除')
   }
   if (changed.length) {
-    const what = changed.join('、')
-    addLog(item, userId, RESIDENT_EDIT_LABEL, `${reporterLabel(item)}修改了${what}`, `你修改了${what}。`)
-    // 剛加的那一筆，多記改完的內容。只改一項時，上一行已經說了改哪一項，不用再寫一次；兩項都改才在前面標名稱
+    const what = changed.join('，')
+    addLog(item, userId, RESIDENT_EDIT_LABEL, `${reporterLabel(item)}${what}`, `你${what}。`)
+    // 剛加的那一筆，多記內容。只有一項時，上一行已經說了是哪一項；兩項都有才在前面標名稱
     item.logs.at(-1).note =
-      changed.length === 1 ? notes[0] : changed.map((name, i) => `${name}：${notes[i]}`).join('\n')
+      changed.length === 1 ? notes[0] : [`說明：${notes[0]}`, `照片／影片：${notes[1]}`].join('\n')
   }
   return presentForResident(item, userId)
 }

@@ -1,6 +1,6 @@
 <script setup>
 // 通報摘要卡（對應 Figma 的 Report/Summary）：通報詳情頁最上面那一張
-// 標題＋狀態徽章，下面是送出日期和公開狀態
+// 標題＋狀態徽章，下面是送出日期和公開狀態，最下面是住戶當初寫的描述（只能看）
 // 公開的通報顯示地球圖示，保密的顯示鎖頭圖示
 import { GlobeIcon, LockIcon } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
@@ -27,6 +27,13 @@ defineProps({
         <component :is="report.visibility === 'private' ? LockIcon : GlobeIcon" class="size-4 shrink-0" />
         {{ report.visibilityLabel }}
       </p>
+    </div>
+    <!-- 你的描述（2026-10-19，suzy 在 #157 提的）：補充說明的輸入框改成每次都是空的之後，
+         住戶在這裡看當初寫了什麼；只能看、不能改，要補充就寫在下面的補充說明 -->
+    <div class="space-y-0.5 border-t border-border pt-3">
+      <!-- 管委會或管理人員代住戶登記的（isOnBehalf），描述是登記的人寫的，標題不寫「你的」（suzy 在 #157 提的） -->
+      <p class="type-body-strong text-foreground">{{ report.isOnBehalf ? '通報描述' : '你的描述' }}</p>
+      <p class="type-body whitespace-pre-line text-muted-foreground">{{ report.description || '沒有填寫描述' }}</p>
     </div>
   </article>
 </template>
