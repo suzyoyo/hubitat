@@ -169,7 +169,7 @@ const supportItems = [
     </section>
 
     <!-- 還沒有登入功能，登出先回到角色選擇頁 -->
-    <Button as-child variant="outline" class="w-full">
+    <Button as-child variant="secondary" class="w-full">
       <RouterLink to="/">登出帳號</RouterLink>
     </Button>
 

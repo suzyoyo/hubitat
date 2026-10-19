@@ -226,7 +226,13 @@ function staffTodos(userId) {
   //   待受理 → 新通報（誰都可以受理）
   //   處理中 → 處理中；已受理、負責人是我（我受理、還沒派廠商）也算
   //   待結案不列入：那是等負責人（主委或副主委）結案，管理人員已經做完了
+  // 交辦給我、連到案件的：那件案件只留交辦那張卡（2026-10-19，原本同一件事會出現兩張）
+  //   交辦卡有誰交辦、完成期限，點進去的交辦詳情可以「前往案件詳情」
+  const myTaskCaseIds = new Set(
+    tasks.filter((task) => task.assigneeId === userId && task.status === 'in_progress' && task.caseId).map((task) => task.caseId),
+  )
   for (const item of cases) {
+    if (myTaskCaseIds.has(item.id)) continue
     let kind = ''
     if (item.status === 'pending') kind = 'new_case'
     else if (item.status === 'in_progress') kind = 'in_progress'

@@ -177,7 +177,7 @@ onMounted(async () => {
 
     <!-- 還沒有登入功能，登出先回到角色選擇頁 -->
     <!-- as-child：讓 Button 的外觀套在裡面的 RouterLink 上，按下去就是換頁 -->
-    <Button as-child variant="outline" class="w-full">
+    <Button as-child variant="secondary" class="w-full">
       <RouterLink to="/">登出帳號</RouterLink>
     </Button>
 
