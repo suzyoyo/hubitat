@@ -77,7 +77,8 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', onBeforeUnload)
       <DialogDescription class="type-body!">
         {{ draftTitle ? '直接離開的話，剛剛填的內容不會保留。' : '離開後，剛剛填的內容不會保留。' }}
       </DialogDescription>
-      <div class="space-y-2">
+      <!-- pt-3：說明和按鈕之間多空一點，不要太擠（2026-10-19） -->
+      <div class="space-y-2 pt-3">
         <!-- 次要在左、主要在右；最安全的「繼續填寫」是主要按鈕，避免誤按就把資料丟掉 -->
         <div class="flex gap-3 *:flex-1">
           <Button variant="outline" :disabled="saving" @click="goToTarget">直接離開</Button>
