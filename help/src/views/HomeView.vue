@@ -1,11 +1,11 @@
 <script setup>
 // 使用手冊首頁：以「快速找到教學」為核心
-//   歡迎區（下載 App 區塊＋「從這裡開始」小連結；搜尋在頂部列） → 三種身分入口 → 新手教學 → 依功能分類 → 常見問題（聯絡支援 2026-10-19 拿掉，頂部列和頁尾都有連結）
+//   歡迎區（下載 App 區塊＋「從這裡開始」小連結＋假手機裡的 App 首頁；搜尋在頂部列） → 三種身分入口 → 新手教學 → 依功能分類 → 常見問題（聯絡支援 2026-10-19 拿掉，頂部列和頁尾都有連結）
 import { ArrowRightIcon, HouseIcon, UserCogIcon, UsersIcon } from '@lucide/vue'
-import pointing from '@/assets/mascot/pointing.png'
 import ArticleCard from '@/components/ArticleCard.vue'
 import DownloadPanel from '@/components/DownloadPanel.vue'
 import FaqList from '@/components/FaqList.vue'
+import HeroPhone from '@/components/HeroPhone.vue'
 import { FAQS } from '@/content/faqs'
 import { ROLES } from '@/content/roles'
 import {
@@ -32,30 +32,42 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
 </script>
 
 <template>
-  <!-- 歡迎區（2026-10-19 參考智生活首頁：左邊標題＋「從這裡開始」按鈕，右邊好彼管家） -->
-  <section class="hero-gradient" aria-labelledby="home-title">
-    <div class="page-container grid items-center gap-8 py-10 md:grid-cols-[minmax(0,1fr)_200px] md:py-14">
+  <!-- 歡迎區（2026-10-19）：左邊標題＋下載區塊，右邊（手機版在下面）是假手機裡的 App 首頁，後面有會動的光 -->
+  <!-- overflow-clip：手機後面的光暈比手機大，超出歡迎區的部分裁掉，才不會出現捲軸、也不會蓋到頂部列 -->
+  <section class="hero-gradient overflow-clip" aria-labelledby="home-title">
+    <!-- 欄位：手機版一欄（假手機在說明和下載區塊中間）；平板、桌機兩欄（文字在左、假手機在右） -->
+    <div
+      class="page-container grid items-center gap-8 py-10 md:grid-cols-[minmax(0,1fr)_280px] md:py-14 xl:grid-cols-[600px_minmax(0,1fr)] xl:gap-12"
+    >
       <div class="min-w-0">
-        <!-- 手機版：好彼管家縮小，放在標題右邊 -->
-        <div class="flex items-center justify-between gap-4">
-          <h1 id="home-title" class="text-[28px] font-bold leading-tight text-brand-950 md:text-[38px]">
-            <!-- 分成兩段，換行時不會把「使用」拆開；「好彼」「社區」用 logo 原本的藍＋紅（2026-10-19 決定；淺藍底上對比約 2 : 1，是刻意的品牌裝飾） -->
-            <span class="inline-block">歡迎來到<span class="text-brand-500">好彼</span><span class="text-accent">社區</span></span><span class="inline-block">使用指南</span>
-          </h1>
-          <img :src="pointing" alt="" class="h-24 w-auto shrink-0 md:hidden" width="150" height="208" />
-        </div>
+        <!-- 好彼管家 2026-10-19 拿掉了（手機版原本在標題右邊、桌機在下載區塊右下角） -->
+        <h1 id="home-title" class="title-glow text-[28px] font-bold leading-tight text-brand-950 md:text-[38px]">
+          <!-- 分成兩段，換行時不會把「使用」拆開；「好彼」「社區」用 logo 原本的藍＋紅（2026-10-19 決定；淺藍底上對比約 2 : 1，是刻意的品牌裝飾） -->
+          <span class="inline-block">歡迎來到<span class="text-brand-500">好彼</span><span class="text-accent">社區</span></span><span class="inline-block">使用指南</span>
+        </h1>
         <p class="lead-text"><span class="inline-block">有好彼管家陪你，</span><span class="inline-block">社區大小事都能輕鬆上手！</span></p>
 
+        <!-- 手機版：假手機放在說明和下載按鈕中間（2026-10-19 suzy 決定） -->
+        <HeroPhone class="mx-auto mt-6 w-[220px] md:hidden" crop-class="h-[280px]" />
+
         <!-- 下載 App（2026-10-19）：最顯眼的是下載區塊，「第一次使用」改成下面一行小連結 -->
-        <DownloadPanel class="mt-6 max-w-lg" />
-        <RouterLink to="/start" class="mt-2 inline-flex min-h-11 items-center gap-1 text-link">
-          第一次使用？從這裡開始
-          <ArrowRightIcon class="size-4" aria-hidden="true" />
-        </RouterLink>
+        <!-- 「第一次使用」放在下載區塊正下方的中間（2026-10-19） -->
+        <div class="mt-2 max-w-lg md:mt-6">
+          <DownloadPanel />
+          <div class="mt-2 text-center">
+            <RouterLink to="/start" class="inline-flex min-h-11 items-center gap-1 text-link">
+              第一次使用？從這裡開始
+              <ArrowRightIcon class="size-4" aria-hidden="true" />
+            </RouterLink>
+          </div>
+        </div>
       </div>
 
-      <!-- 平板、桌機版：好彼管家放在右邊 -->
-      <img :src="pointing" alt="" class="hidden h-52 w-auto justify-self-center md:block" width="150" height="208" />
+      <!-- 平板、桌機：假手機在右邊，貼著歡迎區底部（self-end＋-mb-14 抵掉下面的留白），下半截被歡迎區的底邊切掉 -->
+      <HeroPhone
+        class="-mb-14 hidden w-[240px] self-end justify-self-center md:block xl:w-[300px]"
+        crop-class="h-[390px] xl:h-[480px]"
+      />
     </div>
   </section>
 
@@ -138,3 +150,13 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
     </RouterLink>
   </section>
 </template>
+
+<style scoped>
+/* 標題後面一圈白色的光暈（2026-10-19），讓字在淺藍底上更突出 */
+.title-glow {
+  text-shadow:
+    0 0 24px rgb(255 255 255 / 0.55),
+    0 0 60px rgb(255 255 255 / 0.4),
+    0 0 110px rgb(255 255 255 / 0.35);
+}
+</style>
