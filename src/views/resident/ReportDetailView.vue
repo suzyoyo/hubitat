@@ -1,5 +1,6 @@
 <script setup>
 // 住戶端・通報詳情：看一筆通報的處理進度，也可以補充說明、換照片
+// 補充說明每次進來都是空的，送出後是新加的一段（2026-10-19 改：原本是帶入原本的描述來改，容易重複送出、每次都要先刪字）
 // 沒有「撤回通報」：2026-10-15 和 013 決定拿掉撤回，不需要處理的通報由處理的人寫明原因結案
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -30,26 +31,24 @@ const userId = ref('') // 我是誰，存檔時要用
 
 // 字數的上限放在 src/lib/report.js，和新增通報用同一組
 const DESCRIPTION_MAX = REPORT_DESCRIPTION_MAX
-// 輸入框裡目前的文字。和 report.description 分開放，按「確認修改」才會真的存進去
-const description = ref('')
-// 畫面上目前的照片檔名。和 report.photos 分開放，按「確認修改」才會真的存進去
+// 這次要補充的說明，一開始是空的；送出後清空
+const supplement = ref('')
+// 畫面上目前的照片檔名。和 report.photos 分開放，按「送出補充」才會真的存進去
 const photos = ref([])
 // saving：存檔還在路上時是 true，按鈕先不能按，避免連按兩次
 const saving = ref(false)
 
-// 「確認修改」能不能按：說明或照片有改過，而且不是正在存檔
-// 說明可以是空的：新增通報時它是選填
+// 「送出補充」能不能按：有寫補充說明、或照片有改過，而且不是正在存檔
 const canSave = computed(() => {
-  const text = description.value.trim() // trim()：去掉頭尾的空白和換行
   if (saving.value) return false
   // 兩個陣列不能直接用 === 比，所以先各自接成一串文字再比
   const photosChanged = photos.value.join('|') !== report.value.photos.join('|')
-  return text !== report.value.description || photosChanged
+  return Boolean(supplement.value.trim()) || photosChanged // trim()：去掉頭尾的空白和換行
 })
 
-// 把通報目前的內容放進輸入框和照片格（一開始、存檔之後都會用到）
+// 清空補充說明、照片格放通報目前的照片（一開始、存檔之後都會用到）
 function fillForm() {
-  description.value = report.value.description
+  supplement.value = ''
   // [...陣列]：複製一份。直接用同一個陣列的話，改畫面上的照片會連原本的資料一起改到
   photos.value = [...report.value.photos]
 }
@@ -64,11 +63,11 @@ onMounted(async () => {
   loading.value = false
 })
 
-// 按「確認修改」：把輸入框的文字存起來
+// 按「送出補充」：把補充說明、照片存起來
 async function save() {
   saving.value = true
   const updated = await updateReport(report.value.id, userId.value, {
-    description: description.value.trim(),
+    supplement: supplement.value.trim(),
     photos: photos.value,
   })
   saving.value = false
@@ -79,7 +78,7 @@ async function save() {
   }
   report.value = updated
   fillForm()
-  toast.success('已更新通報')
+  toast.success('已送出補充')
 }
 </script>
 
@@ -116,13 +115,14 @@ async function save() {
           <div class="flex items-center justify-between">
             <!-- for 對應輸入框的 id：點「補充說明」這幾個字，游標會跳進輸入框 -->
             <Label for="report-description" class="text-base">補充說明</Label>
-            <p class="type-date text-muted-foreground">{{ description.length }} / {{ DESCRIPTION_MAX }} 字</p>
+            <p class="type-date text-muted-foreground">{{ supplement.length }} / {{ DESCRIPTION_MAX }} 字</p>
           </div>
           <!-- maxlength：超過字數上限就打不進去 -->
           <Textarea
             id="report-description"
-            v-model="description"
+            v-model="supplement"
             :maxlength="DESCRIPTION_MAX"
+            placeholder="還有想補充的嗎？例如：今天早上又發生一次"
             class="min-h-[132px]"
           />
         </div>
@@ -136,7 +136,7 @@ async function save() {
 
         <!-- 設計稿左邊還有一顆「撤回通報」，2026-10-15 拿掉了 -->
         <BottomCta>
-          <Button :disabled="!canSave" @click="save">確認修改</Button>
+          <Button :disabled="!canSave" @click="save">送出補充</Button>
         </BottomCta>
       </template>
     </template>
