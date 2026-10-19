@@ -21,6 +21,7 @@ export default {
     {
       title: '點合約看內容',
       body: '可以看到合約期間、金額、合約文件，以及以前的合約。',
+      screenshot: { file: 'committee-contract-detail.jpg', alt: '合約詳情頁，有合約期間、金額和合約文件的縮圖' },
     },
     {
       title: '翻閱合約文件',

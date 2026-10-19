@@ -21,6 +21,7 @@ export default {
     {
       title: '要撤回：按「撤回公告」',
       body: '撤回後住戶就看不到這則公告，已經收到通知的住戶會收到更正通知。',
+      screenshot: { file: 'committee-announcement-withdraw.jpg', alt: '「撤回這則公告？」確認視窗，可以填撤回原因' },
     },
     {
       title: '撤回後想恢復：按「復原」',

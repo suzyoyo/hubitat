@@ -17,11 +17,12 @@ export default {
     {
       title: '按「確認結案」',
       body: '確認修好了，按畫面下方的「確認結案」。',
-      screenshot: { file: 'case-close.jpg', alt: '結案頁，有維修費用和結案說明' },
+      screenshot: { file: 'case-to-verify.jpg', alt: '待結案的案件詳情，底部有「退回」和「確認結案」' },
     },
     {
       title: '填維修費用和結案說明（可以不填）',
       body: '維修費用會記進設備的維修紀錄，只有管委會看得到；結案說明住戶也看不到。',
+      screenshot: { file: 'case-close.jpg', alt: '結案頁，有維修費用和結案說明' },
     },
     {
       title: '按「結案」',

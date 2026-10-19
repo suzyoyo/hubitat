@@ -209,9 +209,39 @@ const SHOTS = [
   { file: 'committee-equipment-list', path: '/committee/equipment' },
   { file: 'committee-equipment-detail', path: '/committee/equipment/e-001', run: (page) => scrollTo(page, '保養', 70) },
   { file: 'committee-urgent-log', path: '/committee/me/urgent-log' },
+  // 2026-10-19 加：「換畫面才放圖」補的
+  {
+    file: 'committee-announcement-notify', path: '/committee/announcements/new',
+    run: async (page) => {
+      await page.getByText('施工', { exact: true }).first().click() // 施工、維護才有「推播通知」
+      await wait(page)
+      await scrollTo(page, '標示為緊急', 90)
+    },
+  },
+  {
+    file: 'committee-announcement-withdraw', path: '/committee/announcements/an-001',
+    run: async (page) => {
+      await tap(page, '撤回公告')
+      await wait(page)
+    },
+  },
+  {
+    file: 'case-return', path: '/committee/cases/CASE-20260922-002',
+    run: async (page) => {
+      await tap(page, '退回')
+      await page.getByRole('dialog').locator('textarea, input').first().fill('門把還是會鬆，請再確認一次')
+    },
+  },
+  { file: 'committee-contract-detail', path: '/committee/contracts/ct-001', clip: (page) => clipAbove(page, '下載 PDF') },
+  { file: 'committee-task-detail', path: '/committee/tasks/TASK-104' }, // 對方已回報、待我確認
+  { file: 'resident-report-progress', path: '/resident/reports/CASE-20260925-003', stage: stageResident, run: (page) => scrollTo(page, '處理進度', 70) },
   // 管理人員
   { file: 'staff-home', path: '/staff/home' },
   { file: 'staff-task-detail', path: '/staff/tasks/TASK-099' },
+  {
+    file: 'staff-task-report', path: '/staff/tasks/TASK-099/report',
+    run: (page) => page.locator('#report-note').fill('各棟滅火器都檢查完了，過期的 3 支已列清單。'),
+  },
   // 文章最後「完成了！」那一頁的截圖（做完動作後的畫面，2026-10-19 加）
   {
     file: 'done-join-accepted', path: '/resident/me/join', resident: CHEN,

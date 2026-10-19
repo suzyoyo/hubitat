@@ -21,6 +21,7 @@ export default {
     {
       title: '看「處理進度」',
       body: '進度會從「已收到」走到「處理中」，最後是「已完成」。下面會列出管理室寫給你的說明，例如「已安排廠商，預計 10/3 到場。」',
+      screenshot: { file: 'resident-report-progress.jpg', alt: '處理進度：已收到、處理中、已完成三個階段，下面是管理室寫的說明' },
     },
   ],
   sections: [

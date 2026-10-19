@@ -11,11 +11,11 @@ export default {
     {
       title: '在會議紀錄頁按「留言」',
       body: '打開會議紀錄，按右下角的「留言」。',
-      screenshot: { file: 'resident-meeting-comment.jpg', alt: '從畫面下方滑出的留言框' },
     },
     {
       title: '寫下你的問題',
       body: '例如「續約後保養頻率會不會調整？」',
+      screenshot: { file: 'resident-meeting-comment.jpg', alt: '從畫面下方滑出的留言框' },
     },
     {
       title: '按「確認送出」',

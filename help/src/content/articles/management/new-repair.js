@@ -11,6 +11,7 @@ export default {
     {
       title: '按右下角的「＋」，選「新增通報」',
       body: '步驟和住戶通報一樣。',
+      screenshot: { file: 'committee-fab-menu.jpg', alt: '按右下角「＋」後跳出的新增選單，有「新增通報」' },
     },
     {
       title: '需要的話選「通報住戶」，再選地點',

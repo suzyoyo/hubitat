@@ -20,6 +20,7 @@ export default {
     {
       title: '做完按「回報完成」',
       body: '可以附上照片、寫幾句說明，再送出。',
+      screenshot: { file: 'staff-task-report.jpg', alt: '回報完成頁，可以加附件、寫備註說明，底部有「回報」' },
     },
   ],
   result: '交辦的主委或副主委會收到通知，確認後這件工作就完成了。',

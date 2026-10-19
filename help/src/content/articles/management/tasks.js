@@ -17,6 +17,7 @@ export default {
     {
       title: '點「查看詳情」',
       body: '可以看到交給誰、什麼時候前要完成。',
+      screenshot: { file: 'committee-task-detail.jpg', alt: '交辦詳情頁，對方已回報，底部有「退回說明」和「確認完成」' },
     },
     {
       title: '對方回報後，確認完成或退回',

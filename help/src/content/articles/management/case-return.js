@@ -21,6 +21,7 @@ export default {
     {
       title: '寫下原因，按「確認退回」',
       body: '告訴管理人員還有哪裡要處理。',
+      screenshot: { file: 'case-return.jpg', alt: '「退回給管理人員？」視窗，有退回原因欄位和「確認退回」按鈕' },
     },
   ],
   result: '案件回到「處理中」，管理人員會收到通知。他處理好後，會再回報一次。',

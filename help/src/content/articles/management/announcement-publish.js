@@ -12,6 +12,7 @@ export default {
     {
       title: '按「＋」，選「發布公告」',
       body: '按右下角的「＋」，選「發布公告」。',
+      screenshot: { file: 'committee-fab-menu.jpg', alt: '按右下角「＋」後跳出的新增選單，有「發布公告」' },
     },
     {
       title: '選類型、寫標題和內容',
@@ -25,6 +26,7 @@ export default {
     {
       title: '選要不要通知住戶',
       body: '「推播通知」可以選通知受影響的住戶、通知全社區，或不通知。很緊急的事，可以打開「標示為緊急」。',
+      screenshot: { file: 'committee-announcement-notify.jpg', alt: '發布公告表單的下半部，有「標示為緊急」開關和「推播通知」選項' },
     },
     {
       title: '按「發布公告」',
