@@ -19,7 +19,8 @@ const hasShot = computed(() => props.step.screenshot && screenshotUrl(props.step
 <template>
   <div class="grid gap-5" :class="hasShot && 'md:grid-cols-[minmax(0,1fr)_240px] md:items-start lg:grid-cols-[minmax(0,1fr)_260px]'">
     <div class="min-w-0">
-      <p class="text-sm font-bold text-brand-800">步驟 {{ number }}<span class="sr-only">，共 {{ total }} 步</span></p>
+      <!-- 「步驟 N」用灰色（2026-10-19 從深藍改來） -->
+      <p class="text-sm font-bold text-ink-soft">步驟 {{ number }}<span class="sr-only">，共 {{ total }} 步</span></p>
       <!-- 步驟編號只用上面的「步驟 N」文字，不另外放圓圈（2026-10-18） -->
       <h3 :id="headingId" class="mt-1 text-xl font-bold leading-snug text-brand-900">{{ step.title }}</h3>
       <p class="mt-3"><RichText :text="step.body" /></p>

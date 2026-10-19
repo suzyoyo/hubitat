@@ -126,7 +126,7 @@ watch(
       <!-- 操作步驟 -->
       <section v-if="article.steps?.length" class="mt-10" aria-labelledby="steps">
         <h2 id="steps" class="scroll-mt-24 text-2xl font-bold text-brand-950">操作步驟</h2>
-        <ArticleSteps class="mt-4" :steps="article.steps" :walkthrough="article.walkthrough" />
+        <ArticleSteps class="mt-4" :steps="article.steps" :has-result="!!article.result" />
       </section>
 
       <!-- 其他段落 -->
@@ -162,7 +162,7 @@ watch(
       <!-- 注意事項 -->
       <section v-if="article.notes?.length" class="mt-10" aria-labelledby="notes">
         <h2 id="notes" class="scroll-mt-24 text-2xl font-bold text-brand-950">注意事項</h2>
-        <NoteBox class="mt-4" tone="warning" :mascot="!!article.walkthrough">
+        <NoteBox class="mt-4" tone="warning" :mascot="!!article.complex">
           <ul class="space-y-2">
             <li v-for="note in article.notes" :key="note" class="flex gap-3">
               <span class="mt-[0.72em] size-1.5 shrink-0 rounded-full bg-orange-800" aria-hidden="true" />

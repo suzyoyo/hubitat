@@ -8,7 +8,7 @@ export default {
   keywords: ['流程', '案件', '受理', '交辦', '完工驗收', '結案', '退回', '報修'],
   published: true,
   popular: true,
-  walkthrough: true,
+  complex: true, // 比較複雜的流程：注意事項旁邊放好彼管家
   before: [
     '主委、副主委和管理人員可以受理、處理案件。',
     '交辦、退回和結案，只有主委、副主委可以做。',

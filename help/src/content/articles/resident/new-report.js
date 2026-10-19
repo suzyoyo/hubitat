@@ -8,7 +8,7 @@ export default {
   keywords: ['通報', '報修', '新增', '故障', '漏水', '壞掉', '反映', '照片'],
   published: true,
   popular: true,
-  walkthrough: true,
+  complex: true, // 比較複雜的流程：注意事項旁邊放好彼管家
   before: [
     '可以先拍好問題的照片，通報時一起附上，管理室會更快了解狀況。',
     '漏水、停電、電梯受困這類緊急狀況，請直接打電話給社區管理室。',

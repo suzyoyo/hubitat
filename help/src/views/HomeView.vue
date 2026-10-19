@@ -1,6 +1,6 @@
 <script setup>
 // 使用手冊首頁：以「快速找到教學」為核心
-//   歡迎區 → 三種身分入口（搜尋在頂部列） → 熱門教學 → 依功能分類 → 常見問題 → 聯絡支援
+//   歡迎區（「從這裡開始」按鈕；搜尋在頂部列） → 三種身分入口 → 熱門教學 → 依功能分類 → 常見問題 → 聯絡支援
 import { ArrowRightIcon, HouseIcon, UserCogIcon, UsersIcon } from '@lucide/vue'
 import pointing from '@/assets/mascot/pointing.png'
 import ArticleCard from '@/components/ArticleCard.vue'
@@ -31,20 +31,30 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
 </script>
 
 <template>
-  <!-- 歡迎區 -->
+  <!-- 歡迎區（2026-10-19 參考智生活首頁：左邊標題＋「從這裡開始」按鈕，右邊好彼管家） -->
   <section class="hero-gradient" aria-labelledby="home-title">
-    <div class="page-container grid items-center gap-6 py-10 md:grid-cols-[minmax(0,1fr)_200px] md:py-14">
+    <div class="page-container grid items-center gap-8 py-10 md:grid-cols-[minmax(0,1fr)_200px] md:py-14">
       <div class="min-w-0">
         <!-- 手機版：好彼管家縮小，放在標題右邊 -->
         <div class="flex items-center justify-between gap-4">
           <h1 id="home-title" class="text-[28px] font-bold leading-tight text-brand-950 md:text-[38px]">
-            <!-- 分成兩段，換行時不會把「使用」拆開 -->
-            <span class="inline-block">歡迎來到好彼社區</span><span class="inline-block">使用指南</span>
+            <!-- 分成兩段，換行時不會把「使用」拆開；「好彼」「社區」用 logo 原本的藍＋紅（2026-10-19 決定；淺藍底上對比約 2 : 1，是刻意的品牌裝飾） -->
+            <span class="inline-block">歡迎來到<span class="text-brand-500">好彼</span><span class="text-accent">社區</span></span><span class="inline-block">使用指南</span>
           </h1>
           <img :src="pointing" alt="" class="h-24 w-auto shrink-0 md:hidden" width="150" height="208" />
         </div>
         <p class="lead-text"><span class="inline-block">有好彼管家陪你，</span><span class="inline-block">社區大小事都能輕鬆上手！</span></p>
+
+        <!-- 主要按鈕 -->
+        <div class="mt-6 flex flex-wrap gap-3">
+          <!-- 比一般主要按鈕（brand-800）淺一點（2026-10-19）；白字對比 5.3 : 1 -->
+          <RouterLink to="/start" class="btn btn-primary bg-[#3d7290] hover:bg-brand-800">
+            第一次使用？從這裡開始
+            <ArrowRightIcon class="size-5" aria-hidden="true" />
+          </RouterLink>
+        </div>
       </div>
+
       <!-- 平板、桌機版：好彼管家放在右邊 -->
       <img :src="pointing" alt="" class="hidden h-52 w-auto justify-self-center md:block" width="150" height="208" />
     </div>

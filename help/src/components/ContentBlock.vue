@@ -22,7 +22,6 @@ const badgeColors = {
   blue: 'bg-brand-50 text-[#306077]',
   gray: 'bg-line text-ink',
 }
-const toneNames = { red: '紅色', orange: '橘色', blue: '藍色', gray: '灰色' }
 </script>
 
 <template>
@@ -54,14 +53,13 @@ const toneNames = { red: '紅色', orange: '橘色', blue: '藍色', gray: '灰�
     </table>
   </div>
 
-  <!-- 徽章對照：每一列有徽章樣本＋顏色名稱＋意思，不只靠顏色 -->
+  <!-- 徽章對照：每一列有徽章樣本＋意思（徽章上本來就有文字，不另外寫顏色名稱；2026-10-19 拿掉） -->
   <ul v-else-if="block.type === 'badges'" class="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
-    <li v-for="item in block.items" :key="item.tone" class="grid gap-2 px-4 py-3 sm:grid-cols-[150px_minmax(0,1fr)] sm:items-center">
-      <span class="flex items-center gap-2">
+    <li v-for="item in block.items" :key="item.tone" class="grid gap-2 px-4 py-3 sm:grid-cols-[120px_minmax(0,1fr)] sm:items-center">
+      <span>
         <span class="inline-flex h-7 items-center rounded-full px-3 text-sm font-medium" :class="badgeColors[item.tone]">
           {{ item.label }}
         </span>
-        <span class="text-sm text-muted">{{ toneNames[item.tone] }}</span>
       </span>
       <span><RichText :text="item.meaning" /></span>
     </li>
