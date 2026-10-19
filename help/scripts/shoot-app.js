@@ -212,6 +212,94 @@ const SHOTS = [
   // 管理人員
   { file: 'staff-home', path: '/staff/home' },
   { file: 'staff-task-detail', path: '/staff/tasks/TASK-099' },
+  // 文章最後「完成了！」那一頁的截圖（做完動作後的畫面，2026-10-19 加）
+  {
+    file: 'done-join-accepted', path: '/resident/me/join', resident: CHEN,
+    run: async (page) => {
+      await page.getByPlaceholder(/6 位數字/).fill('482913')
+      await wait(page, 1500)
+      await tap(page, '接受邀請')
+      await wait(page, 1200)
+    },
+  },
+  {
+    file: 'done-report-edit', path: '/resident/reports/CASE-20261001-001', stage: stageResident,
+    run: async (page) => {
+      await page.locator('#report-description').fill('今天早上積水更多了，靠近樓梯那邊也開始滴水。')
+      await tap(page, '送出補充')
+      await wait(page, 900)
+    },
+  },
+  {
+    file: 'done-case-accepted', path: '/committee/cases/CASE-20261001-001',
+    run: async (page) => {
+      await tap(page, '受理')
+      await wait(page, 900)
+    },
+  },
+  {
+    // 先受理、再交辦給張管理員（交辦完會回到案件詳情）
+    file: 'done-case-assigned', path: '/committee/cases/CASE-20261001-001',
+    run: async (page) => {
+      await tap(page, '受理')
+      await wait(page, 900)
+      await tap(page, '交辦')
+      await wait(page, 900)
+      await page.locator('#task-title').fill('聯繫水電廠商處理漏水')
+      await page.locator('#task-assignee').fill('張管理員')
+      await wait(page, 400)
+      await page.getByText('張管理員').first().click()
+      await tap(page, '確認新增')
+      await wait(page, 1200)
+    },
+  },
+  {
+    file: 'done-case-equipment', path: '/committee/cases/CASE-20260918-001',
+    run: async (page) => {
+      await scrollTo(page, '關聯設備', 70)
+      await page.getByPlaceholder('選擇或搜尋設備').click()
+      await page.getByRole('option').first().click()
+      await wait(page)
+      await tap(page, '更新進度') // 存起來才會出現「查看設備」
+      await wait(page, 900)
+      await scrollTo(page, '關聯設備', 70)
+    },
+  },
+  {
+    file: 'done-case-updated', path: '/committee/cases/CASE-20260918-001',
+    run: async (page) => {
+      await scrollTo(page, '處理進度與留痕', 70)
+      await page.locator('#log-resident').fill('廠商 10/5 再來處理')
+      await page.getByPlaceholder('例：零件調貨中').fill('零件調貨中，廠商約 10/5 再來更換')
+      await tap(page, '更新進度')
+      await wait(page, 900)
+    },
+  },
+  {
+    file: 'done-case-returned', path: '/committee/cases/CASE-20260922-002',
+    run: async (page) => {
+      await tap(page, '退回')
+      await page.getByRole('dialog').locator('textarea, input').first().fill('門把還是會鬆，請再確認一次')
+      await tap(page, '確認退回')
+      await wait(page, 900)
+    },
+  },
+  {
+    file: 'done-case-closed', path: '/committee/cases/CASE-20260922-002/close',
+    run: async (page) => {
+      await tap(page, '結案')
+      await wait(page, 1200)
+    },
+  },
+  {
+    file: 'done-task-reported', path: '/staff/tasks/TASK-099/report',
+    run: async (page) => {
+      await page.locator('#report-note').fill('各棟滅火器都檢查完了，過期的 3 支已列清單。')
+      await tap(page, '回報')
+      await tap(page, '確認回報')
+      await wait(page, 1200)
+    },
+  },
 ]
 
 // ── 開始截圖 ──

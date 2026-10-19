@@ -63,6 +63,7 @@ const shots = new Map()
 for (const a of articles.filter((x) => x.published)) {
   const list = [
     ...(a.steps ?? []).filter((s) => s.screenshot).map((s) => s.screenshot),
+    ...(a.resultScreenshot ? [a.resultScreenshot] : []),
     ...(a.sections ?? []).flatMap((s) => s.blocks).filter((b) => b.type === 'image').map((b) => b.screenshot),
   ]
   for (const shot of list) {

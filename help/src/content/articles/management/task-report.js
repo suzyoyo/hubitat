@@ -23,6 +23,7 @@ export default {
     },
   ],
   result: '交辦的主委或副主委會收到通知，確認後這件工作就完成了。',
+  resultScreenshot: { file: 'done-task-reported.jpg', alt: '回報後，上方出現「已回報完成」，交辦狀態是「待確認」' },
   notes: ['如果被退回，會收到通知並看到原因，處理好後再回報一次。'],
   relatedArticles: ['case-complete', 'todos', 'case-flow'],
 }

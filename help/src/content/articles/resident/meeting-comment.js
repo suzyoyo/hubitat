@@ -23,6 +23,7 @@ export default {
     },
   ],
   result: '管委會回覆後，你會收到通知。也可以到「我的留言」看回覆。',
+  resultScreenshot: { file: 'resident-my-comments.jpg', alt: '「我的留言」頁，有全部、待回覆兩個分頁，管委會回覆後會顯示在留言下面' },
   notes: ['你的留言只有你自己和管委會看得到。'],
   relatedArticles: ['my-comments', 'meetings'],
 }

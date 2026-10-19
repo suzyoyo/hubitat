@@ -24,5 +24,6 @@ export default {
     },
   ],
   result: '案件回到「處理中」，管理人員會收到通知。他處理好後，會再回報一次。',
+  resultScreenshot: { file: 'done-case-returned.jpg', alt: '退回後，上方出現「已退回」，案件狀態回到「處理中」' },
   relatedArticles: ['case-close', 'case-complete'],
 }

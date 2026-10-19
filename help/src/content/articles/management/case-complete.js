@@ -25,5 +25,6 @@ export default {
     },
   ],
   result: '管理人員回報後，案件會變成「待結案」，等主委或副主委確認。主委、副主委自己回報的話，案件會直接結案。',
+  resultScreenshot: { file: 'case-to-verify.jpg', alt: '回報完成後的案件，狀態是「待結案」' },
   relatedArticles: ['case-close', 'case-return', 'case-flow'],
 }

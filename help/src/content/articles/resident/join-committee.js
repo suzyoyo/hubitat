@@ -26,6 +26,7 @@ export default {
     },
   ],
   result: '畫面會顯示「已接受邀請！」。任期開始那天，你就能使用管委會的功能；在那之前，「我的」頁會顯示「待生效」。',
+  resultScreenshot: { file: 'done-join-accepted.jpg', alt: '接受邀請後的完成頁，寫著「已接受邀請！」和權限生效的日期' },
   notes: ['邀請碼不能用的話，輸入框下面會說明原因，請再跟主委確認一次。'],
   relatedArticles: ['switch-role'],
 }

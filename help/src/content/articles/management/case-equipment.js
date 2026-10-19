@@ -19,7 +19,8 @@ export default {
       body: '選好後，按畫面下方的「更新進度」存起來。',
     },
   ],
-  result: '選好的設備旁邊會出現「查看設備」，可以點過去看這台設備的資料。結案後，這次維修會自動記進它的維修紀錄。',
+  result: '按「更新進度」存好後，這台設備就和案件連在一起了。結案後，這次維修會自動記進它的維修紀錄；到時候案件詳情的設備旁邊會出現「查看設備」，可以點過去看。',
+  resultScreenshot: { file: 'done-case-equipment.jpg', alt: '按「更新進度」後，上方出現「已更新進度」，關聯設備欄位是選好的設備' },
   notes: ['找不到這台設備的話，可以先不選。'],
   relatedArticles: ['equipment', 'case-vendor', 'case-update'],
 }

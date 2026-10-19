@@ -126,7 +126,8 @@ watch(
       <!-- 操作步驟 -->
       <section v-if="article.steps?.length" class="mt-10" aria-labelledby="steps">
         <h2 id="steps" class="scroll-mt-24 text-2xl font-bold text-brand-950">操作步驟</h2>
-        <ArticleSteps class="mt-4" :steps="article.steps" :has-result="!!article.result" />
+        <!-- 完成後（result）是步驟的最後一頁，不另外放一個段落 -->
+        <ArticleSteps class="mt-4" :steps="article.steps" :result="article.result" :result-screenshot="article.resultScreenshot" />
       </section>
 
       <!-- 其他段落 -->
@@ -149,14 +150,6 @@ watch(
         <div v-if="section.mascot" class="mt-6 grid grid-cols-4 justify-items-center gap-2 md:hidden">
           <img v-for="name in section.mascotRow ?? [section.mascot]" :key="name" :src="MASCOTS[name]" alt="" class="h-20 w-auto" />
         </div>
-      </section>
-
-      <!-- 完成後 -->
-      <section v-if="article.result" class="mt-10" aria-labelledby="result">
-        <h2 id="result" class="scroll-mt-24 text-2xl font-bold text-brand-950">完成後</h2>
-        <NoteBox class="mt-4" tone="done" :mascot="!!article.steps?.length">
-          <p><RichText :text="article.result" /></p>
-        </NoteBox>
       </section>
 
       <!-- 注意事項 -->

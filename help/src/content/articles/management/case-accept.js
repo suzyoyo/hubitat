@@ -24,6 +24,7 @@ export default {
     },
   ],
   result: '案件變成「處理中」，負責人是你。通報的住戶也會收到通知。',
+  resultScreenshot: { file: 'done-case-accepted.jpg', alt: '受理後，上方出現「已受理」，案件狀態是「處理中」、負責人是李主委' },
   notes: ['如果別人剛好先受理了，畫面會提醒你，重新整理就能看到是誰在處理。'],
   relatedArticles: ['case-update', 'case-assign', 'case-flow'],
 }

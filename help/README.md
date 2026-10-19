@@ -87,7 +87,8 @@ help/
 | `before` | | 「開始前要知道」，字串陣列 |
 | `steps` | | 操作步驟，見下面 |
 | `sections` | | 其他段落，見下面 |
-| `result` | | 「完成後」會看到什麼 |
+| `result` | | 「完成後」會看到什麼，放在步驟的最後一頁「完成」（有 `steps` 才會顯示） |
+| `resultScreenshot` | | 「完成」那一頁的截圖，寫法和步驟的 `screenshot` 一樣；沒有的話放好彼管家 |
 | `notes` | | 「注意事項」，字串陣列 |
 | `relatedArticles` | | 相關教學的 id 陣列；連到不存在的文章時 `check:help` 會報錯 |
 
@@ -137,7 +138,7 @@ sections: [
 
 ## 截圖
 
-截圖在 `src/assets/screenshots/`，2026-10-19 用腳本從 App 截好（50 張，手機 375×812、2 倍解析度、`.jpg`）。文章裡寫了 `screenshot.file` 但檔案不存在的圖，網站上不會顯示，也不會留下空白。
+截圖在 `src/assets/screenshots/`，2026-10-19 用腳本從 App 截好（59 張，其中 `done-` 開頭的 9 張是文章「完成了！」那一頁用的；手機 375×812、2 倍解析度、`.jpg`）。文章裡寫了 `screenshot.file` 但檔案不存在的圖，網站上不會顯示，也不會留下空白。
 
 **App 畫面改了、要重截時**：
 

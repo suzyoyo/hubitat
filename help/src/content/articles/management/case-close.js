@@ -29,6 +29,7 @@ export default {
     },
   ],
   result: '通報的住戶會收到通知，知道問題已經處理好了。',
+  resultScreenshot: { file: 'done-case-closed.jpg', alt: '結案後，上方出現「已結案」，案件狀態是「已結案」' },
   notes: ['結案後如果又壞了，請新增一件新的案件。'],
   relatedArticles: ['case-return', 'equipment', 'case-flow'],
 }

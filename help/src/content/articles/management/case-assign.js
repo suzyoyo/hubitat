@@ -29,6 +29,7 @@ export default {
     },
   ],
   result: '案件的負責人會變成你交辦的管理人員。',
+  resultScreenshot: { file: 'done-case-assigned.jpg', alt: '交辦後，上方出現「已交辦，已通知張管理員」，負責人變成張管理員' },
   sections: [
     {
       heading: '想收回交辦？',

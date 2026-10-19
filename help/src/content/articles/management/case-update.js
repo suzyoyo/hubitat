@@ -29,6 +29,7 @@ export default {
     },
   ],
   result: '畫面會顯示「已更新進度」，處理紀錄多一筆。有寫給住戶的說明，住戶也會看到。',
+  resultScreenshot: { file: 'done-case-updated.jpg', alt: '按「更新進度」後，上方出現「已更新進度」，處理紀錄最上面多了一筆' },
   notes: ['沒寫「給住戶看的說明」的話，住戶看不到這次的更新。'],
   relatedArticles: ['case-equipment', 'case-vendor', 'case-complete'],
 }

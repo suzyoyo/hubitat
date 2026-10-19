@@ -45,14 +45,7 @@ export default {
     },
   ],
   result: '畫面會顯示「已收到你的通報！」，管理室會收到通知。之後可以在首頁或「我的通報」看處理進度。',
-  sections: [
-    {
-      heading: '送出後的畫面',
-      blocks: [
-        { type: 'image', screenshot: { file: 'report-submitted.jpg', alt: '通報送出後的完成頁，好彼管家說「已收到你的通報！」' } },
-      ],
-    },
-  ],
+  resultScreenshot: { file: 'report-submitted.jpg', alt: '通報送出後的完成頁，好彼管家說「已收到你的通報！」' },
   notes: [
     '欄位旁邊有紅色星號 * 的一定要填，沒填的話不能進到下一步。',
     '想回到上一步，按左上角的「←」。',

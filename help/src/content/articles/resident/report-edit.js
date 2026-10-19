@@ -25,6 +25,7 @@ export default {
     },
   ],
   result: '畫面會顯示「已送出補充」，管理室也會看到你補充的內容。',
+  resultScreenshot: { file: 'done-report-edit.jpg', alt: '送出補充後，上方出現「已送出補充」，處理進度多了「你補充了說明」' },
   notes: ['通報送出後不能撤回。如果問題已經好了，可以在補充說明裡寫一聲，管理室會說明原因後結案。'],
   relatedArticles: ['report-progress', 'my-reports'],
 }

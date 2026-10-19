@@ -32,6 +32,7 @@ export default {
     },
   ],
   result: '住戶馬上就能在「社區公告」看到；有選通知的話，住戶會收到通知。',
+  resultScreenshot: { file: 'resident-announcements.jpg', alt: '住戶的「社區公告」頁，看得到剛發布的公告' },
   notes: ['有沒填完的欄位時，畫面會提醒你。'],
   relatedArticles: ['announcement-manage', 'urgent-log'],
 }

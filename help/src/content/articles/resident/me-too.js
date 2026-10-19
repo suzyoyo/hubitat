@@ -19,12 +19,7 @@ export default {
     },
   ],
   result: '畫面會顯示「已記錄你也遇到相同問題！」。這個問題處理好的時候，你也會收到通知；在「我的通報」也看得到它。',
-  sections: [
-    {
-      heading: '完成後的畫面',
-      blocks: [{ type: 'image', screenshot: { file: 'report-supported.jpg', alt: '按「我也遇到了」後的完成頁' } }],
-    },
-  ],
+  resultScreenshot: { file: 'report-supported.jpg', alt: '按「我也遇到了」後的完成頁，寫著「已記錄你也遇到相同問題！」' },
   notes: ['按「我也遇到了」的通報，你可以看處理進度，但不能修改內容。'],
   relatedArticles: ['new-report', 'my-reports'],
 }

@@ -20,5 +20,6 @@ export default {
     },
   ],
   result: '會直接換到另一個身分的首頁。',
+  resultScreenshot: { file: 'committee-home.jpg', alt: '切換後直接到管委會的首頁' },
   relatedArticles: ['join-committee', 'committee-home'],
 }

@@ -55,7 +55,7 @@ export function getScreenshots(article) {
     .flatMap((section) => section.blocks)
     .filter((block) => block.type === 'image')
     .map((block) => block.screenshot)
-  return [...fromSteps, ...fromSections]
+  return [...fromSteps, ...(article.resultScreenshot ? [article.resultScreenshot] : []), ...fromSections]
 }
 
 // 文章的段落：截圖檔還沒有的圖片區塊先拿掉；拿掉後沒有內容的段落也不顯示（不會出現空白的標題）
@@ -76,7 +76,6 @@ export function getToc(article) {
   getSections(article).forEach((section, index) => {
     toc.push({ id: sectionId(index), title: section.heading })
   })
-  if (article.result) toc.push({ id: 'result', title: '完成後' })
   if (article.notes?.length) toc.push({ id: 'notes', title: '注意事項' })
   if (getRelatedArticles(article).length) toc.push({ id: 'related', title: '相關教學' })
   return toc
