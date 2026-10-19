@@ -34,6 +34,7 @@ export const TODO_KINDS = {
   // 管理人員
   new_case: { label: '新通報' }, // 待受理的案件（2026-10-15 從「新報修」改，用詞統一叫「通報」）；管委會只有主委、副主委有
   in_progress: { label: '處理中' }, // 2026-10-15 從「施工中」改名（docs/case-flow.md）
+  waiting: { label: '等待中' }, // 我做完了、在等別人：回報完成等確認、完工驗收等結案（2026-10-19，原本做完就從待辦消失）
   to_verify: { label: '待標記完成' }, // 2026-10-15 起不會出現在待辦（待結案是主委、副主委的事），只有「已完成」還用這個種類
   // 兩端都有
   draft: { label: '草稿' }, // 表單「存成草稿」的（2026-10-19，drafts.js）
@@ -99,20 +100,34 @@ function isUnseen(userId, title, id) {
   return notifications.some((item) => item.userId === userId && item.title === title && item.link?.id === id && !item.read)
 }
 
-// 交辦給我、還在進行中的
+// 交辦給我、還在進行中的；已經回報完成、在等對方確認或結案的也留著（kind 'waiting'，2026-10-19）
 //   被退回過的，提示改成退回原因，讓對方知道要改什麼
+//   連到案件的，提示寫上案件標題（2026-10-19：交辦的標題是交辦的人自己打的，看不出是哪件案件）
 function assignedTasks(userId) {
   return tasks
-    .filter((task) => task.assigneeId === userId && task.status === 'in_progress')
+    .filter((task) => task.assigneeId === userId && ['in_progress', 'reported'].includes(task.status))
     .map((task) => {
-      // 例如「李主委交辦・今天 18:00 前完成」；沒有期限的只寫「李主委交辦」
-      const due = task.deadline ? `・${deadlineText(task.deadline)} 前完成` : ''
-      const hint = task.returnNote ? `已退回：${task.returnNote.note}` : `${userLabel(task.assignerId)}交辦${due}`
+      const relatedCase = task.caseId ? cases.find((item) => item.id === task.caseId) : null
+      const about = relatedCase ? `・${relatedCase.title}` : ''
       const link = { type: 'task', id: task.id }
+      if (task.status === 'reported') {
+        // 連到案件、案件在等結案：等主委或副主委結案；其他：等交辦的人確認
+        const waitingClose = relatedCase?.status === 'to_verify'
+        const hint = waitingClose ? `已完工驗收${about}` : `已回報完成，等${userLabel(task.assignerId)}確認`
+        return waitingTodo(task.title, hint, task.report?.at ?? task.createdAt, link, waitingClose ? '等待結案' : '等待確認')
+      }
+      // 例如「李主委交辦・B 棟 5 樓噪音問題・今天 18:00 前完成」；沒有案件、沒有期限的只寫「李主委交辦」
+      const due = task.deadline ? `・${deadlineText(task.deadline)} 前完成` : ''
+      const hint = task.returnNote ? `已退回：${task.returnNote.note}` : `${userLabel(task.assignerId)}交辦${about}${due}`
       // 被退回的用退回的時間（2026-10-16，suzy 在 #111 提的）：剛被退回的才會出現在首頁（首頁放建立時間新的在前）
       const createdAt = task.returnNote?.at ?? task.createdAt
       return todo('assigned', task.title, hint, createdAt, task.deadline || null, link, isUnseenTask(userId, task.id))
     })
+}
+
+// 我做完了、在等別人的待辦：卡片右上角是藍色的 waitText（「等待結案」「等待確認」），沒有期限
+function waitingTodo(title, hint, createdAt, link, waitText) {
+  return { ...todo('waiting', title, hint, createdAt, null, link), waitText }
 }
 
 function committeeTodos(userId) {
@@ -225,14 +240,20 @@ function staffTodos(userId) {
   // 管理人員要處理的案件（規則見 docs/case-flow.md）：
   //   待受理 → 新通報（誰都可以受理）
   //   處理中 → 處理中；已受理、負責人是我（我受理、還沒派廠商）也算
-  //   待結案不列入：那是等負責人（主委或副主委）結案，管理人員已經做完了
+  //   待結案 → 等待結案：負責人是我（我受理、自己完工驗收的）；交辦來的在上面交辦那張（2026-10-19，原本做完就消失）
   // 交辦給我、連到案件的：那件案件只留交辦那張卡（2026-10-19，原本同一件事會出現兩張）
   //   交辦卡有誰交辦、完成期限，點進去的交辦詳情可以「前往案件詳情」
   const myTaskCaseIds = new Set(
-    tasks.filter((task) => task.assigneeId === userId && task.status === 'in_progress' && task.caseId).map((task) => task.caseId),
+    tasks
+      .filter((task) => task.assigneeId === userId && ['in_progress', 'reported'].includes(task.status) && task.caseId)
+      .map((task) => task.caseId),
   )
   for (const item of cases) {
     if (myTaskCaseIds.has(item.id)) continue
+    if (item.status === 'to_verify' && item.assigneeId === userId) {
+      items.push(waitingTodo(item.title, '已完工驗收，等主委、副主委結案', item.completion?.at ?? item.reportedAt, { type: 'case', id: item.id }, '等待結案'))
+      continue
+    }
     let kind = ''
     if (item.status === 'pending') kind = 'new_case'
     else if (item.status === 'in_progress') kind = 'in_progress'

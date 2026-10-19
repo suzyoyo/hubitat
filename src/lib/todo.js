@@ -21,6 +21,8 @@ const NO_DEADLINE_BADGES = {
 }
 
 export function todoDeadlineBadge(todo) {
+  // 我做完了、在等別人的：藍色「等待結案」「等待確認」（2026-10-19）
+  if (todo.kind === 'waiting') return { text: todo.waitText, variant: 'default' }
   if (todo.kind === 'new_case') return { text: '尚未受理', variant: 'destructive' }
   const days = todo.daysLeft
   if (days === null) return NO_DEADLINE_BADGES[todo.kind] ?? null
