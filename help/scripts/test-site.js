@@ -64,6 +64,12 @@ for (const width of WIDTHS) {
           if (r.width === 0 || r.height === 0) return false
           if (el.closest('p') && el.tagName === 'A') return false // 句子裡的文字連結
           if (el.classList.contains('sr-only')) return false
+          // 包在 label 裡的單選、勾選框：整個 label 都能點，看 label 的大小
+          const label = el.closest('label')
+          if (label && ['radio', 'checkbox'].includes(el.type)) {
+            const lr = label.getBoundingClientRect()
+            return lr.height < 43.5 || lr.width < 43.5
+          }
           return r.height < 43.5 || r.width < 43.5
         })
         .map((el) => `${el.tagName.toLowerCase()}「${(el.textContent || el.getAttribute('aria-label') || '').trim().slice(0, 12)}」${Math.round(el.getBoundingClientRect().width)}×${Math.round(el.getBoundingClientRect().height)}`),

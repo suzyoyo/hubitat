@@ -52,7 +52,7 @@ help/
    │  ├─ categories.js             文章分類
    │  ├─ roles.js                  三種身分
    │  ├─ faqs.js                   常見問題
-   │  └─ contact.js                聯絡支援（目前是測試資料）
+   │  └─ contact.js                聯絡支援表單的選項（目前是測試，送出不會真的寄出）
    ├─ assets/screenshots/          App 截圖（見下面「截圖」）
    ├─ lib/                         從文章資料算出導覽、目錄、搜尋
    ├─ components/                  共用元件
