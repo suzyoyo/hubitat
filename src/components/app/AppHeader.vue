@@ -56,27 +56,26 @@ function goBack() {
   </header>
 
   <!-- Brand：logo＋通知鈴鐺 -->
-  <!-- 填色：純色 #eaf4f9＝下面問候列漸層最上面（最淺）的顏色，兩塊無縫接起來（2026-10-19；設計稿 Header 1143:8722 是白 → #eaf4f9 的漸層） -->
   <header
     v-else
-    class="sticky top-0 z-10 flex items-center justify-between bg-[#eaf4f9] pr-5 pb-2.5 pl-5 pt-[max(10px,env(safe-area-inset-top))]"
+    class="sticky top-0 z-10 flex items-center justify-between bg-background pr-5 pb-2.5 pl-5 pt-[max(10px,env(safe-area-inset-top))]"
   >
     <!-- width / height 寫原圖尺寸，讓瀏覽器先算好比例；實際顯示高度由 h-[26px] 決定 -->
     <img :src="logoUrl" alt="好彼社區" width="303" height="67" class="h-[26px] w-auto" />
-    <!-- 鈴鐺 22px、沒有底色，顏色和區塊標題（例如「我的通報」）一樣是 text-heading（2026-10-19，原本是 40px 藍色圓形＋16px 白色鈴鐺） -->
-    <!-- 外層 44px 是可以點的範圍（長輩好按）；-mr-[13px] 抵掉點擊範圍和鈴鐺 icon 本身右邊的空白，鈴鐺的右邊才會和卡片對齊 -->
+    <!-- 外層 44px 是可以點的範圍（長輩好按），藍色圓形 42px、鈴鐺 22px（2026-10-19 從設計稿的 40px 圓、16px 鈴鐺放大，原本太小看不清楚） -->
+    <!-- 右邊距 pr-5 和內容一樣是 20px；-mr-px 抵掉 44px 和 42px 差的 1px，藍色圓形的右邊才會和卡片對齊 -->
     <RouterLink
       :to="notificationsTo"
       :aria-label="hasUnread ? '通知，有未讀' : '通知'"
-      class="-mr-[13px] flex size-11 items-center justify-center text-heading"
+      class="-mr-px flex size-11 items-center justify-center"
     >
-      <!-- relative：讓紅點對齊鈴鐺的右上角 -->
-      <span class="relative flex">
+      <!-- relative：讓紅點對齊藍色圓形的右上角 -->
+      <span class="relative flex size-[42px] items-center justify-center rounded-full bg-primary text-primary-foreground">
         <BellIcon class="size-[22px]" />
-        <!-- 未讀紅點：和通知頁每一則的未讀紅點同一個顏色；白色外圈讓它和鈴鐺分開 -->
+        <!-- 未讀紅點：和通知頁每一則的未讀紅點同一個顏色；白色外圈讓它在藍色上看得清楚 -->
         <span
           v-if="hasUnread"
-          class="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-destructive ring-2 ring-background"
+          class="absolute top-0.5 right-0.5 size-2.5 rounded-full bg-destructive ring-2 ring-background"
         />
       </span>
     </RouterLink>
