@@ -113,22 +113,25 @@ function telLink(phone) {
           <p class="type-date text-muted-foreground">合約期間統計</p>
         </div>
         <div class="space-y-1 rounded-lg bg-brand-subtle p-4">
-          <p class="type-date text-muted-foreground">平均修復時間</p>
-          <p class="type-title text-foreground">
+          <!-- 小標用黑色內文（2026-10-19：原本灰色小字，太像 wireframe） -->
+          <p class="type-body text-foreground">平均修復時間</p>
+          <!-- 數字是重點，放大到 40px（2026-10-19） -->
+          <p class="text-[40px] leading-[48px] font-bold text-foreground">
             {{ stats.averageRepairDays ?? '—' }}
             <span v-if="stats.averageRepairDays !== null" class="type-body-strong">天</span>
           </p>
           <p class="type-date text-muted-foreground">
-            {{ stats.repairCount ? `報修 ${stats.repairCount} 件・從通報到完成的平均天數` : '還沒有完成的報修' }}
+            {{ stats.repairCount ? `通報 ${stats.repairCount} 件・從通報到完成的平均天數` : '還沒有完成的通報' }}
           </p>
         </div>
+        <!-- 兩格的樣子和首頁「交辦進度」「提案與簽核」一樣：白底、品牌藍外框（2026-10-19） -->
         <div class="grid grid-cols-2 gap-3">
-          <div class="space-y-1 rounded-lg bg-muted p-3">
-            <p class="type-date text-muted-foreground">報修件數</p>
+          <div class="space-y-1 rounded-xl border border-primary bg-card p-3.5">
+            <p class="type-body text-foreground">通報件數</p>
             <p class="type-title text-foreground">{{ stats.repairCount }} <span class="type-body-strong">件</span></p>
           </div>
-          <div class="space-y-1 rounded-lg bg-muted p-3">
-            <p class="type-date text-muted-foreground">保養完成</p>
+          <div class="space-y-1 rounded-xl border border-primary bg-card p-3.5">
+            <p class="type-body text-foreground">保養完成</p>
             <p class="type-title text-foreground">
               {{ stats.maintenanceDone }}<span class="type-body-strong">{{ maintenanceText }}</span>
             </p>
@@ -136,29 +139,30 @@ function telLink(phone) {
         </div>
       </section>
 
-      <!-- 聯絡窗口：每一張整張都是打電話的連結（和廠商分頁的聯絡清單一樣） -->
-      <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
-        <h2 class="type-card-title text-foreground">聯絡窗口</h2>
-        <a
-          v-for="contact in vendor.contacts"
-          :key="contact.phone"
-          :href="telLink(contact.phone)"
-          :aria-label="`打電話給${contact.name}，${contact.phone}`"
-          class="flex items-center gap-3 rounded-lg bg-muted p-3"
-        >
-          <div class="min-w-0 flex-1">
-            <p class="flex flex-wrap items-center gap-x-2 type-body-strong text-foreground">
-              {{ contact.name }}
-              <span v-if="contact.title" class="type-date font-normal text-muted-foreground">{{ contact.title }}</span>
-              <Badge v-if="contact.isEmergency" variant="outline">緊急清單</Badge>
-            </p>
-            <p class="type-date text-muted-foreground">{{ contact.phone }}</p>
-          </div>
-          <!-- 電話圖示：提示點了會打電話（整張已經是連結，這裡只是圖示） -->
-          <span class="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card">
-            <PhoneCallIcon class="size-5" />
-          </span>
-        </a>
+      <!-- 聯絡窗口：一列一位、整列都是打電話的連結，樣子和廠商分頁的「廠商緊急聯絡」一樣（2026-10-19：原本是灰底方塊） -->
+      <section class="space-y-1 rounded-xl bg-card p-4 shadow-card">
+        <h2 class="pb-2 type-card-title text-foreground">聯絡窗口</h2>
+        <template v-for="(contact, index) in vendor.contacts" :key="contact.phone">
+          <Separator v-if="index > 0" />
+          <a
+            :href="telLink(contact.phone)"
+            :aria-label="`打電話給${contact.name}，${contact.phone}`"
+            class="flex items-center gap-3 py-3"
+          >
+            <div class="min-w-0 flex-1">
+              <p class="flex flex-wrap items-center gap-x-2 type-body-strong text-foreground">
+                {{ contact.name }}
+                <span v-if="contact.title" class="type-date font-normal text-muted-foreground">{{ contact.title }}</span>
+                <Badge v-if="contact.isEmergency" variant="outline">緊急清單</Badge>
+              </p>
+              <p class="type-date text-muted-foreground">{{ contact.phone }}</p>
+            </div>
+            <!-- 電話圖示：提示點了會打電話（整張已經是連結，這裡只是圖示） -->
+            <span class="flex size-11 shrink-0 items-center justify-center rounded-full border border-border">
+              <PhoneCallIcon class="size-5" />
+            </span>
+          </a>
+        </template>
       </section>
 
       <!-- 合約資訊 -->
@@ -173,15 +177,15 @@ function telLink(phone) {
             <p class="shrink-0 type-date text-muted-foreground">{{ row.label }}</p>
             <p class="min-w-0 flex-1 text-right type-body-strong text-foreground">{{ row.value }}</p>
           </div>
-          <!-- 合約詳情還是佔位頁 -->
-          <RouterLink
-            v-if="filePages"
-            :to="`/committee/contracts/${contract.id}`"
-            class="flex min-h-11 items-center justify-end gap-1 type-link text-primary"
-          >
-            查看合約檔案（{{ filePages }} 頁）
-            <ChevronRightIcon class="size-4" />
-          </RouterLink>
+          <!-- ghost 按鈕（2026-10-19 按鈕規則：不強調的動作）；-mr-3 讓箭頭和卡片內容右邊切齊 -->
+          <div v-if="filePages" class="flex justify-end">
+            <Button as-child variant="ghost" class="-mr-3">
+              <RouterLink :to="`/committee/contracts/${contract.id}`">
+                查看合約檔案（{{ filePages }} 頁）
+                <ChevronRightIcon class="size-4" />
+              </RouterLink>
+            </Button>
+          </div>
         </template>
         <p v-else class="type-body text-muted-foreground">目前沒有生效中的合約</p>
       </section>
@@ -218,16 +222,13 @@ function telLink(phone) {
             </div>
           </div>
         </template>
-        <!-- 超過 4 筆才有「查看全部」 -->
-        <button
-          v-if="!showAllRecords && vendor.serviceRecords.length > SHOW_FIRST"
-          type="button"
-          class="flex min-h-11 w-full items-center justify-end gap-1 type-link text-primary"
-          @click="showAllRecords = true"
-        >
-          查看全部 {{ vendor.serviceRecords.length }} 筆紀錄
-          <ChevronRightIcon class="size-4" />
-        </button>
+        <!-- 超過 4 筆才有「查看全部」；ghost 按鈕（2026-10-19 按鈕規則） -->
+        <div v-if="!showAllRecords && vendor.serviceRecords.length > SHOW_FIRST" class="flex justify-end">
+          <Button type="button" variant="ghost" class="-mr-3" @click="showAllRecords = true">
+            查看全部 {{ vendor.serviceRecords.length }} 筆紀錄
+            <ChevronRightIcon class="size-4" />
+          </Button>
+        </div>
       </section>
     </template>
   </div>
