@@ -1,9 +1,10 @@
 <script setup>
 // 使用手冊首頁：以「快速找到教學」為核心
-//   歡迎區（「從這裡開始」按鈕；搜尋在頂部列） → 三種身分入口 → 熱門教學 → 依功能分類 → 常見問題 → 聯絡支援
+//   歡迎區（下載 App 區塊＋「從這裡開始」小連結；搜尋在頂部列） → 三種身分入口 → 新手教學 → 依功能分類 → 常見問題（聯絡支援 2026-10-19 拿掉，頂部列和頁尾都有連結）
 import { ArrowRightIcon, HouseIcon, UserCogIcon, UsersIcon } from '@lucide/vue'
 import pointing from '@/assets/mascot/pointing.png'
 import ArticleCard from '@/components/ArticleCard.vue'
+import DownloadPanel from '@/components/DownloadPanel.vue'
 import FaqList from '@/components/FaqList.vue'
 import { FAQS } from '@/content/faqs'
 import { ROLES } from '@/content/roles'
@@ -45,14 +46,12 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
         </div>
         <p class="lead-text"><span class="inline-block">有好彼管家陪你，</span><span class="inline-block">社區大小事都能輕鬆上手！</span></p>
 
-        <!-- 主要按鈕 -->
-        <div class="mt-6 flex flex-wrap gap-3">
-          <!-- 比一般主要按鈕（brand-800）淺一點（2026-10-19）；白字對比 5.3 : 1 -->
-          <RouterLink to="/start" class="btn btn-primary bg-[#3d7290] hover:bg-brand-800">
-            第一次使用？從這裡開始
-            <ArrowRightIcon class="size-5" aria-hidden="true" />
-          </RouterLink>
-        </div>
+        <!-- 下載 App（2026-10-19）：最顯眼的是下載區塊，「第一次使用」改成下面一行小連結 -->
+        <DownloadPanel class="mt-6 max-w-lg" />
+        <RouterLink to="/start" class="mt-2 inline-flex min-h-11 items-center gap-1 text-link">
+          第一次使用？從這裡開始
+          <ArrowRightIcon class="size-4" aria-hidden="true" />
+        </RouterLink>
       </div>
 
       <!-- 平板、桌機版：好彼管家放在右邊 -->
@@ -84,9 +83,9 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
     </ul>
   </section>
 
-  <!-- 熱門教學 -->
+  <!-- 新手教學（2026-10-19 從「熱門教學」改名；文章還是用 popular 欄位挑） -->
   <section class="page-container mt-14" aria-labelledby="popular-title">
-    <h2 id="popular-title" class="section-title text-2xl font-bold text-brand-950">熱門教學</h2>
+    <h2 id="popular-title" class="section-title text-2xl font-bold text-brand-950">新手教學</h2>
     <ul class="mt-5 grid gap-4 md:grid-cols-2">
       <li v-for="article in popular" :key="article.id">
         <ArticleCard :article="article" />
@@ -137,18 +136,5 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
       看全部常見問題
       <ArrowRightIcon class="size-5" aria-hidden="true" />
     </RouterLink>
-  </section>
-
-  <!-- 聯絡支援：放在常見問題下面，平板以上文字在左、按鈕在右 -->
-  <section class="page-container mt-12" aria-labelledby="contact-title">
-    <div
-      class="flex flex-col gap-4 rounded-[var(--radius-card)] border border-line bg-white p-5 shadow-[var(--shadow-card)] md:flex-row md:items-center md:justify-between md:p-6"
-    >
-      <div>
-        <h2 id="contact-title" class="text-xl font-bold text-brand-950">還是找不到答案？</h2>
-        <p class="mt-1 text-ink-soft">可以聯絡社區管理室或客服，我們會協助你。</p>
-      </div>
-      <RouterLink to="/contact" class="btn btn-primary w-full shrink-0 md:w-auto">聯絡支援</RouterLink>
-    </div>
   </section>
 </template>

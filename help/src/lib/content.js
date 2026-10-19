@@ -38,7 +38,7 @@ export function getCategoriesForRole(roleId) {
     .filter((category) => category.articles.length > 0)
 }
 
-// 首頁的熱門教學
+// 首頁的新手教學
 export function getPopularArticles() {
   return published.filter((article) => article.popular)
 }

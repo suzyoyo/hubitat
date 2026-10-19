@@ -4,6 +4,7 @@
 //   文字都在 src/content/about.js；內文用 .article-body（17px、字距 0.05em），和文章內頁讀起來一樣
 import { ArrowRightIcon } from '@lucide/vue'
 import ContentBlock from '@/components/ContentBlock.vue'
+import DownloadPanel from '@/components/DownloadPanel.vue'
 import RichText from '@/components/RichText.vue'
 import { ABOUT_INTRO, ABOUT_MASCOT, ABOUT_NAME, ABOUT_SERVICES } from '@/content/about'
 import { MASCOTS } from '@/lib/mascots'
@@ -76,14 +77,12 @@ import { MASCOTS } from '@/lib/mascots'
     <ContentBlock class="article-body mt-3" :block="{ type: 'list', items: ABOUT_MASCOT.appearances }" />
   </section>
 
-  <!-- 結尾：和首頁一樣的「從這裡開始」 -->
-  <section class="page-container mt-14" aria-labelledby="about-start">
-    <div class="rounded-[var(--radius-card)] bg-brand-50 px-5 py-8 text-center md:py-10">
-      <h2 id="about-start" class="text-xl font-bold text-brand-950 md:text-2xl">第一次使用好彼社區？</h2>
-      <RouterLink to="/start" class="btn btn-primary mt-5 bg-[#3d7290] hover:bg-brand-800">
-        從這裡開始
-        <ArrowRightIcon class="size-5" aria-hidden="true" />
-      </RouterLink>
-    </div>
+  <!-- 結尾：和首頁一樣，下載 App 區塊＋「從這裡開始」小連結 -->
+  <section class="page-container mt-14 max-w-xl text-center" aria-label="下載與開始使用">
+    <DownloadPanel class="text-left" />
+    <RouterLink to="/start" class="mt-2 inline-flex min-h-11 items-center gap-1 text-link">
+      第一次使用？從這裡開始
+      <ArrowRightIcon class="size-4" aria-hidden="true" />
+    </RouterLink>
   </section>
 </template>

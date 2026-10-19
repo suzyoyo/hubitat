@@ -1,7 +1,7 @@
 // 常見問題
 //   group：放在常見問題頁的哪一組（見 FAQ_GROUPS）
 //   roles：哪些身分會問（身分專區只列出這個身分的問題）
-//   featured：true 的會出現在首頁（建議 5 題以內）
+//   featured：true 的會出現在首頁（2026-10-19 從 2 題加到 6 題，三種身分都有；建議 6 題左右）
 //   answer：答案，一段一個字串；用「」框起來的字會變色
 //   article：（選填）答案下面加一個「看教學」連結，填文章 id
 // 寫法：站在使用者的角度，用他們聽得懂的話回答；不寫系統怎麼運作、不寫字數上限這類細節
@@ -18,6 +18,7 @@ export const FAQS = [
     id: 'switch-role',
     group: 'general',
     roles: ['resident', 'committee'],
+    featured: true,
     question: '我是住戶也是委員，要怎麼切換？',
     answer: ['到「我的」頁，住戶按「切換至管委會」，管委會按「切換至住戶」。'],
     article: 'switch-role',
@@ -26,6 +27,7 @@ export const FAQS = [
     id: 'notification-dot',
     group: 'general',
     roles: ['resident', 'committee', 'staff'],
+    featured: true,
     question: '右上角鈴鐺的紅點要怎麼消掉？',
     answer: ['點開通知看過，紅點就會消失。想一次全部清掉，在通知頁按「全部已讀」。'],
     article: 'notifications',
@@ -57,6 +59,7 @@ export const FAQS = [
     id: 'cancel-report',
     group: 'resident',
     roles: ['resident'],
+    featured: true,
     question: '通報送出後可以撤回嗎？',
     answer: ['不能撤回。如果問題已經好了，可以在通報裡補充說明一聲，管理室會說明原因後結案。'],
     article: 'report-edit',
@@ -99,6 +102,7 @@ export const FAQS = [
     id: 'staff-close',
     group: 'management',
     roles: ['committee', 'staff'],
+    featured: true,
     question: '管理人員可以自己結案嗎？',
     answer: ['不行。管理人員按「完工驗收」後，會交給主委或副主委確認結案。'],
     article: 'case-complete',

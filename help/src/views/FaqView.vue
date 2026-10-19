@@ -30,7 +30,8 @@ const groups = FAQ_GROUPS.map((group) => ({
         <!-- 疑難排解才放好彼管家，放在標題左邊 -->
         <img v-if="group.id === 'trouble'" :src="surprised" alt="" class="h-24 w-auto shrink-0" width="68" height="96" />
         <div class="min-w-0 flex-1">
-          <h2 :id="group.id" class="section-title scroll-mt-24 text-2xl font-bold text-brand-950">{{ group.title }}</h2>
+          <!-- 有好彼管家的那一組不加紅線，已經有貓咪當記號了（2026-10-19） -->
+          <h2 :id="group.id" class="scroll-mt-24 text-2xl font-bold text-brand-950" :class="group.id !== 'trouble' && 'section-title'">{{ group.title }}</h2>
           <p v-if="group.description" class="mt-1 text-ink-soft">{{ group.description }}</p>
         </div>
       </div>
