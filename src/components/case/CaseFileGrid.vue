@@ -1,13 +1,14 @@
 <script setup>
 // 案件的照片、影片、檔案，一格一個（案件詳情的「現場照片／影片」「完工紀錄」用，2026-10-18）
 //   有暫存照片的（示範時剛選的，見 src/lib/filePreview.js）顯示縮圖，點了全螢幕看，左右滑換張；
-//   假資料只有檔名的，顯示圖示＋檔名（不能點）
+//   暫存的影片顯示第一個畫面（不能點）；假資料只有檔名的，只顯示圖示（不能點）
+//   都不顯示檔名（2026-10-19，和照片格 report/ReportPhotoTile 一樣）
 // 全螢幕的寫法和合約詳情的預覽一樣（views/committee/ContractDetailView.vue）
 import { ChevronLeftIcon, ChevronRightIcon, FileTextIcon, ImageIcon, VideoIcon, XIcon } from '@lucide/vue'
 import { computed, nextTick, ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
-import { previewUrl } from '@/lib/filePreview'
+import { isPdfName, isVideoName, previewUrl } from '@/lib/filePreview'
 
 const props = defineProps({
   // 檔名的清單，例如 ['施工前.jpg', '施工後.jpg']
@@ -18,14 +19,14 @@ const props = defineProps({
 
 // 看副檔名決定圖示：影片用攝影機、PDF 用文件，其他當作照片
 function iconOf(name) {
-  if (/\.(mp4|mov|m4v|webm|avi)$/i.test(name)) return VideoIcon
-  if (/\.pdf$/i.test(name)) return FileTextIcon
+  if (isVideoName(name)) return VideoIcon
+  if (isPdfName(name)) return FileTextIcon
   return ImageIcon
 }
 
-const tiles = computed(() => props.files.map((name) => ({ name, src: previewUrl(name) })))
-// 看得到的照片（全螢幕只放這些）
-const photos = computed(() => tiles.value.filter((tile) => tile.src))
+const tiles = computed(() => props.files.map((name) => ({ name, src: previewUrl(name), isVideo: isVideoName(name) })))
+// 看得到的照片（全螢幕只放這些，影片不放）
+const photos = computed(() => tiles.value.filter((tile) => tile.src && !tile.isVideo))
 
 // ── 全螢幕 ─────────────────────────────────
 const viewerOpen = ref(false)
@@ -55,7 +56,7 @@ function go(index) {
     <template v-for="tile in tiles" :key="tile.name">
       <!-- 有照片：縮圖，點了全螢幕 -->
       <button
-        v-if="tile.src"
+        v-if="tile.src && !tile.isVideo"
         type="button"
         class="h-[100px] overflow-hidden rounded-lg bg-muted"
         :aria-label="`看 ${tile.name}`"
@@ -63,10 +64,14 @@ function go(index) {
       >
         <img :src="tile.src" alt="" class="size-full object-cover" />
       </button>
-      <!-- 只有檔名：圖示＋檔名 -->
-      <div v-else class="flex h-[100px] flex-col items-center justify-center gap-1.5 rounded-lg bg-muted px-2">
+      <!-- 暫存的影片：顯示第 0.1 秒的畫面＋左下角攝影機圖示 -->
+      <div v-else-if="tile.src" class="relative h-[100px] overflow-hidden rounded-lg bg-muted">
+        <video :src="`${tile.src}#t=0.1`" muted playsinline preload="metadata" class="size-full object-cover" />
+        <VideoIcon class="absolute bottom-1.5 left-1.5 size-4 text-white drop-shadow" />
+      </div>
+      <!-- 只有檔名（假資料）：只放圖示，檔名給螢幕閱讀器念 -->
+      <div v-else class="flex h-[100px] items-center justify-center rounded-lg bg-muted" role="img" :aria-label="tile.name">
         <component :is="iconOf(tile.name)" class="size-7 text-muted-foreground" />
-        <p class="w-full truncate text-center type-date text-muted-foreground">{{ tile.name }}</p>
       </div>
     </template>
   </div>
