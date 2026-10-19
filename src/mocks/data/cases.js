@@ -260,7 +260,7 @@ export const cases = [
     ],
   },
 
-  // 展示「我也遇到了」用（2026-10-19 013）：示範故事第 1 步陳先生選「B 棟・電梯／電梯口」時，會先看到這一件
+  // 展示「我也遇到了」用（2026-10-19 013）：示範故事第 1 步陳先生選「B 棟・電梯／電梯口」時，會先看到這兩件
   // 地點要和新增通報選的一模一樣（電梯／電梯口）才找得到；不關聯設備，B 棟電梯的狀態才不會變
   // 交給張副主委：不是示範故事裡的人，不會多出李主委、張管理員的待辦
   {
@@ -291,6 +291,38 @@ export const cases = [
         actorId: 'u-c02',
         label: '已受理',
         text: '張副主委受理，請管理室先檢查燈管',
+        residentText: '管委會已受理。',
+      },
+    ],
+  },
+  {
+    id: 'CASE-20260930-003',
+    place: '電梯／電梯口',
+    subject: '電梯口地磚翹起',
+    title: 'B 棟 1 樓電梯口地磚翹起',
+    areaId: 'area-b',
+    category: 'other',
+    source: 'resident',
+    isPrivate: false,
+    reporterId: 'u-r03',
+    reportedAt: '2026-09-30T08:15',
+    description: '1 樓電梯口有一塊地磚翹起來，推嬰兒車會卡到，長輩也容易絆倒。',
+    photos: [],
+    status: 'accepted',
+    assigneeId: 'u-c02',
+    supporters: [],
+    logs: [
+      {
+        at: '2026-09-30T08:15',
+        label: '住戶通報',
+        text: '周小姐（A 棟 5 樓）通報',
+        residentText: '已收到，好彼管家已通知管理人員。',
+      },
+      {
+        at: '2026-09-30T10:00',
+        actorId: 'u-c02',
+        label: '已受理',
+        text: '張副主委受理，先放警示牌，再請廠商報價',
         residentText: '管委會已受理。',
       },
     ],
