@@ -4,13 +4,24 @@
 //   新通報（待受理的案件）→ 紅「尚未受理」：已經出問題（dev-guide 第 5 節）。它的到期日是通報時間，只用來排序，不顯示逾期
 //   逾期、今天到期 → 紅（destructive）：已經出問題
 //   還沒到期       → 橘（secondary）：輪到你處理
-//   沒有期限的需補資料（快速留存）→ 橘「待補資料」：輪到你處理（2026-10-18，原本沒有徽章）
+//   沒有期限的其他待辦 → 依種類顯示要做什麼（2026-10-19：每張待辦卡右上角都要有徽章，原本沒期限的就空著）
+//     輪到你處理的用橘（secondary），我負責、在等別人的「處理中」用藍（default）
 //   todo 是 getMyTodos() 回傳的 items 其中一筆
+const NO_DEADLINE_BADGES = {
+  incomplete: { text: '待補資料', variant: 'secondary' },
+  to_close: { text: '待結案', variant: 'secondary' },
+  confirm: { text: '待確認', variant: 'secondary' },
+  assigned: { text: '待處理', variant: 'secondary' },
+  sign: { text: '待簽核', variant: 'secondary' },
+  review: { text: '待審核', variant: 'secondary' },
+  expiring: { text: '即將到期', variant: 'secondary' },
+  my_case: { text: '處理中', variant: 'default' },
+}
+
 export function todoDeadlineBadge(todo) {
   if (todo.kind === 'new_case') return { text: '尚未受理', variant: 'destructive' }
   const days = todo.daysLeft
-  if (days === null && todo.kind === 'incomplete') return { text: '待補資料', variant: 'secondary' }
-  if (days === null) return null
+  if (days === null) return NO_DEADLINE_BADGES[todo.kind] ?? null
   if (days < 0) return { text: `逾期 ${-days} 天`, variant: 'destructive' }
   if (days === 0) return { text: '今日到期', variant: 'destructive' }
   return { text: `剩餘 ${days} 天`, variant: 'secondary' }
