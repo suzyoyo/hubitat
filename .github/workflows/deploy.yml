@@ -32,9 +32,12 @@ jobs:
       - run: npm ci
       # 網站放在 /hubitat/ 底下，要告訴 Vite，打包出來的檔案路徑才會對
       - run: npx vite build --base=/hubitat/
-      # GitHub Pages 不認得 Vue Router 的網址，直接打開內頁會找不到檔案（404）
-      # 複製一份 index.html 當 404 頁，讓 Vue 接手顯示正確的頁面
-      - run: cp dist/index.html dist/404.html
+      # 使用手冊（help/）放在 /hubitat/help/：另外打包，再複製到 dist/help/，和 App 一起上傳（2026-10-20）
+      - run: HELP_BASE=/hubitat/help/ npm run build:help
+      - run: cp -R help/dist dist/help
+      # GitHub Pages 不認得 Vue Router 的網址，直接打開內頁會找不到檔案（404），會改顯示 404.html
+      # 404.html 是 App 首頁的複製，讓 Vue 接手顯示正確的頁面；/hubitat/help/ 開頭的轉給使用手冊（說明在 scripts/make-404.js）
+      - run: HELP_BASE=/hubitat/help/ node scripts/make-404.js
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

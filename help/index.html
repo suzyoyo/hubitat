@@ -7,6 +7,17 @@
     <meta name="description" content="好彼社區 Hubitat 使用指南：住戶、管委會、管理人員的圖文操作教學與常見問題。" />
     <meta name="theme-color" content="#f8fafc" />
     <title>好彼社區使用指南</title>
+    <script>
+      // 放在 GitHub Pages 時，直接打開文章網址會先經過 App 的 404.html，被轉到手冊首頁並帶著 ?redirect=原本的網址
+      // 在 Vue Router 啟動前把網址換回原本的樣子，手冊就會顯示那一頁（說明在 scripts/make-404.js）
+      ;(function () {
+        var target = new URLSearchParams(location.search).get('redirect')
+        // 只接受同一個網站裡的路徑（開頭是 / 但不是 //），避免被拿來轉到別的網站
+        if (target && target.charAt(0) === '/' && target.charAt(1) !== '/') {
+          history.replaceState(null, '', target)
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="app"></div>

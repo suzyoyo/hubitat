@@ -16,6 +16,12 @@ export default defineConfig({
     VitePWA({
       // 有新版本時自動更新，不用跳提示問使用者
       registerType: 'autoUpdate',
+      workbox: {
+        // 離線時，App 的網址都會換成 App 首頁（navigateFallback）；但使用手冊和 App 放在同一個網站的 /hubitat/help/，
+        // 不排除的話，打開手冊會跑出 App。這裡排除 /help/ 開頭的網址，交給手冊自己處理（2026-10-20）
+        // 本機打包是 /help/，GitHub Pages 是 /hubitat/help/，兩種都要排除
+        navigateFallbackDenylist: [/^\/(hubitat\/)?help\//],
+      },
       // App 的名稱、顏色、圖示（圖示在 public/icon/，從 app-icon-1024.png 縮出來的）
       // 圖示路徑不加開頭的 /，從 manifest 所在的資料夾找，放到 /hubitat/ 底下也找得到
       manifest: {
