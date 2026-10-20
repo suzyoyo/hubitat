@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { HELP_CENTER_URL } from '@/config/links'
 import { getCommunity, getCurrentUser } from '@/mocks/api'
 // 版本號直接讀專案最外層的 package.json，和其他兩端一樣
 import { version } from '../../../package.json'
@@ -41,9 +42,10 @@ const fontSize = ref(fontSizes.some((item) => item.value === savedFontSize) ? sa
 watch(fontSize, (value) => localStorage.setItem(FONT_SIZE_KEY, value))
 
 // 「系統與支援」的三列；設計稿還有「版本資訊」一列，照住戶端的決定改成最下面一行灰字
+// 使用說明用 href 連到網頁版使用手冊，和住戶端一樣
 const supportItems = [
   { label: '通知設定', icon: BellIcon, to: '/staff/me/notifications' },
-  { label: '使用說明', icon: CircleHelpIcon, to: '/staff/me/help' },
+  { label: '使用說明', icon: CircleHelpIcon, href: HELP_CENTER_URL },
   { label: '帳號與安全', icon: LockIcon, to: '/staff/me/account' },
 ]
 </script>
@@ -116,7 +118,7 @@ const supportItems = [
       <div class="rounded-xl bg-card px-4 py-1 shadow-card">
         <template v-for="(item, index) in supportItems" :key="item.label">
           <Separator v-if="index > 0" />
-          <MenuItem :title="item.label" :to="item.to"><component :is="item.icon" /></MenuItem>
+          <MenuItem :title="item.label" :to="item.to" :href="item.href"><component :is="item.icon" /></MenuItem>
         </template>
       </div>
     </section>

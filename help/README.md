@@ -38,7 +38,7 @@
 
 **放到別的地方**時：`npm run build:help` 產生的 `help/dist/` 是純靜態檔案，伺服器要設定「找不到的路徑都回傳 `index.html`」（Netlify 在 `help/public/` 加 `_redirects`，內容 `/*  /index.html  200`；Vercel 用 rewrites），放在子路徑時打包前設定 `HELP_BASE`。
 
-部署好之後，App「我的」→「使用說明」（`me/help`，目前是佔位頁）要改成連到手冊。這是 App 的修改，要另外開分支。
+App 三端「我的」→「使用說明」連到 https://suzyoyo.github.io/hubitat/help/ （2026-10-20，分支 `shared/help-link`）。網址寫在 `src/config/links.js` 的 `HELP_CENTER_URL`，手冊換網址時要跟著改。用完整網址，所以在本機 `npm run dev` 點下去也是開線上的手冊；用新分頁開（`target="_blank"`），因為 App 裝在手機主畫面時，手冊的網址在 App 的範圍裡，在同一個視窗打開會沒有返回鍵、回不到 App。
 
 ## 資料夾
 

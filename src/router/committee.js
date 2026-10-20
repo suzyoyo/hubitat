@@ -103,7 +103,6 @@ export default {
     { path: 'me/settings', title: '社區設定' },
     { path: 'me/urgent-log', title: '緊急標示使用紀錄' },
     { path: 'me/notifications', title: '通知設定' },
-    { path: 'me/help', title: '使用說明' },
     { path: 'me/account', title: '帳號與安全' },
     // 「社區」分頁點進去的頁面
     { path: 'search', title: '搜尋' },
