@@ -47,7 +47,7 @@
 - 示範住戶可以在 `/playground` 的「假資料」區切換（李先生／陳先生），看完要切回來。兩位的「我的通報」一開始都沒有進行中的（空狀態，#99、#115）；展示主要流程用陳先生（李先生也是主委，用他就變成自己受理自己的通報），步驟在 `docs/case-flow.md` 第 1 節
 - ✅ 主要流程（2026-10-16）：住戶通報 → 管委會受理 → 交辦給管理人員 → 處理、派廠商、完工 → 結案 → 記進設備的維修史，管委會、管理人員兩端都接起來了，在預覽裡從頭跑過一次
 - **下一步**（2026-10-19 更新）：「社區」分頁的其他內頁、手打的廠商名字自動加進名冊（見「待辦提醒」）、住戶通報詳情的補充說明接上離開前確認
-- 網頁版使用手冊（2026-10-18，PR #166 已合進 main）：獨立網站在 `help/`（`npm run dev:help`，port 5180），說明在 `help/README.md`。41 篇文章、18 題常見問題、68 張截圖（用 `npm run shoot:help` 自動截，重截方法見 README）；「認識 App 首頁」和三篇「認識○○首頁」是可以左右滑的導覽輪播（資料在 `help/src/content/home-tour.js`）；聯絡支援是表單（寄給好彼團隊；還沒接收件的地方，送出是假的）；和 App 一起部署在 GitHub Pages：https://suzyoyo.github.io/hubitat/help/（2026-10-20，`shared/help-deploy`；直接打開文章網址靠 `scripts/make-404.js` 轉址，說明在 README「部署」）；App「使用說明」還沒連過去
+- 網頁版使用手冊（2026-10-18，PR #166 已合進 main）：獨立網站在 `help/`（`npm run dev:help`，port 5180），說明在 `help/README.md`。41 篇文章、18 題常見問題、68 張截圖（用 `npm run shoot:help` 自動截，重截方法見 README）；「認識 App 首頁」和三篇「認識○○首頁」是可以左右滑的導覽輪播（資料在 `help/src/content/home-tour.js`）；聯絡支援是表單（寄給好彼團隊；還沒接收件的地方，送出是假的）；和 App 一起部署在 GitHub Pages：https://suzyoyo.github.io/hubitat/help/（2026-10-20，`shared/help-deploy`；直接打開文章網址靠 `scripts/make-404.js` 轉址，說明在 README「部署」）；App 三端「我的」→「使用說明」連到手冊（開新分頁，網址在 `src/config/links.js`，2026-10-20，`shared/help-link`）
 - 013 已是 repo 協作者（hakukanojyo），PR 互相 review 的流程已經跑過很多次（到 2026-10-19 已經到 PR #162）
 - wireframe 大致完成（2026-10-06）
 - ✅ Step 10（PWA）完成（2026-10-16，PR #106）：`vite-plugin-pwa` 1.3.0，手機「加入主畫面」後像 App；只有打包後（`npm run build`）才有，`npm run dev` 不啟用。在手機上測的方法見 `docs/dev-guide.md` 第 1 節

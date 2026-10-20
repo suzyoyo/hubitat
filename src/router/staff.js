@@ -79,7 +79,6 @@ export default {
     // 「我的」頁點進去的頁面
     { path: 'me/profile', title: '個人資料' },
     { path: 'me/notifications', title: '通知設定' },
-    { path: 'me/help', title: '使用說明' },
     { path: 'me/account', title: '帳號與安全' },
     // 全域新增選單（「＋」）的項目；管理人員不能交辦，所以沒有新增交辦
     { path: 'cases/new', title: '新增通報' },

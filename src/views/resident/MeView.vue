@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { HELP_CENTER_URL } from '@/config/links'
 import { formatFullDate } from '@/lib/date'
 import { FONT_SIZES as fontSizes, fontSize } from '@/lib/fontSize'
 import { getCommunity, getCurrentUser, getMyAcceptedInvite, getMyTodos } from '@/mocks/api'
@@ -38,10 +39,11 @@ const switchHint = computed(() => (todoTotal.value ? `有 ${todoTotal.value} 件
 
 // 字體大小：選「大」是 WCAG 大字（展示用，只有首頁、社區、我的三頁會變），規則在 src/lib/fontSize.js
 
-// 「系統與支援」的三列；to 是點了要去的頁面（都還是佔位頁）
+// 「系統與支援」的三列；to 是點了要去的頁面（通知設定、帳號與安全還是佔位頁）
+// 使用說明用 href 連到網頁版使用手冊（App 外面的網站，會開新分頁）
 const supportItems = [
   { label: '通知設定', icon: BellIcon, to: '/resident/me/notifications' },
-  { label: '使用說明', icon: CircleHelpIcon, to: '/resident/me/help' },
+  { label: '使用說明', icon: CircleHelpIcon, href: HELP_CENTER_URL },
   { label: '帳號與安全', icon: LockIcon, to: '/resident/me/account' },
 ]
 
@@ -170,7 +172,7 @@ onMounted(async () => {
         <template v-for="(item, index) in supportItems" :key="item.label">
           <!-- 第一列上面不用分隔線 -->
           <Separator v-if="index > 0" />
-          <MenuItem :title="item.label" :to="item.to"><component :is="item.icon" /></MenuItem>
+          <MenuItem :title="item.label" :to="item.to" :href="item.href"><component :is="item.icon" /></MenuItem>
         </template>
       </div>
     </section>

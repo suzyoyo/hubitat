@@ -73,7 +73,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字；加上 `vertical` 按鈕改成上下排（完成頁用）。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
 | `App/Drawer Content` | `app/DrawerContent.vue` | ⬜ | 從底部滑出的面板內容。外層用基礎元件 `ui/drawer` |
-| `App/Menu Item` | `app/MenuItem.vue` | ✅ | 選單的一列：圖示＋標題＋箭頭。圖示用 slot 放進去；`description` 是標題下面的灰色說明；有傳 `to` 才能點、才有箭頭。住戶端「我的」頁、管委會和管理人員的「全域新增選單」（`app/BottomNav.vue`）在用。設計稿「我的」頁的這幾列用的是基礎元件 Item，不是 `App/Menu Item`，兩個長得一樣不一樣還沒對過 |
+| `App/Menu Item` | `app/MenuItem.vue` | ✅ | 選單的一列：圖示＋標題＋箭頭。圖示用 slot 放進去；`description` 是標題下面的灰色說明；有傳 `to` 才能點、才有箭頭；傳 `href`（完整網址）是連到 App 外面的網站，開新分頁，右邊的箭頭換成「開到外面」的圖示（三端「我的」頁的「使用說明」，2026-10-20）。住戶端「我的」頁、管委會和管理人員的「全域新增選單」（`app/BottomNav.vue`）在用。設計稿「我的」頁的這幾列用的是基礎元件 Item，不是 `App/Menu Item`，兩個長得一樣不一樣還沒對過 |
 | `App/Message` | `app/AppMessage.vue` | ✅ | 右下角圓形的「留言」按鈕（68px、半透明品牌藍），會議紀錄頁用來打開留言抽屜。只是按鈕，固定在哪裡由頁面決定，送出 `click`。圖示是設計稿的 hugeicons（`assets/icons/chat-edit.svg`），lucide 沒有一樣的 |
 | `_Drawer Slot` | ➖ | ➖ | 底線開頭是 Kit 內部用的零件，程式不用做 |
 
