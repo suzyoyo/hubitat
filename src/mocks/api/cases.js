@@ -717,7 +717,7 @@ const RESIDENT_EDIT_LABEL = '住戶補充'
 //   管理端看到「陳先生（B 棟 8 樓）補充了說明」，住戶自己的處理進度看到「你補充了說明。」
 //   紀錄的 note 存補充的內容（照片有改就加上照片的檔名），住戶的處理進度用小字顯示在下面
 // 回傳修改後的通報；不能改的話（不是自己的、已經結案）回傳 undefined
-// 修改只存在記憶體，重新整理網頁會變回原本的假資料
+// 修改存在記憶體，並暫存到關掉 App 為止（persist.js）
 export async function updateReport(id, userId, changes) {
   await delay()
   const item = findEditableCase(id, userId)
@@ -759,7 +759,7 @@ function nextCaseId() {
 //     subject     主旨（簡短），例如 '感應門故障'
 //     description 問題描述
 //     photos      照片或影片檔名的清單，沒有就傳 []
-// 分類先一律歸「其他」，之後由管理人員調整；新通報只存在記憶體，重新整理網頁就不見了
+// 分類先一律歸「其他」，之後由管理人員調整；新通報存在記憶體，並暫存到關掉 App 為止（persist.js）
 export async function createReport(userId, input) {
   await delay()
   const item = {
@@ -818,7 +818,7 @@ function notifyNewReport(item) {
 //     unit  代哪一戶登記，例如 { building: 'A', unit: '6樓之3' }；不是代住戶登記就不傳
 //           有傳的話，同一戶的住戶在「我的通報」看得到這一筆（只能看，不能修改或撤回）
 //   role  'committee' 委員登記 / 'staff' 管理人員登記
-// 新案件只存在記憶體，重新整理網頁就不見了
+// 新案件存在記憶體，並暫存到關掉 App 為止（persist.js）
 export async function createRepair(userId, input, role = 'committee') {
   await delay()
   const who = userLabel(userId)

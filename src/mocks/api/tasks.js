@@ -172,7 +172,7 @@ export function canAssignTasks(userId) {
 //     deadline   完成期限，例如 '2026-10-08T18:00'，選填（2026-10-15 改）；有填的話要比現在晚
 //     caseId     關聯的案件（選填）。案件要還沒結案，而且同一件案件同時只能有一筆還沒完成的交辦
 //                有傳的話，案件的處理紀錄會多一筆「交辦」（不給住戶看）
-// 交辦後會通知被交辦人；新交辦只存在記憶體，重新整理網頁就不見了
+// 交辦後會通知被交辦人；新交辦存在記憶體，並暫存到關掉 App 為止（persist.js）
 export async function createTask(userId, input) {
   await delay()
   if (!canAssignTasks(userId) || !input.title?.trim() || !findUser(input.assigneeId)) return undefined

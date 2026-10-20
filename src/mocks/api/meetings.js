@@ -159,7 +159,7 @@ export const MEETING_COMMENT_MAX = 300
 // 住戶對一場會議留言，回傳新增好的留言；不能留言的話回傳 undefined
 //   只有已發布的會議可以留言；內容去掉頭尾空白後不能是空的，也不能超過 MEETING_COMMENT_MAX 字
 // 留言會出現在管委會首頁的「住戶意見」（getResidentOpinions），等主委或副主委回覆
-// 新留言只存在記憶體，重新整理網頁就不見了
+// 新留言存在記憶體，並暫存到關掉 App 為止（persist.js）
 export async function createMeetingComment(meetingId, userId, text) {
   await delay()
   const meeting = meetings.find((item) => item.id === meetingId)
