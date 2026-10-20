@@ -8,6 +8,7 @@ import { DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenu
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import logo from '@app/assets/logo/logo3.svg'
+import BackToAppBar from './BackToAppBar.vue'
 import NavDrawer from './NavDrawer.vue'
 import SearchBox from './SearchBox.vue'
 import { NAV_ITEMS } from './links'
@@ -44,6 +45,8 @@ const activeClass = 'bg-brand-50 font-bold text-brand-900'
 
 <template>
   <header class="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
+    <!-- 從 App 裡打開手冊時，最上面多一條「回到好彼社區」（2026-10-20） -->
+    <BackToAppBar />
     <!-- 桌機用三欄：logo 那欄佔掉剩下的空間，導覽和搜尋欄就一起靠右，導覽緊貼在搜尋欄左邊（2026-10-19 從導覽置中改過來） -->
     <div class="mx-auto flex h-16 max-w-[1440px] items-center gap-1 px-3 md:px-6 xl:grid xl:grid-cols-[1fr_auto_auto] xl:gap-3">
       <div class="flex min-w-0 items-center gap-1">
