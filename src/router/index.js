@@ -65,8 +65,13 @@ const router = createRouter({
   // BASE_URL：網站放在哪個資料夾底下。本機是 '/'；放上 GitHub Pages 時是 '/hubitat/'（打包時用 --base 指定）
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  // 換頁後回到頁面頂端
-  scrollBehavior() {
+  // 換頁後回到頁面頂端；網址有 #（例如元件盤點頁上方的分類 #list）就捲到那一區
+  scrollBehavior(to) {
+    if (to.hash) {
+      // 留出那一區設定的 scroll-mt（上方固定的標題列），標題才不會被蓋住
+      const el = document.getElementById(to.hash.slice(1))
+      return { el: to.hash, top: el ? parseFloat(getComputedStyle(el).scrollMarginTop) : 0 }
+    }
     return { top: 0 }
   },
 })

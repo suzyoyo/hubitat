@@ -2,6 +2,8 @@
 // 元件盤點頁：把 shadcn-vue 元件依類別陳列，方便看外觀與用法
 // 每個類別拆成一個檔案，放在 ./playground/ 資料夾
 import { ArrowLeftIcon } from '@lucide/vue'
+import { useEventListener } from '@vueuse/core'
+import { onMounted, ref, watch } from 'vue'
 import BasicSection from './playground/BasicSection.vue'
 import MobileSection from './playground/MobileSection.vue'
 import FormSection from './playground/FormSection.vue'
@@ -22,13 +24,40 @@ const categories = [
   { id: 'state', label: '狀態畫面' },
   { id: 'mock', label: '假資料' },
 ]
+
+// 現在看到哪一區：上方對應的分類按鈕變成品牌藍
+const header = ref(null)
+const nav = ref(null)
+const current = ref('token')
+
+// 最後一個「頂端已經捲到標題列下面」的區塊，就是現在在看的；捲到最底時算最後一區
+function updateCurrent() {
+  const line = header.value.getBoundingClientRect().bottom + 24
+  const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
+  let found = categories[0].id
+  for (const { id } of categories) {
+    const el = document.getElementById(id)
+    if (el && el.getBoundingClientRect().top <= line) found = id
+  }
+  current.value = atBottom ? categories.at(-1).id : found
+}
+
+useEventListener(window, 'scroll', updateCurrent, { passive: true })
+onMounted(updateCurrent)
+
+// 分類按鈕超出畫面時，左右捲動讓現在的那顆看得到
+watch(current, (id) => {
+  const chip = nav.value?.querySelector(`[href="#${id}"]`)
+  if (!chip) return
+  nav.value.scrollTo({ left: chip.offsetLeft - 16, behavior: 'smooth' })
+})
 </script>
 
 <template>
   <!-- 手機優先：最大寬度限制在 md（約 448px），置中顯示 -->
   <div class="mx-auto min-h-screen max-w-md bg-background">
     <!-- 頂部：標題 + 分類跳轉（sticky 讓它捲動時固定在上方） -->
-    <header class="sticky top-0 z-10 border-b bg-background/95 px-4 pt-4 backdrop-blur">
+    <header ref="header" class="sticky top-0 z-10 border-b bg-background/95 px-4 pt-4 backdrop-blur">
       <!-- 返回按鈕＋標題；手機上沒有瀏覽器的上一頁，靠這顆回角色選擇頁 -->
       <div class="flex items-center gap-1">
         <!-- 44px 是可點擊範圍；-ml-3 讓箭頭對齊下面的文字 -->
@@ -43,12 +72,19 @@ const categories = [
       </div>
       <p class="text-sm text-muted-foreground">好彼社區 · shadcn-vue 首批元件</p>
       <!-- overflow-x-auto：手機寬度不夠時可以左右滑動 -->
-      <nav class="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-3">
+      <!-- 現在在看的那區是品牌藍；其他的按下去會變灰（手機上沒有 hover） -->
+      <nav ref="nav" class="relative -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-3">
         <a
           v-for="category in categories"
           :key="category.id"
           :href="`#${category.id}`"
-          class="shrink-0 rounded-full border bg-card px-4 py-2.5 text-sm hover:bg-muted"
+          class="shrink-0 rounded-full border px-4 py-2.5 text-sm"
+          :class="
+            current === category.id
+              ? 'border-primary bg-primary font-bold text-primary-foreground'
+              : 'bg-card hover:bg-muted active:bg-muted'
+          "
+          :aria-current="current === category.id ? 'true' : undefined"
         >
           {{ category.label }}
         </a>

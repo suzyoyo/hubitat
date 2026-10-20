@@ -380,6 +380,15 @@ const basicRows = computed(() => {
         </div>
       </section>
 
+      <!-- 完工紀錄：完工了才有；放在廠商和處理進度中間（2026-10-19 013，原本在最下面，紀錄一多就看不到） -->
+      <section v-if="item.completion" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
+        <h2 class="type-card-title text-foreground">完工紀錄</h2>
+        <p class="type-date text-muted-foreground">{{ dateTimeText(item.completion.at) }}</p>
+        <p class="type-body text-foreground">{{ item.completion.note }}</p>
+        <!-- 附件直接顯示（2026-10-18 013）：和現場照片一樣一格一個，有照片的點了全螢幕看 -->
+        <CaseFileGrid v-if="item.completion.photos.length" :files="item.completion.photos" title="完工紀錄" />
+      </section>
+
       <!-- 處理進度與留痕：新增的欄位在最上面，紀錄由新到舊（2026-10-19 改，原本欄位在最下面、紀錄由舊到新，
            紀錄一多，不管要看最新的還是要新增，都要滑到最下面） -->
       <section class="space-y-3.5 rounded-xl bg-card p-4 shadow-card">
@@ -406,17 +415,6 @@ const basicRows = computed(() => {
           </div>
         </template>
       </section>
-
-      <!-- 完工紀錄：完工了才有 -->
-      <section v-if="item.completion" class="space-y-3 rounded-xl bg-card p-4 shadow-card">
-        <h2 class="type-card-title text-foreground">完工紀錄</h2>
-        <p class="type-date text-muted-foreground">{{ dateTimeText(item.completion.at) }}</p>
-        <p class="type-body text-foreground">{{ item.completion.note }}</p>
-        <!-- 附件直接顯示（2026-10-18 013）：和現場照片一樣一格一個，有照片的點了全螢幕看 -->
-        <CaseFileGrid v-if="item.completion.photos.length" :files="item.completion.photos" title="完工紀錄" />
-      </section>
-
-
     </template>
 
     <!-- 底部按鈕：上面一排是更新進度，下面一排是依狀態出現的動作（排法照設計稿 1134:17558，

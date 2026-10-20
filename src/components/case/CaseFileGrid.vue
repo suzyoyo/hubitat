@@ -62,8 +62,9 @@ function go(index) {
 </script>
 
 <template>
-  <!-- 一排、超過寬度就左右滑；bleed 時 -mx-4 px-4 讓滑動時可以滑到卡片邊緣，第一格還是和文字對齊 -->
-  <div class="flex snap-x gap-2.5 overflow-x-auto pb-1" :class="{ '-mx-4 px-4': bleed }">
+  <!-- 一排、超過寬度就左右滑；bleed 時 -mx-4 px-4 讓滑動時可以滑到卡片邊緣，第一格還是和文字對齊
+       scroll-px-4：每一格停下來的位置也留 16px，不然滑過之後第一格會貼在卡片邊上（2026-10-19） -->
+  <div class="flex snap-x gap-2.5 overflow-x-auto pb-1" :class="{ '-mx-4 scroll-px-4 px-4': bleed }">
     <template v-for="tile in tiles" :key="tile.name">
       <!-- 有照片或影片：縮圖，點了全螢幕 -->
       <button
