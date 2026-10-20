@@ -1,6 +1,6 @@
 # 好彼社區使用指南（Help Center）
 
-給住戶、管委會、管理人員看的網頁版使用手冊。是一個**獨立的網站**，和 App 放在同一個 repo、共用 `package.json` 的套件，但分開啟動、分開打包、分開部署，不會影響 App。
+給住戶、管委會、管理人員看的網頁版使用手冊。是一個**獨立的網站**，和 App 放在同一個 repo、共用 `package.json` 的套件，但分開啟動、分開打包，不會影響 App；部署時和 App 放在同一個 GitHub Pages 的 `/hubitat/help/`（見下面「部署」）。
 
 - 內容的依據：`docs/help-center-handoff.md`（產品現況）＋實際的 App 程式。**只寫已經做好的功能**，沒做的功能不寫、也不寫「即將推出」。
 - 技術：Vue 3 ＋ Vite ＋ Vue Router ＋ Tailwind CSS v4 ＋ reka-ui（抽屜、彈窗、常見問題摺疊）＋ Lucide 圖示，都是 App 已經有的套件，沒有另外安裝；只多了開發用的 Playwright（自動檢查用）。
@@ -20,14 +20,25 @@
 
 ## 部署
 
-`npm run build:help` 產生的 `help/dist/` 是純靜態檔案，可以放到任何靜態網站服務（Netlify、Vercel、GitHub Pages、Cloudflare Pages…）。
+手冊和 App 放在**同一個 GitHub Pages**：App 在 https://suzyoyo.github.io/hubitat/ ，手冊在 https://suzyoyo.github.io/hubitat/help/ （2026-10-20）。push 到 `main` 就會自動部署，流程寫在 `.github/workflows/deploy.yml`：
 
-1. **網址沒有 `#`**（例如 `/articles/new-report`），所以伺服器要設定「找不到的路徑都回傳 `index.html`」，不然直接打開文章網址會 404：
-   - Netlify：在 `help/public/` 新增 `_redirects`，內容 `/*  /index.html  200`
-   - Vercel：rewrites 設定 `{ "source": "/(.*)", "destination": "/index.html" }`
-   - GitHub Pages：不支援這個設定，要另外做 `404.html` 轉址，或改用其他服務
-2. **放在子路徑**時（例如 `https://example.com/help/`），打包前設定 `HELP_BASE`：`HELP_BASE=/help/ npm run build:help`
-3. 部署好之後，把 App「我的」→「使用說明」（`me/help`，目前是佔位頁）改成連到這個網址。這是 App 的修改，要另外開分支。
+1. 打包 App：`npx vite build --base=/hubitat/`（產生 `dist/`）
+2. 打包手冊：`HELP_BASE=/hubitat/help/ npm run build:help`（產生 `help/dist/`），再複製到 `dist/help/`
+3. 產生 404 頁：`HELP_BASE=/hubitat/help/ node scripts/make-404.js`
+4. 把 `dist/` 整包上傳
+
+**直接打開文章網址的轉址**：手冊的網址沒有 `#`（例如 `/hubitat/help/articles/quick-save`），GitHub Pages 找不到這個檔案，會改給整個網站共用的 `404.html`。`404.html` 是 App 首頁的複製，前面多一小段程式（`scripts/make-404.js` 產生）：
+
+- 網址開頭是 `/hubitat/help/` → 轉到手冊首頁，原本的網址放在 `?redirect=` 帶過去（`/hubitat/help/?redirect=%2Fhubitat%2Fhelp%2Farticles%2Fquick-save`）；手冊的 `help/index.html` 在 Vue Router 啟動前把網址換回原本的樣子，手冊就顯示那一篇
+- 其他網址 → 照舊交給 App
+
+**App 的 Service Worker**：App 的 PWA 管整個 `/hubitat/`，離線時會把網址都換成 App 首頁。根目錄 `vite.config.js` 的 `navigateFallbackDenylist` 排除了 `/help/` 開頭的網址，打開手冊才不會跑出 App。
+
+**在本機模擬部署**：照上面 1～3 步打包後，用一個「把 `dist/` 放在 `/hubitat/`、找不到的檔案回 `404.html`」的靜態伺服器來看（`vite preview` 找不到時回的是 `index.html`，和 GitHub Pages 不一樣，測不出轉址）。要檢查：App 首頁、App 內頁直接開、手冊首頁、手冊文章網址直接開、先開過 App（Service Worker 接管後）再開手冊。
+
+**放到別的地方**時：`npm run build:help` 產生的 `help/dist/` 是純靜態檔案，伺服器要設定「找不到的路徑都回傳 `index.html`」（Netlify 在 `help/public/` 加 `_redirects`，內容 `/*  /index.html  200`；Vercel 用 rewrites），放在子路徑時打包前設定 `HELP_BASE`。
+
+部署好之後，App「我的」→「使用說明」（`me/help`，目前是佔位頁）要改成連到手冊。這是 App 的修改，要另外開分支。
 
 ## 資料夾
 
