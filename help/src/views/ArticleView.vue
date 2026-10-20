@@ -98,7 +98,8 @@ watch(
 
       <!-- 頁內目錄（平板、手機）：收在這裡，點了展開 -->
       <details v-if="toc.length > 2" class="group mt-6 rounded-xl border border-line bg-white xl:hidden">
-        <summary class="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 font-bold text-brand-900">
+        <!-- list-none 在 iPhone 的 Safari 藏不掉預設的三角形，要另外加 ::-webkit-details-marker -->
+        <summary class="flex min-h-12 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden justify-between px-4 font-bold text-brand-900">
           本頁目錄
           <ChevronRightIcon class="size-5 text-brand-800 transition-transform group-open:rotate-90" aria-hidden="true" />
         </summary>

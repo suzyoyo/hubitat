@@ -13,7 +13,6 @@ const groups = FAQ_GROUPS.map((group) => ({
 <template>
   <div class="page-container max-w-[880px] py-8 md:py-12">
     <h1 class="text-[28px] font-bold text-brand-950 md:text-[34px]">常見問題</h1>
-    <p class="lead-text">點問題就會展開答案。找不到的話，可以用搜尋或聯絡我們。</p>
 
     <nav aria-label="問題分類" class="mt-6">
       <ul class="flex flex-wrap gap-2">
