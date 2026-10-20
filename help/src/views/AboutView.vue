@@ -1,10 +1,10 @@
 <script setup>
 // 認識我們（/about）：介紹好彼社區有哪些服務（2026-10-19 從一篇文章改成獨立的介紹頁，參考智生活首頁下半部）
-//   頁首（名稱的由來） → 我們的服務（一個服務一個區塊，桌機左右交替） → 認識好彼管家比比 → 從這裡開始
+//   頁首（名稱的由來） → 我們的服務（一個服務一個區塊，桌機左右交替） → 認識好彼管家比比 → 開始使用好彼社區
 //   文字都在 src/content/about.js；內文用 .article-body（17px、字距 0.05em），和文章內頁讀起來一樣
 import { ArrowRightIcon } from '@lucide/vue'
 import ContentBlock from '@/components/ContentBlock.vue'
-import DownloadPanel from '@/components/DownloadPanel.vue'
+import OpenAppPanel from '@/components/OpenAppPanel.vue'
 import PhoneMockup from '@/components/PhoneMockup.vue'
 import RichText from '@/components/RichText.vue'
 import { ABOUT_INTRO, ABOUT_MASCOT, ABOUT_NAME, ABOUT_SERVICES } from '@/content/about'
@@ -89,12 +89,8 @@ import { MASCOTS } from '@/lib/mascots'
     <ContentBlock class="article-body mt-3" :block="{ type: 'list', items: ABOUT_MASCOT.appearances }" />
   </section>
 
-  <!-- 結尾：和首頁一樣，下載 App 區塊＋「從這裡開始」小連結 -->
-  <section class="page-container mt-14 max-w-xl text-center" aria-label="下載與開始使用">
-    <DownloadPanel class="text-left" />
-    <RouterLink to="/start" class="mt-2 inline-flex min-h-11 items-center gap-1 text-link">
-      第一次使用？從這裡開始
-      <ArrowRightIcon class="size-4" aria-hidden="true" />
-    </RouterLink>
+  <!-- 結尾：和首頁一樣，「開始使用好彼社區」區塊（「從這裡開始」小連結 2026-10-20 拿掉） -->
+  <section class="page-container mt-14 max-w-xl" aria-label="開始使用">
+    <OpenAppPanel />
   </section>
 </template>

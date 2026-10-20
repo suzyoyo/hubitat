@@ -1,9 +1,9 @@
 <script setup>
 // 使用手冊首頁：以「快速找到教學」為核心
-//   歡迎區（下載 App 區塊＋「從這裡開始」小連結＋假手機裡的 App 首頁；搜尋在頂部列） → 三種身分入口 → 新手教學 → 依功能分類 → 常見問題（聯絡支援 2026-10-19 拿掉，頂部列和頁尾都有連結）
+//   歡迎區（「開始使用好彼社區」區塊＋假手機裡的 App 首頁；搜尋在頂部列） → 三種身分入口 → 新手教學 → 依功能分類 → 常見問題（聯絡支援 2026-10-19 拿掉，頂部列和頁尾都有連結）
 import { ArrowRightIcon, HouseIcon, UserCogIcon, UsersIcon } from '@lucide/vue'
 import ArticleCard from '@/components/ArticleCard.vue'
-import DownloadPanel from '@/components/DownloadPanel.vue'
+import OpenAppPanel from '@/components/OpenAppPanel.vue'
 import FaqList from '@/components/FaqList.vue'
 import HeroPhone from '@/components/HeroPhone.vue'
 import { FAQS } from '@/content/faqs'
@@ -32,34 +32,28 @@ const featuredFaqs = FAQS.filter((faq) => faq.featured)
 </script>
 
 <template>
-  <!-- 歡迎區（2026-10-19）：左邊標題＋下載區塊，右邊（手機版在下面）是假手機裡的 App 首頁，後面有會動的光 -->
+  <!-- 歡迎區（2026-10-19）：左邊標題＋開始使用區塊，右邊（手機版在下面）是假手機裡的 App 首頁，後面有會動的光 -->
   <!-- overflow-clip：手機後面的光暈比手機大，超出歡迎區的部分裁掉，才不會出現捲軸、也不會蓋到頂部列 -->
   <section class="hero-gradient overflow-clip" aria-labelledby="home-title">
-    <!-- 欄位：手機版一欄（假手機在說明和下載區塊中間）；平板、桌機兩欄（文字在左、假手機在右） -->
+    <!-- 欄位：手機版一欄（假手機在說明和開始使用區塊中間）；平板、桌機兩欄（文字在左、假手機在右） -->
     <div
       class="page-container grid items-center gap-8 py-10 md:grid-cols-[minmax(0,1fr)_280px] md:py-14 xl:grid-cols-[600px_minmax(0,1fr)] xl:gap-12"
     >
       <div class="min-w-0">
-        <!-- 好彼管家 2026-10-19 拿掉了（手機版原本在標題右邊、桌機在下載區塊右下角） -->
+        <!-- 好彼管家 2026-10-19 拿掉了（手機版原本在標題右邊、桌機在原本下載區塊的右下角） -->
         <h1 id="home-title" class="title-glow text-[28px] font-bold leading-tight text-brand-950 md:text-[38px]">
           <!-- 分成兩段，換行時不會把「使用」拆開；「好彼」「社區」用 logo 原本的藍＋紅（2026-10-19 決定；淺藍底上對比約 2 : 1，是刻意的品牌裝飾） -->
           <span class="inline-block">歡迎來到<span class="text-brand-500">好彼</span><span class="text-accent">社區</span></span><span class="inline-block">使用指南</span>
         </h1>
         <p class="lead-text"><span class="inline-block">有好彼管家陪你，</span><span class="inline-block">社區大小事都能輕鬆上手！</span></p>
 
-        <!-- 手機版：假手機放在說明和下載按鈕中間（2026-10-19 suzy 決定） -->
+        <!-- 手機版：假手機放在說明和開始使用區塊中間（2026-10-19 suzy 決定） -->
         <HeroPhone class="mx-auto mt-6 w-[220px] md:hidden" crop-class="h-[280px]" />
 
-        <!-- 下載 App（2026-10-19）：最顯眼的是下載區塊，「第一次使用」改成下面一行小連結 -->
-        <!-- 「第一次使用」放在下載區塊正下方的中間（2026-10-19） -->
+        <!-- 開始使用好彼社區（2026-10-20 從「下載 App」改來，從 App 裡打開時不顯示）
+             下面原本有「第一次使用？從這裡開始」小連結，2026-10-20 拿掉（按鈕太多；頂部列有「開始使用」） -->
         <div class="mt-2 max-w-lg md:mt-6">
-          <DownloadPanel />
-          <div class="mt-2 text-center">
-            <RouterLink to="/start" class="inline-flex min-h-11 items-center gap-1 text-link">
-              第一次使用？從這裡開始
-              <ArrowRightIcon class="size-4" aria-hidden="true" />
-            </RouterLink>
-          </div>
+          <OpenAppPanel />
         </div>
       </div>
 

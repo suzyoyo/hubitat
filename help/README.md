@@ -38,7 +38,12 @@
 
 **放到別的地方**時：`npm run build:help` 產生的 `help/dist/` 是純靜態檔案，伺服器要設定「找不到的路徑都回傳 `index.html`」（Netlify 在 `help/public/` 加 `_redirects`，內容 `/*  /index.html  200`；Vercel 用 rewrites），放在子路徑時打包前設定 `HELP_BASE`。
 
-App 三端「我的」→「使用說明」連到 https://suzyoyo.github.io/hubitat/help/ （2026-10-20，分支 `shared/help-link`）。網址寫在 `src/config/links.js` 的 `HELP_CENTER_URL`，手冊換網址時要跟著改。用完整網址，所以在本機 `npm run dev` 點下去也是開線上的手冊；用新分頁開（`target="_blank"`），因為 App 裝在手機主畫面時，手冊的網址在 App 的範圍裡，在同一個視窗打開會沒有返回鍵、回不到 App。
+App 三端「我的」→「使用說明」連到 https://suzyoyo.github.io/hubitat/help/ （2026-10-20，分支 `shared/help-link`）。網址寫在 `src/config/links.js` 的 `HELP_CENTER_URL`，手冊換網址時要跟著改。用完整網址，所以在本機 `npm run dev` 點下去也是開線上的手冊；連結有寫新分頁（`target="_blank"`），但 App 裝在手機主畫面時，實際上手冊還是開在 App 的視窗裡（手冊的網址在 App 的範圍裡），這個視窗沒有網址列和返回鍵（2026-10-20 在手機上確認）。
+
+**從 App 裡打開手冊時**（2026-10-20，分支 `help/no-download`）：
+- 頂部列最上面多一條「← 回到好彼社區」（`components/BackToAppBar.vue`），捲動時一直看得到。按了用「上一頁」退回 App 剛剛那一頁（在手冊裡看了幾頁就一次退幾頁），App 比較有機會保持原本的樣子；退不回去時直接打開剛剛那一頁或 App 首頁
+- 首頁、認識我們的「開始使用好彼社區」區塊不顯示（人已經在 App 裡了）
+- 怎麼判斷是從 App 來的：畫面是「主畫面 App」模式（`display-mode: standalone`），寫在 `lib/from-app.js`。在電腦上看效果：`npm run dev:help` 後打開 http://localhost:5180/?from=app （記在 sessionStorage，關掉分頁就恢復）
 
 ## 資料夾
 
@@ -64,9 +69,10 @@ help/
    │  ├─ categories.js             文章分類
    │  ├─ roles.js                  三種身分
    │  ├─ faqs.js                   常見問題
-   │  └─ contact.js                聯絡支援表單的選項（目前是測試，送出不會真的寄出）
+   │  ├─ contact.js                聯絡支援表單的選項（目前是測試，送出不會真的寄出）
+   │  └─ open-app.js               「開始使用好彼社區」區塊（App 的網址、按鈕文字）
    ├─ assets/screenshots/          App 截圖（見下面「截圖」）
-   ├─ lib/                         從文章資料算出導覽、目錄、搜尋
+   ├─ lib/                         從文章資料算出導覽、目錄、搜尋；from-app.js 判斷是不是從 App 打開的
    ├─ components/                  共用元件
    └─ views/                       頁面
 ```
@@ -145,6 +151,7 @@ sections: [
 ### 寫法
 
 - **按鈕、欄位、畫面上的文字用「」框起來**，網站會自動加粗變深藍，例如「送出通報」。文字一定要和 App 畫面上的一模一樣
+- 文字裡寫 `https://` 開頭的網址，會自動變成連結（新分頁打開）；網址後面接中文標點或空白，才知道網址在哪裡結束
 - 短句、動詞開頭，一個步驟只做一件事
 - 給一般住戶看的，不要用技術名詞（API、資料庫、狀態值…）
 - 站在使用者的角度：只寫「會看到什麼、要按什麼」。不寫字數上限、錯誤訊息原文、系統內部怎麼運作（例如設備狀態怎麼自動改變）、兩個人同時操作這類細節（2026-10-18 全部文章照這個原則改寫過）
