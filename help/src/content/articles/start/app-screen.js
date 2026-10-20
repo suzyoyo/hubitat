@@ -3,12 +3,12 @@ import { HOME_TOUR } from '../../home-tour.js'
 export default {
   id: 'app-screen',
   title: '認識 App 首頁',
-  description: '上方的鈴鐺、下方的分頁、右下角的按鈕，各是做什麼的。',
+  description: '住戶、管委會、管理人員的首頁，各有哪些功能。', // 2026-10-20 改：內容早就換成三種身分的首頁導覽
   category: 'start',
   hideDescription: true, // 文章頁不顯示 description（2026-10-19）
   applicableRoles: ['resident', 'committee', 'staff'],
   order: 1,
-  keywords: ['首頁', '畫面', '分頁', '導覽', '鈴鐺', '按鈕', '待辦', '新手', '入門'],
+  keywords: ['首頁', '畫面', '導覽', '鈴鐺', '按鈕', '待辦', '公告', '交辦', '住戶', '管委會', '管理人員', '新手', '入門'],
   published: true,
   popular: true,
   sections: [
