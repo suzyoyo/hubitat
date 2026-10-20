@@ -5,6 +5,7 @@ import { areaName } from './community'
 import { MOCK_NOW, delay, omit } from './helpers'
 import { COMMITTEE_TITLES, users } from '../data/users'
 import { findUser, userLabel } from './users'
+import { keepInSession } from './persist'
 
 // 這個人能不能發布公告：主委、副主委、管理人員（財務、修繕、監察委員不能）
 export function canPublishAnnouncement(userId) {
@@ -55,12 +56,14 @@ function present(item, role) {
 
 // ── 住戶端 ────────────────────────────────────────────────
 
-// 已讀紀錄：誰看過哪些公告，例如 { 'u-c04': Set { 'an-001', 'an-002' } }
-// 現在沒有後端，先記在記憶體裡：換頁還會記得，重新整理網頁就會清空（全部變回未讀）
+// 已讀紀錄：誰看過哪些公告，例如 { 'u-c04': ['an-001', 'an-002'] }
+// 現在沒有後端，先記在記憶體裡，也暫存在 sessionStorage（persist.js）：關掉 App 才清空（全部變回未讀）
+// 用陣列不用 Set：Set 沒辦法轉成文字存起來
 const readIdsByUser = {}
+keepInSession('readAnnouncements', readIdsByUser)
 
 function hasRead(userId, id) {
-  return readIdsByUser[userId]?.has(id) ?? false
+  return readIdsByUser[userId]?.includes(id) ?? false
 }
 
 // 取得住戶看得到的公告：已發布、還沒結束，依開始時間排序
@@ -83,10 +86,10 @@ export async function getAnnouncements(userId) {
 // 把幾則公告記成「這位住戶看過了」；ids 是公告編號的清單，例如 ['an-001', 'an-002']
 export async function markAnnouncementsRead(userId, ids) {
   await delay()
-  // 這位住戶還沒有紀錄的話，先建立一個空的 Set（Set 是不會重複的清單）
-  readIdsByUser[userId] ??= new Set()
+  // 這位住戶還沒有紀錄的話，先建立一個空的清單
+  readIdsByUser[userId] ??= []
   for (const id of ids) {
-    readIdsByUser[userId].add(id)
+    if (!readIdsByUser[userId].includes(id)) readIdsByUser[userId].push(id) // 看過的不重複記
   }
 }
 
@@ -131,7 +134,7 @@ export async function getAnnouncementById(id, role = 'resident', userId) {
 // 撤回公告（管理端用）：已發布、還沒結束的公告 → 已撤回，住戶就看不到了
 //   reason 撤回原因，選填
 // 回傳 true 代表撤回成功；不能撤回的話（沒有權限、不是已發布、已經結束）回傳 false
-// 撤回只存在記憶體，重新整理網頁會變回原本的假資料
+// 撤回存在記憶體，並暫存到關掉 App 為止（persist.js）
 export async function withdrawAnnouncement(id, userId, reason = '') {
   await delay()
   const item = announcements.find((entry) => entry.id === id)
@@ -212,7 +215,7 @@ function pickFormFields(input) {
 //     push        推播對象：'affected' / 'all' / 'none'
 //   選填：timeText（多日的每日時段）、place（活動地點）、caseId、equipmentId
 // 要審核的 → 待審核；緊急的 → 直接發布並通知住戶（審核規則見上面）
-// 新公告只存在記憶體，重新整理網頁就不見了
+// 新公告存在記憶體，並暫存到關掉 App 為止（persist.js）
 export async function createAnnouncement(userId, input) {
   await delay()
   if (!canPublishAnnouncement(userId)) return undefined

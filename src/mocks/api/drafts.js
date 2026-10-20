@@ -1,11 +1,13 @@
 // 草稿：表單填到一半，在「離開前確認」按「存成草稿，晚點再填」存下的內容（2026-10-19）
-// 只存在記憶體，重新整理網頁就不見了（和其他假資料一樣）
+// 存在記憶體，也和其他假資料一樣暫存在 sessionStorage（persist.js），關掉 App 才不見
 // 一個人在同一個表單（同一個網址）只留一份，再存一次會蓋掉舊的
 // 回到同一個表單時用 takeDraft 拿回來（拿了就刪掉；沒送出又要離開時可以再存一次）
 // 管委會、管理人員的「我的待辦」會多一張草稿（種類「草稿」、徽章「未送出」，todos.js 用 draftsOf）
 import { MOCK_NOW, delay } from './helpers'
+import { keepInSession } from './persist'
 
 const drafts = [] // { userId, role, path, title, data, savedAt }
+keepInSession('drafts', drafts)
 
 // 存草稿
 //   path：表單的網址，例如 '/committee/tasks/new'；回到這個網址就會帶回來，待辦卡也連到這裡

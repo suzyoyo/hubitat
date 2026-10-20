@@ -7,6 +7,8 @@
 // 很多函式可以傳入 role（'resident' / 'committee' / 'staff'），
 // 假 API 會依角色拿掉不該看到的欄位（例如合約金額只有管委會看得到）。
 
+// persist 要放第一個：先把 sessionStorage 存過的假資料讀回來，其他假 API 才拿到改過的資料
+export { resetMockData } from './persist'
 export { MOCK_NOW, MOCK_TODAY, mockFail } from './helpers'
 export * from './users'
 export * from './invites'

@@ -27,6 +27,7 @@ import {
   getStaffMembers,
   getTasks,
   getVendors,
+  resetMockData,
   setDemoResidentId,
 } from '@/mocks/api'
 import { ANNOUNCEMENT_TYPES } from '@/mocks/data/announcements'
@@ -181,6 +182,12 @@ function dueText(item) {
           {{ resident.name }}（{{ resident.roles.includes('committee') ? '委員' : '一般住戶' }}）
         </Button>
       </div>
+    </div>
+
+    <!-- 回到原本的假資料：展示時新增、改過的東西會暫存到關掉 App 為止（mocks/api/persist.js），想馬上清掉就按這裡 -->
+    <div class="space-y-2">
+      <h3 class="text-sm font-medium text-muted-foreground">展示時改過的假資料（關掉 App 才會清掉）</h3>
+      <Button size="sm" variant="secondary" @click="resetMockData">重設假資料</Button>
     </div>
 
     <!-- 載入中：顯示灰色佔位框 -->
