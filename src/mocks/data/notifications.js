@@ -60,9 +60,9 @@ export const notifications = [
     id: 'n-002',
     userId: 'u-r04', // 2026-10-16 跟著通報人改（原本是李先生）
     role: 'resident',
-    title: '通報有新進度',
-    body: '頂樓花園｜灑水噴頭漏水・廠商已初步查勘',
-    at: '2026-10-01T12:40',
+    title: '通報已受理', // 2026-10-20 改：住戶只在受理、結案時收到通知（原本是「通報有新進度」）
+    body: '你通報的「頂樓花園灑水噴頭漏水」已受理，點擊查看處理進度',
+    at: '2026-09-24T15:20',
     read: true,
     link: { type: 'case', id: 'CASE-20260923-001' },
   },
@@ -70,9 +70,9 @@ export const notifications = [
     id: 'n-005',
     userId: 'u-r03', // 2026-10-16 跟著通報人改（原本是李先生）
     role: 'resident',
-    title: '通報有新進度',
-    body: '1F 大廳｜感應門故障・已通報原廠工程師排查線路',
-    at: '2026-09-25T14:30',
+    title: '通報已受理', // 2026-10-20 改：住戶只在受理、結案時收到通知（原本是「通報有新進度」）
+    body: '你通報的「A 棟 1F 大廳感應門故障」已受理，點擊查看處理進度',
+    at: '2026-09-22T09:00',
     read: true,
     link: { type: 'case', id: 'CASE-20260920-001' },
   },
@@ -134,8 +134,8 @@ export const notifications = [
     id: 'n-106',
     userId: 'u-c04',
     role: 'committee',
-    title: '管理人員發布了緊急公告',
-    body: 'B2 車道臨時封閉，由張管理員標示緊急並直接發布',
+    title: '緊急公告已發布', // 2026-10-21 改：和 notifyCommittee 發的一樣（api/announcements.js）
+    body: '張管理員發布了緊急公告：B2 車道臨時封閉',
     at: '2026-10-01T13:40',
     read: true,
     link: { type: 'announcement', id: 'an-011' },
@@ -218,7 +218,7 @@ export const notifications = [
     id: 'n-202',
     userId: 'u-s02',
     role: 'staff',
-    title: '新通報',
+    title: '新的住戶通報', // 2026-10-21 改：和 api/cases.js 發的一樣（原本是「新通報」）
     body: 'A 棟 2F 水管漏水，住戶剛送出通報',
     at: '2026-10-01T11:42',
     read: true,
