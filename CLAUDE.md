@@ -73,7 +73,7 @@
 - 日期和補充資訊用 `type-date`，也是 16px（2026-10-12 從 14px 放大，原本 14px 和自己拼的 16px 混用）。靠 `text-muted-foreground` 的灰色和內文區分，不要自己拼 `text-base leading-5`
 - 卡片：好彼 Kit 的卡片圓角是 14px，新做的元件用 `rounded-xl` + `shadow-card`。`rounded-card`（20px）是舊值，shadcn 的 `<Card>`（`src/components/ui/card/Card.vue`）、角色選擇頁和 playground 還在用，還沒決定要不要改
 - 徽章（`src/components/ui/badge/index.js`，對照 Kit 的 Badge，高 22px）：顏色代表「需不需要注意」，住戶端和管理端的意思不同，完整規則與例子在 `docs/dev-guide.md` 第 5 節（2026-10-11 定案，來源是 013 整理的《管委會端規格：角色權限與狀態顏色》）
-  - 住戶端：紅 `destructive`＝今天就會影響你（施工中、今天開始、緊急公告）；橘 `secondary`＝需要你動手做（待投票、請補充通報資料）；藍 `default`＝跟你有關但不用做什麼（與你相關、明天開始、已收到、處理中）；灰 `outline`＝已結束或只是分類（已完成、公告類型、一般日期）
+  - 住戶端：紅 `destructive`＝今天就會影響你（施工中、今天開始、緊急公告）；橘 `secondary`＝需要你動手做（請補充通報資料）；藍 `default`＝跟你有關但不用做什麼（與你相關、明天開始、已收到、處理中）；灰 `outline`＝已結束或只是分類（已完成、公告類型、一般日期）
   - 管理端：紅＝已經出問題（逾期、尚未受理）；橘＝輪到你處理或快到期；藍＝進行中、在等別人；灰＝已結束、正常或分類
   - 住戶端不顯示逾期天數、附議人數、處理人姓名
   - 紅色色階 2026-10-18 換成 Kit 的 `rdx/colors` 紅 1～12（Radix），只有品牌輔色 `red-500`（`#ff5657`）留著。紅色徽章照 Kit：淺紅底 red-4（`#ffdbdc`）＋紅字 `text-destructive`（`#e7000b`，不在 1～12 裡，寫在 `--warning-strong`）；錯誤訊息、必填星號、destructive 按鈕的紅字也是它。紅字在 red-4 底上對比約 3.7，比 4.5 低，013 決定照 Kit

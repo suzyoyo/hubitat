@@ -28,17 +28,21 @@ const managementMenu = [
   { path: 'tasks/new', label: '新增交辦', icon: WrenchIcon, permission: 'assign' },
   { path: 'cases/new', label: '新增通報', icon: PencilIcon },
   { path: 'announcements/new', label: '發布公告', icon: MegaphoneIcon, permission: 'publish' },
-  { path: 'files/upload', label: '上傳文件', icon: FileTextIcon },
+  { path: 'files/upload', label: '上傳文件', icon: FileTextIcon, permission: 'upload' },
   { path: 'quick-saves/new', label: '快速留存', icon: ClipboardPenLineIcon },
 ]
 
-// 這個人看不看得到選單的這一項（規則見 docs/data-model.md 的交辦、公告）
+// 這個人看不看得到選單的這一項（規則見 docs/data-model.md 的交辦、公告，以及 docs/permissions.md）
 //   assign  新增交辦：只有主委、副主委
 //   publish 發布公告：主委、副主委、管理人員
+//   upload  上傳文件：主委、副主委、財務委員（財務報告）、管理人員（法定文件、規約）
 export function canUseMenuItem(item, user) {
   const isChairOrVice = ['chair', 'viceChair'].includes(user.committeeTitle)
   if (item.permission === 'assign') return user.currentRole === 'committee' && isChairOrVice
   if (item.permission === 'publish') return user.currentRole === 'staff' || isChairOrVice
+  if (item.permission === 'upload') {
+    return user.currentRole === 'staff' || isChairOrVice || user.committeeTitle === 'finance'
+  }
   return true
 }
 

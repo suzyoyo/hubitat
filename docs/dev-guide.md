@@ -538,7 +538,7 @@ const latestReport = computed(() => reports.value[0])
 
 ```vue
 <Badge variant="destructive">施工中</Badge>
-<Badge variant="secondary">待投票</Badge>
+<Badge variant="secondary">請補充通報資料</Badge>
 <Badge>處理中</Badge>
 <Badge variant="outline">1F 大廳</Badge>
 ```
@@ -552,7 +552,7 @@ const latestReport = computed(() => reports.value[0])
 | 顏色 | 意思 | 例子 |
 |---|---|---|
 | 紅 `destructive` | 今天就會影響你 | 施工中、進行中・共 3 天、今天開始、今天停水、緊急公告 |
-| 橘 `secondary` | 需要你動手做的事 | 待繳費、待投票、請補充通報資料 |
+| 橘 `secondary` | 需要你動手做的事 | 請補充通報資料 |
 | 藍 `default` | 跟你有關，但不用你做什麼 | 與你相關、明天開始、已收到、處理中、待生效 |
 | 灰 `outline` | 已結束，或只是分類 | 已完成、通過、現行有效；公告、會議、文件的類型；身分；一般日期 |
 

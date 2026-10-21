@@ -19,6 +19,7 @@ export const TERM = {
 
 // 委員職稱：short 是簡稱，用在簽核名單這種空間小的地方（例如「李主委」）
 // canReviewAnnouncement：能不能審核公告（只有主委、副主委可以）
+// 權限看角色、不看職稱（docs/permissions.md）：修繕委員、監察委員是「一般委員」的職稱，只用來顯示
 export const COMMITTEE_TITLES = {
   chair: { label: '主委', short: '主委', canReviewAnnouncement: true },
   viceChair: { label: '副主委', short: '副主委', canReviewAnnouncement: true },
