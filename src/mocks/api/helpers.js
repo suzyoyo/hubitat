@@ -7,15 +7,20 @@ import { ref, watch } from 'vue'
 export const MOCK_TODAY = '2026-10-28'
 
 // 「現在」：日期用 MOCK_TODAY，時、分用電腦真的時間（2026-10-22）
-// 這樣操作時記下的時間跟著真的時間走，例如 15:32 結案就記 2026-10-28T15:32
-// 每次都要重新算，所以是函式：mockNow() → '2026-10-28T15:32'
-// 最早是 13:42：假資料裡「今天」最晚的紀錄是 13:40，太早的話新的紀錄會排到舊的下面
-export function mockNow() {
+// 每次都要重新算，所以是函式：clockNow() → '2026-10-28T09:15'
+// 只用來顯示，例如首頁的早安、午安、晚安（2026-10-22 suzy 提的：上午報告時要顯示「早安」）
+export function clockNow() {
   const now = new Date()
   const hh = String(now.getHours()).padStart(2, '0')
   const mm = String(now.getMinutes()).padStart(2, '0')
-  const time = `${hh}:${mm}`
-  return `${MOCK_TODAY}T${time < '13:42' ? '13:42' : time}`
+  return `${MOCK_TODAY}T${hh}:${mm}`
+}
+
+// 操作時記下的「現在」：和 clockNow() 一樣，例如 15:32 結案就記 2026-10-28T15:32
+// 但最早是 13:42：假資料裡「今天」最晚的紀錄是 13:40，太早的話新的紀錄會排到舊的下面
+export function mockNow() {
+  const now = clockNow()
+  return now.split('T')[1] < '13:42' ? `${MOCK_TODAY}T13:42` : now
 }
 
 // 展示錯誤畫面用的開關（在 /playground 的「狀態畫面」切換）

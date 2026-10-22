@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { greetingWord } from '@/lib/date'
 import {
-  mockNow,
+  clockNow,
   MOCK_TODAY,
   getAnnouncements,
   getCurrentUser,
@@ -63,7 +63,7 @@ const homeNotices = computed(() => allNotices.value.filter((item) => item.relate
 const latestMeeting = computed(() => meetings.value[0])
 
 // 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
-const hello = greetingWord(mockNow())
+const hello = greetingWord(clockNow())
 
 // 問候列的兩行字：提醒「今天」社區有什麼事
 const greeting = computed(() => {

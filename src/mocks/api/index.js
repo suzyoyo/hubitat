@@ -9,7 +9,7 @@
 
 // persist 要放第一個：先把 sessionStorage 存過的假資料讀回來，其他假 API 才拿到改過的資料
 export { resetMockData } from './persist'
-export { mockNow, MOCK_TODAY, mockFail } from './helpers'
+export { clockNow, mockNow, MOCK_TODAY, mockFail } from './helpers'
 export * from './users'
 export * from './invites'
 export * from './community'
