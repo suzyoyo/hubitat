@@ -92,7 +92,9 @@ function scrollIntoView() {
   const els = targetsOf(step.value.target).filter((el) => !isPinned(el))
   if (!els.length) return
   const top = Math.min(...els.map((el) => el.getBoundingClientRect().top))
-  const bottom = Math.max(...els.map((el) => el.getBoundingClientRect().bottom))
+  let bottom = Math.max(...els.map((el) => el.getBoundingClientRect().bottom))
+  // 指定說明框放下面的：連說明框的高度一起算，要捲到說明框也放得下（不蓋到底部導覽）
+  if (step.value.place === 'below') bottom += GAP + (tipEl.value?.offsetHeight ?? 190)
   // 上面留給頂部列，下面留給底部導覽列
   if (top < 80 || bottom > window.innerHeight - 120) {
     window.scrollTo(0, window.scrollY + top - 100)

@@ -76,7 +76,7 @@ const fabClass = computed(() => [
     <!-- 管委會、管理人員：按下去在按鈕上方跳出全域新增選單；打開時「＋」變成叉叉，再按一次關掉 -->
     <Popover v-if="fab.menu" v-model:open="menuOpen">
       <PopoverTrigger as-child>
-        <button type="button" :aria-label="fab.title" :class="[fabClass, 'relative']">
+        <button type="button" :aria-label="fab.title" data-tour="fab" :class="[fabClass, 'relative']">
           <component :is="menuOpen ? XIcon : PlusIcon" :class="compact ? 'size-6' : 'size-[26px]'" />
         </button>
       </PopoverTrigger>

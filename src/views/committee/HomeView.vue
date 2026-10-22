@@ -5,6 +5,7 @@ import { computed, onMounted, ref } from 'vue'
 import AdminNoticeCard from '@/components/admin/AdminNoticeCard.vue'
 import AdminTodoCard from '@/components/admin/AdminTodoCard.vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
+import HomeTour from '@/components/app/HomeTour.vue'
 import NotificationReminder from '@/components/feedback/NotificationReminder.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import IconTile from '@/components/common/IconTile.vue'
@@ -63,6 +64,20 @@ const shortcuts = [
   { title: '交辦進度', icon: CircleCheckIcon, to: '/committee/tasks' },
   { title: '提案與簽核', icon: FileTextIcon, to: '/committee/proposals' },
 ]
+
+// 第一次進首頁的導覽（app/HomeTour.vue）：target 對到畫面上的 data-tour
+//   鈴鐺在 AppHeader；「＋」fab、分頁 tab-○○ 在 BottomNav；其他在這一頁
+const TOUR_STEPS = [
+  { target: 'bell', text: '有新通知時，鈴鐺上會出現紅點，點選可以查看所有通知。' },
+  { target: 'todos', text: '等你處理的事會列在這裡，點選右上角可以查看全部待辦。' },
+  { target: 'shortcuts', text: '「交辦進度」可以追蹤交辦給管理人員的工作，「提案與簽核」可以處理委員之間的提案。' },
+  { target: 'fab', text: '按「＋」可以新增交辦、通報、公告，或快速留存單據照片。' },
+  { target: 'tab-home', text: '「首頁」可以看到你的待辦、住戶意見和最新公告。' },
+  { target: 'tab-cases', text: '「案件」可以查看所有住戶通報和處理進度。' },
+  { target: 'tab-vendors', text: '「廠商」可以查看廠商名冊、緊急聯絡電話和社區的鑰匙清單。' },
+  { target: 'tab-files', text: '「社區」可以查看社區的大小事，像是會議紀錄、規約、合約和設備清冊。' },
+  { target: 'tab-me', text: '「我的」可以管理個人資料和各種設定，主委、副主委也能在這裡換屆交接。' },
+]
 </script>
 
 <template>
@@ -74,7 +89,7 @@ const shortcuts = [
       <!-- 還沒開通知就一直提醒，但不擋（2026-10-18 013） -->
       <NotificationReminder />
 
-      <section class="space-y-3">
+      <section class="space-y-3" data-tour="todos">
         <div class="flex items-center justify-between">
           <h2 class="type-title text-heading">我的待辦</h2>
           <!-- 「查看 N 件待辦 ›」（2026-10-15 suzy 改：拿掉件數徽章和下面的「查看全部待辦事項」按鈕，管理人員首頁也一樣）
@@ -103,7 +118,7 @@ const shortcuts = [
         </template>
       </section>
 
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-2 gap-3" data-tour="shortcuts">
         <RouterLink
           v-for="shortcut in shortcuts"
           :key="shortcut.to"
@@ -153,5 +168,7 @@ const shortcuts = [
         </div>
       </section>
     </div>
+
+    <HomeTour :steps="TOUR_STEPS" storage-key="hubitat-tour-committee" :ready="!loading" />
   </div>
 </template>
