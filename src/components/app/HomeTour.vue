@@ -24,6 +24,7 @@ const MASCOTS = {
 
 const props = defineProps({
   // 每一步：{ target: data-tour 的名稱, text: 說明（\n 是換行）, mascot: 好彼管家的動作（MASCOTS 的名稱，不寫就沒有）,
+  //          mascotSide: 'top' | 'bottom' 好彼管家站說明框的上緣或下緣（不寫就站靠近亮框的那一邊）,
   //          merge: 同名的好幾塊合成一個亮框, place: 'above' | 'below' 說明放上面或下面（不寫就自動） }
   steps: { type: Array, required: true },
   // 記在瀏覽器裡的名稱，三端分開記，例如 hubitat-tour-resident
@@ -34,20 +35,21 @@ const props = defineProps({
 
 const PAD = 6 // 亮框比元素大一圈
 const GAP = 12 // 說明框和亮框的距離
-const MASCOT_HEIGHT = 72 // 好彼管家的高度
-const MASCOT_RISE = 60 // 好彼管家冒出說明框上緣的高度（下面 12px 疊在說明框的留白上，不會蓋到字）
+const MASCOT_HEIGHT = 110 // 好彼管家的高度
+const MASCOT_RISE = 98 // 好彼管家冒出說明框的高度（另外 12px 疊在說明框的留白上，不會蓋到字）
 
 const route = useRoute()
 const open = ref(false)
 const index = ref(0)
 const holes = ref([]) // 這一步要亮的框：[{ x, y, w, h }]
 const tipStyle = ref({})
+const mascotStyle = ref({})
 const nextButton = ref(null)
 const tipEl = ref(null)
 
 const step = computed(() => props.steps[index.value])
 const mascot = computed(() => MASCOTS[step.value.mascot])
-// 說明框上面要多留給好彼管家的高度（說明框放在亮框下面時，好彼管家站在兩者中間）
+// 說明框和亮框中間要多留給好彼管家的高度：好彼管家站在說明框靠近亮框的那一邊，像在指給你看
 const rise = computed(() => (mascot.value ? MASCOT_RISE : 0))
 const isLast = computed(() => index.value === props.steps.length - 1)
 
@@ -113,12 +115,12 @@ function scrollIntoView() {
   if (!els.length) return
   const top = Math.min(...els.map((el) => el.getBoundingClientRect().top))
   let bottom = Math.max(...els.map((el) => el.getBoundingClientRect().bottom))
-  // 指定說明框放下面的：連說明框的高度一起算，要捲到說明框也放得下（不蓋到底部導覽）
+  // 指定說明框放下面的：連說明框和好彼管家的高度一起算，要捲到它們也放得下（不蓋到底部導覽）
   if (step.value.place === 'below') bottom += GAP + rise.value + (tipEl.value?.offsetHeight ?? 190)
-  // 上面留給頂部列，下面留給底部導覽列
-  if (top < 80 || bottom > window.innerHeight - 120) {
-    window.scrollTo(0, window.scrollY + top - 100)
-  }
+  // 上面留給頂部列，下面留給底部導覽列；只捲剛好需要的距離，畫面不要跳太多
+  const limit = window.innerHeight - 120
+  if (top < 80) window.scrollBy(0, top - 100)
+  else if (bottom > limit) window.scrollBy(0, Math.min(bottom - limit, top - 100))
 }
 
 // 自己或外層是 fixed / sticky（頂部列、底部導覽）：不會跟著頁面捲動
@@ -161,10 +163,24 @@ function measure() {
   // 放下面會超出畫面（矮的手機）就改放上面
   const tipHeight = tipEl.value?.offsetHeight ?? 140
   if (place === 'below' && anchor.y + anchor.h + GAP + rise.value + tipHeight > window.innerHeight - GAP) place = 'above'
+
+  // 好彼管家站哪一邊：預設是靠近亮框的那一邊（說明框在下面就站上緣，在上面就站下緣）
+  //   mascotSide 可以指定，例如住戶第 2 步：說明框夾在兩個按鈕中間，好彼管家站下緣、靠近右下角的「通報」
+  const side = step.value.mascotSide ?? (place === 'below' ? 'top' : 'bottom')
+  const lift = (forSide) => (side === forSide ? rise.value : 0)
   tipStyle.value =
     place === 'below'
-      ? { top: `${anchor.y + anchor.h + GAP + rise.value}px` }
-      : { bottom: `${window.innerHeight - anchor.y + GAP}px` }
+      ? { top: `${anchor.y + anchor.h + GAP + lift('top')}px` }
+      : { bottom: `${window.innerHeight - anchor.y + GAP + lift('bottom')}px` }
+
+  // 好彼管家左右對準它那一邊的亮框（例如「我的」分頁正上方），不超出說明框
+  if (!mascot.value) return
+  const near = side === 'top' ? holes.value.reduce((a, b) => (b.y < a.y ? b : a)) : holes.value.reduce((a, b) => (b.y > a.y ? b : a))
+  const boxWidth = tipEl.value?.offsetWidth ?? window.innerWidth - 24
+  const boxLeft = (window.innerWidth - boxWidth) / 2
+  const catWidth = (MASCOT_HEIGHT * mascot.value.width) / mascot.value.height
+  const left = Math.min(Math.max(near.x + near.w / 2 - catWidth / 2 - boxLeft, 8), boxWidth - catWidth - 8)
+  mascotStyle.value = { left: `${left}px`, [side]: `-${MASCOT_RISE}px`, height: `${MASCOT_HEIGHT}px` }
 }
 
 function next() {
@@ -205,7 +221,7 @@ function finish() {
 
     <!-- 說明框：最寬 351px（375 的手機左右各留 12px，放得下「交辦進度」那句一整行，2026-10-22 013） -->
     <div ref="tipEl" class="absolute inset-x-0 mx-auto w-[calc(100%-24px)] max-w-[351px] rounded-xl bg-card p-4 shadow-card" :style="tipStyle">
-      <!-- 好彼管家站在說明框右上角，冒出上緣 60px；只是裝飾，alt 留空 -->
+      <!-- 好彼管家站在說明框靠近亮框的那一邊，位置在 measure() 算；只是裝飾，alt 留空 -->
       <img
         v-if="mascot"
         :key="step.mascot"
@@ -213,8 +229,8 @@ function finish() {
         alt=""
         :width="mascot.width"
         :height="mascot.height"
-        class="pointer-events-none absolute right-4 w-auto"
-        :style="{ height: `${MASCOT_HEIGHT}px`, top: `-${MASCOT_RISE}px` }"
+        class="pointer-events-none absolute w-auto"
+        :style="mascotStyle"
       />
       <!-- whitespace-pre-line：說明裡寫 \n 的地方會換行（例如逗號後面） -->
       <p class="whitespace-pre-line type-body text-foreground">{{ step.text }}</p>

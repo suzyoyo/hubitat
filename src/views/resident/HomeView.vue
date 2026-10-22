@@ -68,7 +68,8 @@ const TOUR_STEPS = [
   // 用敘述的口氣，講清楚這裡能做什麼、看得到什麼；動詞換著用，不要每句都是「可以」（2026-10-22 013）
   // mascot：說明框上的好彼管家，每一步換一個動作（2026-10-22 013）
   { target: 'bell', mascot: 'waving', text: '有新通知時，鈴鐺上會出現紅點，點進去就能看到所有通知。' },
-  { target: 'new-report', mascot: 'pointing', text: '社區有問題時，按這兩個按鈕都能通報。', place: 'below' }, // 說明框夾在兩個按鈕中間（放不下時導覽會先往上捲）
+  // 說明框夾在兩個按鈕中間（放不下時導覽會先往上捲），好彼管家站下緣、靠近右下角的「通報」
+  { target: 'new-report', mascot: 'pointing', text: '社區有問題時，按這兩個按鈕都能通報。', place: 'below', mascotSide: 'bottom' },
   { target: 'notices', mascot: 'searching', text: '社區的公告和活動會列在這裡，點「看全部」查看所有公告。', merge: true },
   { target: 'tab-home', mascot: 'thinking', text: '「首頁」隨時掌握你通報的處理進度和最新公告。' },
   { target: 'tab-files', mascot: 'pointing', text: '「社區」收錄社區的大小事，像是管委會報告、社區規約和設備維修紀錄。' },
