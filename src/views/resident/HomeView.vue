@@ -70,8 +70,9 @@ const TOUR_STEPS = [
   { target: 'new-report', text: '社區有問題時，按這兩個按鈕都可以通報。', place: 'above' }, // 放下面會蓋到右下角的「通報」
   { target: 'notices', text: '社區的公告和活動會列在這裡，點選「看全部」可以查看所有公告。', merge: true },
   { target: 'tab-home', text: '「首頁」可以看到你通報的處理進度和最新公告。' },
-  { target: 'tab-files', text: '「社區」可以查看管委會報告、社區規約和設備的維修紀錄。' },
-  { target: 'tab-me', text: '「我的」可以查看你的留言，調整字體大小和通知設定。' },
+  { target: 'tab-files', text: '「社區」可以查看社區的大小事，像是管委會報告、社區規約和設備維修紀錄。' },
+  // 「我的留言」藏在「我的」裡面比較難找，特別寫出來
+  { target: 'tab-me', text: '「我的」可以管理個人資料和各種設定，也能查看你給管委會的留言和回覆。' },
 ]
 
 // 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
