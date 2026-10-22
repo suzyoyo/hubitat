@@ -52,10 +52,12 @@ const fabClass = computed(() => [
       :class="compact ? '' : 'h-[70px]'"
     >
       <!-- 一般分頁的文字顏色設在外層 nav 上；active-class 是「目前分頁」才會加上的 class -->
+      <!-- data-tour：首頁導覽要亮的地方（app/HomeTour.vue），例如 tab-files -->
       <RouterLink
         v-for="tab in tabs"
         :key="tab.path"
         :to="`${basePath}/${tab.path}`"
+        :data-tour="`tab-${tab.path}`"
         class="flex min-w-0 flex-1 flex-col items-center justify-center rounded-full whitespace-nowrap"
         :class="compact ? 'py-2 type-label' : 'type-nav'"
         active-class="bg-nav-active text-nav-active-foreground shadow-nav-active"
@@ -74,7 +76,7 @@ const fabClass = computed(() => [
     <!-- 管委會、管理人員：按下去在按鈕上方跳出全域新增選單；打開時「＋」變成叉叉，再按一次關掉 -->
     <Popover v-if="fab.menu" v-model:open="menuOpen">
       <PopoverTrigger as-child>
-        <button type="button" :aria-label="fab.title" :class="[fabClass, 'relative']">
+        <button type="button" :aria-label="fab.title" data-tour="fab" :class="[fabClass, 'relative']">
           <component :is="menuOpen ? XIcon : PlusIcon" :class="compact ? 'size-6' : 'size-[26px]'" />
         </button>
       </PopoverTrigger>
@@ -102,7 +104,7 @@ const fabClass = computed(() => [
     </Popover>
 
     <!-- 住戶：按下去換到新增通報 -->
-    <RouterLink v-else :to="`${basePath}/${fab.path}`" :aria-label="fab.title" :class="fabClass">
+    <RouterLink v-else :to="`${basePath}/${fab.path}`" :aria-label="fab.title" data-tour="new-report" :class="fabClass">
       <PlusIcon :class="compact ? 'size-6' : 'size-[26px]'" />
       <!-- 只有住戶端的按鈕上有文字「通報」 -->
       <span v-if="fab.text">{{ fab.text }}</span>

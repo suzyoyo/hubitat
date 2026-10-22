@@ -373,6 +373,10 @@ for (const shot of list) {
     await page.addInitScript((id) => {
       localStorage.setItem('hubitat-demo-resident', id)
       sessionStorage.setItem('notification-reminder-dismissed', '1')
+      // 首頁導覽（app/HomeTour.vue）當作看過了，不然首頁會被遮罩和說明框蓋住
+      localStorage.setItem('hubitat-tour-resident', 'done')
+      localStorage.setItem('hubitat-tour-committee', 'done')
+      localStorage.setItem('hubitat-tour-staff', 'done')
     }, shot.resident ?? 'u-c04')
     if (shot.stage) {
       // 先開一個不讀資料的頁面、改好假資料，再用 App 自己的換頁（不重新整理，改過的資料才會留著）

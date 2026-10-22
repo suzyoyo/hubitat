@@ -67,6 +67,7 @@ function goBack() {
     <RouterLink
       :to="notificationsTo"
       :aria-label="hasUnread ? '通知，有未讀' : '通知'"
+      data-tour="bell"
       class="-mr-0.5 flex size-11 items-center justify-center"
     >
       <!-- relative：讓紅點對齊藍色圓形的右上角 -->
