@@ -2,7 +2,7 @@
 import { cases } from '../data/cases'
 import { equipment } from '../data/equipment'
 import { quickSaves } from '../data/quickSaves'
-import { MOCK_NOW, delay } from './helpers'
+import { mockNow, delay } from './helpers'
 import { userLabel } from './users'
 
 // 取得某個人的留存，新的在前
@@ -27,7 +27,7 @@ export async function addQuickSave(ownerId, fields) {
     name: fields.name ?? '',
     note: fields.note ?? '',
     photos: fields.photos ?? [],
-    savedAt: MOCK_NOW,
+    savedAt: mockNow(),
     resolved: false,
   }
   quickSaves.push(item)
@@ -63,7 +63,7 @@ export async function linkQuickSaveToCase(id, userId, caseId) {
   if (!target || !['accepted', 'in_progress'].includes(target.status)) return undefined
   item.resolved = true
   item.linked = { type: 'case', id: caseId }
-  const log = { at: MOCK_NOW, actorId: userId, label: '附上留存', text: `${userLabel(userId)}附上留存「${item.name || '未命名的留存'}」` }
+  const log = { at: mockNow(), actorId: userId, label: '附上留存', text: `${userLabel(userId)}附上留存「${item.name || '未命名的留存'}」` }
   if (item.note) log.note = item.note
   if (item.photos.length) log.files = [...item.photos]
   target.logs.push(log)

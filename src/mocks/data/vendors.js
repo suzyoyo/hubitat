@@ -46,7 +46,7 @@ export const vendors = [
       { name: '王技師', title: '維修負責人', phone: '0911-222-333', isEmergency: false },
       { name: '24 小時報修專線', title: '', phone: '0800-123-456', isEmergency: true },
     ],
-    createdAt: '2023-10-01',
+    createdAt: '2023-10-28',
   },
   {
     id: 'v-002',
@@ -64,7 +64,7 @@ export const vendors = [
         isEmergency: true,
       },
     ],
-    createdAt: '2026-09-28',
+    createdAt: '2026-10-25',
   },
   {
     id: 'v-003',
@@ -74,7 +74,7 @@ export const vendors = [
     services: ['漏水', '排水堵塞', '跳電', '照明維修'],
     status: 'active',
     contacts: [{ name: '林先生', title: '負責人', phone: '02-2765-4321', isEmergency: true }],
-    createdAt: '2024-03-15',
+    createdAt: '2024-04-11',
   },
   {
     id: 'v-004',
@@ -84,7 +84,7 @@ export const vendors = [
     services: ['公共區域清潔', '垃圾清運', '水塔清洗'],
     status: 'active',
     contacts: [{ name: '吳主任', title: '現場主任', phone: '02-2788-5566', isEmergency: false }],
-    createdAt: '2024-04-01',
+    createdAt: '2024-04-28',
   },
   {
     id: 'v-005',
@@ -94,7 +94,7 @@ export const vendors = [
     services: ['門禁', '監視系統', '駐衛保全'],
     status: 'active',
     contacts: [{ name: '黃主任', title: '駐點主任', phone: '02-2311-7788', isEmergency: false }],
-    createdAt: '2024-01-01',
+    createdAt: '2024-01-28',
   },
   {
     id: 'v-006',
@@ -104,7 +104,7 @@ export const vendors = [
     services: ['植栽修剪', '中庭植栽養護'],
     status: 'active',
     contacts: [{ name: '蔡小姐', title: '業務窗口', phone: '0935-666-777', isEmergency: false }],
-    createdAt: '2024-11-01',
+    createdAt: '2024-11-28',
   },
   {
     id: 'v-007',
@@ -114,7 +114,7 @@ export const vendors = [
     services: ['機電維護', '發電機保養', '抽水馬達檢修'],
     status: 'active',
     contacts: [{ name: '林組長', title: '維修組長', phone: '02-2599-3344', isEmergency: false }],
-    createdAt: '2025-03-01',
+    createdAt: '2025-03-28',
   },
   {
     id: 'v-008',
@@ -124,7 +124,7 @@ export const vendors = [
     services: ['屋頂防水', '外牆抓漏', '地坪止滑'],
     status: 'active',
     contacts: [{ name: '許老闆', title: '負責人', phone: '0928-123-987', isEmergency: false }],
-    createdAt: '2026-08-20',
+    createdAt: '2026-09-16',
   },
   {
     id: 'v-009',
@@ -134,7 +134,7 @@ export const vendors = [
     services: ['瓦斯漏氣', '管線檢查'],
     status: 'active',
     contacts: [{ name: '24 小時服務專線', title: '', phone: '02-2345-1234', isEmergency: true }],
-    createdAt: '2023-10-01',
+    createdAt: '2023-10-28',
   },
   {
     id: 'v-010',
@@ -144,7 +144,7 @@ export const vendors = [
     services: ['環境消毒', '除蟲', '病媒防治'],
     status: 'candidate',
     contacts: [{ name: '簡先生', title: '業務', phone: '0955-432-100', isEmergency: false }],
-    createdAt: '2026-09-10',
+    createdAt: '2026-10-07',
   },
   {
     id: 'v-011',
@@ -154,7 +154,7 @@ export const vendors = [
     services: ['排水疏通', '管線更換'],
     status: 'candidate',
     contacts: [{ name: '鄭先生', title: '估價人員', phone: '0966-789-012', isEmergency: false }],
-    createdAt: '2026-09-27',
+    createdAt: '2026-10-24',
   },
   {
     id: 'v-012',
@@ -164,7 +164,7 @@ export const vendors = [
     services: ['水溝清理', '化糞池清運'],
     status: 'inactive',
     contacts: [{ name: '洪小姐', title: '客服', phone: '02-2933-1100', isEmergency: false }],
-    createdAt: '2022-05-01',
+    createdAt: '2022-05-28',
   },
   {
     id: 'v-013',
@@ -174,6 +174,6 @@ export const vendors = [
     services: ['門窗鎖具', '信箱維修', '五金更換'],
     status: 'active',
     contacts: [{ name: '金老闆', title: '負責人', phone: '02-2766-8899', isEmergency: false }],
-    createdAt: '2025-06-10',
+    createdAt: '2025-07-07',
   },
 ]

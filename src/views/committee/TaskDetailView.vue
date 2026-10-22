@@ -20,7 +20,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { formatFullDate, formatTime } from '@/lib/date'
 import { taskStatusBadge } from '@/lib/task'
 import {
-  MOCK_NOW,
+  mockNow,
   confirmTask,
   getCurrentUser,
   getTaskById,
@@ -102,7 +102,7 @@ const newDeadline = ref('')
 
 // 原本的期限是不是已經過了；過了的話，退回時一定要給新期限，不然對方一被退回就逾期
 // 沒有期限的不算過了（期限是選填）
-const deadlinePassed = computed(() => Boolean(task.value.deadline) && task.value.deadline <= MOCK_NOW)
+const deadlinePassed = computed(() => Boolean(task.value.deadline) && task.value.deadline <= mockNow())
 
 function openDialog(mode) {
   dialogMode.value = mode
@@ -310,7 +310,7 @@ const recordRows = computed(() => {
               <span v-else class="type-date text-muted-foreground">選填</span>
             </Label>
             <!-- datetime-local：手機會跳出選日期和時間的轉盤；min 讓使用者選不到比現在早的時間 -->
-            <Input id="task-deadline" v-model="newDeadline" type="datetime-local" :min="MOCK_NOW" />
+            <Input id="task-deadline" v-model="newDeadline" type="datetime-local" :min="mockNow()" />
             <p class="type-date text-muted-foreground">原本的期限：{{ dateText(task.deadline) }}</p>
           </div>
 

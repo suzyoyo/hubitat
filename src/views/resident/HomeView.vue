@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { greetingWord } from '@/lib/date'
 import {
-  MOCK_NOW,
+  mockNow,
   MOCK_TODAY,
   getAnnouncements,
   getCurrentUser,
@@ -54,7 +54,7 @@ onMounted(async () => {
 // 首頁每一區只放最前面的幾筆，其餘的按「看全部」
 // 首頁放最新通報的那一筆（照通報時間，2026-10-16 和 013 定的）；getMyReports 是照最後更新時間排的
 //   時間一樣時改比案件編號（|| 的意思：前面比出來是 0 就改用後面的比）：
-//   假資料裡新送出的通報時間都是固定的 MOCK_NOW，連送兩筆時間會一樣；編號新的比較大（-001 → -002）
+//   同一分鐘內連送兩筆，通報時間會一樣（mockNow() 只到分）；編號新的比較大（-001 → -002）
 const latestReport = computed(
   () => reports.value.toSorted((a, b) => b.submittedAt.localeCompare(a.submittedAt) || b.id.localeCompare(a.id))[0],
 )
@@ -63,7 +63,7 @@ const homeNotices = computed(() => allNotices.value.filter((item) => item.relate
 const latestMeeting = computed(() => meetings.value[0])
 
 // 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
-const hello = greetingWord(MOCK_NOW)
+const hello = greetingWord(mockNow())
 
 // 問候列的兩行字：提醒「今天」社區有什麼事
 const greeting = computed(() => {

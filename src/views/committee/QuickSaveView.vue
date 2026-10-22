@@ -111,7 +111,7 @@ const isDirty = computed(
       <Label for="quick-save-name" class="text-base">
         名稱<span class="type-date text-muted-foreground">選填</span>
       </Label>
-      <Input id="quick-save-name" v-model="name" placeholder="例：電梯保養單 10/01" :maxlength="NAME_MAX" />
+      <Input id="quick-save-name" v-model="name" placeholder="例：電梯保養單 10/28" :maxlength="NAME_MAX" />
     </div>
 
     <div class="space-y-2">

@@ -2,7 +2,7 @@
 import { ANNOUNCEMENT_TYPES, announcements } from '../data/announcements'
 import { notifications } from '../data/notifications'
 import { areaName } from './community'
-import { MOCK_NOW, delay, omit } from './helpers'
+import { mockNow, delay, omit } from './helpers'
 import { COMMITTEE_TITLES, users } from '../data/users'
 import { findUser, userLabel } from './users'
 import { keepInSession } from './persist'
@@ -47,8 +47,8 @@ function present(item, role) {
     reviewerLabel: item.reviewerId ? userLabel(item.reviewerId) : '',
     needsReview: announcementNeedsReview(item),
     withdrawnByLabel: item.withdrawnBy ? userLabel(item.withdrawnBy) : '',
-    isOngoing: item.startAt <= MOCK_NOW && MOCK_NOW <= item.endAt, // 正在進行中
-    hasEnded: item.endAt < MOCK_NOW, // 已經結束
+    isOngoing: item.startAt <= mockNow() && mockNow() <= item.endAt, // 正在進行中
+    hasEnded: item.endAt < mockNow(), // 已經結束
   }
   // 關聯的案件與設備是內部資訊，住戶看不到
   return role === 'resident' ? omit(full, ['caseId', 'equipmentId', 'push']) : full
@@ -74,7 +74,7 @@ export async function getAnnouncements(userId) {
   await delay()
   const user = findUser(userId)
   return announcements
-    .filter((item) => item.status === 'published' && item.endAt >= MOCK_NOW)
+    .filter((item) => item.status === 'published' && item.endAt >= mockNow())
     .toSorted((a, b) => a.startAt.localeCompare(b.startAt))
     .map((item) => ({
       ...present(item, 'resident'),
@@ -138,10 +138,10 @@ export async function getAnnouncementById(id, role = 'resident', userId) {
 export async function withdrawAnnouncement(id, userId, reason = '') {
   await delay()
   const item = announcements.find((entry) => entry.id === id)
-  if (!item || item.status !== 'published' || item.endAt < MOCK_NOW) return false
+  if (!item || item.status !== 'published' || item.endAt < mockNow()) return false
   if (!canManage(item, userId)) return false
   item.status = 'withdrawn'
-  item.withdrawnAt = MOCK_NOW
+  item.withdrawnAt = mockNow()
   item.withdrawnBy = userId
   if (reason) item.withdrawReason = reason
   notifyResidents(item, '公告已撤回')
@@ -180,7 +180,7 @@ function notifyResidents(item, title) {
       role: 'resident',
       title,
       body: item.title,
-      at: MOCK_NOW,
+      at: mockNow(),
       read: false,
       link: { type: 'announcement', id: item.id },
     })
@@ -225,13 +225,13 @@ export async function createAnnouncement(userId, input) {
     id: `an-${String(maxNumber + 1).padStart(3, '0')}`,
     ...pickFormFields(input),
     authorId: userId,
-    createdAt: MOCK_NOW,
+    createdAt: mockNow(),
   }
   if (announcementNeedsReview(item)) {
     item.status = 'pending'
   } else {
     item.status = 'published'
-    item.publishedAt = MOCK_NOW
+    item.publishedAt = mockNow()
     notifyResidents(item, `新公告：${item.title}`)
     if (item.isUrgent) notifyCommittee(item, userId)
   }
@@ -251,7 +251,7 @@ function notifyCommittee(item, authorId) {
       role: 'committee',
       title: '緊急公告已發布',
       body: `${userLabel(authorId)}發布了緊急公告：${item.title}`,
-      at: MOCK_NOW,
+      at: mockNow(),
       read: false,
       link: { type: 'announcement', id: item.id },
     })
@@ -268,7 +268,7 @@ function notifyChairs(item, title) {
       role: 'committee',
       title,
       body: item.title,
-      at: MOCK_NOW,
+      at: mockNow(),
       read: false,
       link: { type: 'announcement', id: item.id },
     })
@@ -283,7 +283,7 @@ function notifyChairs(item, title) {
 export async function updateAnnouncement(id, userId, changes) {
   await delay()
   const item = announcements.find((entry) => entry.id === id)
-  if (!item || item.status !== 'published' || item.endAt < MOCK_NOW) return undefined
+  if (!item || item.status !== 'published' || item.endAt < mockNow()) return undefined
   if (!canManage(item, userId)) return undefined
   // 先清掉表單的欄位，再放進新的（例如從多日改成單日，timeText 就要拿掉）
   for (const key of FORM_FIELDS) delete item[key]
@@ -306,8 +306,8 @@ export async function getUrgentLog() {
       at: item.publishedAt,
       authorLabel: userLabel(item.authorId),
     }))
-  const thisYear = MOCK_NOW.slice(0, 4) // '2026'
-  const thisMonth = MOCK_NOW.slice(0, 7) // '2026-10'
+  const thisYear = mockNow().slice(0, 4) // '2026'
+  const thisMonth = mockNow().slice(0, 7) // '2026-10'
   return {
     items,
     yearCount: items.filter((item) => item.at.startsWith(thisYear)).length,

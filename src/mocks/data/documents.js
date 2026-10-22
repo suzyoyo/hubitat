@@ -38,7 +38,7 @@ export const legalDocuments = [
     type: 'fire',
     name: '消防安檢申報證明',
     result: '合格申報',
-    expiresAt: '2027-03-31',
+    expiresAt: '2027-04-27',
     isPublic: true,
     file: '消防安檢申報_2026.pdf',
   },
@@ -47,7 +47,7 @@ export const legalDocuments = [
     type: 'elevator',
     name: '電梯使用許可證',
     result: '安檢合格',
-    expiresAt: '2026-12-31',
+    expiresAt: '2027-01-27',
     isPublic: true,
     file: '電梯使用許可證_2026.pdf',
   },
@@ -56,7 +56,7 @@ export const legalDocuments = [
     type: 'building',
     name: '建築物公共安全自主檢查合格證明',
     result: '主管機關核備',
-    expiresAt: '2027-06-30',
+    expiresAt: '2027-07-27',
     isPublic: true,
     file: '公安檢查合格證明.pdf',
   },
@@ -64,7 +64,7 @@ export const legalDocuments = [
     id: 'ld-004',
     type: 'insurance',
     name: '公共意外責任險保單',
-    expiresAt: '2026-11-15',
+    expiresAt: '2026-12-12',
     isPublic: false,
     file: '公共意外責任險_2025.pdf',
   },
@@ -73,7 +73,7 @@ export const legalDocuments = [
     type: 'water',
     name: '飲用水水質檢驗報告',
     result: '檢驗合格',
-    expiresAt: '2027-01-14',
+    expiresAt: '2027-02-10',
     isPublic: true,
     file: '水質檢驗_202607.pdf',
   },
@@ -81,10 +81,10 @@ export const legalDocuments = [
     id: 'ld-006',
     type: 'elevator',
     name: '電梯年度安全檢查報告',
-    expiresAt: '2027-10-05',
+    expiresAt: '2027-11-01',
     isPublic: false,
     file: null,
-    dueAt: '2026-10-05',
+    dueAt: '2026-11-01',
   },
 ]
 
@@ -101,14 +101,14 @@ export const PUBLIC_DOCUMENT_CATEGORIES = {
 }
 
 export const publicDocuments = [
-  { id: 'pd-001', category: 'finance', title: '2026 年第 3 季公共基金收支彙總', tag: '季度報表', publishedAt: '2026-09-30', file: '2026Q3_收支彙總.pdf' },
-  { id: 'pd-002', category: 'finance', title: '2026 年第 2 季公共基金收支彙總', tag: '季度報表', publishedAt: '2026-06-30', file: '2026Q2_收支彙總.pdf' },
-  { id: 'pd-003', category: 'finance', title: '2025 年度公共基金決算與審計報告', tag: '年度財報', publishedAt: '2026-02-20', file: '2025_決算報告.pdf' },
-  { id: 'pd-004', category: 'finance', title: '2026 年第 1 季公共基金收支彙總', tag: '季度報表', publishedAt: '2026-03-31', file: '2026Q1_收支彙總.pdf' },
-  { id: 'pd-005', category: 'finance', title: '2025 年第 4 季公共基金收支彙總', tag: '季度報表', publishedAt: '2025-12-31', file: '2025Q4_收支彙總.pdf' },
-  { id: 'pd-006', category: 'notice', title: '2026 年第 4 次管委會例會通知', tag: '定期會議', publishedAt: '2026-10-01', file: '第4次例會通知.pdf' },
-  { id: 'pd-007', category: 'notice', title: '2026 年外牆修繕專案說明會', tag: '專案會議', publishedAt: '2026-08-10', file: '外牆修繕說明會.pdf' },
-  { id: 'pd-008', category: 'notice', title: '住戶大會會議通知', tag: '全員大會', publishedAt: '2026-03-25', file: '住戶大會通知.pdf' },
+  { id: 'pd-001', category: 'finance', title: '2026 年第 3 季公共基金收支彙總', tag: '季度報表', publishedAt: '2026-10-27', file: '2026Q3_收支彙總.pdf' },
+  { id: 'pd-002', category: 'finance', title: '2026 年第 2 季公共基金收支彙總', tag: '季度報表', publishedAt: '2026-07-27', file: '2026Q2_收支彙總.pdf' },
+  { id: 'pd-003', category: 'finance', title: '2025 年度公共基金決算與審計報告', tag: '年度財報', publishedAt: '2026-03-19', file: '2025_決算報告.pdf' },
+  { id: 'pd-004', category: 'finance', title: '2026 年第 1 季公共基金收支彙總', tag: '季度報表', publishedAt: '2026-04-27', file: '2026Q1_收支彙總.pdf' },
+  { id: 'pd-005', category: 'finance', title: '2025 年第 4 季公共基金收支彙總', tag: '季度報表', publishedAt: '2026-01-27', file: '2025Q4_收支彙總.pdf' },
+  { id: 'pd-006', category: 'notice', title: '2026 年第 4 次管委會例會通知', tag: '定期會議', publishedAt: '2026-10-28', file: '第4次例會通知.pdf' },
+  { id: 'pd-007', category: 'notice', title: '2026 年外牆修繕專案說明會', tag: '專案會議', publishedAt: '2026-09-06', file: '外牆修繕說明會.pdf' },
+  { id: 'pd-008', category: 'notice', title: '住戶大會會議通知', tag: '全員大會', publishedAt: '2026-04-21', file: '住戶大會通知.pdf' },
 ]
 
 // ── 社區規約 ──────────────────────────────────────────────
@@ -119,7 +119,7 @@ export const bylaws = [
   {
     id: 'bl-v3',
     version: 3,
-    revisedAt: '2026-06-15',
+    revisedAt: '2026-07-12',
     action: '修訂',
     isCurrent: true,
     summary: '新增寵物管理與裝潢施工時段規定（第 15～17 條）',
@@ -170,7 +170,7 @@ export const bylaws = [
   {
     id: 'bl-v2',
     version: 2,
-    revisedAt: '2022-03-20',
+    revisedAt: '2022-04-16',
     action: '修訂',
     isCurrent: false,
     summary: '調整管理費計算方式與停車位抽籤規則',
@@ -179,7 +179,7 @@ export const bylaws = [
   {
     id: 'bl-v1',
     version: 1,
-    revisedAt: '2018-09-01',
+    revisedAt: '2018-09-28',
     action: '制定',
     isCurrent: false,
     summary: '社區成立時訂定之初版規約',
