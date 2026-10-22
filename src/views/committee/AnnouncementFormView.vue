@@ -160,7 +160,7 @@ const titlePlaceholder = computed(
     ({
       construction: '例如：B 棟頂樓防水施工',
       maintenance: '例如：A 棟電梯定期保養',
-      activity: '例如：中秋社區烤肉聯誼',
+      activity: '例如：秋季社區烤肉聯誼',
     })[form.type] ?? '例如：社區年度消毒與除蟲',
 )
 

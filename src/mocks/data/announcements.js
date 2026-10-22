@@ -127,7 +127,7 @@ export const announcements = [
   {
     id: 'an-005',
     type: 'activity',
-    title: '重陽敬老茶會',
+    title: '秋日敬老茶會',
     content: '邀請社區長輩與家人一起喝茶聊天，現場備有茶點與小禮物。',
     startAt: '2026-11-14T14:00',
     endAt: '2026-11-14T16:00',
@@ -145,7 +145,7 @@ export const announcements = [
   {
     id: 'an-006',
     type: 'activity',
-    title: '中秋社區烤肉聯誼',
+    title: '秋季社區烤肉聯誼',
     content: '歡迎住戶攜家帶眷參加，現場備有烤肉食材與飲品。',
     startAt: '2026-10-31T18:00',
     endAt: '2026-10-31T21:00',

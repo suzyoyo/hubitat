@@ -92,7 +92,7 @@ export const notifications = [
     id: 'n-008',
     userId: 'u-r01',
     role: 'resident',
-    title: '新公告：中秋社區烤肉聯誼',
+    title: '新公告：秋季社區烤肉聯誼',
     body: '10/31 18:00–21:00，A 棟中庭',
     at: '2026-10-27T21:00',
     read: true,

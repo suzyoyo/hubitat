@@ -114,8 +114,8 @@ export const tasks = [
   },
   {
     id: 'TASK-085',
-    title: '張貼中秋活動海報',
-    content: '請於各棟大廳與電梯內張貼中秋活動海報。',
+    title: '張貼烤肉聯誼海報',
+    content: '請於各棟大廳與電梯內張貼烤肉聯誼海報。',
     assignerId: 'u-c02',
     assigneeId: 'u-s02',
     createdAt: '2026-10-09T10:00',
