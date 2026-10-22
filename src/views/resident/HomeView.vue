@@ -65,12 +65,13 @@ const latestMeeting = computed(() => meetings.value[0])
 
 // 第一次進首頁的導覽：target 對到畫面上的 data-tour（鈴鐺在 AppHeader、分頁 tab-○○ 和「通報」在 BottomNav）
 const TOUR_STEPS = [
-  { target: 'bell', text: '有新通知時，鈴鐺上會有紅點。' },
-  { target: 'new-report', text: '社區有問題時，按這兩個按鈕都可以通報。', place: 'below' },
-  { target: 'notices', text: '社區的公告和活動會列在這裡，點選右上角可以查看全部。', merge: true },
-  { target: 'tab-home', text: '首頁：看你通報的處理進度，和社區最新的公告。' },
-  { target: 'tab-files', text: '社區：查看管委會報告、社區規約、公開文件，還有設備的維修紀錄。' },
-  { target: 'tab-me', text: '我的：查看你的留言，調整字體大小和通知設定。' },
+  // 口氣像好彼管家在旁邊說話：親切、句尾加「喔！」，講清楚點了能做什麼、看到什麼（2026-10-22 013）
+  { target: 'bell', text: '有新通知時，鈴鐺上會出現小紅點，點一下就能看喔！' },
+  { target: 'new-report', text: '社區有東西壞了嗎？按這兩個按鈕都可以通報喔！', place: 'below' },
+  { target: 'notices', text: '社區的公告和活動都在這裡，點「看全部」可以看到更多喔！', merge: true },
+  { target: 'tab-home', text: '點「首頁」，隨時回來看通報的處理進度和最新公告喔！' },
+  { target: 'tab-files', text: '點「社區」，可以看到管委會報告、社區規約，還有設備的維修紀錄喔！' },
+  { target: 'tab-me', text: '點「我的」，可以看你的留言，還能把字調大、設定通知喔！' },
 ]
 
 // 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
