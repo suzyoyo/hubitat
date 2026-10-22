@@ -9,7 +9,7 @@ export const community = {
   phone: '02-2345-6789',
   status: '正常營運',
   updatedBy: 'u-c04', // 最後修改的人（對應 users.js 的 id）
-  updatedAt: '2026-09-01',
+  updatedAt: '2026-09-28',
 }
 
 // 地點清單：分成兩層，「範圍」底下有多個「地點」

@@ -1,7 +1,7 @@
 // 通知相關的假 API
 import { diffDays, formatRelativeTime } from '@/lib/date'
 import { notifications } from '../data/notifications'
-import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
+import { mockNow, MOCK_TODAY, delay } from './helpers'
 
 // 取得某個人、某個身分的通知，新的在前
 // unreadOnly 傳 true 只回傳未讀的
@@ -20,7 +20,7 @@ export async function getNotifications(userId, role, unreadOnly = false) {
       let group = 'earlier'
       if (daysAgo === 0) group = 'today'
       if (daysAgo === 1) group = 'yesterday'
-      return { ...item, group, timeText: formatRelativeTime(item.at, MOCK_NOW) }
+      return { ...item, group, timeText: formatRelativeTime(item.at, mockNow()) }
     })
 }
 

@@ -3,10 +3,20 @@ import { ref, watch } from 'vue'
 
 // 假裝「今天」是這一天，這樣不管哪天打開，畫面內容都固定
 // 合約「7 天後到期」、設備「保養逾期 11 天」這些文字，都是用這個日期算出來的
-export const MOCK_TODAY = '2026-10-01'
+// 2026-10-22 從 10/01 改成 10/28（展示那天），假資料的日期也整批往後移了 27 天
+export const MOCK_TODAY = '2026-10-28'
 
-// 假裝「現在」的時間，用來算「2 小時前」「今天 18:00 前」這類文字
-export const MOCK_NOW = '2026-10-01T13:42'
+// 「現在」：日期用 MOCK_TODAY，時、分用電腦真的時間（2026-10-22）
+// 這樣操作時記下的時間跟著真的時間走，例如 15:32 結案就記 2026-10-28T15:32
+// 每次都要重新算，所以是函式：mockNow() → '2026-10-28T15:32'
+// 最早是 13:42：假資料裡「今天」最晚的紀錄是 13:40，太早的話新的紀錄會排到舊的下面
+export function mockNow() {
+  const now = new Date()
+  const hh = String(now.getHours()).padStart(2, '0')
+  const mm = String(now.getMinutes()).padStart(2, '0')
+  const time = `${hh}:${mm}`
+  return `${MOCK_TODAY}T${time < '13:42' ? '13:42' : time}`
+}
 
 // 展示錯誤畫面用的開關（在 /playground 的「狀態畫面」切換）
 // 打開後，所有假 API 都會失敗，就像網路斷掉或伺服器壞掉

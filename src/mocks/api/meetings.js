@@ -11,7 +11,7 @@ import {
   meetings,
   nextMeeting,
 } from '../data/meetings'
-import { MOCK_NOW, delay } from './helpers'
+import { mockNow, delay } from './helpers'
 import { findUser, userLabel } from './users'
 
 // 決議結果的顯示文字
@@ -172,7 +172,7 @@ export async function createMeetingComment(meetingId, userId, text) {
   const comment = {
     id: `cm-${String(maxNumber + 1).padStart(3, '0')}`,
     userId,
-    at: MOCK_NOW,
+    at: mockNow(),
     text: content,
   }
   meeting.comments.push(comment)

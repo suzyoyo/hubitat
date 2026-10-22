@@ -15,7 +15,7 @@ import { TO_CLOSE_TITLE, canCloseCases, caseDeadlineOf, caseHint } from './cases
 import { draftsOf } from './drafts'
 import { contractStatus } from './contracts'
 import { legalDocumentStatus } from './documents'
-import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
+import { mockNow, MOCK_TODAY, delay } from './helpers'
 import { proposalStatus } from './proposals'
 import { NEW_TASK_TITLE } from './tasks'
 import { findUser, userLabel } from './users'

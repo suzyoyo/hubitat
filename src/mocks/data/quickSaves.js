@@ -15,10 +15,10 @@ export const quickSaves = [
   {
     id: 'qs-001',
     ownerId: 'u-s02',
-    name: '電梯保養單 09/30',
+    name: '電梯保養單 10/27',
     note: '大同電梯來做 C 棟複檢時留下的保養單，還沒登記到設備紀錄。',
     photos: ['保養單.jpg'],
-    savedAt: '2026-09-30T15:10',
+    savedAt: '2026-10-27T15:10',
     resolved: false,
   },
   {
@@ -27,9 +27,9 @@ export const quickSaves = [
     name: '信箱更換收據',
     note: '金城五金更換 C 棟信箱門片的收據。',
     photos: ['收據.jpg'],
-    savedAt: '2026-09-20T15:40',
+    savedAt: '2026-10-17T15:40',
     resolved: true,
-    linked: { type: 'case', id: 'CASE-20260915-001' },
+    linked: { type: 'case', id: 'CASE-20261012-001' },
   },
   {
     id: 'qs-003',
@@ -37,7 +37,7 @@ export const quickSaves = [
     name: '中庭植栽報價單',
     note: '綠意園藝現場給的手寫報價，提案時要用。',
     photos: ['報價單_1.jpg', '報價單_2.jpg'],
-    savedAt: '2026-09-29T17:25',
+    savedAt: '2026-10-26T17:25',
     resolved: false,
   },
   {
@@ -46,7 +46,7 @@ export const quickSaves = [
     name: '',
     note: '揚水馬達拆回檢修前的現場照片。',
     photos: ['馬達現況.jpg'],
-    savedAt: '2026-09-29T10:05',
+    savedAt: '2026-10-26T10:05',
     resolved: true,
     linked: { type: 'equipment', id: 'e-006' },
   },

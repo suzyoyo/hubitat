@@ -61,7 +61,7 @@ export const EXECUTION_STATUSES = {
 
 // 下一次定期會議（住戶端「管委會報告」最上面顯示）
 export const nextMeeting = {
-  heldAt: '2026-10-18T19:30',
+  heldAt: '2026-11-14T19:30',
   place: '一樓社區管委會會議室',
 }
 
@@ -70,11 +70,11 @@ export const meetings = [
     id: 'm-2026-t2',
     type: 'special',
     title: '2026 年第 2 次臨時會議',
-    heldAt: '2026-09-28T19:30',
+    heldAt: '2026-10-25T19:30',
     place: '社區 B1 多功能會議室',
     attendance: { total: 5, present: 4, proxy: 0, guests: ['u-s01'] },
     status: 'organizing',
-    uploadedAt: '2026-09-29',
+    uploadedAt: '2026-10-26',
     files: { minutes: { name: '臨時會議紀錄_0928.pdf', sizeMB: 1.1 }, signIn: [] },
     resolutions: [],
     comments: [],
@@ -83,12 +83,12 @@ export const meetings = [
     id: 'm-2026-03',
     type: 'regular',
     title: '2026 年第 3 次管委會',
-    heldAt: '2026-09-20T19:30',
+    heldAt: '2026-10-17T19:30',
     place: '社區 B1 多功能會議室',
     attendance: { total: 5, present: 4, proxy: 1, guests: ['u-s01'] },
     status: 'published',
-    uploadedAt: '2026-09-21',
-    publishedAt: '2026-09-25T20:00',
+    uploadedAt: '2026-10-18',
+    publishedAt: '2026-10-22T20:00',
     files: {
       minutes: { name: '會議紀錄原始檔.pdf', sizeMB: 2.4 },
       signIn: ['簽名簿.pdf', '委託書.pdf'],
@@ -161,10 +161,10 @@ export const meetings = [
       {
         id: 'cm-001',
         userId: 'u-c04',
-        at: '2026-09-30T14:20',
+        at: '2026-10-27T14:20',
         text: '想請問電梯保養廠商續約後，保養頻率會不會調整？',
         reply: {
-          at: '2026-10-01T13:32',
+          at: '2026-10-28T13:32',
           byId: 'u-c02',
           text: '續約後維持每月 1 次保養，下次例會會公告保養排程。',
         },
@@ -172,7 +172,7 @@ export const meetings = [
       {
         id: 'cm-002',
         userId: 'u-r03',
-        at: '2026-10-01T13:40',
+        at: '2026-10-28T13:40',
         text: '想請問地下室防水工程大概什麼時候會動工？B2 車道下雨天都會積水。',
       },
     ],
@@ -181,11 +181,11 @@ export const meetings = [
     id: 'm-2026-t1',
     type: 'special',
     title: '2026 年第 1 次臨時會議',
-    heldAt: '2026-08-15T20:00',
+    heldAt: '2026-09-11T20:00',
     place: '社區 B1 多功能會議室',
     attendance: { total: 5, present: 5, proxy: 0, guests: ['u-s01'] },
     status: 'pending',
-    uploadedAt: '2026-08-17',
+    uploadedAt: '2026-09-13',
     files: { minutes: { name: '臨時會議紀錄_0815.pdf', sizeMB: 1.3 }, signIn: ['簽名簿.pdf'] },
     resolutions: [
       {
@@ -216,12 +216,12 @@ export const meetings = [
     id: 'm-2026-02',
     type: 'regular',
     title: '2026 年第 2 次管委會',
-    heldAt: '2026-07-15T19:30',
+    heldAt: '2026-08-11T19:30',
     place: '社區 B1 多功能會議室',
     attendance: { total: 5, present: 5, proxy: 0, guests: ['u-s01'] },
     status: 'published',
-    uploadedAt: '2026-07-16',
-    publishedAt: '2026-07-20T18:00',
+    uploadedAt: '2026-08-12',
+    publishedAt: '2026-08-16T18:00',
     files: { minutes: { name: '第2次管委會紀錄.pdf', sizeMB: 1.8 }, signIn: ['簽名簿.pdf'] },
     resolutions: [
       {
@@ -257,12 +257,12 @@ export const meetings = [
     id: 'm-2026-g1',
     type: 'general',
     title: '2026 年區分所有權人會議',
-    heldAt: '2026-04-10T14:00',
+    heldAt: '2026-05-07T14:00',
     place: '1F 中庭花園',
     attendance: { total: 120, present: 68, proxy: 14, guests: ['u-s01'] },
     status: 'published',
-    uploadedAt: '2026-04-12',
-    publishedAt: '2026-04-18T18:00',
+    uploadedAt: '2026-05-09',
+    publishedAt: '2026-05-15T18:00',
     files: { minutes: { name: '區權會紀錄_2026.pdf', sizeMB: 3.6 }, signIn: ['簽名簿.pdf', '委託書彙整.pdf'] },
     resolutions: [
       {
@@ -303,7 +303,7 @@ export const meetings = [
       {
         id: 'cm-003',
         userId: 'u-r04', // 別的住戶問的。不用李先生：他是主委，自己的問題不該出現在自己的待回覆清單
-        at: '2026-09-29T21:05',
+        at: '2026-10-26T21:05',
         text: '停車位抽籤規則的修正，什麼時候會公告？',
       },
     ],
@@ -312,18 +312,18 @@ export const meetings = [
     id: 'm-2026-01',
     type: 'regular',
     title: '2026 年第 1 次管委會',
-    heldAt: '2026-03-14T19:30',
+    heldAt: '2026-04-10T19:30',
     place: '社區 B1 多功能會議室',
     attendance: { total: 5, present: 5, proxy: 0, guests: [] },
     status: 'published',
-    uploadedAt: '2026-03-15',
-    publishedAt: '2026-03-20T18:00',
+    uploadedAt: '2026-04-11',
+    publishedAt: '2026-04-16T18:00',
     files: { minutes: { name: '第1次管委會紀錄.pdf', sizeMB: 1.5 }, signIn: ['簽名簿.pdf'] },
     resolutions: [
       {
         id: 'res-2026-01-1',
         title: '區分所有權人會議議程確認',
-        note: '排定 4/10 召開',
+        note: '排定 5/7 召開',
         result: 'passed',
         votes: { yes: 5, no: 0 },
         ownerId: 'u-c01',
@@ -340,12 +340,12 @@ export const meetings = [
     id: 'm-2025-06',
     type: 'regular',
     title: '2025 年第 6 次管委會',
-    heldAt: '2025-12-10T19:30',
+    heldAt: '2026-01-06T19:30',
     place: '社區 B1 多功能會議室',
     attendance: { total: 5, present: 4, proxy: 1, guests: ['u-s01'] },
     status: 'published',
-    uploadedAt: '2025-12-11',
-    publishedAt: '2025-12-15T18:00',
+    uploadedAt: '2026-01-07',
+    publishedAt: '2026-01-11T18:00',
     files: { minutes: { name: '2025第6次管委會紀錄.pdf', sizeMB: 2.0 }, signIn: ['簽名簿.pdf'] },
     resolutions: [
       {
@@ -369,7 +369,7 @@ export const meetings = [
       {
         id: 'res-2025-06-3',
         title: '年終社區大掃除日期',
-        note: '訂於 12/27 上午',
+        note: '訂於 1/23 上午',
         result: 'passed',
         votes: { yes: 5, no: 0 },
         ownerId: 'u-s01',
@@ -387,9 +387,9 @@ export const meetings = [
       {
         id: 'cm-004',
         userId: 'u-c04',
-        at: '2025-12-11T09:30',
+        at: '2026-01-07T09:30',
         text: '請問 B2 防水工程完工後，保固期是多久？',
-        reply: { at: '2025-12-12T19:40', byId: 'u-c02', text: '保固 2 年，保固書已歸檔在社區檔案。' },
+        reply: { at: '2026-01-08T19:40', byId: 'u-c02', text: '保固 2 年，保固書已歸檔在社區檔案。' },
       },
     ],
   },
@@ -397,12 +397,12 @@ export const meetings = [
     id: 'm-2025-05',
     type: 'regular',
     title: '2025 年第 5 次管委會',
-    heldAt: '2025-10-18T19:30',
+    heldAt: '2025-11-14T19:30',
     place: '社區 B1 多功能會議室',
     attendance: { total: 5, present: 5, proxy: 0, guests: ['u-s01'] },
     status: 'published',
-    uploadedAt: '2025-10-19',
-    publishedAt: '2025-10-24T18:00',
+    uploadedAt: '2025-11-15',
+    publishedAt: '2025-11-20T18:00',
     files: { minutes: { name: '2025第5次管委會紀錄.pdf', sizeMB: 1.7 }, signIn: ['簽名簿.pdf'] },
     resolutions: [
       {

@@ -3,13 +3,13 @@ import { diffDays, formatFullDate, formatTime } from '@/lib/date'
 import { cases } from '../data/cases'
 import { notifications } from '../data/notifications'
 import { tasks } from '../data/tasks'
-import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
+import { mockNow, MOCK_TODAY, delay } from './helpers'
 import { findUser, userLabel } from './users'
 
 // 算出畫面上要顯示的狀態
 // 還在進行中、而且已經超過期限的，顯示為「已逾期」；沒有期限的不會逾期（期限選填，2026-10-15）
 export function taskDisplayStatus(task) {
-  if (task.status === 'in_progress' && task.deadline && task.deadline < MOCK_NOW) return 'overdue'
+  if (task.status === 'in_progress' && task.deadline && task.deadline < mockNow()) return 'overdue'
   return task.status
 }
 
@@ -82,7 +82,7 @@ function notifyAssignee(task, title, reason) {
     role: assignee.staffTitle ? 'staff' : 'committee',
     title,
     body: `${task.title}：${reason}`,
-    at: MOCK_NOW,
+    at: mockNow(),
     read: false,
     link: { type: 'task', id: task.id },
   })
@@ -97,7 +97,7 @@ function notifyAssigner(task, title, reason) {
     role: 'committee',
     title,
     body: `${task.title}：${reason}`,
-    at: MOCK_NOW,
+    at: mockNow(),
     read: false,
     link: { type: 'task', id: task.id },
   })
@@ -121,7 +121,7 @@ export async function confirmTask(id, userId) {
   const task = findMyTask(id, userId, ['reported'])
   if (!task) return false
   task.status = 'done'
-  task.doneAt = MOCK_NOW
+  task.doneAt = mockNow()
   return true
 }
 
@@ -133,9 +133,9 @@ export async function returnTask(id, userId, reason, newDeadline = '') {
   await delay()
   const task = findMyTask(id, userId, ['reported'])
   if (!task || !reason) return false
-  if (newDeadline && newDeadline <= MOCK_NOW) return false
+  if (newDeadline && newDeadline <= mockNow()) return false
   task.status = 'in_progress'
-  task.returnNote = { at: MOCK_NOW, note: reason }
+  task.returnNote = { at: mockNow(), note: reason }
   let message = reason
   if (newDeadline) {
     task.deadline = newDeadline
@@ -152,7 +152,7 @@ export async function withdrawTask(id, userId, reason) {
   const task = findMyTask(id, userId, ['in_progress'])
   if (!task || !reason) return false
   task.status = 'withdrawn'
-  task.withdrawReason = { at: MOCK_NOW, note: reason }
+  task.withdrawReason = { at: mockNow(), note: reason }
   notifyAssignee(task, '交辦已撤回', reason)
   return true
 }
@@ -176,7 +176,7 @@ export function canAssignTasks(userId) {
 export async function createTask(userId, input) {
   await delay()
   if (!canAssignTasks(userId) || !input.title?.trim() || !findUser(input.assigneeId)) return undefined
-  if (input.deadline && input.deadline <= MOCK_NOW) return undefined
+  if (input.deadline && input.deadline <= mockNow()) return undefined
   const relatedCase = input.caseId ? cases.find((item) => item.id === input.caseId) : undefined
   if (input.caseId) {
     if (!relatedCase || relatedCase.status === 'closed') return undefined
@@ -193,14 +193,14 @@ export async function createTask(userId, input) {
     content: input.content ?? '',
     assignerId: userId,
     assigneeId: input.assigneeId,
-    createdAt: MOCK_NOW,
+    createdAt: mockNow(),
     deadline: input.deadline || '', // 沒有期限是空字串
     status: 'in_progress',
   }
   if (relatedCase) {
     task.caseId = relatedCase.id
     relatedCase.logs.push({
-      at: MOCK_NOW,
+      at: mockNow(),
       actorId: userId,
       label: '交辦',
       text: `${userLabel(userId)}交辦給${userLabel(input.assigneeId)}（${task.id}）`,
@@ -223,7 +223,7 @@ export async function reportTask(id, userId, { note = '', files = [] } = {}) {
   const task = tasks.find((item) => item.id === id && item.assigneeId === userId && item.status === 'in_progress')
   if (!task) return false
   task.status = 'reported'
-  task.report = { at: MOCK_NOW, note, files: [...files] }
+  task.report = { at: mockNow(), note, files: [...files] }
   delete task.returnNote
   notifyAssigner(task, '交辦已回報完成', `${userLabel(userId)}已回報完成，請確認`)
   return true

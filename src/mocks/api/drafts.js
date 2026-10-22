@@ -3,7 +3,7 @@
 // 一個人在同一個表單（同一個網址）只留一份，再存一次會蓋掉舊的
 // 回到同一個表單時用 takeDraft 拿回來（拿了就刪掉；沒送出又要離開時可以再存一次）
 // 管委會、管理人員的「我的待辦」會多一張草稿（種類「草稿」、徽章「未送出」，todos.js 用 draftsOf）
-import { MOCK_NOW, delay } from './helpers'
+import { mockNow, delay } from './helpers'
 import { keepInSession } from './persist'
 
 const drafts = [] // { userId, role, path, title, data, savedAt }
@@ -18,7 +18,7 @@ export async function saveDraft(userId, role, path, title, data) {
   const index = drafts.findIndex((item) => item.userId === userId && item.path === path)
   if (index !== -1) drafts.splice(index, 1)
   // JSON 轉一次：存一份複本，之後畫面再改表單也不會改到草稿
-  drafts.push({ userId, role, path, title, data: JSON.parse(JSON.stringify(data)), savedAt: MOCK_NOW })
+  drafts.push({ userId, role, path, title, data: JSON.parse(JSON.stringify(data)), savedAt: mockNow() })
 }
 
 // 拿回草稿的內容並刪掉；沒有就回傳 null

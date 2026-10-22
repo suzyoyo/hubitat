@@ -11,7 +11,7 @@ import { tasks } from '../data/tasks'
 import { users } from '../data/users'
 import { vendors } from '../data/vendors'
 import { areaName } from './community'
-import { MOCK_NOW, MOCK_TODAY, delay } from './helpers'
+import { mockNow, MOCK_TODAY, delay } from './helpers'
 import { findUser, userLabel } from './users'
 
 // 是否未結案
@@ -92,7 +92,7 @@ function handlerIdOf(item) {
 // 待結案、已結案的寫法只有案件卡用，在 caseCardHint
 export function caseHint(item) {
   if (item.status === 'pending') {
-    const when = formatRelativeTime(item.reportedAt, MOCK_NOW) // 「2 小時前」「昨天 09:00」「9/25」
+    const when = formatRelativeTime(item.reportedAt, mockNow()) // 「2 小時前」「昨天 09:00」「9/25」
     // 「2 小時前」「剛剛」後面直接接「通報」；日期、時間後面空一格比較好讀
     const gap = when.endsWith('前') || when === '剛剛' ? '' : ' '
     return `${reporterLabel(item)}・${when}${gap}通報`
@@ -282,7 +282,7 @@ function findHandleableCase(id, userId, statuses) {
 
 // 在案件上加一筆處理紀錄；residentText 沒傳就不給住戶看
 function addLog(item, userId, label, text, residentText = '') {
-  const log = { at: MOCK_NOW, actorId: userId, label, text }
+  const log = { at: mockNow(), actorId: userId, label, text }
   if (residentText) log.residentText = residentText
   item.logs.push(log)
 }
@@ -317,7 +317,7 @@ export async function acceptCase(id, userId, options = {}) {
 // 廠商已經來過（第一次到場的時間已經過了）就不改：例如 10/3 來過、改約 10/5，10/4 還是維修中
 // 還沒來過就跟著新的預約改（換廠商、改期都算）；沒有預約時間就拿掉
 function setFirstVisit(item, scheduledAt) {
-  if (item.firstVisitAt && item.firstVisitAt <= MOCK_NOW) return
+  if (item.firstVisitAt && item.firstVisitAt <= mockNow()) return
   if (scheduledAt) item.firstVisitAt = scheduledAt
   else delete item.firstVisitAt
 }
@@ -479,12 +479,12 @@ export async function updateCase(id, userId, { category = '', equipmentId = '', 
 //   cost 維修費用，只有委員填得了；note 結案說明，寫在「已結案」那筆紀錄裡（管理端看得到，住戶看不到）
 function closeItem(item, userId, cost, note = '') {
   item.status = 'closed'
-  item.closedAt = MOCK_NOW
+  item.closedAt = mockNow()
   // 連到這件案件、等確認的交辦，一起確認完成
   for (const task of tasks) {
     if (task.caseId === item.id && task.status === 'reported') {
       task.status = 'done'
-      task.doneAt = MOCK_NOW
+      task.doneAt = mockNow()
     }
   }
   // 有關聯設備：設備變回正常，維修紀錄多一筆（費用只有委員填得了，管理人員看不到費用）
@@ -535,7 +535,7 @@ function notifyResidents(item, type) {
       role: 'resident',
       title: notice.title,
       body: `${lead}「${item.title}」${notice.body}`,
-      at: MOCK_NOW,
+      at: mockNow(),
       read: false,
       link: { type: 'case', id: item.id },
     })
@@ -553,7 +553,7 @@ export async function completeCase(id, userId, { note = '', photos = [], cost })
   await delay()
   const item = findHandleableCase(id, userId, ['accepted', 'in_progress'])
   if (!item) return undefined
-  item.completion = { at: MOCK_NOW, note, photos: [...photos] }
+  item.completion = { at: mockNow(), note, photos: [...photos] }
   addLog(item, userId, '完工驗收', note || '已完工驗收')
   // 主委、副主委自己處理、自己按的：他本身就是審核的人，直接結案
   if (canCloseCases(userId)) {
@@ -566,7 +566,7 @@ export async function completeCase(id, userId, { note = '', photos = [], cost })
   const task = tasks.find((entry) => entry.caseId === id && entry.assigneeId === userId && entry.status === 'in_progress')
   if (task) {
     task.status = 'reported'
-    task.report = { at: MOCK_NOW, note: note || '已完工驗收', files: [...photos] }
+    task.report = { at: mockNow(), note: note || '已完工驗收', files: [...photos] }
     delete task.returnNote
   }
   notifyToClose(item, userId)
@@ -586,7 +586,7 @@ function notifyToClose(item, userId) {
       role: 'committee',
       title: TO_CLOSE_TITLE,
       body: `${item.title}：${userLabel(userId)}已完工驗收，請結案`,
-      at: MOCK_NOW,
+      at: mockNow(),
       read: false,
       link: { type: 'case', id: item.id },
     })
@@ -632,7 +632,7 @@ export async function returnCase(id, userId, reason) {
   const task = tasks.find((entry) => entry.caseId === id && entry.status === 'reported')
   if (task) {
     task.status = 'in_progress'
-    task.returnNote = { at: MOCK_NOW, note }
+    task.returnNote = { at: mockNow(), note }
   }
   // 通知要再處理的人：有交辦就是交辦對象，沒有就是按完工驗收的人
   const targetId = task ? task.assigneeId : item.logs.findLast((log) => log.label === '完工驗收')?.actorId
@@ -644,7 +644,7 @@ export async function returnCase(id, userId, reason) {
       role: target.roles.includes('staff') ? 'staff' : 'committee',
       title: task ? '交辦被退回' : '案件被退回',
       body: `${item.title}：${note}`,
-      at: MOCK_NOW,
+      at: mockNow(),
       read: false,
       link: task ? { type: 'task', id: task.id } : { type: 'case', id: item.id },
     })
@@ -773,14 +773,14 @@ export async function createReport(userId, input) {
     source: 'resident',
     isPrivate: input.isPrivate,
     reporterId: userId,
-    reportedAt: MOCK_NOW,
+    reportedAt: mockNow(),
     description: input.description,
     photos: [...input.photos],
     status: 'pending',
     supporters: [],
     logs: [
       {
-        at: MOCK_NOW,
+        at: mockNow(),
         label: '住戶通報',
         text: `${reporterLabel({ reporterId: userId, source: 'resident' })}通報${input.photos.length ? `，附 ${input.photos.length} 個照片或影片` : ''}`,
         residentText: '已收到，好彼管家已通知管理人員。',
@@ -806,7 +806,7 @@ function notifyNewReport(item) {
       role,
       title: '新的住戶通報',
       body: `${areaName(item.areaId)}・${item.place}：${item.subject}`,
-      at: MOCK_NOW,
+      at: mockNow(),
       read: false,
       link: { type: 'case', id: item.id },
     })
@@ -833,14 +833,14 @@ export async function createRepair(userId, input, role = 'committee') {
     source: role,
     isPrivate: input.isPrivate,
     reporterId: userId,
-    reportedAt: MOCK_NOW,
+    reportedAt: mockNow(),
     description: input.description,
     photos: [...input.photos],
     status: 'pending',
     supporters: [],
     logs: [
       {
-        at: MOCK_NOW,
+        at: mockNow(),
         actorId: userId,
         label: CASE_SOURCES[role].label,
         text: input.unit ? `${who} 代 ${unitLabel(input.unit)} 登記通報` : `${who} 登記通報`,

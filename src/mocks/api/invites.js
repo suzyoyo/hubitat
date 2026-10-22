@@ -1,12 +1,12 @@
 // 管委會邀請相關的假 API（住戶端「加入管委會」流程用）
 import { INVITE_STATUSES, invites } from '../data/invites'
-import { MOCK_NOW, delay } from './helpers'
+import { mockNow, delay } from './helpers'
 import { describeUser, findUser } from './users'
 
 // 算出邀請碼現在的狀態：'valid' 可以用 / 'used' 用過了 / 'expired' 過期了
 function inviteStatus(invite) {
   if (invite.result) return 'used' // 已經有人接受或婉拒
-  if (invite.expiresAt < MOCK_NOW) return 'expired'
+  if (invite.expiresAt < mockNow()) return 'expired'
   return 'valid'
 }
 
@@ -39,7 +39,7 @@ function respond(code, userId, result) {
   if (!invite || inviteStatus(invite) !== 'valid') return undefined
   invite.result = result
   invite.respondedBy = userId
-  invite.respondedAt = MOCK_NOW
+  invite.respondedAt = mockNow()
   return present(invite)
 }
 

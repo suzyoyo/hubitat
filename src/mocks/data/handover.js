@@ -5,5 +5,5 @@
 export const handoverNote = {
   text: 'B2 防水工程的廠商保固要記得追蹤，保固單在紙本資料第 3 箱；中庭景觀燈定時器最近偶爾跳脫，可請配合的水電廠商林先生檢修。',
   updatedBy: 'u-c04', // 最後編輯的人（對應 users.js）
-  updatedAt: '2026-09-28T14:30',
+  updatedAt: '2026-10-25T14:30',
 }
