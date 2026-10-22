@@ -2,6 +2,7 @@
 // 住戶端首頁：問候列、我的通報、公告與動態
 import { computed, onMounted, ref } from 'vue'
 import AppGreeting from '@/components/app/AppGreeting.vue'
+import HomeTour from '@/components/app/HomeTour.vue'
 import NotificationReminder from '@/components/feedback/NotificationReminder.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import MeetingCard from '@/components/meeting/MeetingCard.vue'
@@ -62,6 +63,14 @@ const latestReport = computed(
 const homeNotices = computed(() => allNotices.value.filter((item) => item.relatedToMe).slice(0, 2))
 const latestMeeting = computed(() => meetings.value[0])
 
+// 第一次進首頁的導覽：target 對到畫面上的 data-tour（鈴鐺在 AppHeader、分頁和「通報」在 BottomNav）
+const TOUR_STEPS = [
+  { target: 'bell', text: '有新通知時，鈴鐺上會有紅點。' },
+  { target: 'new-report', text: '社區有問題時，按這兩個按鈕都可以通報。', place: 'below' },
+  { target: 'notices', text: '社區的公告和活動會列在這裡，點選右上角可以查看全部。', merge: true },
+  { target: 'tabs', text: '點下面的分頁，可以切換到首頁、社區、我的。' },
+]
+
 // 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
 const hello = greetingWord(MOCK_NOW)
 
@@ -96,22 +105,24 @@ const greeting = computed(() => {
         />
         <!-- as-child：讓 Button 的外觀套在裡面的 RouterLink 上，按下去就是換頁 -->
         <!-- 品牌輔色（紅 500，和右下角「通報」按鈕同色，2026-10-18 013）：只有這一顆，不另外做按鈕樣式 -->
-        <Button as-child class="w-full bg-warning text-white inset-shadow-[0_-1px_0_var(--warning-strong)] [a]:hover:bg-warning/80">
+        <Button as-child data-tour="new-report" class="w-full bg-warning text-white inset-shadow-[0_-1px_0_var(--warning-strong)] [a]:hover:bg-warning/80">
           <RouterLink to="/resident/reports/new">新增通報</RouterLink>
         </Button>
       </section>
 
       <section class="space-y-3">
-        <SectionHeader title="公告與動態" to="/resident/announcements" />
+        <SectionHeader title="公告與動態" to="/resident/announcements" data-tour="notices" />
         <template v-if="loading">
           <Skeleton class="h-[150px] rounded-xl" />
           <Skeleton class="h-[150px] rounded-xl" />
         </template>
         <template v-else>
+          <!-- 導覽只亮標題和第一張卡片 -->
           <NoticeHomeCard
-            v-for="notice in homeNotices"
+            v-for="(notice, i) in homeNotices"
             :key="notice.id"
             :notice="notice"
+            :data-tour="i === 0 ? 'notices' : undefined"
             @detail="openDetail"
           />
           <MeetingCard
@@ -125,5 +136,7 @@ const greeting = computed(() => {
 
     <!-- 公告詳情彈窗：平常看不到，detailOpen 變成 true 才會出現 -->
     <NoticeDetailDialog v-model:open="detailOpen" :notice="detailNotice" />
+
+    <HomeTour :steps="TOUR_STEPS" storage-key="hubitat-tour-resident" :ready="!loading" />
   </div>
 </template>
