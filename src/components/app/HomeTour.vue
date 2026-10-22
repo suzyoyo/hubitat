@@ -3,13 +3,28 @@
 //   亮哪裡：頁面上加 data-tour="名稱" 的元素，打開時才去量它們在畫面上的位置，所以大手機、小手機、大字都對得上
 //   看過或按「跳過使用說明」就記在瀏覽器裡（localStorage），之後不再出現
 //   想再看一次：網址後面加 ?tour，例如 /resident/home?tour
-//   說明文字沿用使用手冊「認識住戶首頁」（help/src/content/home-tour.js）
+//   說明框右上角站著好彼管家，每一步可以換不同動作（mascot）
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import happyUrl from '@/assets/mascot/happy.png' // 開心奔跑
+import pointingUrl from '@/assets/mascot/pointing.png' // 指向左上
+import searchingUrl from '@/assets/mascot/searching.png' // 拿放大鏡
+import thinkingUrl from '@/assets/mascot/thinking.png' // 思考
+import wavingUrl from '@/assets/mascot/waving.png' // 坐著揮手
 import { Button } from '@/components/ui/button'
 
+// 好彼管家的動作：圖片網址和原圖尺寸（寫 width / height 讓瀏覽器先算好比例）
+const MASCOTS = {
+  happy: { src: happyUrl, width: 214, height: 255 },
+  pointing: { src: pointingUrl, width: 233, height: 330 },
+  searching: { src: searchingUrl, width: 233, height: 229 },
+  thinking: { src: thinkingUrl, width: 233, height: 330 },
+  waving: { src: wavingUrl, width: 233, height: 330 },
+}
+
 const props = defineProps({
-  // 每一步：{ target: data-tour 的名稱, text: 說明（\n 是換行）,merge: 同名的好幾塊合成一個亮框, place: 'above' | 'below' 說明放上面或下面（不寫就自動） }
+  // 每一步：{ target: data-tour 的名稱, text: 說明（\n 是換行）, mascot: 好彼管家的動作（MASCOTS 的名稱，不寫就沒有）,
+  //          merge: 同名的好幾塊合成一個亮框, place: 'above' | 'below' 說明放上面或下面（不寫就自動） }
   steps: { type: Array, required: true },
   // 記在瀏覽器裡的名稱，三端分開記，例如 hubitat-tour-resident
   storageKey: { type: String, required: true },
@@ -19,6 +34,8 @@ const props = defineProps({
 
 const PAD = 6 // 亮框比元素大一圈
 const GAP = 12 // 說明框和亮框的距離
+const MASCOT_HEIGHT = 72 // 好彼管家的高度
+const MASCOT_RISE = 60 // 好彼管家冒出說明框上緣的高度（下面 12px 疊在說明框的留白上，不會蓋到字）
 
 const route = useRoute()
 const open = ref(false)
@@ -29,6 +46,9 @@ const nextButton = ref(null)
 const tipEl = ref(null)
 
 const step = computed(() => props.steps[index.value])
+const mascot = computed(() => MASCOTS[step.value.mascot])
+// 說明框上面要多留給好彼管家的高度（說明框放在亮框下面時，好彼管家站在兩者中間）
+const rise = computed(() => (mascot.value ? MASCOT_RISE : 0))
 const isLast = computed(() => index.value === props.steps.length - 1)
 
 // 看過了嗎（瀏覽器不讓用 localStorage 時當作沒看過）
@@ -94,7 +114,7 @@ function scrollIntoView() {
   const top = Math.min(...els.map((el) => el.getBoundingClientRect().top))
   let bottom = Math.max(...els.map((el) => el.getBoundingClientRect().bottom))
   // 指定說明框放下面的：連說明框的高度一起算，要捲到說明框也放得下（不蓋到底部導覽）
-  if (step.value.place === 'below') bottom += GAP + (tipEl.value?.offsetHeight ?? 190)
+  if (step.value.place === 'below') bottom += GAP + rise.value + (tipEl.value?.offsetHeight ?? 190)
   // 上面留給頂部列，下面留給底部導覽列
   if (top < 80 || bottom > window.innerHeight - 120) {
     window.scrollTo(0, window.scrollY + top - 100)
@@ -140,10 +160,10 @@ function measure() {
   let place = step.value.place ?? (anchor.y + anchor.h / 2 < window.innerHeight / 2 ? 'below' : 'above')
   // 放下面會超出畫面（矮的手機）就改放上面
   const tipHeight = tipEl.value?.offsetHeight ?? 140
-  if (place === 'below' && anchor.y + anchor.h + GAP + tipHeight > window.innerHeight - GAP) place = 'above'
+  if (place === 'below' && anchor.y + anchor.h + GAP + rise.value + tipHeight > window.innerHeight - GAP) place = 'above'
   tipStyle.value =
     place === 'below'
-      ? { top: `${anchor.y + anchor.h + GAP}px` }
+      ? { top: `${anchor.y + anchor.h + GAP + rise.value}px` }
       : { bottom: `${window.innerHeight - anchor.y + GAP}px` }
 }
 
@@ -185,6 +205,17 @@ function finish() {
 
     <!-- 說明框：最寬 351px（375 的手機左右各留 12px，放得下「交辦進度」那句一整行，2026-10-22 013） -->
     <div ref="tipEl" class="absolute inset-x-0 mx-auto w-[calc(100%-24px)] max-w-[351px] rounded-xl bg-card p-4 shadow-card" :style="tipStyle">
+      <!-- 好彼管家站在說明框右上角，冒出上緣 60px；只是裝飾，alt 留空 -->
+      <img
+        v-if="mascot"
+        :key="step.mascot"
+        :src="mascot.src"
+        alt=""
+        :width="mascot.width"
+        :height="mascot.height"
+        class="pointer-events-none absolute right-4 w-auto"
+        :style="{ height: `${MASCOT_HEIGHT}px`, top: `-${MASCOT_RISE}px` }"
+      />
       <!-- whitespace-pre-line：說明裡寫 \n 的地方會換行（例如逗號後面） -->
       <p class="whitespace-pre-line type-body text-foreground">{{ step.text }}</p>
       <div class="mt-2 flex items-center justify-between">
