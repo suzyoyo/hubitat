@@ -67,16 +67,17 @@ const shortcuts = [
 
 // 第一次進首頁的導覽（app/HomeTour.vue）：target 對到畫面上的 data-tour
 //   鈴鐺在 AppHeader；「＋」fab、分頁 tab-○○ 在 BottomNav；其他在這一頁
+//   動詞換著用，不要每句都是「可以」；\n 是換行（2026-10-22 013）
 const TOUR_STEPS = [
-  { target: 'bell', text: '有新通知時，鈴鐺上會出現紅點，點選可以查看所有通知。' },
-  { target: 'todos', text: '等你處理的事會列在這裡，點選右上角可以查看全部待辦。' },
-  { target: 'shortcuts', text: '「交辦進度」可以追蹤交辦給管理人員的工作，「提案與簽核」可以處理委員之間的提案。' },
-  { target: 'fab', text: '按「＋」可以新增交辦、通報、公告，或快速留存單據照片。' },
-  { target: 'tab-home', text: '「首頁」可以看到你的待辦、住戶意見和最新公告。' },
-  { target: 'tab-cases', text: '「案件」可以查看所有住戶通報和處理進度。' },
-  { target: 'tab-vendors', text: '「廠商」可以查看廠商名冊、緊急聯絡電話和社區的鑰匙清單。' },
-  { target: 'tab-files', text: '「社區」可以查看社區的大小事，像是會議紀錄、規約、合約和設備清冊。' },
-  { target: 'tab-me', text: '「我的」可以管理個人資料和各種設定，主委、副主委也能在這裡換屆交接。' },
+  { target: 'bell', text: '有新通知時，鈴鐺上會出現紅點，點進去就能看到所有通知。' },
+  { target: 'todos', text: '等你處理的事會列在這裡，點右上角查看全部待辦。' },
+  { target: 'shortcuts', text: '「交辦進度」追蹤交辦給管理人員的工作，\n「提案與簽核」處理委員之間的提案。' },
+  { target: 'fab', text: '按「＋」新增交辦、通報、公告，或快速留存單據照片。' },
+  { target: 'tab-home', text: '「首頁」一眼看到你的待辦、住戶意見和最新公告。' },
+  { target: 'tab-cases', text: '「案件」列出所有住戶通報，處理進度一目了然。' },
+  { target: 'tab-vendors', text: '「廠商」有廠商名冊、緊急聯絡電話和社區的鑰匙清單。' },
+  { target: 'tab-files', text: '「社區」收錄社區的大小事，像是會議紀錄、規約、合約和設備清冊。' },
+  { target: 'tab-me', text: '「我的」管理個人資料和各種設定，\n管委會的換屆交接也在這裡。' },
 ]
 </script>
 

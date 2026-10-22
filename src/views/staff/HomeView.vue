@@ -47,15 +47,16 @@ const greeting = computed(() => {
 
 // 第一次進首頁的導覽（app/HomeTour.vue）：target 對到畫面上的 data-tour
 //   鈴鐺在 AppHeader；「＋」fab、分頁 tab-○○ 在 BottomNav；待辦在這一頁
+//   動詞換著用，不要每句都是「可以」（2026-10-22 013）
 const TOUR_STEPS = [
-  { target: 'bell', text: '有新通知時，鈴鐺上會出現紅點，點選可以查看所有通知。' },
-  { target: 'todos', text: '等你處理的事會列在這裡，點選右上角可以查看全部待辦。' },
-  { target: 'fab', text: '按「＋」可以新增通報、發布公告，或快速留存單據照片。' },
-  { target: 'tab-home', text: '「首頁」可以看到你的待辦和最新公告。' },
-  { target: 'tab-cases', text: '「案件」可以查看所有住戶通報和處理進度。' },
-  { target: 'tab-vendors', text: '「廠商」可以查看廠商名冊、緊急聯絡電話和社區的鑰匙清單。' },
-  { target: 'tab-files', text: '「社區」可以查看社區的大小事，像是會議紀錄、規約和設備清冊。' },
-  { target: 'tab-me', text: '「我的」可以管理個人資料、字體大小和通知設定。' },
+  { target: 'bell', text: '有新通知時，鈴鐺上會出現紅點，點進去就能看到所有通知。' },
+  { target: 'todos', text: '等你處理的事會列在這裡，點右上角查看全部待辦。' },
+  { target: 'fab', text: '按「＋」新增通報、發布公告，或快速留存單據照片。' },
+  { target: 'tab-home', text: '「首頁」一眼看到你的待辦和最新公告。' },
+  { target: 'tab-cases', text: '「案件」列出所有住戶通報，處理進度一目了然。' },
+  { target: 'tab-vendors', text: '「廠商」有廠商名冊、緊急聯絡電話和社區的鑰匙清單。' },
+  { target: 'tab-files', text: '「社區」收錄社區的大小事，像是會議紀錄、規約和設備清冊。' },
+  { target: 'tab-me', text: '「我的」調整個人資料、字體大小和通知設定。' },
 ]
 
 // 首頁只放最前面的 2 筆待辦，其餘的按「查看全部待辦事項」

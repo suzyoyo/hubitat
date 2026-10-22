@@ -65,14 +65,14 @@ const latestMeeting = computed(() => meetings.value[0])
 
 // 第一次進首頁的導覽：target 對到畫面上的 data-tour（鈴鐺在 AppHeader、分頁 tab-○○ 和「通報」在 BottomNav）
 const TOUR_STEPS = [
-  // 用敘述的口氣，講清楚這裡能做什麼、看得到什麼（2026-10-22 013）
-  { target: 'bell', text: '有新通知時，鈴鐺上會出現紅點，點選可以查看所有通知。' },
-  { target: 'new-report', text: '社區有問題時，按這兩個按鈕都可以通報。', place: 'below' }, // 說明框夾在兩個按鈕中間（放不下時導覽會先往上捲）
-  { target: 'notices', text: '社區的公告和活動會列在這裡，點選「看全部」可以查看所有公告。', merge: true },
-  { target: 'tab-home', text: '「首頁」可以看到你通報的處理進度和最新公告。' },
-  { target: 'tab-files', text: '「社區」可以查看社區的大小事，像是管委會報告、社區規約和設備維修紀錄。' },
+  // 用敘述的口氣，講清楚這裡能做什麼、看得到什麼；動詞換著用，不要每句都是「可以」（2026-10-22 013）
+  { target: 'bell', text: '有新通知時，鈴鐺上會出現紅點，點進去就能看到所有通知。' },
+  { target: 'new-report', text: '社區有問題時，按這兩個按鈕都能通報。', place: 'below' }, // 說明框夾在兩個按鈕中間（放不下時導覽會先往上捲）
+  { target: 'notices', text: '社區的公告和活動會列在這裡，點「看全部」查看所有公告。', merge: true },
+  { target: 'tab-home', text: '「首頁」隨時掌握你通報的處理進度和最新公告。' },
+  { target: 'tab-files', text: '「社區」收錄社區的大小事，像是管委會報告、社區規約和設備維修紀錄。' },
   // 「我的留言」藏在「我的」裡面比較難找，特別寫出來
-  { target: 'tab-me', text: '「我的」可以管理個人資料和各種設定，也能查看你給管委會的留言和回覆。' },
+  { target: 'tab-me', text: '「我的」管理個人資料和各種設定，\n你給管委會的留言和回覆也在這裡。' },
 ]
 
 // 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）

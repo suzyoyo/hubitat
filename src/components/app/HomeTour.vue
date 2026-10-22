@@ -9,7 +9,7 @@ import { useRoute } from 'vue-router'
 import { Button } from '@/components/ui/button'
 
 const props = defineProps({
-  // 每一步：{ target: data-tour 的名稱, text: 說明, merge: 同名的好幾塊合成一個亮框, place: 'above' | 'below' 說明放上面或下面（不寫就自動） }
+  // 每一步：{ target: data-tour 的名稱, text: 說明（\n 是換行）,merge: 同名的好幾塊合成一個亮框, place: 'above' | 'below' 說明放上面或下面（不寫就自動） }
   steps: { type: Array, required: true },
   // 記在瀏覽器裡的名稱，三端分開記，例如 hubitat-tour-resident
   storageKey: { type: String, required: true },
@@ -183,9 +183,10 @@ function finish() {
       <rect width="100%" height="100%" fill="black" opacity="0.5" mask="url(#home-tour-mask)" />
     </svg>
 
-    <!-- 說明框：寬度和內容一樣，最寬 343px（375 的手機左右各留 16px） -->
-    <div ref="tipEl" class="absolute inset-x-0 mx-auto w-[calc(100%-32px)] max-w-[343px] rounded-xl bg-card p-4 shadow-card" :style="tipStyle">
-      <p class="type-body text-foreground">{{ step.text }}</p>
+    <!-- 說明框：最寬 351px（375 的手機左右各留 12px，放得下「交辦進度」那句一整行，2026-10-22 013） -->
+    <div ref="tipEl" class="absolute inset-x-0 mx-auto w-[calc(100%-24px)] max-w-[351px] rounded-xl bg-card p-4 shadow-card" :style="tipStyle">
+      <!-- whitespace-pre-line：說明裡寫 \n 的地方會換行（例如逗號後面） -->
+      <p class="whitespace-pre-line type-body text-foreground">{{ step.text }}</p>
       <div class="mt-2 flex items-center justify-between">
         <span class="type-date text-muted-foreground">{{ index + 1 }} / {{ steps.length }}</span>
         <!-- 跳過是不強調的動作，用 ghost；-mr-3 讓字和下面的按鈕右邊對齊 -->
