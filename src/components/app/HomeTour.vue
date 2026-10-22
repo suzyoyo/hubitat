@@ -78,7 +78,8 @@ watch([open, index], async () => {
   await nextTick()
   scrollIntoView()
   measure()
-  nextButton.value?.$el?.focus()
+  // 鍵盤可以直接按 Enter 下一步；focusVisible: false 是不要出現一圈外框
+  nextButton.value?.$el?.focus({ focusVisible: false })
 })
 
 function targetsOf(name) {
@@ -109,15 +110,24 @@ function isPinned(el) {
 
 function measure() {
   const els = targetsOf(step.value.target)
-  let rects = els.map((el) => el.getBoundingClientRect())
+  // 亮框的圓角跟著元素自己的圓角（分頁、「通報」是圓的），再加上外擴的那一圈
+  //   鈴鐺的連結本身是方的、裡面的藍色圓形才是圓的，所以也看第一層子元素
+  const radiusOf = (el) => (el ? parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0 : 0)
+  let rects = els.map((el) => {
+    const r = el.getBoundingClientRect()
+    return { left: r.left, top: r.top, right: r.right, bottom: r.bottom, width: r.width, height: r.height, radius: Math.max(radiusOf(el), radiusOf(el.firstElementChild)) }
+  })
   if (step.value.merge && rects.length > 1) {
     const left = Math.min(...rects.map((r) => r.left))
     const top = Math.min(...rects.map((r) => r.top))
     const right = Math.max(...rects.map((r) => r.right))
     const bottom = Math.max(...rects.map((r) => r.bottom))
-    rects = [{ left, top, width: right - left, height: bottom - top }]
+    rects = [{ left, top, width: right - left, height: bottom - top, radius: 14 - PAD }]
   }
-  holes.value = rects.map((r) => ({ x: r.left - PAD, y: r.top - PAD, w: r.width + PAD * 2, h: r.height + PAD * 2 }))
+  holes.value = rects.map((r) => {
+    const h = r.height + PAD * 2
+    return { x: r.left - PAD, y: r.top - PAD, w: r.width + PAD * 2, h, rx: Math.min(r.radius + PAD, h / 2) }
+  })
 
   // 說明框跟著第一個亮框：亮框在畫面上半部就放下面，在下半部就放上面
   const anchor = holes.value[0]
@@ -165,7 +175,7 @@ function finish() {
       <defs>
         <mask id="home-tour-mask">
           <rect width="100%" height="100%" fill="white" />
-          <rect v-for="(hole, i) in holes" :key="i" :x="hole.x" :y="hole.y" :width="hole.w" :height="hole.h" rx="14" fill="black" />
+          <rect v-for="(hole, i) in holes" :key="i" :x="hole.x" :y="hole.y" :width="hole.w" :height="hole.h" :rx="hole.rx" fill="black" />
         </mask>
       </defs>
       <rect width="100%" height="100%" fill="black" opacity="0.5" mask="url(#home-tour-mask)" />

@@ -47,17 +47,17 @@ const fabClass = computed(() => [
   >
     <!-- 毛玻璃（2026-10-18）：半透明底色＋把後面的畫面模糊（backdrop-blur），後面卡片的字才不會和分頁的字疊在一起；
          backdrop-saturate 把模糊後變灰的顏色拉回來。模糊 20px、飽和度 1.8 照 Apple 官網的導覽列；底色是 style.css 的 --nav（白 60%，比 Apple 的 80% 透一點）。不支援模糊的舊瀏覽器只會看到原本的半透明白 -->
-    <!-- data-tour：首頁導覽要亮的地方（app/HomeTour.vue） -->
     <nav
-      data-tour="tabs"
       class="flex min-w-0 flex-1 items-stretch rounded-full border border-nav-border bg-nav p-1 text-nav-foreground shadow-nav backdrop-blur-[20px] backdrop-saturate-[1.8]"
       :class="compact ? '' : 'h-[70px]'"
     >
       <!-- 一般分頁的文字顏色設在外層 nav 上；active-class 是「目前分頁」才會加上的 class -->
+      <!-- data-tour：首頁導覽要亮的地方（app/HomeTour.vue），例如 tab-files -->
       <RouterLink
         v-for="tab in tabs"
         :key="tab.path"
         :to="`${basePath}/${tab.path}`"
+        :data-tour="`tab-${tab.path}`"
         class="flex min-w-0 flex-1 flex-col items-center justify-center rounded-full whitespace-nowrap"
         :class="compact ? 'py-2 type-label' : 'type-nav'"
         active-class="bg-nav-active text-nav-active-foreground shadow-nav-active"

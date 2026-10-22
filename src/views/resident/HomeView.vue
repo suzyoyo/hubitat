@@ -63,12 +63,14 @@ const latestReport = computed(
 const homeNotices = computed(() => allNotices.value.filter((item) => item.relatedToMe).slice(0, 2))
 const latestMeeting = computed(() => meetings.value[0])
 
-// 第一次進首頁的導覽：target 對到畫面上的 data-tour（鈴鐺在 AppHeader、分頁和「通報」在 BottomNav）
+// 第一次進首頁的導覽：target 對到畫面上的 data-tour（鈴鐺在 AppHeader、分頁 tab-○○ 和「通報」在 BottomNav）
 const TOUR_STEPS = [
   { target: 'bell', text: '有新通知時，鈴鐺上會有紅點。' },
   { target: 'new-report', text: '社區有問題時，按這兩個按鈕都可以通報。', place: 'below' },
   { target: 'notices', text: '社區的公告和活動會列在這裡，點選右上角可以查看全部。', merge: true },
-  { target: 'tabs', text: '點下面的分頁，可以切換到首頁、社區、我的。' },
+  { target: 'tab-home', text: '首頁：看你通報的處理進度，和社區最新的公告。' },
+  { target: 'tab-files', text: '社區：查看管委會報告、社區規約、公開文件，還有設備的維修紀錄。' },
+  { target: 'tab-me', text: '我的：查看你的留言，調整字體大小和通知設定。' },
 ]
 
 // 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
