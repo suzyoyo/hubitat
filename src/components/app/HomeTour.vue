@@ -184,11 +184,15 @@ function finish() {
     <!-- 說明框：寬度和內容一樣，最寬 343px（375 的手機左右各留 16px） -->
     <div ref="tipEl" class="absolute inset-x-0 mx-auto w-[calc(100%-32px)] max-w-[343px] rounded-xl bg-card p-4 shadow-card" :style="tipStyle">
       <p class="type-body text-foreground">{{ step.text }}</p>
-      <div class="mt-3 flex items-center gap-2">
+      <div class="mt-2 flex items-center justify-between">
         <span class="type-date text-muted-foreground">{{ index + 1 }} / {{ steps.length }}</span>
-        <!-- 主要按鈕只有「下一步」；跳過是不強調的動作，用 ghost -->
-        <Button variant="ghost" class="ml-auto" @click="finish">跳過使用說明</Button>
-        <Button ref="nextButton" @click="next">{{ isLast ? '開始使用' : '下一步' }}</Button>
+        <!-- 跳過是不強調的動作，用 ghost；-mr-3 讓字和下面的按鈕右邊對齊 -->
+        <Button variant="ghost" class="-mr-3" @click="finish">跳過使用說明</Button>
+      </div>
+      <!-- 主要按鈕只有「下一步」；「上一步」和它並排，用 outline。第一步沒有上一步，「下一步」佔滿整行 -->
+      <div class="mt-2 flex gap-2">
+        <Button v-if="index > 0" variant="outline" class="flex-1" @click="index -= 1">上一步</Button>
+        <Button ref="nextButton" class="flex-1" @click="next">{{ isLast ? '開始使用' : '下一步' }}</Button>
       </div>
     </div>
   </div>
