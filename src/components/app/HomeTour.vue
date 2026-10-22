@@ -181,6 +181,19 @@ function finish() {
         </mask>
       </defs>
       <rect width="100%" height="100%" fill="black" opacity="0.5" mask="url(#home-tour-mask)" />
+      <!-- 品牌藍邊框＋外光暈，讓亮框看得出是重點（2026-10-22 013）：邊框 2px 畫在亮框的邊上（一半在裡面、一半在外面），
+           光暈是同色的模糊陰影，疊兩層（貼近的 3px＋擴散的 9px；試過 6px 一層太淡、4px＋12px 太重） -->
+      <rect
+        v-for="(hole, i) in holes"
+        :key="`outline-${i}`"
+        :x="hole.x"
+        :y="hole.y"
+        :width="hole.w"
+        :height="hole.h"
+        :rx="hole.rx"
+        class="fill-none stroke-primary [filter:drop-shadow(0_0_3px_var(--primary))_drop-shadow(0_0_9px_var(--primary))]"
+        stroke-width="2"
+      />
     </svg>
 
     <!-- 說明框：最寬 351px（375 的手機左右各留 12px，放得下「交辦進度」那句一整行，2026-10-22 013） -->
