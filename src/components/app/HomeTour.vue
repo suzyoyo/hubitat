@@ -179,10 +179,16 @@ function finish() {
           <rect width="100%" height="100%" fill="white" />
           <rect v-for="(hole, i) in holes" :key="i" :x="hole.x" :y="hole.y" :width="hole.w" :height="hole.h" :rx="hole.rx" fill="black" />
         </mask>
+        <!-- 光暈：SVG 自己的濾鏡，iPhone Safari 也看得到（CSS 的 drop-shadow 加在 SVG 裡 Safari 不支援，suzy 在 #178 提的）
+             同色的模糊陰影疊兩層：貼近的＋擴散的。stdDeviation 是 CSS 模糊值的一半（3px → 1.5、9px → 4.5）
+             試過 CSS 6px 一層太淡、4px＋12px 太重；flood-color 要寫在 style 裡，var(--primary) 才會生效 -->
+        <filter id="home-tour-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="1.5" style="flood-color: var(--primary)" />
+          <feDropShadow dx="0" dy="0" stdDeviation="4.5" style="flood-color: var(--primary)" />
+        </filter>
       </defs>
       <rect width="100%" height="100%" fill="black" opacity="0.5" mask="url(#home-tour-mask)" />
-      <!-- 品牌藍邊框＋外光暈，讓亮框看得出是重點（2026-10-22 013）：邊框 2px 畫在亮框的邊上（一半在裡面、一半在外面），
-           光暈是同色的模糊陰影，疊兩層（貼近的 3px＋擴散的 9px；試過 6px 一層太淡、4px＋12px 太重） -->
+      <!-- 品牌藍邊框＋外光暈，讓亮框看得出是重點（2026-10-22 013）：邊框 2px 畫在亮框的邊上（一半在裡面、一半在外面） -->
       <rect
         v-for="(hole, i) in holes"
         :key="`outline-${i}`"
@@ -191,8 +197,9 @@ function finish() {
         :width="hole.w"
         :height="hole.h"
         :rx="hole.rx"
-        class="fill-none stroke-primary [filter:drop-shadow(0_0_3px_var(--primary))_drop-shadow(0_0_9px_var(--primary))]"
+        class="fill-none stroke-primary"
         stroke-width="2"
+        filter="url(#home-tour-glow)"
       />
     </svg>
 
