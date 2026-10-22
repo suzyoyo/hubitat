@@ -11,7 +11,7 @@ import SectionHeader from '@/components/app/SectionHeader.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { greetingWord } from '@/lib/date'
 import { newestTodos, todoLink } from '@/lib/todo'
-import { clockNow, getCurrentUser, getManagedAnnouncements, getMyTodos } from '@/mocks/api'
+import { mockNow, getCurrentUser, getManagedAnnouncements, getMyTodos } from '@/mocks/api'
 
 const loading = ref(true)
 const userName = ref('') // 問候語裡的名字，例如「張管理員」
@@ -36,7 +36,7 @@ onMounted(async () => {
 })
 
 // 早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
-const hello = greetingWord(clockNow())
+const hello = greetingWord(mockNow())
 
 // 問候列的兩行字。設計稿有寫名字：「早安，王小姐！今天有」「7 件待辦事項喔！」
 const greeting = computed(() => {

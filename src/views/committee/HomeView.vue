@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { greetingWord } from '@/lib/date'
 import { newestTodos, todoLink } from '@/lib/todo'
 import {
-  clockNow,
+  mockNow,
   getCurrentUser,
   getManagedAnnouncements,
   getMyTodos,
@@ -45,7 +45,7 @@ onMounted(async () => {
 })
 
 // 依現在幾點決定問候語：早安、午安或晚安（規則在 src/lib/date.js，三端的首頁共用）
-const hello = greetingWord(clockNow())
+const hello = greetingWord(mockNow())
 
 // 問候列的兩行字：提醒今天有幾件待辦
 const greeting = computed(() => {

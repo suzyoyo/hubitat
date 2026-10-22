@@ -74,14 +74,14 @@ export const cases = [
     source: 'resident',
     isPrivate: false,
     reporterId: 'u-r02',
-    reportedAt: '2026-10-28T11:42',
+    reportedAt: '2026-10-28T07:00',
     description: '2 樓公共走廊靠茶水間的牆面一直滲水，地板已經積水，走過去容易滑倒。',
     photos: ['漏水牆面.jpg'],
     status: 'pending',
     supporters: [],
     logs: [
       {
-        at: '2026-10-28T11:42',
+        at: '2026-10-28T07:00',
         label: '住戶通報',
         text: '吳小姐（A 棟 2 樓）通報，附 1 張照片',
         residentText: '已收到，好彼管家已通知管理人員。',

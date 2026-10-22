@@ -84,7 +84,7 @@ export const announcements = [
     status: 'published',
     authorId: 'u-s01',
     createdAt: '2026-10-27T10:00',
-    publishedAt: '2026-10-28T10:40',
+    publishedAt: '2026-10-28T06:40',
     reviewerId: 'u-c02',
     equipmentId: 'e-001',
   },
@@ -173,8 +173,8 @@ export const announcements = [
     push: 'all',
     status: 'published',
     authorId: 'u-s02',
-    createdAt: '2026-10-28T13:40',
-    publishedAt: '2026-10-28T13:40',
+    createdAt: '2026-10-28T07:30',
+    publishedAt: '2026-10-28T07:30',
   },
 
   // ── 待審核（管理人員送出的一般公告）────────────────────────
@@ -191,7 +191,7 @@ export const announcements = [
     push: 'affected',
     status: 'pending',
     authorId: 'u-s02',
-    createdAt: '2026-10-28T13:30',
+    createdAt: '2026-10-28T07:20',
     caseId: 'CASE-20261019-002',
     equipmentId: 'e-003',
   },
@@ -210,7 +210,7 @@ export const announcements = [
     push: 'affected',
     status: 'draft',
     authorId: 'u-s02',
-    createdAt: '2026-10-28T11:20',
+    createdAt: '2026-10-28T06:50',
   },
 
   // ── 已退回（管理人員送出後，被主委或副主委退回）──────────────
@@ -230,7 +230,7 @@ export const announcements = [
     authorId: 'u-s01',
     createdAt: '2026-10-27T16:00',
     reviewerId: 'u-c04',
-    rejectedAt: '2026-10-28T08:30',
+    rejectedAt: '2026-10-28T06:00',
     rejectReason: '日期錯誤',
   },
 
@@ -251,7 +251,7 @@ export const announcements = [
     createdAt: '2026-10-26T11:00',
     publishedAt: '2026-10-26T18:30',
     reviewerId: 'u-c02',
-    withdrawnAt: '2026-10-28T09:20',
+    withdrawnAt: '2026-10-28T06:20',
     withdrawnBy: 'u-s01',
     withdrawReason: '廠商改期，日期確認後重新公告',
   },
