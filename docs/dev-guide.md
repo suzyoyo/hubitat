@@ -95,6 +95,7 @@ npm run dev
 - 改了程式要重新 `npm run build`，手機上的 App 關掉再打開才會更新
 - 假資料只在記憶體：App 關掉再打開，做過的事都會不見
 - 這樣是 `http` 網址，iPhone 可以加到主畫面；Android 的「安裝」提示和離線開啟要 `https` 網址才有
+- iPhone 主畫面圖示（`apple-touch-icon.png`）打包時直接寫進 `index.html`（2026-10-23，`vite.config.js` 的 `inlineTouchIcon`）：iOS 27 有人加入主畫面只出現「好」字，抓不到網路上的圖示檔。換圖示只要換 `public/icon/apple-touch-icon.png`，打包會自動寫進去。iPhone 會記住加入當下的圖示，測之前先刪掉主畫面上舊的再重加
 
 ### 認識幾個網址
 

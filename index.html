@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>好彼社區</title>
     <!-- 加到主畫面用（PWA）：iPhone 的主畫面圖示、App 名稱、打開時全螢幕；其他設定在 vite.config.js -->
-    <link rel="apple-touch-icon" href="/icon/apple-touch-icon.png" />
+    <!-- iPhone 主畫面圖示：打包時 vite.config.js 的 inlineTouchIcon 會把 href 換成圖片本身（data: 網址），
+         因為 iOS 27 加入主畫面時抓不到網路上的圖示檔、會變成「好」字（2026-10-23）。?v=2 讓手機重新抓，不用舊的結果 -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon/apple-touch-icon.png?v=2" />
     <meta name="theme-color" content="#f8fafc" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
