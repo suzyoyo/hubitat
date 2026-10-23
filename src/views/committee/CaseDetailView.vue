@@ -7,8 +7,8 @@
 //   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
 //   沒有「撤回通報」：2026-10-15 和 013 決定拿掉撤回，不需要處理的通報由處理的人完工驗收時寫明原因結案
 import { ChevronRightIcon } from '@lucide/vue'
-import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { caseStatusBadge } from '@/components/admin/caseStatusBadge'
 import BottomCta from '@/components/app/BottomCta.vue'
@@ -245,6 +245,54 @@ function failUpdate() {
   return false
 }
 
+// ── 離開前確認：改了還沒按「更新進度」就要離開時，先問一次（2026-10-23）─────────────
+//   返回、點底部分頁、按交辦、結案、連到另一件案件都會擋（完工驗收本來就會先幫他存好）
+//   按鈕：捨棄變更（紅）｜更新進度（藍，存好再去原本要去的地方）＋ ghost 繼續編輯；沒有叉叉
+const leaveOpen = ref(false)
+let leaveTarget = null // 使用者原本要去的地方
+// 還沒存的是哪幾項，寫在彈窗的說明裡
+const draftLabels = computed(() =>
+  [categoryDraft.value && '問題分類', equipmentDraft.value && '關聯設備', vendorDraft.value && '廠商', logDraft.value && '處理紀錄']
+    .filter(Boolean)
+    .join('、'),
+)
+
+function guardLeave(to) {
+  if (!hasDraft.value) return true
+  leaveTarget = to
+  leaveOpen.value = true
+  return false
+}
+onBeforeRouteLeave(guardLeave)
+// 從一件案件連到另一件：Vue 沿用同一個頁面，要另外擋
+onBeforeRouteUpdate(guardLeave)
+
+// 清掉記下來的內容，再去原本要去的地方（原本是按返回就退回上一頁，歷史紀錄才不會多一筆，寫法同 LeaveConfirmDialog）
+function leaveNow() {
+  categoryDraft.value = ''
+  equipmentDraft.value = null
+  vendorDraft.value = null
+  logDraft.value = null
+  leaveOpen.value = false
+  if (window.history.state?.back === leaveTarget.fullPath) router.back()
+  else router.push(leaveTarget.fullPath)
+}
+
+// 按「更新進度」：存好才走；沒存成功就留在這一頁（updateStatus 會跳失敗提示）
+async function saveAndLeave() {
+  if (await updateStatus()) leaveNow()
+  else leaveOpen.value = false
+}
+
+// 重新整理、關掉分頁：瀏覽器只能跳它自己的提醒，文字不能改
+function onBeforeUnload(event) {
+  if (!hasDraft.value) return
+  event.preventDefault()
+  event.returnValue = ''
+}
+onMounted(() => window.addEventListener('beforeunload', onBeforeUnload))
+onBeforeUnmount(() => window.removeEventListener('beforeunload', onBeforeUnload))
+
 const statusBadge = computed(() => caseStatusBadge(item.value))
 
 // '2026-09-25T10:12' → '2026/09/25 10:12'（管委會端的日期有年份）
@@ -440,6 +488,22 @@ const basicRows = computed(() => {
         <Button v-if="canUpdate" :disabled="!hasDraft || pending" @click="updateStatus">更新進度</Button>
       </div>
     </BottomCta>
+
+    <!-- 離開前確認：沒有右上角的叉叉；按「繼續編輯」或點彈窗外面，都是留在這一頁 -->
+    <Dialog v-model:open="leaveOpen">
+      <DialogContent :show-close-button="false" class="gap-3.5 p-5">
+        <DialogTitle class="type-card-title!">你更改的內容尚未儲存</DialogTitle>
+        <DialogDescription class="type-body!">{{ draftLabels }}還沒更新，捨棄的話不會保留。</DialogDescription>
+        <div class="space-y-2 pt-3">
+          <!-- 捨棄在左、主要的更新進度在右 -->
+          <div class="flex gap-3 *:flex-1">
+            <Button variant="destructive" :disabled="pending" @click="leaveNow">捨棄變更</Button>
+            <Button :disabled="pending" @click="saveAndLeave">更新進度</Button>
+          </div>
+          <Button variant="ghost" class="w-full" :disabled="pending" @click="leaveOpen = false">繼續編輯</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
 
     <!-- 寫原因的彈窗：退回案件、撤回交辦共用；原因必填，寫法和交辦詳情的彈窗一樣 -->
     <Dialog v-model:open="reasonOpen">
