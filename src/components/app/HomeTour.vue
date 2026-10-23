@@ -210,7 +210,8 @@ function finish() {
       <div class="mt-2 flex items-center justify-between">
         <span class="type-date text-muted-foreground">{{ index + 1 }} / {{ steps.length }}</span>
         <!-- 跳過是不強調的動作，用 ghost；-mr-3 讓字和下面的按鈕右邊對齊 -->
-        <Button variant="ghost" class="-mr-3" @click="finish">跳過使用說明</Button>
+        <!-- border-transparent：ghost 預設有外框，這顆例外不要（2026-10-23），只剩文字才不會比「下一步」還搶眼 -->
+        <Button variant="ghost" class="-mr-3 border-transparent" @click="finish">跳過使用說明</Button>
       </div>
       <!-- 主要按鈕只有「下一步」；「上一步」和它並排，用 outline。第一步沒有上一步，「下一步」佔滿整行 -->
       <div class="mt-2 flex gap-2">
