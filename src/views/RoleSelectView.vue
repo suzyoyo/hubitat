@@ -19,7 +19,7 @@ import { roles } from '@/config/roles'
     <h1><img :src="logoUrl" alt="好彼社區 Hubitat" width="215" height="172" class="mx-auto h-28 w-auto" /></h1>
     <!-- 說明這頁怎麼用：還沒有登入，靠這頁切換三端 -->
     <div class="mt-6 space-y-2 text-center">
-      <p class="type-body-strong text-foreground">開發預覽：點選下方角色，即可進入該角色的介面。</p>
+      <p class="type-body-strong text-foreground">開發預覽：點選角色，即可進入該角色介面。</p>
       <!-- 補充說明用 14px 的 type-note（2026-10-22 013） -->
       <p class="type-note text-muted-foreground">
         如需切換角色，請至「我的」點選<span class="whitespace-nowrap">「登出帳號」</span>，<br />
