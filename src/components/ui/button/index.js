@@ -14,6 +14,7 @@ export { default as Button } from "./Button.vue";
 //      怎麼選的完整規則在 docs/dev-guide.md 第 5 節「按鈕」（2026-10-19 定案）
 //        ghost       沒有底色、深藍字、中等粗細（500）：不強調的動作（2026-10-19 從黑色粗體改，原本太粗太黑）
 //                    外框和文字同色（border-current，2026-10-23 加）；白字的（照片全螢幕）就是白框
+//                    只有圖示的（size="icon" 這幾種）沒有外框，寫在下面的 compoundVariants
 //      底部的線：Kit 是「往內長的底部線條」，程式用往內的陰影（inset-shadow）來做。
 //      線條畫在按鈕裡面、會順著圓角彎，而且不佔空間，按鈕大小不變。
 //      （不用 border-b：邊框在圓角的地方會變細、斷開，看起來像按鈕底下多墊了一條線）
@@ -48,6 +49,14 @@ export const buttonVariants = cva(
         "icon-lg": "size-12",
       },
     },
+    // 只有圖示的 ghost（size 是 icon 開頭的，例如彈窗右上角的 ✕）不要外框（2026-10-23）
+    compoundVariants: [
+      {
+        variant: "ghost",
+        size: ["icon", "icon-xs", "icon-sm", "icon-lg"],
+        class: "border-transparent",
+      },
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",
