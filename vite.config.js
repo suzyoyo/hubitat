@@ -1,8 +1,29 @@
+import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+
+// iPhone 主畫面圖示直接寫進 index.html（2026-10-23）
+//   iOS 27 有人加入主畫面只出現「好」字：圖示檔本身沒問題，但 iOS 27 加入主畫面時抓不到網路上的圖示檔；
+//   圖片直接寫在網頁裡（data: 網址）就不用另外下載。其他開發者也遇到一樣的事，Apple 沒有正式說明
+//   做法：把 index.html 裡 apple-touch-icon 的網址，換成 public/icon/apple-touch-icon.png 的內容（約 11KB）
+const TOUCH_ICON_HREF = '/icon/apple-touch-icon.png?v=2'
+function inlineTouchIcon() {
+  return {
+    name: 'inline-touch-icon',
+    transformIndexHtml: {
+      order: 'pre', // 在 Vite 幫網址加上 /hubitat/ 之前先換掉
+      handler(html) {
+        // 找不到就是 index.html 被改過了，直接報錯，不要默默失效
+        if (!html.includes(TOUCH_ICON_HREF)) throw new Error(`index.html 裡找不到 ${TOUCH_ICON_HREF}`)
+        const png = readFileSync(new URL('./public/icon/apple-touch-icon.png', import.meta.url))
+        return html.replace(TOUCH_ICON_HREF, `data:image/png;base64,${png.toString('base64')}`)
+      },
+    },
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,6 +34,7 @@ export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
+    inlineTouchIcon(),
     VitePWA({
       // 有新版本時自動更新，不用跳提示問使用者
       registerType: 'autoUpdate',
