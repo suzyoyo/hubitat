@@ -83,8 +83,8 @@ async function save() {
 </script>
 
 <template>
-  <!-- 可以修改時底部有固定的按鈕區，pb-24 留空間給它，內容才不會被蓋住 -->
-  <div class="space-y-4 px-5 pt-4" :class="{ 'pb-24': report?.canEdit }">
+  <!-- 有資料時底部有固定的按鈕區，pb-24 留空間給它，內容才不會被蓋住 -->
+  <div class="space-y-4 px-5 pt-4" :class="{ 'pb-24': report }">
     <!-- 載入中：兩個和卡片差不多高的灰色方塊 -->
     <template v-if="loading">
       <Skeleton class="h-[88px] rounded-xl" />
@@ -134,11 +134,15 @@ async function save() {
           <ReportPhotoGrid v-model="photos" />
         </div>
 
-        <!-- 設計稿左邊還有一顆「撤回通報」，2026-10-15 拿掉了 -->
-        <BottomCta>
-          <Button :disabled="!canSave" @click="save">送出補充</Button>
-        </BottomCta>
       </template>
+
+      <!-- 設計稿左邊還有一顆「撤回通報」，2026-10-15 拿掉了；「回到首頁」每一筆都有，可以修改時旁邊才有「送出補充」 -->
+      <BottomCta>
+        <Button variant="outline" as-child>
+          <RouterLink to="/resident/home">回到首頁</RouterLink>
+        </Button>
+        <Button v-if="report.canEdit" :disabled="!canSave" @click="save">送出補充</Button>
+      </BottomCta>
     </template>
   </div>
 </template>
