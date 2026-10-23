@@ -186,11 +186,8 @@ const publishRows = computed(() => {
 </script>
 
 <template>
-  <!-- 有按鈕時底部有固定的按鈕區，留空間給它，內容才不會被蓋住；兩顆上下排要留多一點 -->
-  <div
-    class="space-y-4 px-5 pt-4"
-    :class="announcement?.canWithdraw ? 'pb-40' : hasActions ? 'pb-24' : 'pb-5'"
-  >
+  <!-- 有按鈕時底部有固定的按鈕區，留空間給它，內容才不會被蓋住 -->
+  <div class="space-y-4 px-5 pt-4" :class="hasActions ? 'pb-24' : 'pb-5'">
     <!-- 載入中：三個和卡片差不多高的灰色方塊 -->
     <template v-if="loading">
       <Skeleton class="h-[200px] rounded-xl" />
@@ -242,17 +239,17 @@ const publishRows = computed(() => {
         </div>
       </section>
 
-      <!-- 已發布：兩顆上下排（照設計稿） -->
-      <BottomCta v-if="announcement.canWithdraw" vertical>
+      <!-- 已發布：兩顆左右排，撤回（紅）在左、主要的修改在右（2026-10-23 013 改，原本照設計稿上下排） -->
+      <BottomCta v-if="announcement.canWithdraw">
+        <Button variant="destructive" :disabled="pending" @click="openWithdraw">撤回公告</Button>
         <Button as-child>
           <RouterLink :to="editLink">修改公告</RouterLink>
         </Button>
-        <Button variant="destructive" :disabled="pending" @click="openWithdraw">撤回公告</Button>
       </BottomCta>
 
       <!-- 撤回確認彈窗：平常看不到，withdrawOpen 變成 true 才會出現（長相和撤回通報的彈窗一樣） -->
       <Dialog v-model:open="withdrawOpen">
-        <!-- 沒有右上角的叉叉，用「取消」關閉；點彈窗外面也可以關 -->
+        <!-- 沒有右上角的叉叉，用「保留公告」關閉；點彈窗外面也可以關 -->
         <!-- @open-auto-focus.prevent：打開時不要自動把游標放進輸入框（不然手機的鍵盤會馬上跳出來），點了輸入框才開始打字 -->
         <DialogContent :show-close-button="false" class="gap-3.5 p-5" @open-auto-focus.prevent>
           <!-- 結尾的 ! 是「一定要用這個」：DialogTitle 本身有預設的字級，要蓋過它 -->
@@ -262,14 +259,15 @@ const publishRows = computed(() => {
           </DialogDescription>
           <!-- aria-label：輸入框沒有另外的標題文字，這是給螢幕閱讀器念的名稱 -->
           <Input v-model="withdrawReason" aria-label="撤回原因" placeholder="撤回原因（選填）" maxlength="50" />
+          <!-- 做了就回不去的動作（紅）在左；安全的「保留公告」是主要按鈕、在右，手滑按到也不會出事（2026-10-23） -->
           <div class="flex gap-3">
-            <!-- DialogClose：包住的按鈕按下去就會關閉彈窗 -->
-            <DialogClose as-child>
-              <Button variant="outline" class="flex-1">取消</Button>
-            </DialogClose>
             <Button variant="destructive" class="flex-1" :disabled="pending" @click="submitWithdraw">
               確認撤回
             </Button>
+            <!-- DialogClose：包住的按鈕按下去就會關閉彈窗 -->
+            <DialogClose as-child>
+              <Button class="flex-1">保留公告</Button>
+            </DialogClose>
           </div>
         </DialogContent>
       </Dialog>
