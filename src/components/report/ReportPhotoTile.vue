@@ -5,11 +5,13 @@
 //   thumbnail：一個已經加入的檔案，格子裡直接顯示照片（不顯示檔名；PDF 沒有縮圖，例外留檔名），下面有「刪除」按鈕
 //   add：      虛線框的「新增」，按了可以選檔案（手機上會問要拍照、錄影還是從相簿選），可以一次選好幾個
 // 沒有「更換」：要換的話先刪除再新增
+// 按「刪除」先跳確認彈窗，按「刪除」才真的刪（2026-10-23，防止按錯；三端所有上傳照片的地方都會有）
 // 假資料只記檔名：示範時剛選的照片、影片暫存在瀏覽器（src/lib/filePreview.js），看得到真的內容；
 //   假資料原本的檔案沒有內容，顯示照片、影片或文件的圖示
 import { FileTextIcon, ImageIcon, PlusIcon, VideoIcon } from '@lucide/vue'
 import { computed, ref } from 'vue'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { isPdfName, isVideoName, previewUrl } from '@/lib/filePreview'
 
 const props = defineProps({
@@ -34,6 +36,19 @@ const icon = computed(() => {
   if (isPdf.value) return FileTextIcon
   return ImageIcon
 })
+
+// 刪除確認彈窗：按「刪除」時打開；標題依檔案種類換說法
+const confirmOpen = ref(false)
+const confirmTitle = computed(() => {
+  if (isVideo.value) return '刪除這段影片？'
+  if (isPdf.value) return '刪除這個檔案？'
+  return '刪除這張照片？'
+})
+
+function confirmRemove() {
+  confirmOpen.value = false
+  emit('remove')
+}
 
 // fileInput：指向下面那個藏起來的 <input type="file">，按「新增」時用程式幫使用者按它
 const fileInput = ref(null)
@@ -81,8 +96,22 @@ function onFileChange(event) {
     </div>
     <!-- 用文字按鈕，不用叉叉圖示：長輩比較看得懂。按鈕高 44px -->
     <!-- type="button"：放在 <form> 裡時，按了才不會被當成送出表單 -->
-    <Button type="button" variant="ghost" class="w-full px-0" :aria-label="`刪除 ${name}`" @click="emit('remove')">
+    <Button type="button" variant="ghost" class="w-full px-0" :aria-label="`刪除 ${name}`" @click="confirmOpen = true">
       刪除
     </Button>
+
+    <!-- 刪除確認彈窗：長相和撤回公告的彈窗一樣，沒有右上角的叉叉，用「取消」關閉 -->
+    <Dialog v-model:open="confirmOpen">
+      <DialogContent :show-close-button="false" class="gap-3.5 p-5">
+        <DialogTitle class="type-card-title!">{{ confirmTitle }}</DialogTitle>
+        <DialogDescription class="type-body!">刪除後要重新選擇才能加回來。</DialogDescription>
+        <div class="flex gap-3">
+          <DialogClose as-child>
+            <Button type="button" variant="outline" class="flex-1">取消</Button>
+          </DialogClose>
+          <Button type="button" variant="destructive" class="flex-1" @click="confirmRemove">刪除</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
