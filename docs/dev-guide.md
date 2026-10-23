@@ -709,6 +709,7 @@ const latestReport = computed(() => reports.value[0])
 
 - **必填**：欄位名稱後面加紅色星號，不要寫「必填」兩個字。
 - **選填**：欄位名稱後面用灰色小字寫「選填」，不要加底色。
+- **刪除照片、檔案先確認**（2026-10-23）：照片格（`report/ReportPhotoTile`）按「刪除」會先跳「刪除這張照片？」（影片是「這段影片」、PDF 是「這個檔案」），左邊「取消」、右邊紅色「刪除」。寫在照片格裡，三端所有上傳照片的地方都有，頁面不用自己做。
 - **離開前確認**（2026-10-19）：會填很多東西的表單，放一個 `<LeaveConfirmDialog>`（`components/feedback/`）。填到一半按返回、點分頁時跳出「還沒送出，確定要離開嗎？」：左邊「直接離開」（次要）、右邊「繼續填寫」（主要），下面一顆 ghost「存成草稿，晚點再填」；重新整理、關掉分頁時跳瀏覽器自己的提醒。
   ```vue
   <LeaveConfirmDialog :dirty="isDirty" draft-title="快速留存" :draft-data="{ photos, name, note }" />
