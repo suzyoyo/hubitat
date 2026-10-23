@@ -15,7 +15,6 @@ import ReportFlowProgress from '@/components/report/ReportFlowProgress.vue'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { REPORT_TYPES } from '@/lib/report'
-import { restoreDraft } from '@/lib/draft'
 import { createReport, getAreas, getCurrentUser, getEquipmentById, getSimilarReports, supportReport } from '@/mocks/api'
 import ReportConfirmStep from '@/components/report/ReportConfirmStep.vue'
 import ReportDescribeStep from '@/components/report/ReportDescribeStep.vue'
@@ -81,8 +80,6 @@ onMounted(async () => {
   areas.value = areaList
   if (device) fillFromEquipment(device)
   loading.value = false
-  // 從設備來的是新的一筆，不帶回草稿
-  if (!device) await restoreDraft(user.id, route.path, (data) => Object.assign(form, data))
 })
 
 // 從設備帶入：地點、類型（公共設施問題）、通報問題先填設備名稱，住戶接著打哪裡壞了
@@ -286,6 +283,7 @@ const isDirty = computed(() => inFlow.value && Boolean(form.subject || form.desc
       <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
     </BottomCta>
     <!-- 填到一半想離開時先問一次 -->
-    <LeaveConfirmDialog :dirty="isDirty" draft-title="新增通報" :draft-data="{ ...form }" :draft-path="route.path" />
+    <!-- 住戶沒有「存成草稿」（2026-10-23）：只問直接離開或繼續填寫 -->
+    <LeaveConfirmDialog :dirty="isDirty" />
   </div>
 </template>
