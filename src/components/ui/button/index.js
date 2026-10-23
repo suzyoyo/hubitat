@@ -13,6 +13,7 @@ export { default as Button } from "./Button.vue";
 //        destructive 淺紅底、紅字：刪除、撤回這類做了就回不去的動作
 //      怎麼選的完整規則在 docs/dev-guide.md 第 5 節「按鈕」（2026-10-19 定案）
 //        ghost       沒有底色、深藍字、中等粗細（500）：不強調的動作（2026-10-19 從黑色粗體改，原本太粗太黑）
+//                    外框和文字同色（border-current，2026-10-23 加）；白字的（照片全螢幕）就是白框
 //      底部的線：Kit 是「往內長的底部線條」，程式用往內的陰影（inset-shadow）來做。
 //      線條畫在按鈕裡面、會順著圓角彎，而且不佔空間，按鈕大小不變。
 //      （不用 border-b：邊框在圓角的地方會變細、斷開，看起來像按鈕底下多墊了一條線）
@@ -28,7 +29,7 @@ export const buttonVariants = cva(
         secondary:
           "bg-secondary text-secondary-foreground inset-shadow-[0_-1px_0_var(--secondary-foreground)] hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
-          "font-medium text-secondary-foreground hover:bg-muted dark:hover:bg-muted/50 aria-expanded:bg-muted",
+          "border-current font-medium text-secondary-foreground hover:bg-muted dark:hover:bg-muted/50 aria-expanded:bg-muted",
         destructive:
           "bg-warning-subtle text-warning-strong inset-shadow-[0_-1px_0_var(--warning-strong)] hover:bg-warning-subtle/80 focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
         link: "text-primary underline-offset-4 hover:underline",
