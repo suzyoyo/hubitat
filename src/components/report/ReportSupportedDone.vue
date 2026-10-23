@@ -7,6 +7,9 @@ import mascotUrl from '@/assets/mascot/waving.png' // 坐著揮手的好彼管�
 defineProps({
   // 按了「我也遇到了」的那一筆通報
   report: { type: Object, required: true },
+  // 標題、標題下面的一句說明；住戶端改成說明這件會出現在「我的通報」（管委會端沒有「我的通報」，用預設）
+  title: { type: String, default: '已記錄你也遇到相同問題！' },
+  note: { type: String, default: '' },
 })
 </script>
 
@@ -16,7 +19,8 @@ defineProps({
       <!-- alt 留空：圖片只是裝飾，螢幕閱讀器會跳過 -->
       <!-- width / height 寫圖檔尺寸，讓瀏覽器先算好比例；實際顯示高度由 h-[133px] 決定 -->
       <img :src="mascotUrl" alt="" width="233" height="330" class="mx-auto h-[133px] w-auto" />
-      <h2 class="type-title text-foreground">已記錄你也遇到相同問題！</h2>
+      <h2 class="type-title text-foreground">{{ title }}</h2>
+      <p v-if="note" class="type-body text-muted-foreground">{{ note }}</p>
     </div>
     <ReportSimilarCard :report="report" type="joined" />
     <div class="flex items-start gap-3 rounded-lg bg-muted px-4 py-3.5">

@@ -190,11 +190,13 @@ async function support(report) {
 
 // submitting：送出還在路上時是 true，按鈕先不能按，避免連按兩次送出兩筆
 const submitting = ref(false)
+// 剛送出的通報，完成頁的「查看這件通報」要連到它的詳情頁
+const createdReport = ref(null)
 
 // 按了「送出通報」
 async function submit() {
   submitting.value = true
-  await createReport(userId.value, {
+  createdReport.value = await createReport(userId.value, {
     areaId: summary.value.areaId,
     place: summary.value.place,
     isPrivate: summary.value.visibility === 'private',
@@ -235,7 +237,12 @@ const isDirty = computed(() => inFlow.value && Boolean(form.subject || form.desc
 
       <ReportSimilarStep v-else-if="step === 2" :reports="similarReports" :supporting-id="supportingId" @support="support" />
 
-      <ReportSupportedDone v-else-if="step === 'supported'" :report="supportedReport" />
+      <ReportSupportedDone
+        v-else-if="step === 'supported'"
+        :report="supportedReport"
+        title="已將此通報加入「我的通報」"
+        note="你可以和其他住戶一起，隨時查看此通報處理進度。"
+      />
 
       <ReportTypeStep v-else-if="step === 3" v-model="form.visibility" />
 
@@ -271,7 +278,7 @@ const isDirty = computed(() => inFlow.value && Boolean(form.subject || form.desc
     </BottomCta>
     <!-- 兩個完成頁：按鈕上下排。replace：離開之後按返回不會再回到完成頁 -->
     <BottomCta v-else-if="step === 'submitted'" vertical>
-      <Button @click="router.replace('/resident/reports')">查看我的通報</Button>
+      <Button @click="router.replace(`/resident/reports/${createdReport.id}`)">查看這件通報</Button>
       <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
     </BottomCta>
     <BottomCta v-else-if="step === 'supported'" vertical>
