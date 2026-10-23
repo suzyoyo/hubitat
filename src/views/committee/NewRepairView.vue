@@ -199,7 +199,7 @@ const isDirty = computed(
   <div>
     <ReportFlowProgress v-if="inFlow" :step="step" />
 
-    <div class="px-5 pt-4" :class="inFlow ? 'pb-32' : 'pb-24'">
+    <div class="px-5 pt-4" :class="inFlow ? 'pb-32' : 'pb-40'">
       <div v-if="loading" class="space-y-4">
         <Skeleton class="h-[62px] rounded-lg" />
         <Skeleton class="h-[102px] rounded-lg" />
@@ -326,14 +326,14 @@ const isDirty = computed(
     <BottomCta v-else-if="step === 5">
       <Button :disabled="submitting" @click="submit">送出通報</Button>
     </BottomCta>
-    <!-- 兩個完成頁：左右排，主要動作在右（2026-10-23）。replace，離開之後按返回不會再回到完成頁 -->
-    <BottomCta v-else-if="step === 'submitted'">
-      <Button variant="outline" @click="router.replace(`${base}/home`)">回到首頁</Button>
+    <!-- 兩個完成頁：replace，離開之後按返回不會再回到完成頁 -->
+    <BottomCta v-else-if="step === 'submitted'" vertical>
       <Button @click="router.replace(`${base}/cases/${createdCase.id}`)">查看案件</Button>
-    </BottomCta>
-    <BottomCta v-else-if="step === 'supported'">
       <Button variant="outline" @click="router.replace(`${base}/home`)">回到首頁</Button>
+    </BottomCta>
+    <BottomCta v-else-if="step === 'supported'" vertical>
       <Button @click="router.replace(`${base}/cases/${supportedReport.id}`)">查看案件</Button>
+      <Button variant="outline" @click="router.replace(`${base}/home`)">回到首頁</Button>
     </BottomCta>
     <!-- 填到一半想離開時先問一次 -->
     <LeaveConfirmDialog :dirty="isDirty" draft-title="新增通報（代住戶登記）" :draft-data="{ ...form }" :draft-path="route.path" />
