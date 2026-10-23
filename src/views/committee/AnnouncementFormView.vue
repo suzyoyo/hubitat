@@ -285,8 +285,8 @@ const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.
 </script>
 
 <template>
-  <!-- 底部有兩顆上下排的按鈕，pb-40 留空間給它 -->
-  <div class="px-5 pt-4" :class="allowed ? 'pb-40' : 'pb-5'">
+  <!-- 底部有固定的按鈕區，pb-24 留空間給它 -->
+  <div class="px-5 pt-4" :class="allowed ? 'pb-24' : 'pb-5'">
     <div v-if="loading" class="space-y-4">
       <Skeleton class="h-[136px] rounded-xl" />
       <Skeleton class="h-[72px] rounded-xl" />
@@ -558,9 +558,10 @@ const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.
         </RadioGroup>
       </fieldset>
 
-      <BottomCta vertical>
-        <Button type="submit" :disabled="pending">{{ submitLabel }}</Button>
+      <!-- 左右排，主要動作在右（2026-10-23） -->
+      <BottomCta>
         <Button type="button" variant="outline" @click="cancel">取消</Button>
+        <Button type="submit" :disabled="pending">{{ submitLabel }}</Button>
       </BottomCta>
     </form>
     <!-- 填到一半想離開時先問一次 -->

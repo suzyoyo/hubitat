@@ -153,8 +153,8 @@ const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.
 </script>
 
 <template>
-  <!-- 底部有兩顆上下排的按鈕，pb-40 留空間給它 -->
-  <div class="px-5 pt-4 pb-40">
+  <!-- 底部有固定的按鈕區，pb-24 留空間給它 -->
+  <div class="px-5 pt-4 pb-24">
     <div v-if="loading" class="space-y-6">
       <Skeleton v-for="n in 4" :key="n" class="h-[72px] rounded-xl" />
     </div>
@@ -297,9 +297,10 @@ const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.
         />
       </div>
 
-      <BottomCta vertical>
-        <Button type="submit" :disabled="pending">確認新增</Button>
+      <!-- 左右排，主要動作在右（2026-10-23） -->
+      <BottomCta>
         <Button type="button" variant="outline" @click="cancel">取消</Button>
+        <Button type="submit" :disabled="pending">確認新增</Button>
       </BottomCta>
     </form>
     <!-- 填到一半想離開時先問一次 -->
