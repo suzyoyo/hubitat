@@ -498,7 +498,7 @@ const basicRows = computed(() => {
       <DialogContent :show-close-button="false" class="gap-3.5 p-5">
         <DialogTitle class="type-card-title!">你更改的內容尚未儲存</DialogTitle>
         <!-- 說明不列改了哪幾項，統一一句（2026-10-24 013 決定） -->
-        <DialogDescription class="type-body!">你更改的內容尚未更新</DialogDescription>
+        <DialogDescription class="type-body!">內容尚未更新，捨棄的話不會保留。</DialogDescription>
         <div class="space-y-2 pt-3">
           <!-- 捨棄在左、主要的更新進度在右 -->
           <div class="flex gap-3 *:flex-1">
