@@ -253,12 +253,6 @@ const leaveOpen = ref(false)
 let leaveTarget = null // 使用者原本要去的地方
 // 有沒有改過：記下來的內容，加上還沒填完整的廠商欄位（只要動過就提醒，2026-10-24）
 const hasUnsaved = computed(() => hasDraft.value || vendorDirty.value)
-// 還沒存的是哪幾項，寫在彈窗的說明裡
-const draftLabels = computed(() =>
-  [categoryDraft.value && '問題分類', equipmentDraft.value && '關聯設備', (vendorDraft.value || vendorDirty.value) && '廠商', logDraft.value && '處理紀錄']
-    .filter(Boolean)
-    .join('、'),
-)
 
 function guardLeave(to) {
   if (!hasUnsaved.value) return true
@@ -503,7 +497,8 @@ const basicRows = computed(() => {
     <Dialog v-model:open="leaveOpen">
       <DialogContent :show-close-button="false" class="gap-3.5 p-5">
         <DialogTitle class="type-card-title!">你更改的內容尚未儲存</DialogTitle>
-        <DialogDescription class="type-body!">{{ draftLabels }}還沒更新，捨棄的話不會保留。</DialogDescription>
+        <!-- 說明不列改了哪幾項，統一一句（2026-10-24 013 決定） -->
+        <DialogDescription class="type-body!">你更改的內容尚未更新</DialogDescription>
         <div class="space-y-2 pt-3">
           <!-- 捨棄在左、主要的更新進度在右 -->
           <div class="flex gap-3 *:flex-1">
