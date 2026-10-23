@@ -94,7 +94,7 @@ function telLink(phone) {
       <!-- 基本資料 -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <div class="flex items-start gap-2">
-          <h2 class="min-w-0 flex-1 type-card-title text-foreground">{{ vendor.name }}</h2>
+          <h2 class="min-w-0 flex-1 type-card-title text-heading">{{ vendor.name }}</h2>
           <Badge variant="outline" class="mt-0.5 shrink-0">{{ statusLabel }}</Badge>
         </div>
         <p class="type-date text-muted-foreground">統一編號：{{ vendor.taxId }}</p>
@@ -109,7 +109,7 @@ function telLink(phone) {
       <!-- 施工表現：從案件和設備紀錄算出來的 -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <div class="flex items-baseline justify-between gap-2">
-          <h2 class="type-card-title text-foreground">施工表現</h2>
+          <h2 class="type-card-title text-heading">施工表現</h2>
           <p class="type-date text-muted-foreground">合約期間統計</p>
         </div>
         <div class="space-y-1 rounded-lg bg-brand-subtle p-4">
@@ -141,7 +141,7 @@ function telLink(phone) {
 
       <!-- 聯絡窗口：一列一位、整列都是打電話的連結，樣子和廠商分頁的「廠商緊急聯絡」一樣（2026-10-19：原本是灰底方塊） -->
       <section class="space-y-1 rounded-xl bg-card p-4 shadow-card">
-        <h2 class="pb-2 type-card-title text-foreground">聯絡窗口</h2>
+        <h2 class="pb-2 type-card-title text-heading">聯絡窗口</h2>
         <template v-for="(contact, index) in vendor.contacts" :key="contact.phone">
           <Separator v-if="index > 0" />
           <a
@@ -168,7 +168,7 @@ function telLink(phone) {
       <!-- 合約資訊 -->
       <section class="space-y-3 rounded-xl bg-card p-4 shadow-card">
         <div class="flex items-start gap-2">
-          <h2 class="min-w-0 flex-1 type-card-title text-foreground">合約資訊</h2>
+          <h2 class="min-w-0 flex-1 type-card-title text-heading">合約資訊</h2>
           <Badge v-if="contract" :variant="badge.variant" class="mt-0.5 shrink-0">{{ badge.text }}</Badge>
           <Badge v-else variant="destructive" class="mt-0.5 shrink-0">無合約</Badge>
         </div>
@@ -193,7 +193,7 @@ function telLink(phone) {
       <!-- 負責設備：連到設備詳情（還是佔位頁） -->
       <section v-if="vendor.equipment.length" class="space-y-1 rounded-xl bg-card p-4 shadow-card">
         <div class="flex items-baseline justify-between gap-2 pb-2">
-          <h2 class="type-card-title text-foreground">負責設備</h2>
+          <h2 class="type-card-title text-heading">負責設備</h2>
           <p class="type-date text-muted-foreground">點設備看維修歷程</p>
         </div>
         <template v-for="(item, index) in vendor.equipment" :key="item.id">
@@ -210,7 +210,7 @@ function telLink(phone) {
 
       <!-- 服務紀錄：這家廠商在各設備留下的紀錄，新的在前 -->
       <section class="space-y-1 rounded-xl bg-card p-4 shadow-card">
-        <h2 class="pb-2 type-card-title text-foreground">服務紀錄</h2>
+        <h2 class="pb-2 type-card-title text-heading">服務紀錄</h2>
         <p v-if="!vendor.serviceRecords.length" class="type-body text-muted-foreground">還沒有服務紀錄</p>
         <template v-for="(record, index) in shownRecords" :key="record.id">
           <Separator v-if="index > 0" />
