@@ -70,9 +70,10 @@ function usePhotos() {
         </div>
       </dl>
 
-      <div class="space-y-2">
-        <Button v-if="kind === 'camera'" class="w-full" @click="usePhotos">改從相簿選照片</Button>
-        <Button class="w-full" :variant="kind === 'camera' ? 'outline' : 'default'" @click="open = false">知道了</Button>
+      <!-- 左右排，主要動作在右（2026-10-23）；只有「知道了」一顆時佔滿整行 -->
+      <div class="flex gap-3 *:flex-1">
+        <Button :variant="kind === 'camera' ? 'outline' : 'default'" @click="open = false">知道了</Button>
+        <Button v-if="kind === 'camera'" @click="usePhotos">改從相簿選照片</Button>
       </div>
     </DialogContent>
   </Dialog>

@@ -44,6 +44,12 @@ const confirmTitle = computed(() => {
   if (isPdf.value) return '刪除這個檔案？'
   return '刪除這張照片？'
 })
+// 不刪的那顆：寫清楚「會怎樣」，不用「取消」（和「刪除」一樣像負面的字，容易搞混，2026-10-23）
+const keepLabel = computed(() => {
+  if (isVideo.value) return '保留影片'
+  if (isPdf.value) return '保留檔案'
+  return '保留照片'
+})
 
 function confirmRemove() {
   confirmOpen.value = false
@@ -100,16 +106,17 @@ function onFileChange(event) {
       刪除
     </Button>
 
-    <!-- 刪除確認彈窗：長相和撤回公告的彈窗一樣，沒有右上角的叉叉，用「取消」關閉 -->
+    <!-- 刪除確認彈窗：長相和撤回公告的彈窗一樣，沒有右上角的叉叉，用「保留照片」關閉 -->
     <Dialog v-model:open="confirmOpen">
       <DialogContent :show-close-button="false" class="gap-3.5 p-5">
         <DialogTitle class="type-card-title!">{{ confirmTitle }}</DialogTitle>
         <DialogDescription class="type-body!">刪除後要重新選擇才能加回來。</DialogDescription>
+        <!-- 刪除（紅）在左；安全的「保留」是主要按鈕、在右，手滑按到也不會出事（2026-10-23） -->
         <div class="flex gap-3">
-          <DialogClose as-child>
-            <Button type="button" variant="outline" class="flex-1">取消</Button>
-          </DialogClose>
           <Button type="button" variant="destructive" class="flex-1" @click="confirmRemove">刪除</Button>
+          <DialogClose as-child>
+            <Button type="button" class="flex-1">{{ keepLabel }}</Button>
+          </DialogClose>
         </div>
       </DialogContent>
     </Dialog>

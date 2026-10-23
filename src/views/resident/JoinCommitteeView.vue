@@ -108,8 +108,8 @@ function scan() {
 </script>
 
 <template>
-  <!-- pb-40：完成頁有固定在底部的兩個按鈕，留空間才不會蓋住內容 -->
-  <div class="px-5 pt-4" :class="step === 'done' ? 'pb-40' : ''">
+  <!-- pb-24：完成頁有固定在底部的按鈕區，留空間才不會蓋住內容 -->
+  <div class="px-5 pt-4" :class="step === 'done' ? 'pb-24' : ''">
     <CodeStep v-if="step === 'code'" v-model="code" :error="error" :checking="checking" @scan="scan" />
 
     <ConfirmStep
@@ -122,10 +122,10 @@ function scan() {
 
     <template v-else-if="step === 'done' && invite">
       <AcceptedDone :invite="invite" />
-      <!-- 按鈕上下排。replace：離開之後按返回不會再回到完成頁 -->
-      <BottomCta vertical>
-        <Button @click="router.replace('/resident/me')">查看我的身分</Button>
+      <!-- 按鈕左右排，主要動作在右（2026-10-23）。replace：離開之後按返回不會再回到完成頁 -->
+      <BottomCta>
         <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
+        <Button @click="router.replace('/resident/me')">查看我的身分</Button>
       </BottomCta>
     </template>
   </div>
