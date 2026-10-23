@@ -18,8 +18,8 @@ export default {
       screenshot: { file: 'report-step2.jpg', alt: '相似通報的卡片，下方有「我也遇到了」按鈕' },
     },
   ],
-  result: '畫面會顯示「已記錄你也遇到相同問題！」。這個問題處理好的時候，你也會收到通知；在「我的通報」也看得到它。',
-  resultScreenshot: { file: 'report-supported.jpg', alt: '按「我也遇到了」後的完成頁，寫著「已記錄你也遇到相同問題！」' },
+  result: '畫面會顯示「已一起加入『我的通報』！」。你可以在「我的通報」隨時查看處理進度，這個問題處理好的時候，你也會收到通知。',
+  resultScreenshot: { file: 'report-supported.jpg', alt: '按「我也遇到了」後的完成頁，寫著「已一起加入『我的通報』！」' },
   notes: ['按「我也遇到了」的通報，你可以看處理進度，但不能修改內容。'],
   relatedArticles: ['new-report', 'my-reports'],
 }
