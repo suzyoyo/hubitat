@@ -22,7 +22,7 @@ import { roles } from '@/config/roles'
       <p class="type-body-strong text-foreground">開發預覽：點選角色，即可進入該角色介面。</p>
       <!-- 補充說明用 14px 的 type-note（2026-10-22 013） -->
       <p class="type-note text-muted-foreground">
-        如需切換角色，請至「我的」點選<span class="whitespace-nowrap">「登出帳號」</span>，<br />
+        如需切換角色，請至「我的」點選<span class="whitespace-nowrap">「登出帳號」</span><br />
         返回此頁重新選擇。
       </p>
     </div>
