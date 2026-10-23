@@ -5,6 +5,8 @@
 **線上試用**：https://suzyoyo.github.io/hubitat/ （手機版，用電腦開請把瀏覽器縮窄，或用開發者工具切成手機畫面）
 **使用手冊**：https://suzyoyo.github.io/hubitat/help/
 
+> 🚧 開發中：主要流程（通報到結案）已經可以從頭走完，其他頁面持續補上。截圖由 `npm run shoot:help` 從 App 自動截取，畫面改版後重截即可更新。
+
 <p>
   <img src="help/src/assets/screenshots/resident-home.jpg" width="220" alt="住戶端首頁">
   <img src="help/src/assets/screenshots/committee-home.jpg" width="220" alt="管委會端首頁">
@@ -62,16 +64,9 @@
 - 假 API：`src/mocks/`，全部回傳 Promise、延遲 400ms，畫面只透過它拿資料，之後換成真的後端不用改畫面
 - 部署：GitHub Actions，合併進 `main` 後自動部署到 GitHub Pages
 
-## 團隊與分工
+## 協作方式
 
-| 成員 | 負責 |
-|---|---|
-| [suzy](https://github.com/suzyoyo) | 住戶端、使用手冊網站、部署 |
-| [013](https://github.com/hakukanojyo) | 管委會端 |
-
-管理人員端、案件流程、共用元件兩人一起做。設計稿在 Figma，元件庫「好彼 Kit」從 shadcn 延伸。
-
-協作方式：一頁一個分支、每個改動都開 PR，動到共用的東西（設計 Token、基礎元件、假資料、規則文件）要對方 review 才合併（[`docs/git-workflow.md`](docs/git-workflow.md)）。開發時用 [Claude Code](https://claude.com/claude-code) 協作寫程式，規格、設計和取捨由我們決定。
+兩人開發，設計稿在 Figma，元件庫「好彼 Kit」從 shadcn 延伸。一頁一個分支、每個改動都開 PR，動到共用的東西（設計 Token、基礎元件、假資料、規則文件）要對方 review 才合併（[`docs/git-workflow.md`](docs/git-workflow.md)）。開發時用 [Claude Code](https://claude.com/claude-code) 協作寫程式，規格、設計和取捨由我們決定。
 
 ## 在自己的電腦跑
 
