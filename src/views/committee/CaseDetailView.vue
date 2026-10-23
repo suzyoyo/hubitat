@@ -282,9 +282,11 @@ function leaveNow() {
   else router.push(leaveTarget.fullPath)
 }
 
-// 按「更新進度」：存好才走；沒存成功就留在這一頁（updateStatus 會跳失敗提示）
+// 按「更新進度」：不用全部填完，存得了的先存好再走（2026-10-24 013 決定）
+//   例如廠商只選了日期、還沒選時間：廠商照存，日期不算；只動了存不了的欄位，就直接走
+//   沒存成功就留在這一頁（updateStatus 會跳失敗提示）
 async function saveAndLeave() {
-  if (await updateStatus()) leaveNow()
+  if (!hasDraft.value || (await updateStatus())) leaveNow()
   else leaveOpen.value = false
 }
 
@@ -501,15 +503,12 @@ const basicRows = computed(() => {
     <Dialog v-model:open="leaveOpen">
       <DialogContent :show-close-button="false" class="gap-3.5 p-5">
         <DialogTitle class="type-card-title!">你更改的內容尚未儲存</DialogTitle>
-        <!-- 只動了沒填完整的欄位（例如只選日期、沒選時間），還不能更新進度：說明改成提醒他填完整 -->
-        <DialogDescription class="type-body!">
-          {{ hasDraft ? `${draftLabels}還沒更新，捨棄的話不會保留。` : `${draftLabels}還沒填完整，填好才能更新進度；捨棄的話不會保留。` }}
-        </DialogDescription>
+        <DialogDescription class="type-body!">{{ draftLabels }}還沒更新，捨棄的話不會保留。</DialogDescription>
         <div class="space-y-2 pt-3">
           <!-- 捨棄在左、主要的更新進度在右 -->
           <div class="flex gap-3 *:flex-1">
             <Button variant="destructive" :disabled="pending" @click="leaveNow">捨棄變更</Button>
-            <Button :disabled="pending || !hasDraft" @click="saveAndLeave">更新進度</Button>
+            <Button :disabled="pending" @click="saveAndLeave">更新進度</Button>
           </div>
           <Button variant="ghost" class="w-full" :disabled="pending" @click="leaveOpen = false">繼續編輯</Button>
         </div>
