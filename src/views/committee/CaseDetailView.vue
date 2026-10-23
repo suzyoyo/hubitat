@@ -68,6 +68,7 @@ const categoryDraft = ref('') // 問題分類，例如 'leak'
 const equipmentDraft = ref(null) // { equipmentId, name, place }
 const vendorDraft = ref(null) // { vendorId, vendorName, scheduledAt }
 const logDraft = ref(null) // { text, residentText, scheduledAt }
+const vendorDirty = ref(false) // 廠商卡片動過了沒（還沒填完整也算，例如只選了日期），離開前確認用
 
 // 拿這一頁要的資料：我是誰、這件案件、可以選的設備和廠商
 async function load() {
@@ -250,15 +251,17 @@ function failUpdate() {
 //   按鈕：捨棄變更（紅）｜更新進度（藍，存好再去原本要去的地方）＋ ghost 繼續編輯；沒有叉叉
 const leaveOpen = ref(false)
 let leaveTarget = null // 使用者原本要去的地方
+// 有沒有改過：記下來的內容，加上還沒填完整的廠商欄位（只要動過就提醒，2026-10-24）
+const hasUnsaved = computed(() => hasDraft.value || vendorDirty.value)
 // 還沒存的是哪幾項，寫在彈窗的說明裡
 const draftLabels = computed(() =>
-  [categoryDraft.value && '問題分類', equipmentDraft.value && '關聯設備', vendorDraft.value && '廠商', logDraft.value && '處理紀錄']
+  [categoryDraft.value && '問題分類', equipmentDraft.value && '關聯設備', (vendorDraft.value || vendorDirty.value) && '廠商', logDraft.value && '處理紀錄']
     .filter(Boolean)
     .join('、'),
 )
 
 function guardLeave(to) {
-  if (!hasDraft.value) return true
+  if (!hasUnsaved.value) return true
   leaveTarget = to
   leaveOpen.value = true
   return false
@@ -273,6 +276,7 @@ function leaveNow() {
   equipmentDraft.value = null
   vendorDraft.value = null
   logDraft.value = null
+  vendorDirty.value = false
   leaveOpen.value = false
   if (window.history.state?.back === leaveTarget.fullPath) router.back()
   else router.push(leaveTarget.fullPath)
@@ -286,7 +290,7 @@ async function saveAndLeave() {
 
 // 重新整理、關掉分頁：瀏覽器只能跳它自己的提醒，文字不能改
 function onBeforeUnload(event) {
-  if (!hasDraft.value) return
+  if (!hasUnsaved.value) return
   event.preventDefault()
   event.returnValue = ''
 }
@@ -408,7 +412,11 @@ const basicRows = computed(() => {
         <h2 class="type-card-title text-foreground">廠商</h2>
         <!-- 可以派廠商的時候直接顯示欄位（欄位裡已經帶入存好的廠商和預約時間，2026-10-15 拿掉灰底區塊）；
              不能改的只看文字 -->
-        <CaseVendorPicker v-if="canPickVendor" v-model:draft="vendorDraft" :vendors="vendors" :current="shownVendor" />
+        <CaseVendorPicker
+          v-if="canPickVendor"
+          v-model:draft="vendorDraft"
+          v-model:dirty="vendorDirty"
+          :vendors="vendors" :current="shownVendor" />
         <!-- 「查看廠商」靠右，和左邊文字的最下排對齊；名冊裡的廠商才有詳細頁，自己打名字的（沒有 vendorId）沒有連結 -->
         <div v-else class="flex items-end justify-between gap-3">
           <div class="min-w-0 space-y-0.5">
@@ -493,12 +501,15 @@ const basicRows = computed(() => {
     <Dialog v-model:open="leaveOpen">
       <DialogContent :show-close-button="false" class="gap-3.5 p-5">
         <DialogTitle class="type-card-title!">你更改的內容尚未儲存</DialogTitle>
-        <DialogDescription class="type-body!">{{ draftLabels }}還沒更新，捨棄的話不會保留。</DialogDescription>
+        <!-- 只動了沒填完整的欄位（例如只選日期、沒選時間），還不能更新進度：說明改成提醒他填完整 -->
+        <DialogDescription class="type-body!">
+          {{ hasDraft ? `${draftLabels}還沒更新，捨棄的話不會保留。` : `${draftLabels}還沒填完整，填好才能更新進度；捨棄的話不會保留。` }}
+        </DialogDescription>
         <div class="space-y-2 pt-3">
           <!-- 捨棄在左、主要的更新進度在右 -->
           <div class="flex gap-3 *:flex-1">
             <Button variant="destructive" :disabled="pending" @click="leaveNow">捨棄變更</Button>
-            <Button :disabled="pending" @click="saveAndLeave">更新進度</Button>
+            <Button :disabled="pending || !hasDraft" @click="saveAndLeave">更新進度</Button>
           </div>
           <Button variant="ghost" class="w-full" :disabled="pending" @click="leaveOpen = false">繼續編輯</Button>
         </div>
