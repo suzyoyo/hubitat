@@ -1,6 +1,6 @@
 <script setup>
 // 固定在畫面底部的按鈕區（對應 Figma 的 App/Bottom CTA）
-// 用法：把按鈕放在標籤中間，一個或兩個都可以，會自動平分寬度（主要動作放右邊）；加上 vertical 會改成上下排、每個都滿版
+// 用法：把按鈕放在標籤中間，一個或兩個都可以，會自動平分寬度；加上 vertical 會改成上下排、每個都滿版
 //   <BottomCta note="送出後無法修改">
 //     <Button variant="outline">取消</Button>
 //     <Button>送出</Button>
@@ -11,7 +11,7 @@
 defineProps({
   // 按鈕下面的一行灰色說明；不傳就不顯示
   note: { type: String, default: '' },
-  // 按鈕要不要上下排（預設是左右排）。兩顆一律左右排（2026-10-23）；三顆排兩排、或按鈕上面還有欄位時才用
+  // 按鈕要不要上下排（預設是左右排）。完成頁這種「主要動作＋回首頁」的時候用
   vertical: { type: Boolean, default: false },
 })
 </script>

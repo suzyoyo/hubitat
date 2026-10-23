@@ -216,8 +216,8 @@ const isDirty = computed(() => inFlow.value && Boolean(form.subject || form.desc
   <div>
     <ReportFlowProgress v-if="inFlow" :step="step" />
 
-    <!-- pb：留空間給固定在底部的按鈕區，內容才不會被蓋住。流程中的按鈕區比較高，要留多一點 -->
-    <div class="px-5 pt-4" :class="inFlow ? 'pb-32' : 'pb-24'">
+    <!-- pb：留空間給固定在底部的按鈕區，內容才不會被蓋住。完成頁有兩個上下排的按鈕，要留多一點 -->
+    <div class="px-5 pt-4" :class="inFlow ? 'pb-32' : 'pb-40'">
       <!-- 載入中 -->
       <div v-if="loading" class="space-y-4">
         <Skeleton class="h-[102px] rounded-lg" />
@@ -273,14 +273,14 @@ const isDirty = computed(() => inFlow.value && Boolean(form.subject || form.desc
     <BottomCta v-else-if="step === 5" note="送出即表示你同意社區公約與通報規範。">
       <Button :disabled="submitting" @click="submit">送出通報</Button>
     </BottomCta>
-    <!-- 兩個完成頁：按鈕左右排，主要動作在右（2026-10-23）。replace：離開之後按返回不會再回到完成頁 -->
-    <BottomCta v-else-if="step === 'submitted'">
-      <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
+    <!-- 兩個完成頁：按鈕上下排。replace：離開之後按返回不會再回到完成頁 -->
+    <BottomCta v-else-if="step === 'submitted'" vertical>
       <Button @click="router.replace(`/resident/reports/${createdReport.id}`)">查看這件通報</Button>
-    </BottomCta>
-    <BottomCta v-else-if="step === 'supported'">
       <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
+    </BottomCta>
+    <BottomCta v-else-if="step === 'supported'" vertical>
       <Button @click="router.replace(`/resident/reports/${supportedReport.id}`)">查看這件通報</Button>
+      <Button variant="outline" @click="router.replace('/resident/home')">回到首頁</Button>
     </BottomCta>
     <!-- 填到一半想離開時先問一次 -->
     <!-- 住戶沒有「存成草稿」（2026-10-23）：只問直接離開或繼續填寫 -->

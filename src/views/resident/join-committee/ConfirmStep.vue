@@ -52,10 +52,9 @@ const declineOpen = ref(false)
       <AlertDescription>簽核提案、查看管委會會議紀錄</AlertDescription>
     </Alert>
 
-    <!-- 左右排，主要動作在右（2026-10-23） -->
-    <div class="flex gap-3 *:flex-1">
-      <Button variant="outline" :disabled="pending" @click="declineOpen = true">婉拒</Button>
-      <Button :disabled="pending" @click="$emit('accept')">接受邀請</Button>
+    <div class="space-y-4">
+      <Button class="w-full" :disabled="pending" @click="$emit('accept')">接受邀請</Button>
+      <Button variant="outline" class="w-full" :disabled="pending" @click="declineOpen = true">婉拒</Button>
     </div>
 
     <!-- 婉拒之後邀請碼就不能再用，所以先問一次 -->
