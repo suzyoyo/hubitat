@@ -240,8 +240,8 @@ const isDirty = computed(() => inFlow.value && Boolean(form.subject || form.desc
       <ReportSupportedDone
         v-else-if="step === 'supported'"
         :report="supportedReport"
-        title="已一起加入「我的通報」！"
-        note="你可以和其他住戶一起，隨時查看處理進度。"
+        title="已將此通報加入「我的通報」"
+        note="你可以和其他住戶一起，隨時查看此通報處理進度。"
       />
 
       <ReportTypeStep v-else-if="step === 3" v-model="form.visibility" />
