@@ -70,7 +70,7 @@
 
 ## 在自己的電腦跑
 
-需要 Node.js 20.19 或 22.12 以上（Vite 8 的要求）。
+建議用 Node.js 24（LTS）。Node 26 跑 `npm run shoot:help`（手冊截圖）時，Playwright 下載瀏覽器會卡住。
 
 ```bash
 npm install
@@ -89,3 +89,9 @@ npm run build        # 打包（PWA 只有打包後才有）
 | [`docs/data-model.md`](docs/data-model.md) | 假資料的規劃 |
 | [`docs/dev-guide.md`](docs/dev-guide.md) | 寫程式的規則（按鈕、徽章、表單、篩選…） |
 | [`docs/component-map.md`](docs/component-map.md) | Figma 元件和程式的對照 |
+
+## 版權
+
+© 2026 [suzy](https://github.com/suzyoyo)、[013](https://github.com/hakukanojyo)。保留所有權利。
+
+本專案公開僅供瀏覽與作品集展示，未經同意不得複製、修改、散布或用於商業用途。「好彼社區」「Hubitat」名稱、標誌與吉祥物「好彼管家」的圖像同樣受保護。
