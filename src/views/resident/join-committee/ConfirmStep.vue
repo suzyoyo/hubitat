@@ -59,21 +59,22 @@ const declineOpen = ref(false)
 
     <!-- 婉拒之後邀請碼就不能再用，所以先問一次 -->
     <Dialog v-model:open="declineOpen">
-      <!-- 沒有右上角的叉叉，用「取消」關閉；點彈窗外面也可以關 -->
+      <!-- 沒有右上角的叉叉，用「保留邀請」關閉；點彈窗外面也可以關 -->
       <DialogContent :show-close-button="false" class="gap-3.5 p-5">
         <!-- 結尾的 ! 是「一定要用這個」：DialogTitle 本身有預設的字級，要蓋過它 -->
         <DialogTitle class="type-card-title!">婉拒這次邀請？</DialogTitle>
         <DialogDescription class="type-body!">
           婉拒後這組邀請碼就不能再使用，之後想加入要請主委重新提供
         </DialogDescription>
+        <!-- 做了就回不去的（紅）在左，右邊藍色「保留邀請」（2026-10-24，和撤回公告一樣，不寫「取消」） -->
         <div class="flex gap-3">
-          <!-- DialogClose：包住的按鈕按下去就會關閉彈窗 -->
-          <DialogClose as-child>
-            <Button variant="outline" class="flex-1">取消</Button>
-          </DialogClose>
           <Button variant="destructive" class="flex-1" :disabled="pending" @click="$emit('decline')">
             確認婉拒
           </Button>
+          <!-- DialogClose：包住的按鈕按下去就會關閉彈窗 -->
+          <DialogClose as-child>
+            <Button class="flex-1">保留邀請</Button>
+          </DialogClose>
         </div>
       </DialogContent>
     </Dialog>
