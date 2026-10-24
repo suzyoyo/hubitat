@@ -140,6 +140,8 @@ const hasBottom = computed(() => !loading.value && item.value && (actions.value.
 // 交辦放上面一排；其他（受理、完工驗收、結案）和「更新進度」並排在下面
 const topActions = computed(() => actions.value.filter((action) => action.key === 'assign'))
 const mainActions = computed(() => actions.value.filter((action) => action.key !== 'assign'))
+// 底部只剩「更新進度」一顆（沒有其他動作）
+const onlyUpdate = computed(() => canUpdate.value && mainActions.value.length === 0)
 
 function runAction(action) {
   const base = `/${route.meta.roleId}`
@@ -213,9 +215,8 @@ async function accept() {
   toast.success('已受理', { description: '接著可以選設備、派廠商' })
 }
 
-// 完工驗收：到回報完成頁。有記下來還沒存的，先幫他存好，才不會弄丟
-async function goComplete() {
-  if (hasDraft.value && !(await updateStatus())) return
+// 完工驗收：到回報完成頁。有改了還沒存的，換頁時會跳離開前確認（2026-10-24 改，原本是不問就先幫他存）
+function goComplete() {
   router.push(`/${route.meta.roleId}/cases/${item.value.id}/complete`)
 }
 
@@ -247,7 +248,7 @@ function failUpdate() {
 }
 
 // ── 離開前確認：改了還沒按「更新進度」就要離開時，先問一次（2026-10-23）─────────────
-//   返回、點底部分頁、按交辦、結案、連到另一件案件都會擋（完工驗收本來就會先幫他存好）
+//   返回、點底部分頁、按交辦、結案、連到另一件案件都會擋、按完工驗收
 //   按鈕：捨棄變更（紅）｜更新進度（藍，存好再去原本要去的地方）＋ ghost 繼續編輯；沒有叉叉
 const leaveOpen = ref(false)
 let leaveTarget = null // 使用者原本要去的地方
@@ -480,6 +481,8 @@ const basicRows = computed(() => {
       <!-- 下面一排：動作（完工驗收、結案…）在左、更新進度在右（2026-10-15 013 改）
            顏色不跟著換：右邊那顆是主要的藍色；有更新進度時，左邊的動作是並排的次要按鈕（灰白，2026-10-19 按鈕規則） -->
       <div v-if="canUpdate || mainActions.length" class="flex gap-3 *:flex-1">
+        <!-- 只剩「更新進度」一顆時（例如管理人員完工驗收後、等主委結案），左邊放「回到首頁」（2026-10-24 013 加） -->
+        <Button v-if="onlyUpdate" variant="outline" @click="router.push(`/${route.meta.roleId}/home`)">回到首頁</Button>
         <Button
           v-for="action in mainActions"
           :key="action.key"
