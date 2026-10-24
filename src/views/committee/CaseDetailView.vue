@@ -7,8 +7,8 @@
 //   結案（到結案頁）依狀態出現。發布公告從「＋」選單進去，這裡不放
 //   沒有「撤回通報」：2026-10-15 和 013 決定拿掉撤回，不需要處理的通報由處理的人完工驗收時寫明原因結案
 import { ChevronRightIcon } from '@lucide/vue'
-import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { caseStatusBadge } from '@/components/admin/caseStatusBadge'
 import BottomCta from '@/components/app/BottomCta.vue'
@@ -68,6 +68,7 @@ const categoryDraft = ref('') // 問題分類，例如 'leak'
 const equipmentDraft = ref(null) // { equipmentId, name, place }
 const vendorDraft = ref(null) // { vendorId, vendorName, scheduledAt }
 const logDraft = ref(null) // { text, residentText, scheduledAt }
+const vendorDirty = ref(false) // 廠商卡片動過了沒（還沒填完整也算，例如只選了日期），離開前確認用
 
 // 拿這一頁要的資料：我是誰、這件案件、可以選的設備和廠商
 async function load() {
@@ -245,6 +246,53 @@ function failUpdate() {
   return false
 }
 
+// ── 離開前確認：改了還沒按「更新進度」就要離開時，先問一次（2026-10-23）─────────────
+//   返回、點底部分頁、按交辦、結案、連到另一件案件都會擋（完工驗收本來就會先幫他存好）
+//   按鈕：捨棄變更（紅）｜更新進度（藍，存好再去原本要去的地方）＋ ghost 繼續編輯；沒有叉叉
+const leaveOpen = ref(false)
+let leaveTarget = null // 使用者原本要去的地方
+// 有沒有改過：記下來的內容，加上還沒填完整的廠商欄位（只要動過就提醒，2026-10-24）
+const hasUnsaved = computed(() => hasDraft.value || vendorDirty.value)
+
+function guardLeave(to) {
+  if (!hasUnsaved.value) return true
+  leaveTarget = to
+  leaveOpen.value = true
+  return false
+}
+onBeforeRouteLeave(guardLeave)
+// 從一件案件連到另一件：Vue 沿用同一個頁面，要另外擋
+onBeforeRouteUpdate(guardLeave)
+
+// 清掉記下來的內容，再去原本要去的地方（原本是按返回就退回上一頁，歷史紀錄才不會多一筆，寫法同 LeaveConfirmDialog）
+function leaveNow() {
+  categoryDraft.value = ''
+  equipmentDraft.value = null
+  vendorDraft.value = null
+  logDraft.value = null
+  vendorDirty.value = false
+  leaveOpen.value = false
+  if (window.history.state?.back === leaveTarget.fullPath) router.back()
+  else router.push(leaveTarget.fullPath)
+}
+
+// 按「更新進度」：不用全部填完，存得了的先存好再走（2026-10-24 013 決定）
+//   例如廠商只選了日期、還沒選時間：廠商照存，日期不算；只動了存不了的欄位，就直接走
+//   沒存成功就留在這一頁（updateStatus 會跳失敗提示）
+async function saveAndLeave() {
+  if (!hasDraft.value || (await updateStatus())) leaveNow()
+  else leaveOpen.value = false
+}
+
+// 重新整理、關掉分頁：瀏覽器只能跳它自己的提醒，文字不能改
+function onBeforeUnload(event) {
+  if (!hasUnsaved.value) return
+  event.preventDefault()
+  event.returnValue = ''
+}
+onMounted(() => window.addEventListener('beforeunload', onBeforeUnload))
+onBeforeUnmount(() => window.removeEventListener('beforeunload', onBeforeUnload))
+
 const statusBadge = computed(() => caseStatusBadge(item.value))
 
 // '2026-09-25T10:12' → '2026/09/25 10:12'（管委會端的日期有年份）
@@ -360,7 +408,11 @@ const basicRows = computed(() => {
         <h2 class="type-card-title text-foreground">廠商</h2>
         <!-- 可以派廠商的時候直接顯示欄位（欄位裡已經帶入存好的廠商和預約時間，2026-10-15 拿掉灰底區塊）；
              不能改的只看文字 -->
-        <CaseVendorPicker v-if="canPickVendor" v-model:draft="vendorDraft" :vendors="vendors" :current="shownVendor" />
+        <CaseVendorPicker
+          v-if="canPickVendor"
+          v-model:draft="vendorDraft"
+          v-model:dirty="vendorDirty"
+          :vendors="vendors" :current="shownVendor" />
         <!-- 「查看廠商」靠右，和左邊文字的最下排對齊；名冊裡的廠商才有詳細頁，自己打名字的（沒有 vendorId）沒有連結 -->
         <div v-else class="flex items-end justify-between gap-3">
           <div class="min-w-0 space-y-0.5">
@@ -440,6 +492,23 @@ const basicRows = computed(() => {
         <Button v-if="canUpdate" :disabled="!hasDraft || pending" @click="updateStatus">更新進度</Button>
       </div>
     </BottomCta>
+
+    <!-- 離開前確認：沒有右上角的叉叉；按「繼續編輯」或點彈窗外面，都是留在這一頁 -->
+    <Dialog v-model:open="leaveOpen">
+      <DialogContent :show-close-button="false" class="gap-3.5 p-5">
+        <DialogTitle class="type-card-title!">你更改的內容尚未儲存</DialogTitle>
+        <!-- 說明不列改了哪幾項，統一一句（2026-10-24 013 決定） -->
+        <DialogDescription class="type-body!">內容尚未更新，捨棄的話不會保留。</DialogDescription>
+        <div class="space-y-2 pt-3">
+          <!-- 捨棄在左、主要的更新進度在右 -->
+          <div class="flex gap-3 *:flex-1">
+            <Button variant="destructive" :disabled="pending" @click="leaveNow">捨棄變更</Button>
+            <Button :disabled="pending" @click="saveAndLeave">更新進度</Button>
+          </div>
+          <Button variant="ghost" class="w-full" :disabled="pending" @click="leaveOpen = false">繼續編輯</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
 
     <!-- 寫原因的彈窗：退回案件、撤回交辦共用；原因必填，寫法和交辦詳情的彈窗一樣 -->
     <Dialog v-model:open="reasonOpen">
