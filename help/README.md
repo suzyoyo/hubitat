@@ -165,6 +165,7 @@ sections: [
 
 1. `npm run shoot:help` 全部重截；只截幾張就加檔名：`npm run shoot:help -- resident-home case-pending`
 2. 腳本在 `scripts/shoot-app.js`，每張圖要開哪一頁、點哪裡都寫在 `SHOTS` 清單裡。按鈕文字改了，腳本會顯示「❌ 某張 … Timeout」，到清單裡改那一張的動作
+   - 腳本裡有寫死的案件編號（例如 `CASE-20261015-001`）。假資料的日期改了（案件編號跟著變），要一起改，不然會打不開那頁、截到「找不到」（2026-10-23，#176 往後移 27 天時遇到）
 3. 截完要**一張一張看過**，並對照文章文字有沒有跟著改（按鈕名稱、步驟順序）
 4. 新增文章要用新圖時：文章寫好 `screenshot`，在 `SHOTS` 加一筆同檔名的，`npm run check:help` 會列出還缺哪幾張
 
