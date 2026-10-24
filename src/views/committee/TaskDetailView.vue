@@ -280,7 +280,7 @@ const recordRows = computed(() => {
 
       <!-- 退回、撤回的彈窗：平常看不到，dialogOpen 變成 true 才會出現 -->
       <Dialog v-model:open="dialogOpen">
-        <!-- 沒有右上角的叉叉，用「取消」關閉；點彈窗外面也可以關（和撤回通報的彈窗一樣） -->
+        <!-- 沒有右上角的叉叉，用「取消」（撤回時是「保留交辦」）關閉；點彈窗外面也可以關 -->
         <DialogContent :show-close-button="false" class="gap-3.5 p-5">
           <!-- 結尾的 ! 是「一定要用這個」：DialogTitle 本身有預設的字級，要蓋過它 -->
           <DialogTitle class="type-card-title!">
@@ -314,19 +314,22 @@ const recordRows = computed(() => {
             <p class="type-date text-muted-foreground">原本的期限：{{ dateText(task.deadline) }}</p>
           </div>
 
+          <!-- DialogClose：包住的按鈕按下去就會關閉彈窗 -->
           <div class="flex gap-3">
-            <!-- DialogClose：包住的按鈕按下去就會關閉彈窗 -->
-            <DialogClose as-child>
-              <Button variant="outline" class="flex-1">取消</Button>
-            </DialogClose>
-            <Button
-              :variant="dialogMode === 'return' ? 'default' : 'destructive'"
-              class="flex-1"
-              :disabled="!canSubmit"
-              @click="submitDialog"
-            >
-              {{ dialogMode === 'return' ? '確認退回' : '確認撤回' }}
-            </Button>
+            <!-- 撤回：做了就回不去的（紅）在左，右邊藍色「保留交辦」（2026-10-24，和撤回公告一樣，不寫「取消」） -->
+            <template v-if="dialogMode === 'withdraw'">
+              <Button variant="destructive" class="flex-1" :disabled="!canSubmit" @click="submitDialog">確認撤回</Button>
+              <DialogClose as-child>
+                <Button class="flex-1">保留交辦</Button>
+              </DialogClose>
+            </template>
+            <!-- 退回：取消｜確認退回 -->
+            <template v-else>
+              <DialogClose as-child>
+                <Button variant="outline" class="flex-1">取消</Button>
+              </DialogClose>
+              <Button class="flex-1" :disabled="!canSubmit" @click="submitDialog">確認退回</Button>
+            </template>
           </div>
         </DialogContent>
       </Dialog>

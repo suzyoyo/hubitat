@@ -528,10 +528,22 @@ const basicRows = computed(() => {
           <Textarea id="case-reason" v-model="reason" :maxlength="REASON_MAX" class="min-h-[100px]" />
         </div>
         <div class="flex gap-3">
-          <DialogClose as-child>
-            <Button variant="outline" class="flex-1">取消</Button>
-          </DialogClose>
-          <Button class="flex-1" :disabled="pending || !reason.trim()" @click="submitReason">{{ reasonText.button }}</Button>
+          <!-- 撤回交辦：做了就回不去的（紅）在左，右邊藍色「保留交辦」（2026-10-24，和撤回公告一樣，不寫「取消」） -->
+          <template v-if="reasonMode === 'withdraw'">
+            <Button variant="destructive" class="flex-1" :disabled="pending || !reason.trim()" @click="submitReason">
+              {{ reasonText.button }}
+            </Button>
+            <DialogClose as-child>
+              <Button class="flex-1">保留交辦</Button>
+            </DialogClose>
+          </template>
+          <!-- 退回：取消｜確認退回 -->
+          <template v-else>
+            <DialogClose as-child>
+              <Button variant="outline" class="flex-1">取消</Button>
+            </DialogClose>
+            <Button class="flex-1" :disabled="pending || !reason.trim()" @click="submitReason">{{ reasonText.button }}</Button>
+          </template>
         </div>
       </DialogContent>
     </Dialog>
