@@ -41,7 +41,7 @@ async function stageResident(page) {
   await page.evaluate(async () => {
     const { cases } = await import('/src/mocks/data/cases.js')
     const { notifications } = await import('/src/mocks/data/notifications.js')
-    for (const id of ['CASE-20260925-003', 'CASE-20261001-001']) cases.find((c) => c.id === id).reporterId = 'u-c04'
+    for (const id of ['CASE-20261022-003', 'CASE-20261028-001']) cases.find((c) => c.id === id).reporterId = 'u-c04'
     for (const id of ['n-001', 'n-003']) notifications.find((n) => n.id === id).read = false
   })
 }
@@ -85,9 +85,9 @@ const SHOTS = [
   // 住戶
   { file: 'resident-home', path: '/resident/home', stage: stageResident },
   { file: 'resident-reports', path: '/resident/reports', stage: stageResident },
-  { file: 'resident-report-detail', path: '/resident/reports/CASE-20260925-003', stage: stageResident },
+  { file: 'resident-report-detail', path: '/resident/reports/CASE-20261022-003', stage: stageResident },
   {
-    file: 'resident-report-edit', path: '/resident/reports/CASE-20261001-001', stage: stageResident,
+    file: 'resident-report-edit', path: '/resident/reports/CASE-20261028-001', stage: stageResident,
     run: async (page) => {
       await page.locator('#report-description').fill('今天早上積水更多了，靠近樓梯那邊也開始滴水。')
       await scrollTo(page, '處理進度', 70)
@@ -163,12 +163,12 @@ const SHOTS = [
   },
   { file: 'committee-todos', path: '/committee/todos' },
   { file: 'committee-cases', path: '/committee/cases' },
-  { file: 'case-pending', path: '/committee/cases/CASE-20261001-001' },
-  { file: 'case-processing', path: '/committee/cases/CASE-20260918-001' },
-  { file: 'case-to-verify', path: '/committee/cases/CASE-20260922-002' },
-  { file: 'case-log-form', path: '/committee/cases/CASE-20260918-001', run: (page) => scrollTo(page, '處理進度與留痕', 70) },
+  { file: 'case-pending', path: '/committee/cases/CASE-20261028-001' },
+  { file: 'case-processing', path: '/committee/cases/CASE-20261015-001' },
+  { file: 'case-to-verify', path: '/committee/cases/CASE-20261019-002' },
+  { file: 'case-log-form', path: '/committee/cases/CASE-20261015-001', run: (page) => scrollTo(page, '處理進度與留痕', 70) },
   {
-    file: 'case-vendor', path: '/committee/cases/CASE-20260918-001',
+    file: 'case-vendor', path: '/committee/cases/CASE-20261015-001',
     run: async (page) => {
       await scrollTo(page, '廠商', 70)
       // 清掉原本的廠商，打開名冊清單
@@ -178,15 +178,15 @@ const SHOTS = [
     },
   },
   {
-    file: 'case-equipment', path: '/committee/cases/CASE-20260918-001',
+    file: 'case-equipment', path: '/committee/cases/CASE-20261015-001',
     run: async (page) => {
       await scrollTo(page, '關聯設備', 70)
       await page.getByPlaceholder('選擇或搜尋設備').click()
     },
   },
-  { file: 'case-assign', path: '/committee/tasks/new?caseId=CASE-20261001-001' },
-  { file: 'case-complete', path: '/committee/cases/CASE-20260918-001/complete' },
-  { file: 'case-close', path: '/committee/cases/CASE-20260922-002/close' },
+  { file: 'case-assign', path: '/committee/tasks/new?caseId=CASE-20261028-001' },
+  { file: 'case-complete', path: '/committee/cases/CASE-20261015-001/complete' },
+  { file: 'case-close', path: '/committee/cases/CASE-20261019-002/close' },
   { file: 'committee-tasks', path: '/committee/tasks' },
   { file: 'committee-new-repair', path: '/committee/cases/new' },
   { file: 'committee-announcement-detail', path: '/committee/announcements/an-001' },
@@ -215,7 +215,7 @@ const SHOTS = [
     },
   },
   {
-    file: 'case-return', path: '/committee/cases/CASE-20260922-002',
+    file: 'case-return', path: '/committee/cases/CASE-20261019-002',
     run: async (page) => {
       await tap(page, '退回')
       await page.getByRole('dialog').locator('textarea, input').first().fill('門把還是會鬆，請再確認一次')
@@ -232,7 +232,7 @@ const SHOTS = [
   { file: 'quick-save-detail', path: '/committee/quick-saves/qs-003' }, // 李主委還沒補齊的「中庭植栽報價單」
   { file: 'committee-contract-detail', path: '/committee/contracts/ct-001', clip: (page) => clipAbove(page, '下載 PDF') },
   { file: 'committee-task-detail', path: '/committee/tasks/TASK-104' }, // 對方已回報、待我確認
-  { file: 'resident-report-progress', path: '/resident/reports/CASE-20260925-003', stage: stageResident, run: (page) => scrollTo(page, '處理進度', 70) },
+  { file: 'resident-report-progress', path: '/resident/reports/CASE-20261022-003', stage: stageResident, run: (page) => scrollTo(page, '處理進度', 70) },
   // 管理人員
   { file: 'staff-home', path: '/staff/home', stage: stageUnread },
   { file: 'staff-task-detail', path: '/staff/tasks/TASK-099' },
@@ -251,7 +251,7 @@ const SHOTS = [
     },
   },
   {
-    file: 'done-report-edit', path: '/resident/reports/CASE-20261001-001', stage: stageResident,
+    file: 'done-report-edit', path: '/resident/reports/CASE-20261028-001', stage: stageResident,
     run: async (page) => {
       await page.locator('#report-description').fill('今天早上積水更多了，靠近樓梯那邊也開始滴水。')
       await tap(page, '送出補充')
@@ -259,7 +259,7 @@ const SHOTS = [
     },
   },
   {
-    file: 'done-case-accepted', path: '/committee/cases/CASE-20261001-001',
+    file: 'done-case-accepted', path: '/committee/cases/CASE-20261028-001',
     run: async (page) => {
       await tap(page, '受理')
       await wait(page, 900)
@@ -267,7 +267,7 @@ const SHOTS = [
   },
   {
     // 先受理、再交辦給張管理員（交辦完會回到案件詳情）
-    file: 'done-case-assigned', path: '/committee/cases/CASE-20261001-001',
+    file: 'done-case-assigned', path: '/committee/cases/CASE-20261028-001',
     run: async (page) => {
       await tap(page, '受理')
       await wait(page, 900)
@@ -282,7 +282,7 @@ const SHOTS = [
     },
   },
   {
-    file: 'done-case-equipment', path: '/committee/cases/CASE-20260918-001',
+    file: 'done-case-equipment', path: '/committee/cases/CASE-20261015-001',
     run: async (page) => {
       await scrollTo(page, '關聯設備', 70)
       await page.getByPlaceholder('選擇或搜尋設備').click()
@@ -294,7 +294,7 @@ const SHOTS = [
     },
   },
   {
-    file: 'done-case-updated', path: '/committee/cases/CASE-20260918-001',
+    file: 'done-case-updated', path: '/committee/cases/CASE-20261015-001',
     run: async (page) => {
       await scrollTo(page, '處理進度與留痕', 70)
       await page.locator('#log-resident').fill('廠商 10/5 再來處理')
@@ -304,7 +304,7 @@ const SHOTS = [
     },
   },
   {
-    file: 'done-case-returned', path: '/committee/cases/CASE-20260922-002',
+    file: 'done-case-returned', path: '/committee/cases/CASE-20261019-002',
     run: async (page) => {
       await tap(page, '退回')
       await page.getByRole('dialog').locator('textarea, input').first().fill('門把還是會鬆，請再確認一次')
@@ -313,7 +313,7 @@ const SHOTS = [
     },
   },
   {
-    file: 'done-case-closed', path: '/committee/cases/CASE-20260922-002/close',
+    file: 'done-case-closed', path: '/committee/cases/CASE-20261019-002/close',
     run: async (page) => {
       await tap(page, '結案')
       await wait(page, 1200)

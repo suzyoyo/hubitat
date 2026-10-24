@@ -20,7 +20,6 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
-import { restoreDraft } from '@/lib/draft'
 import {
   canAssignTasks,
   createTask,
@@ -65,7 +64,6 @@ onMounted(async () => {
   openCases.value = caseList.filter((item) => ['accepted', 'in_progress'].includes(item.status) && !item.openTaskId)
   loading.value = false
   initialForm.value = JSON.stringify(form) // 記下剛載入時的樣子，之後比較有沒有改過
-  await restoreDraft(user.id, route.fullPath, (data) => Object.assign(form, data))
 })
 
 // 從案件進來，但這件案件不能交辦：找不到、已經結案或取消、還有沒完成的交辦
@@ -302,7 +300,7 @@ const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.
         <Button type="button" variant="outline" @click="cancel">取消</Button>
       </BottomCta>
     </form>
-    <!-- 填到一半想離開時先問一次 -->
-    <LeaveConfirmDialog :dirty="isDirty" draft-title="新增交辦" :draft-data="{ ...form }" />
+    <!-- 填到一半想離開時先問一次；新增交辦沒有「存成草稿」（2026-10-24 013 決定），只問直接離開或繼續填寫 -->
+    <LeaveConfirmDialog :dirty="isDirty" />
   </div>
 </template>

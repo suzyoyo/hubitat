@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -70,11 +71,16 @@ const cases = ref([])
 const equipment = ref([])
 
 // 表單上每個欄位的值
+// 日期的兩種：單日、多日
+const DATE_MODES = [
+  { value: 'single', label: '單日' },
+  { value: 'multi', label: '多日' },
+]
 const form = reactive({
   type: 'construction', // 發布時預設是施工；修改時換成原本的類型
   title: '',
   content: '',
-  dateMode: 'single', // 'single' 單日 / 'multi' 多日
+  dateMode: 'single', // 'single' 單日 / 'multi' 多日（選項見 DATE_MODES）
   startDate: '', // '2026-10-10'
   endDate: '', // 多日才用
   startTime: '',
@@ -389,24 +395,20 @@ const isDirty = computed(() => !saved.value && initialForm.value !== '' && JSON.
         <legend class="mb-2 text-base font-medium text-foreground">
           {{ labels.date }} <span class="text-warning-strong">*</span>
         </legend>
-        <div class="grid grid-cols-2 gap-2">
-          <Button
-            type="button"
-            :variant="form.dateMode === 'single' ? 'secondary' : 'outline'"
-            :aria-pressed="form.dateMode === 'single'"
-            @click="form.dateMode = 'single'"
-          >
-            單日
-          </Button>
-          <Button
-            type="button"
-            :variant="form.dateMode === 'multi' ? 'secondary' : 'outline'"
-            :aria-pressed="form.dateMode === 'multi'"
-            @click="form.dateMode = 'multi'"
-          >
-            多日
-          </Button>
-        </div>
+        <!-- 單日／多日：用分頁的樣子（和我的待辦「未完成／已完成」一樣，2026-10-23 013 改，原本是兩顆按鈕） -->
+        <Tabs v-model="form.dateMode">
+          <TabsList class="h-11! w-full rounded-xl border border-border bg-background p-1">
+            <!-- before:…：按鈕看起來大約 35px 高，用看不見的 before 往上下各補 8px，可以點的範圍超過 44px -->
+            <TabsTrigger
+              v-for="mode in DATE_MODES"
+              :key="mode.value"
+              :value="mode.value"
+              class="text-base text-muted-foreground before:absolute before:inset-x-0 before:-inset-y-2 data-active:bg-secondary data-active:text-secondary-foreground"
+            >
+              {{ mode.label }}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
         <!-- 日期用月曆（DatePicker）、時間用時分兩欄（TimePicker），都是 components/common/ 自己做的 -->
         <!-- 多日時開始、結束日期上下排：按鈕上的「2026/10/12（一）」放在半寬的框裡會擠不下 -->
         <div class="grid grid-cols-1 gap-2">
