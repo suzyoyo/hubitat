@@ -64,6 +64,13 @@ watch([name, scheduledAt], () => {
   const changed = vendorName !== props.current.name || scheduledAt.value !== props.current.scheduledAt
   draft.value = vendorName && changed ? { vendorId: listed.value?.id ?? '', vendorName, scheduledAt: scheduledAt.value } : null
 })
+
+// 有沒有動過欄位（還沒填完整也算，例如只選了日期），頁面離開前確認用（v-model:dirty，2026-10-24）
+const dirty = defineModel('dirty', { type: Boolean, default: false })
+watch([name, scheduledDate, scheduledTime], () => {
+  const [date = '', time = ''] = props.current.scheduledAt.split('T')
+  dirty.value = name.value.trim() !== props.current.name || scheduledDate.value !== date || scheduledTime.value !== time
+})
 </script>
 
 <template>
