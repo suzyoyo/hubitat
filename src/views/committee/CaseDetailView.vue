@@ -522,7 +522,7 @@ const basicRows = computed(() => {
         <div class="space-y-2">
           <div class="flex items-center justify-between">
             <!-- 必填只用紅色星號（dev-guide 第 5 節「表單」） -->
-            <Label for="case-reason" class="text-base">{{ reasonText.label }}<span class="text-destructive">*</span></Label>
+            <Label for="case-reason" class="text-base">{{ reasonText.label }}<span class="text-warning-strong">*</span></Label>
             <p class="type-date text-muted-foreground">{{ reason.length }} / {{ REASON_MAX }} 字</p>
           </div>
           <Textarea id="case-reason" v-model="reason" :maxlength="REASON_MAX" class="min-h-[100px]" />
