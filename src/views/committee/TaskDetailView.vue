@@ -295,7 +295,7 @@ const recordRows = computed(() => {
             <div class="flex items-center justify-between">
               <!-- 必填只用紅色星號（dev-guide 第 5 節「表單」） -->
               <Label for="task-reason" class="text-base">
-                {{ dialogMode === 'return' ? '退回原因' : '撤回原因' }}<span class="text-destructive">*</span>
+                {{ dialogMode === 'return' ? '退回原因' : '撤回原因' }}<span class="text-warning-strong">*</span>
               </Label>
               <p class="type-date text-muted-foreground">{{ reason.length }} / {{ REASON_MAX }} 字</p>
             </div>
@@ -306,7 +306,7 @@ const recordRows = computed(() => {
           <div v-if="dialogMode === 'return'" class="space-y-2">
             <Label for="task-deadline" class="text-base">
               新的完成期限
-              <span v-if="deadlinePassed" class="text-destructive">*</span>
+              <span v-if="deadlinePassed" class="text-warning-strong">*</span>
               <span v-else class="type-date text-muted-foreground">選填</span>
             </Label>
             <!-- datetime-local：手機會跳出選日期和時間的轉盤；min 讓使用者選不到比現在早的時間 -->
