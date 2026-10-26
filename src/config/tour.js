@@ -1,6 +1,6 @@
 // 三端的新手導覽步驟（app/HomeTour.vue）：首頁和「我的」頁共用同一份，步驟編號才接得起來
 //   target 對到畫面上的 data-tour：鈴鐺在 AppHeader；「＋」fab、分頁 tab-○○、住戶的「通報」在 BottomNav；help 在「我的」；其他在首頁
-//   page：這一步在哪一頁（不寫就是首頁）；tap：要點亮起來的地方才會往下走，這一步沒有「下一步」（「我的」分頁，點了就切過去）
+//   page：這一步在哪一頁（不寫就是首頁）；tap：點亮起來的地方也算下一步（「我的」分頁，點了就切過去）；next：「下一步」按鈕改寫的字
 //   hint：說明下面再加一行粗體、問候語的藍色，請他動手點
 //   用敘述的口氣，講清楚這裡能做什麼、看得到什麼；動詞換著用，不要每句都是「可以」；\n 是換行（2026-10-22 013）
 
@@ -16,7 +16,7 @@ export const TOUR_STEPS = {
     { target: 'tab-home', text: '「首頁」隨時掌握你通報的處理進度和最新公告。' },
     { target: 'tab-files', text: '「社區」收錄社區的大小事，像是管委會報告、社區規約和設備維修紀錄。' },
     // 「我的留言」藏在「我的」裡面比較難找，特別寫出來
-    { target: 'tab-me', tap: true, text: '「我的」管理個人資料和各種設定，\n你給管委會的留言和回覆也在這裡。', hint: TO_ME },
+    { target: 'tab-me', tap: true, next: '前往「我的」', text: '「我的」管理個人資料和各種設定，\n你給管委會的留言和回覆也在這裡。', hint: TO_ME },
     HELP_STEP,
   ],
   committee: [
@@ -28,7 +28,7 @@ export const TOUR_STEPS = {
     { target: 'tab-cases', text: '「案件」列出所有住戶通報，處理進度一目了然。' },
     { target: 'tab-vendors', text: '「廠商」有廠商名冊、緊急聯絡電話和社區的鑰匙清單。' },
     { target: 'tab-files', text: '「社區」收錄社區的大小事，像是會議紀錄、規約、合約和設備清冊。' },
-    { target: 'tab-me', tap: true, text: '「我的」管理個人資料和各種設定，\n管委會的換屆交接也在這裡。', hint: TO_ME },
+    { target: 'tab-me', tap: true, next: '前往「我的」', text: '「我的」管理個人資料和各種設定，\n管委會的換屆交接也在這裡。', hint: TO_ME },
     HELP_STEP,
   ],
   staff: [
@@ -39,7 +39,7 @@ export const TOUR_STEPS = {
     { target: 'tab-cases', text: '「案件」列出所有住戶通報，處理進度一目了然。' },
     { target: 'tab-vendors', text: '「廠商」有廠商名冊、緊急聯絡電話和社區的鑰匙清單。' },
     { target: 'tab-files', text: '「社區」收錄社區的大小事，像是會議紀錄、規約和設備清冊。' },
-    { target: 'tab-me', tap: true, text: '「我的」調整個人資料、字體大小和通知設定。', hint: TO_ME },
+    { target: 'tab-me', tap: true, next: '前往「我的」', text: '「我的」調整個人資料、字體大小和通知設定。', hint: TO_ME },
     HELP_STEP,
   ],
 }

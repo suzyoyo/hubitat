@@ -250,10 +250,10 @@ function finish() {
         <Button variant="ghost" class="-mr-3 border-transparent" @click="finish">跳過使用說明</Button>
       </div>
       <!-- 主要按鈕只有「下一步」；「上一步」和它並排，用 outline。第一步沒有上一步，「下一步」佔滿整行 -->
-      <!-- tap 的步驟沒有「下一步」：要點亮起來的地方（按「下一步」突然換頁會嚇到人，2026-10-26 013） -->
+      <!-- 會換頁的步驟寫 next 改字，例如「前往「我的」」：按「下一步」突然換頁會嚇到人（2026-10-26 013） -->
       <div class="mt-2 flex gap-2">
         <Button v-if="index > 0" variant="outline" class="flex-1" @click="go(index - 1)">上一步</Button>
-        <Button v-if="!step.tap" ref="nextButton" class="flex-1" @click="next">{{ isLast ? '開始使用' : '下一步' }}</Button>
+        <Button ref="nextButton" class="flex-1" @click="next">{{ isLast ? '開始使用' : (step.next ?? '下一步') }}</Button>
       </div>
     </div>
   </div>
