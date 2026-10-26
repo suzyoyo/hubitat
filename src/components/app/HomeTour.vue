@@ -3,9 +3,10 @@
 //   亮哪裡：頁面上加 data-tour="名稱" 的元素，打開時才去量它們在畫面上的位置，所以大手機、小手機、大字都對得上
 //   看過或按「跳過使用說明」就記在瀏覽器裡（localStorage），之後不再出現
 //   想再看一次：網址後面加 ?tour，例如 /resident/home?tour
+//   跨頁（2026-10-26 013）：步驟寫 page: 'me' 的在「我的」頁亮；走到那一步就換頁，網址帶 ?tour=第幾步（從 0 算），那一頁的導覽接著打開
 //   說明文字沿用使用手冊「認識住戶首頁」（help/src/content/home-tour.js）
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { Button } from '@/components/ui/button'
 
 const props = defineProps({
@@ -15,12 +16,18 @@ const props = defineProps({
   storageKey: { type: String, required: true },
   // 頁面資料載入完才開始（不然要亮的區塊還是灰色的佔位方塊）
   ready: { type: Boolean, default: false },
+  // 這個導覽放在哪一頁：'home' 首頁、'me' 我的；只顯示 page 一樣的步驟
+  page: { type: String, default: 'home' },
 })
 
 const PAD = 6 // 亮框比元素大一圈
 const GAP = 12 // 說明框和亮框的距離
 
 const route = useRoute()
+const router = useRouter()
+// 這一端的開頭，例如 /resident
+const basePath = `/${route.path.split('/')[1]}`
+const pageOf = (s) => s.page ?? 'home'
 const open = ref(false)
 const index = ref(0)
 const holes = ref([]) // 這一步要亮的框：[{ x, y, w, h }]
@@ -48,13 +55,20 @@ function markSeen() {
   }
 }
 
-// 頁面準備好了：沒看過、或網址有 ?tour，就打開
+// 網址的 ?tour=第幾步：是這一頁的步驟才算，不是就從這一頁的第一步開始
+function startIndex() {
+  const n = Number(route.query.tour)
+  if (route.query.tour && props.steps[n] && pageOf(props.steps[n]) === props.page) return n
+  return props.steps.findIndex((s) => pageOf(s) === props.page)
+}
+
+// 頁面準備好了：首頁是沒看過、或網址有 ?tour 就打開；其他頁只有從上一頁接過來（?tour=第幾步）才打開
 watch(
   () => props.ready,
   (ready) => {
     if (!ready || open.value) return
-    if (seen() && !('tour' in route.query)) return
-    index.value = 0
+    if (props.page === 'home' ? seen() && !('tour' in route.query) : !route.query.tour) return
+    index.value = startIndex()
     window.scrollTo(0, 0)
     open.value = true
   },
@@ -147,16 +161,35 @@ function measure() {
       : { bottom: `${window.innerHeight - anchor.y + GAP}px` }
 }
 
-function next() {
-  if (isLast.value) finish()
-  else index.value += 1
+// 到第 i 步：在別頁的話換頁，那一頁的導覽會接著打開
+function go(i) {
+  const page = pageOf(props.steps[i])
+  if (page === props.page) {
+    index.value = i
+    return
+  }
+  open.value = false
+  router.push(`${basePath}/${page}?tour=${i}`)
 }
 
-// 看完或跳過：回到首頁最上面
+function next() {
+  if (isLast.value) finish()
+  else go(index.value + 1)
+}
+
+// 寫了 tap 的步驟：點亮起來的地方也算下一步（整片還是擋住，不會真的按到後面的按鈕）
+function tapHole(event) {
+  if (!step.value.tap) return
+  const { clientX: x, clientY: y } = event
+  if (holes.value.some((h) => x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h)) next()
+}
+
+// 看完或跳過：回到這一頁最上面；網址的 ?tour 拿掉，重新整理才不會又跳出來
 function finish() {
   markSeen()
   open.value = false
   window.scrollTo(0, 0)
+  if ('tour' in route.query) router.replace(route.path)
 }
 </script>
 
@@ -170,6 +203,7 @@ function finish() {
     aria-modal="true"
     aria-label="首頁使用說明"
     @keydown.esc="finish"
+    @click="tapHole"
   >
     <!-- 暗色遮罩挖洞：mask 裡白色是「蓋暗」、黑色是「挖空」 -->
     <!-- 黑色 50%：彈窗背景的 40% 再加 10%（2026-10-22 013） -->
@@ -215,7 +249,7 @@ function finish() {
       </div>
       <!-- 主要按鈕只有「下一步」；「上一步」和它並排，用 outline。第一步沒有上一步，「下一步」佔滿整行 -->
       <div class="mt-2 flex gap-2">
-        <Button v-if="index > 0" variant="outline" class="flex-1" @click="index -= 1">上一步</Button>
+        <Button v-if="index > 0" variant="outline" class="flex-1" @click="go(index - 1)">上一步</Button>
         <Button ref="nextButton" class="flex-1" @click="next">{{ isLast ? '開始使用' : '下一步' }}</Button>
       </div>
     </div>

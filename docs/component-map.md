@@ -69,7 +69,7 @@ Kit 的元件右側面板有兩種設定，轉成程式時都是 props：
 | `App/Nav Item` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/FAB` | ➖ | ➖ | 寫在 `BottomNav.vue` 裡面，沒有拆出來 |
 | `App/Greeting` | `app/AppGreeting.vue` | ✅ | |
-| （Kit 沒有）首頁新手導覽 | `app/HomeTour.vue` | ✅ | 三端首頁第一次進來時的導覽（#177、#178）。要亮的元素加 `data-tour` 記號，步驟寫在各端的 `HomeView.vue`；看過記在 localStorage，網址加 `?tour` 重看 |
+| （Kit 沒有）首頁新手導覽 | `app/HomeTour.vue` | ✅ | 三端首頁第一次進來時的導覽（#177、#178）。要亮的元素加 `data-tour` 記號，步驟寫在 `src/config/tour.js`；看過記在 localStorage，網址加 `?tour` 重看。最後亮「我的」分頁（點了就切過去），在「我的」頁接著亮「使用說明」（2026-10-26） |
 | `App/Section Header` | `app/SectionHeader.vue` | ✅ | 沒傳 `to` 就不顯示「看全部」；文字可以用 `link-text` 換，例如廠商分頁的「查看所有廠商」（2026-10-18） |
 | `App/Bottom CTA` | `app/BottomCta.vue` | ✅ | 畫面底部固定的按鈕區。按鈕用 slot 放進去，一個或兩個都會平分寬度；`note` 是按鈕下面的一行灰字；加上 `vertical` 按鈕改成上下排（完成頁用）。這一區會蓋住頁面最下面的內容，頁面自己要在底部留空間（例如 `pb-24`）。用法見 `views/resident/ReportDetailView.vue` |
 | `App/Bottom CTA 三按鈕` | `app/BottomCta.vue` | ⬜ | 做成同一個檔案，用 props 決定幾個按鈕 |
