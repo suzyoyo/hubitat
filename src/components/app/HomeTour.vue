@@ -241,6 +241,8 @@ function finish() {
     <div ref="tipEl" class="absolute inset-x-0 mx-auto w-[calc(100%-24px)] max-w-[351px] rounded-xl bg-card p-4 shadow-card" :style="tipStyle">
       <!-- whitespace-pre-line：說明裡寫 \n 的地方會換行（例如逗號後面） -->
       <p class="whitespace-pre-line type-body text-foreground">{{ step.text }}</p>
+      <!-- 請他動手點的那一句：粗體、和首頁問候語同一個藍（AppGreeting 的 text-blue-800） -->
+      <p v-if="step.hint" class="type-body font-bold text-blue-800">{{ step.hint }}</p>
       <div class="mt-2 flex items-center justify-between">
         <span class="type-date text-muted-foreground">{{ index + 1 }} / {{ steps.length }}</span>
         <!-- 跳過是不強調的動作，用 ghost；-mr-3 讓字和下面的按鈕右邊對齊 -->
@@ -248,9 +250,10 @@ function finish() {
         <Button variant="ghost" class="-mr-3 border-transparent" @click="finish">跳過使用說明</Button>
       </div>
       <!-- 主要按鈕只有「下一步」；「上一步」和它並排，用 outline。第一步沒有上一步，「下一步」佔滿整行 -->
+      <!-- tap 的步驟沒有「下一步」：要點亮起來的地方（按「下一步」突然換頁會嚇到人，2026-10-26 013） -->
       <div class="mt-2 flex gap-2">
         <Button v-if="index > 0" variant="outline" class="flex-1" @click="go(index - 1)">上一步</Button>
-        <Button ref="nextButton" class="flex-1" @click="next">{{ isLast ? '開始使用' : '下一步' }}</Button>
+        <Button v-if="!step.tap" ref="nextButton" class="flex-1" @click="next">{{ isLast ? '開始使用' : '下一步' }}</Button>
       </div>
     </div>
   </div>
