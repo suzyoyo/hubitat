@@ -6,6 +6,8 @@
 //   還沒到期       → 橘（secondary）：輪到你處理
 //   沒有期限的其他待辦 → 依種類顯示要做什麼（2026-10-19：每張待辦卡右上角都要有徽章，原本沒期限的就空著）
 //     輪到你處理的用橘（secondary），我負責、在等別人的「處理中」用藍（default）
+//   待結案、待確認 → 有期限也一律寫種類（2026-10-26 013）：期限是交辦給對方的完成期限，對方已經做完了，
+//     對主委、副主委來說重點是「輪到我驗收」；寫天數看不出哪張在等我結案。到期日、排序照舊
 //   todo 是 getMyTodos() 回傳的 items 其中一筆
 const NO_DEADLINE_BADGES = {
   incomplete: { text: '待補資料', variant: 'secondary' },
@@ -24,6 +26,7 @@ export function todoDeadlineBadge(todo) {
   // 我做完了、在等別人的：藍色「等待結案」「等待確認」（2026-10-19）
   if (todo.kind === 'waiting') return { text: todo.waitText, variant: 'default' }
   if (todo.kind === 'new_case') return { text: '尚未受理', variant: 'destructive' }
+  if (todo.kind === 'to_close' || todo.kind === 'confirm') return NO_DEADLINE_BADGES[todo.kind]
   const days = todo.daysLeft
   if (days === null) return NO_DEADLINE_BADGES[todo.kind] ?? null
   if (days < 0) return { text: `逾期 ${-days} 天`, variant: 'destructive' }
