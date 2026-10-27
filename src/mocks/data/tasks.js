@@ -36,7 +36,7 @@ export const tasks = [
     assignerId: 'u-c04',
     assigneeId: 'u-s01',
     createdAt: '2026-10-21T10:00',
-    deadline: '2026-10-27T18:00',
+    deadline: '2026-11-03T18:00', // 2026-10-27 從 10/27 改成 11/03：展示時待確認卡下面不要寫「到期」已經過了的日期（CLAUDE.md 待辦提醒）
     status: 'reported',
     report: {
       at: '2026-10-26T16:20',
