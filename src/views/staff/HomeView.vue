@@ -10,6 +10,7 @@ import HomeTour from '@/components/app/HomeTour.vue'
 import NotificationReminder from '@/components/feedback/NotificationReminder.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import { Skeleton } from '@/components/ui/skeleton'
+import { TOUR_STEPS } from '@/config/tour'
 import { greetingWord } from '@/lib/date'
 import { newestTodos, todoLink } from '@/lib/todo'
 import { mockNow, getCurrentUser, getManagedAnnouncements, getMyTodos } from '@/mocks/api'
@@ -44,20 +45,6 @@ const greeting = computed(() => {
   if (todos.value.total === 0) return { title: `${hello}，${userName.value}！`, subtitle: '今天沒有待辦事項喔！' }
   return { title: `${hello}，${userName.value}！今天有`, subtitle: `${todos.value.total} 件待辦事項喔！` }
 })
-
-// 第一次進首頁的導覽（app/HomeTour.vue）：target 對到畫面上的 data-tour
-//   鈴鐺在 AppHeader；「＋」fab、分頁 tab-○○ 在 BottomNav；待辦在這一頁
-//   動詞換著用，不要每句都是「可以」（2026-10-22 013）
-const TOUR_STEPS = [
-  { target: 'bell', text: '有新通知時，鈴鐺上會出現紅點，點進去就能看到所有通知。' },
-  { target: 'todos', text: '等你處理的事會列在這裡，點右上角查看全部待辦。' },
-  { target: 'fab', text: '按「＋」新增通報、發布公告，或快速留存單據照片。' },
-  { target: 'tab-home', text: '「首頁」一眼看到你的待辦和最新公告。' },
-  { target: 'tab-cases', text: '「案件」列出所有住戶通報，處理進度一目了然。' },
-  { target: 'tab-vendors', text: '「廠商」有廠商名冊、緊急聯絡電話和社區的鑰匙清單。' },
-  { target: 'tab-files', text: '「社區」收錄社區的大小事，像是會議紀錄、規約和設備清冊。' },
-  { target: 'tab-me', text: '「我的」調整個人資料、字體大小和通知設定。' },
-]
 
 // 首頁只放最前面的 2 筆待辦，其餘的按「查看全部待辦事項」
 // 首頁只放最新的 2 張（建立時間新的在前，規則在 src/lib/todo.js）；全部待辦頁才照到期日排
@@ -126,6 +113,6 @@ function staffTodoLink(todo) {
       </section>
     </div>
 
-    <HomeTour :steps="TOUR_STEPS" storage-key="hubitat-tour-staff" :ready="!loading" />
+    <HomeTour :steps="TOUR_STEPS.staff" storage-key="hubitat-tour-staff" :ready="!loading" />
   </div>
 </template>

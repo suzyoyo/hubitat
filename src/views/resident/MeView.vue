@@ -11,6 +11,7 @@ import {
   UserRoundIcon,
   UsersIcon,
 } from '@lucide/vue'
+import HomeTour from '@/components/app/HomeTour.vue'
 import MenuItem from '@/components/app/MenuItem.vue'
 import SectionHeader from '@/components/app/SectionHeader.vue'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +20,7 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { HELP_CENTER_URL } from '@/config/links'
+import { TOUR_STEPS } from '@/config/tour'
 import { formatFullDate } from '@/lib/date'
 import { FONT_SIZES as fontSizes, fontSize } from '@/lib/fontSize'
 import { getCommunity, getCurrentUser, getMyAcceptedInvite, getMyTodos } from '@/mocks/api'
@@ -43,7 +45,7 @@ const switchHint = computed(() => (todoTotal.value ? `有 ${todoTotal.value} 件
 // 使用說明用 href 連到網頁版使用手冊（App 外面的網站，會開新分頁）
 const supportItems = [
   { label: '通知設定', icon: BellIcon, to: '/resident/me/notifications' },
-  { label: '使用說明', icon: CircleHelpIcon, href: HELP_CENTER_URL },
+  { label: '使用說明', icon: CircleHelpIcon, href: HELP_CENTER_URL, tour: 'help' },
   { label: '帳號與安全', icon: LockIcon, to: '/resident/me/account' },
 ]
 
@@ -172,7 +174,7 @@ onMounted(async () => {
         <template v-for="(item, index) in supportItems" :key="item.label">
           <!-- 第一列上面不用分隔線 -->
           <Separator v-if="index > 0" />
-          <MenuItem :title="item.label" :to="item.to" :href="item.href"><component :is="item.icon" /></MenuItem>
+          <MenuItem :title="item.label" :to="item.to" :href="item.href" :data-tour="item.tour"><component :is="item.icon" /></MenuItem>
         </template>
       </div>
     </section>
@@ -186,5 +188,8 @@ onMounted(async () => {
 
     <!-- 版本只是一行字，不另外做一頁 -->
     <p class="text-center type-date text-muted-foreground">好彼社區 V{{ version }}</p>
+
+    <!-- 首頁導覽的最後一步在這裡接著亮「使用說明」（只有從首頁導覽過來才會打開，app/HomeTour.vue） -->
+    <HomeTour :steps="TOUR_STEPS.resident" storage-key="hubitat-tour-resident" page="me" :ready="!loading" />
   </div>
 </template>
