@@ -168,6 +168,8 @@ function go(i) {
     index.value = i
     return
   }
+  // 換頁前先記成看過：在別頁還沒按「開始使用」就關掉 App，下次不會從頭再來一次（suzy 在 #204 提的）
+  markSeen()
   open.value = false
   router.push(`${basePath}/${page}?tour=${i}`)
 }
@@ -201,7 +203,7 @@ function finish() {
     class="fixed inset-0 z-50"
     role="dialog"
     aria-modal="true"
-    aria-label="首頁使用說明"
+    aria-label="使用說明"
     @keydown.esc="finish"
     @click="tapHole"
   >
