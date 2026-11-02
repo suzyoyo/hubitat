@@ -78,12 +78,19 @@ watch(
 // 打開時：畫面不能被手指捲動（程式還是可以幫忙捲到要亮的地方）
 watch(open, (value) => {
   document.documentElement.style.overflow = value ? 'hidden' : ''
-  if (value) window.addEventListener('resize', measure)
-  else window.removeEventListener('resize', measure)
+  // 畫面一捲動也重新量：iPhone 的捲動會晚一點才停好，只量一次框會留在舊的位置（suzy 2026-11-02 在 iPhone 看到）
+  if (value) {
+    window.addEventListener('resize', measure)
+    window.addEventListener('scroll', measure)
+  } else {
+    window.removeEventListener('resize', measure)
+    window.removeEventListener('scroll', measure)
+  }
 })
 onBeforeUnmount(() => {
   document.documentElement.style.overflow = ''
   window.removeEventListener('resize', measure)
+  window.removeEventListener('scroll', measure)
 })
 
 // 換一步就重新量位置
@@ -111,7 +118,9 @@ function scrollIntoView() {
   if (step.value.place === 'below') bottom += GAP + (tipEl.value?.offsetHeight ?? 190)
   // 上面留給頂部列，下面留給底部導覽列
   if (top < 80 || bottom > window.innerHeight - 120) {
-    window.scrollTo(0, window.scrollY + top - 100)
+    // 不要捲超過頁面底部（例如「我的」的使用說明在最下面）：iPhone 會先捲過頭再彈回來，框就對不上
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+    window.scrollTo(0, Math.min(window.scrollY + top - 100, maxScroll))
   }
 }
 
